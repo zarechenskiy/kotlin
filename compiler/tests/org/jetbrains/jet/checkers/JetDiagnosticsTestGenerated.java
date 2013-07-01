@@ -969,6 +969,66 @@ public class JetDiagnosticsTestGenerated extends AbstractDiagnosticsTestWithEage
                 doTest("compiler/testData/diagnostics/tests/cast/AsErasedWarning.kt");
             }
             
+            @TestMetadata("IsErasedAllowForDerivedWithOneSubstitutedAndOneSameGeneric.kt")
+            public void testIsErasedAllowForDerivedWithOneSubstitutedAndOneSameGeneric() throws Exception {
+                doTest("compiler/testData/diagnostics/tests/cast/IsErasedAllowForDerivedWithOneSubstitutedAndOneSameGeneric.kt");
+            }
+            
+            @TestMetadata("IsErasedAllowForExactSupertypeCheck.kt")
+            public void testIsErasedAllowForExactSupertypeCheck() throws Exception {
+                doTest("compiler/testData/diagnostics/tests/cast/IsErasedAllowForExactSupertypeCheck.kt");
+            }
+            
+            @TestMetadata("IsErasedAllowForOverridenVarianceWithProjection.kt")
+            public void testIsErasedAllowForOverridenVarianceWithProjection() throws Exception {
+                doTest("compiler/testData/diagnostics/tests/cast/IsErasedAllowForOverridenVarianceWithProjection.kt");
+            }
+            
+            @TestMetadata("IsErasedAllowForSubtypeMappedToTwoParams.kt")
+            public void testIsErasedAllowForSubtypeMappedToTwoParams() throws Exception {
+                doTest("compiler/testData/diagnostics/tests/cast/IsErasedAllowForSubtypeMappedToTwoParams.kt");
+            }
+            
+            @TestMetadata("IsErasedAllowForSupertypeCheckWithContrvariance.kt")
+            public void testIsErasedAllowForSupertypeCheckWithContrvariance() throws Exception {
+                doTest("compiler/testData/diagnostics/tests/cast/IsErasedAllowForSupertypeCheckWithContrvariance.kt");
+            }
+            
+            @TestMetadata("IsErasedAllowForSupertypeCheckWithCovariance.kt")
+            public void testIsErasedAllowForSupertypeCheckWithCovariance() throws Exception {
+                doTest("compiler/testData/diagnostics/tests/cast/IsErasedAllowForSupertypeCheckWithCovariance.kt");
+            }
+            
+            @TestMetadata("IsErasedAllowForTypeParameterWithConstraints.kt")
+            public void testIsErasedAllowForTypeParameterWithConstraints() throws Exception {
+                doTest("compiler/testData/diagnostics/tests/cast/IsErasedAllowForTypeParameterWithConstraints.kt");
+            }
+            
+            @TestMetadata("IsErasedAllowForTypeWithConstraints.kt")
+            public void testIsErasedAllowForTypeWithConstraints() throws Exception {
+                doTest("compiler/testData/diagnostics/tests/cast/IsErasedAllowForTypeWithConstraints.kt");
+            }
+            
+            @TestMetadata("IsErasedAllowForTypeWithInconsistentTypeParameterError.kt")
+            public void testIsErasedAllowForTypeWithInconsistentTypeParameterError() throws Exception {
+                doTest("compiler/testData/diagnostics/tests/cast/IsErasedAllowForTypeWithInconsistentTypeParameterError.kt");
+            }
+            
+            @TestMetadata("IsErasedAllowForTypeWithIrrelevantMixin.kt")
+            public void testIsErasedAllowForTypeWithIrrelevantMixin() throws Exception {
+                doTest("compiler/testData/diagnostics/tests/cast/IsErasedAllowForTypeWithIrrelevantMixin.kt");
+            }
+            
+            @TestMetadata("IsErasedAllowForTypeWithTwoSameTypeSubstitutions.kt")
+            public void testIsErasedAllowForTypeWithTwoSameTypeSubstitutions() throws Exception {
+                doTest("compiler/testData/diagnostics/tests/cast/IsErasedAllowForTypeWithTwoSameTypeSubstitutions.kt");
+            }
+            
+            @TestMetadata("IsErasedAllowForTypeWithoutTypeArguments.kt")
+            public void testIsErasedAllowForTypeWithoutTypeArguments() throws Exception {
+                doTest("compiler/testData/diagnostics/tests/cast/IsErasedAllowForTypeWithoutTypeArguments.kt");
+            }
+            
             @TestMetadata("IsErasedAllowFromOut.kt")
             public void testIsErasedAllowFromOut() throws Exception {
                 doTest("compiler/testData/diagnostics/tests/cast/IsErasedAllowFromOut.kt");
@@ -1004,6 +1064,16 @@ public class JetDiagnosticsTestGenerated extends AbstractDiagnosticsTestWithEage
                 doTest("compiler/testData/diagnostics/tests/cast/IsErasedDisallowDifferentArgInvariantPosition.kt");
             }
             
+            @TestMetadata("IsErasedDisallowForOverridenVariance.kt")
+            public void testIsErasedDisallowForOverridenVariance() throws Exception {
+                doTest("compiler/testData/diagnostics/tests/cast/IsErasedDisallowForOverridenVariance.kt");
+            }
+            
+            @TestMetadata("IsErasedDisallowForTypeWithConstraints.kt")
+            public void testIsErasedDisallowForTypeWithConstraints() throws Exception {
+                doTest("compiler/testData/diagnostics/tests/cast/IsErasedDisallowForTypeWithConstraints.kt");
+            }
+            
             @TestMetadata("IsErasedDisallowFromAny.kt")
             public void testIsErasedDisallowFromAny() throws Exception {
                 doTest("compiler/testData/diagnostics/tests/cast/IsErasedDisallowFromAny.kt");
@@ -1024,9 +1094,24 @@ public class JetDiagnosticsTestGenerated extends AbstractDiagnosticsTestWithEage
                 doTest("compiler/testData/diagnostics/tests/cast/IsErasedDisallowFromOutAtClass.kt");
             }
             
+            @TestMetadata("IsErasedDissallowForSubtypeMappedToTwoParamsWithFirstInvalid.kt")
+            public void testIsErasedDissallowForSubtypeMappedToTwoParamsWithFirstInvalid() throws Exception {
+                doTest("compiler/testData/diagnostics/tests/cast/IsErasedDissallowForSubtypeMappedToTwoParamsWithFirstInvalid.kt");
+            }
+            
+            @TestMetadata("IsErasedDissallowForSubtypeMappedToTwoParamsWithSecondInvalid.kt")
+            public void testIsErasedDissallowForSubtypeMappedToTwoParamsWithSecondInvalid() throws Exception {
+                doTest("compiler/testData/diagnostics/tests/cast/IsErasedDissallowForSubtypeMappedToTwoParamsWithSecondInvalid.kt");
+            }
+            
             @TestMetadata("IsErasedStar.kt")
             public void testIsErasedStar() throws Exception {
                 doTest("compiler/testData/diagnostics/tests/cast/IsErasedStar.kt");
+            }
+            
+            @TestMetadata("IsRecursionSustainable.kt")
+            public void testIsRecursionSustainable() throws Exception {
+                doTest("compiler/testData/diagnostics/tests/cast/IsRecursionSustainable.kt");
             }
             
             @TestMetadata("IsReified.kt")
