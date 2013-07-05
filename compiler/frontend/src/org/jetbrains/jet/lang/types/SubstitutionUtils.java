@@ -129,20 +129,6 @@ public class SubstitutionUtils {
                                   : Variance.OUT_VARIANCE, parameterDescriptor.getUpperBoundsAsType());
     }
 
-    public static boolean hasUnsubstitutedTypeParameters(JetType type) {
-        if (type.getConstructor().getDeclarationDescriptor() instanceof TypeParameterDescriptor) {
-            return true;
-        }
-
-        for(TypeProjection proj : type.getArguments()) {
-            if (hasUnsubstitutedTypeParameters(proj.getType())) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     public static Map<TypeConstructor, TypeProjection> removeTrivialSubstitutions(Map<TypeConstructor, TypeProjection> context) {
         Map<TypeConstructor, TypeProjection> clean = Maps.newHashMap(context);
         boolean changed = false;
@@ -156,21 +142,5 @@ public class SubstitutionUtils {
             }
         }
         return changed ? clean : context;
-    }
-
-    public static void assertNotImmediatelyRecursive(Map<TypeConstructor, TypeProjection> context) {
-        // Make sure we never replace a T with "Foo<T>" or something similar,
-        // because the substitution will not terminate in this case
-        // This check is not complete. It does not find cases like
-        //    T -> Foo<T1>
-        //    T -> Bar<T>
-
-        for (Map.Entry<TypeConstructor, TypeProjection> entry : context.entrySet()) {
-            TypeConstructor key = entry.getKey();
-            TypeProjection value = entry.getValue();
-            if (TypeUtils.typeConstructorUsedInType(key, value.getType())) {
-                throw new IllegalStateException("Immediately recursive substitution: " + context + "\nProblematic parameter: " + key + " -> " + value);
-            }
-        }
     }
 }

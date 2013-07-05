@@ -243,10 +243,10 @@ public class BasicExpressionTypingVisitor extends ExpressionTypingVisitor {
     }
 
     /**
-     * Check if assignment from supertype to subtype is erased.
+     * Check if assignment from actual type to target is erased and can't be performed.
      * It is an error in "is" statement and warning in "as".
      */
-    public static boolean isCastErased(@NotNull JetType actualType, @NotNull JetType targetType, @NotNull JetTypeChecker typeChecker) {
+    private static boolean isCastErased(@NotNull JetType actualType, @NotNull JetType targetType, @NotNull JetTypeChecker typeChecker) {
         if (!(targetType.getConstructor().getDeclarationDescriptor() instanceof ClassDescriptor)) {
             // TODO: what if it is TypeParameterDescriptor?
             return false;
@@ -257,6 +257,7 @@ public class BasicExpressionTypingVisitor extends ExpressionTypingVisitor {
             return false;
         }
 
+        // Type parameters can be erased but compiler knows that cast will always be succeed
         if (typeChecker.isSubtypeOf(actualType, targetType)) {
             return false;
         }
@@ -281,7 +282,7 @@ public class BasicExpressionTypingVisitor extends ExpressionTypingVisitor {
             @NotNull JetType targetType,
             @NotNull JetTypeChecker typeChecker
     ) {
-        // Substitution of all superclasses of a type with actual type arguments of target type
+        // Substitution of all superclasses of a type with type arguments of target type
         Multimap<TypeConstructor, TypeProjection> targetTypeSubstitution = SubstitutionUtils.buildDeepSubstitutionMultimap(targetType);
 
         Map<TypeConstructor, TypeProjection> actualArgumentsMapping = SubstitutionUtils.buildSubstitutionContext(actualType);
@@ -307,6 +308,8 @@ public class BasicExpressionTypingVisitor extends ExpressionTypingVisitor {
             if (actualParameters.isEmpty()) {
                 // Target parameter isn't mapped to any know parameter in actual type. It's erased and can't be checked.
                 // Return for: Any is List<String>
+
+                // TODO: check for "out Any"
                 return true;
             }
 
@@ -351,7 +354,7 @@ public class BasicExpressionTypingVisitor extends ExpressionTypingVisitor {
 
     /*
       Maps target type parameter to type parameters of actual type.
-      Examples:
+      Examples (actual, target => result):
       1. Base<T>, Derived: Base<Foo> => empty
       2. Base<T, U>, Derived<S>: Base<String, S> => { S -> U }
       3. Base<T, S>, Derived<U>: Base<U, U> => { U -> T, S }
