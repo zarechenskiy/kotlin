@@ -53,6 +53,8 @@ import org.jetbrains.jet.plugin.stubindex.*;
 
 import java.util.*;
 
+import static org.jetbrains.jet.plugin.caches.JetFromJavaDescriptorHelper.getTopLevelFunctionFqNames;
+
 /**
  * Will provide both java elements from jet context and some special declarations special to jet.
  * All those declaration are planned to be used in completion.
@@ -87,7 +89,8 @@ public class JetShortNamesCache extends PsiShortNamesCache {
 
         // .namespace classes can not be indexed, since they have no explicit declarations
         IDELightClassGenerationSupport lightClassGenerationSupport = IDELightClassGenerationSupport.getInstanceForIDE(project);
-        Set<String> packageClassShortNames = lightClassGenerationSupport.getAllPossiblePackageClasses(GlobalSearchScope.allScope(project)).keySet();
+        Set<String> packageClassShortNames =
+                lightClassGenerationSupport.getAllPossiblePackageClasses(GlobalSearchScope.allScope(project)).keySet();
         classNames.addAll(packageClassShortNames);
 
         return ArrayUtil.toStringArray(classNames);
@@ -125,8 +128,8 @@ public class JetShortNamesCache extends PsiShortNamesCache {
             FqName fqName = JetPsiUtil.getFQName(classOrObject);
             if (fqName != null) {
                 assert fqName.shortName().asString().equals(name) : "A declaration obtained from index has non-matching name:\n" +
-                                                                   "in index: " + name + "\n" +
-                                                                   "declared: " + fqName.shortName() + "(" + fqName + ")";
+                                                                    "in index: " + name + "\n" +
+                                                                    "declared: " + fqName.shortName() + "(" + fqName + ")";
                 PsiClass psiClass = JavaElementFinder.getInstance(project).findClass(fqName.asString(), scope);
                 if (psiClass != null) {
                     result.add(psiClass);
@@ -161,7 +164,8 @@ public class JetShortNamesCache extends PsiShortNamesCache {
         Set<String> topObjectNames = new HashSet<String>();
         topObjectNames.addAll(JetTopLevelShortObjectNameIndex.getInstance().getAllKeys(project));
 
-        Collection<PsiClass> classObjects = JetFromJavaDescriptorHelper.getCompiledClassesForTopLevelObjects(project, GlobalSearchScope.allScope(project));
+        Collection<PsiClass> classObjects =
+                JetFromJavaDescriptorHelper.getCompiledClassesForTopLevelObjects(project, GlobalSearchScope.allScope(project));
         topObjectNames.addAll(Collections2.transform(classObjects, new Function<PsiClass, String>() {
             @Override
             public String apply(@Nullable PsiClass aClass) {
@@ -230,24 +234,21 @@ public class JetShortNamesCache extends PsiShortNamesCache {
 
         Set<FunctionDescriptor> result = Sets.newHashSet();
 
-        Collection<PsiMethod> topLevelFunctionPrototypes = JetFromJavaDescriptorHelper.getTopLevelFunctionPrototypesByName(
-                referenceName.asString(), project, scope);
-        for (PsiMethod method : topLevelFunctionPrototypes) {
-            FqName functionFQN = JetFromJavaDescriptorHelper.getJetTopLevelDeclarationFQN(method);
-            if (functionFQN != null) {
-                JetImportDirective importDirective = JetPsiFactory.createImportDirective(project, new ImportPath(functionFQN, false));
-                Collection<? extends DeclarationDescriptor> declarationDescriptors = new QualifiedExpressionResolver().analyseImportReference(
-                        importDirective, jetScope, new BindingTraceContext(), resolveSession.getRootModuleDescriptor());
-                for (DeclarationDescriptor declarationDescriptor : declarationDescriptors) {
-                    if (declarationDescriptor instanceof FunctionDescriptor) {
-                        result.add((FunctionDescriptor) declarationDescriptor);
-                    }
+        Collection<FqName> topLevelFunctionFqNames = getTopLevelFunctionFqNames(referenceName.asString(), project, scope, false);
+        for (FqName fqName : topLevelFunctionFqNames) {
+            JetImportDirective importDirective = JetPsiFactory.createImportDirective(project, new ImportPath(fqName, false));
+            Collection<? extends DeclarationDescriptor> declarationDescriptors = new QualifiedExpressionResolver().analyseImportReference(
+                    importDirective, jetScope, new BindingTraceContext(), resolveSession.getRootModuleDescriptor());
+            for (DeclarationDescriptor declarationDescriptor : declarationDescriptors) {
+                if (declarationDescriptor instanceof FunctionDescriptor) {
+                    result.add((FunctionDescriptor) declarationDescriptor);
                 }
             }
         }
 
         Set<FqName> affectedPackages = Sets.newHashSet();
-        Collection<JetNamedFunction> jetNamedFunctions = JetShortFunctionNameIndex.getInstance().get(referenceName.asString(), project, scope);
+        Collection<JetNamedFunction> jetNamedFunctions =
+                JetShortFunctionNameIndex.getInstance().get(referenceName.asString(), project, scope);
         for (JetNamedFunction jetNamedFunction : jetNamedFunctions) {
             PsiFile containingFile = jetNamedFunction.getContainingFile();
             if (containingFile instanceof JetFile) {
@@ -285,10 +286,9 @@ public class JetShortNamesCache extends PsiShortNamesCache {
         return extensionFunctionNames;
     }
 
-    public Collection<PsiElement> getJetExtensionFunctionsByName(@NotNull String name, @NotNull GlobalSearchScope scope) {
+    private Collection<PsiElement> getJetExtensionFunctionsByName(@NotNull String name, @NotNull GlobalSearchScope scope) {
         HashSet<PsiElement> functions = new HashSet<PsiElement>();
         functions.addAll(JetExtensionFunctionNameIndex.getInstance().get(name, project, scope));
-        functions.addAll(JetFromJavaDescriptorHelper.getTopExtensionFunctionPrototypesByName(name, project, scope));
 
         return functions;
     }
@@ -330,6 +330,7 @@ public class JetShortNamesCache extends PsiShortNamesCache {
                                 }
                             }
                         }
+                        functionFQNs.addAll(getTopLevelFunctionFqNames(name, project, searchScope, true));
                     }
                 }
 
@@ -397,7 +398,11 @@ public class JetShortNamesCache extends PsiShortNamesCache {
     }
 
     @Override
-    public boolean processMethodsWithName(@NonNls @NotNull String name, @NotNull GlobalSearchScope scope, @NotNull Processor<PsiMethod> processor) {
+    public boolean processMethodsWithName(
+            @NonNls @NotNull String name,
+            @NotNull GlobalSearchScope scope,
+            @NotNull Processor<PsiMethod> processor
+    ) {
         return false;
     }
 
