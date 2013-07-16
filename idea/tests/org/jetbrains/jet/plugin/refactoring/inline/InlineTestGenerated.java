@@ -232,11 +232,6 @@ public class InlineTestGenerated extends AbstractInlineTest {
         public void testQualifiedDontAdd() throws Exception {
             doTest("idea/testData/refactoring/inline/addParenthesis/QualifiedDontAdd.kt");
         }
-                
-        @TestMetadata("UnaryIntoBinary.kt")
-        public void testUnaryIntoBinary() throws Exception {
-            doTest("idea/testData/refactoring/inline/addParenthesis/UnaryIntoBinary.kt");
-        }
         
         @TestMetadata("StringTemplate.kt")
         public void testStringTemplate() throws Exception {
@@ -251,6 +246,11 @@ public class InlineTestGenerated extends AbstractInlineTest {
         @TestMetadata("StringTemplateDontAdd.kt")
         public void testStringTemplateDontAdd() throws Exception {
             doTest("idea/testData/refactoring/inline/addParenthesis/StringTemplateDontAdd.kt");
+        }
+        
+        @TestMetadata("UnaryIntoBinary.kt")
+        public void testUnaryIntoBinary() throws Exception {
+            doTest("idea/testData/refactoring/inline/addParenthesis/UnaryIntoBinary.kt");
         }
         
     }
