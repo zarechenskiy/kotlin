@@ -33,7 +33,6 @@ import org.jetbrains.jet.lang.resolve.java.resolver.JavaValueParameterResolver;
 import org.jetbrains.jet.lang.resolve.java.resolver.JavaSignatureResolver;
 import org.jetbrains.jet.lang.resolve.java.resolver.DeserializedDescriptorResolver;
 import org.jetbrains.jet.lang.resolve.java.resolver.AnnotationDescriptorDeserializer;
-import org.jetbrains.jet.lang.resolve.java.resolver.ErrorReporter;
 import org.jetbrains.jet.lang.resolve.java.resolver.JavaNamespaceResolver;
 import org.jetbrains.jet.lang.resolve.java.resolver.JavaSupertypeResolver;
 import org.jetbrains.jet.lang.resolve.java.resolver.JavaConstructorResolver;
@@ -62,7 +61,6 @@ public class InjectorForJavaDescriptorResolver {
     private JavaSignatureResolver javaSignatureResolver;
     private DeserializedDescriptorResolver deserializedDescriptorResolver;
     private AnnotationDescriptorDeserializer annotationDescriptorDeserializer;
-    private ErrorReporter errorReporter;
     private JavaNamespaceResolver javaNamespaceResolver;
     private JavaSupertypeResolver javaSupertypeResolver;
     private JavaConstructorResolver javaConstructorResolver;
@@ -91,7 +89,6 @@ public class InjectorForJavaDescriptorResolver {
         this.javaSignatureResolver = new JavaSignatureResolver();
         this.deserializedDescriptorResolver = new DeserializedDescriptorResolver();
         this.annotationDescriptorDeserializer = new AnnotationDescriptorDeserializer();
-        this.errorReporter = new ErrorReporter();
         this.javaNamespaceResolver = new JavaNamespaceResolver();
         this.javaSupertypeResolver = new JavaSupertypeResolver();
         this.javaConstructorResolver = new JavaConstructorResolver();
@@ -144,14 +141,11 @@ public class InjectorForJavaDescriptorResolver {
         javaSignatureResolver.setJavaSemanticServices(javaSemanticServices);
 
         deserializedDescriptorResolver.setAnnotationDeserializer(annotationDescriptorDeserializer);
-        deserializedDescriptorResolver.setErrorReporter(errorReporter);
         deserializedDescriptorResolver.setJavaClassResolver(javaClassResolver);
         deserializedDescriptorResolver.setJavaNamespaceResolver(javaNamespaceResolver);
 
         annotationDescriptorDeserializer.setJavaClassResolver(javaClassResolver);
         annotationDescriptorDeserializer.setPsiClassFinder(psiClassFinder);
-
-        errorReporter.setTrace(bindingTrace);
 
         javaNamespaceResolver.setDeserializedDescriptorResolver(deserializedDescriptorResolver);
         javaNamespaceResolver.setJavaSemanticServices(javaSemanticServices);
