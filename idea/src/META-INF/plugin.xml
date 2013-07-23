@@ -271,6 +271,8 @@
     <fileBasedIndex implementation="org.jetbrains.jet.plugin.versions.KotlinAbiVersionIndex"/>
     <fileBasedIndex implementation="org.jetbrains.jet.plugin.vfilefinder.KotlinClassFileIndex"/>
 
+    <clsStubBuilderFactory implementation="org.jetbrains.jet.plugin.stubs.builder.JetClsStubBuilderFactory"/>
+
     <contentBasedClassFileProcessor implementation="org.jetbrains.jet.plugin.libraries.JetContentBasedFileSubstitutor"/>
 
     <editorNotificationProvider implementation="org.jetbrains.jet.plugin.versions.KotlinLibrariesNotificationProvider"/>
@@ -283,6 +285,7 @@
     <directClassInheritorsSearch implementation="org.jetbrains.jet.plugin.search.KotlinDirectInheritorsSearcher"/>
     <definitionsSearch implementation="org.jetbrains.jet.plugin.search.KotlinDefinitionsSearcher"/>
     <annotatedElementsSearch implementation="org.jetbrains.jet.plugin.search.KotlinAnnotatedElementsSearcher"/>
+    <lang.fileViewProviderFactory implementationClass="org.jetbrains.jet.plugin.search.KotlinFileViewProviderFactory" language="jet"/>
 
     <exceptionFilter implementation="org.jetbrains.jet.plugin.filters.JetExceptionFilterFactory" order="first"/>
 

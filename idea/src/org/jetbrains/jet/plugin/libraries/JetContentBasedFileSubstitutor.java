@@ -25,6 +25,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.jet.plugin.JetLanguage;
 import org.jetbrains.jet.plugin.highlighter.JetHighlighter;
 
 public final class JetContentBasedFileSubstitutor implements ContentBasedClassFileProcessor {
@@ -61,7 +62,7 @@ public final class JetContentBasedFileSubstitutor implements ContentBasedClassFi
 
     @Override
     public Language obtainLanguageForFile(VirtualFile file) {
-        return null;
+        return DecompiledUtils.isKotlinCompiledFile(file) ? JetLanguage.INSTANCE : null;
     }
 
     @NotNull
