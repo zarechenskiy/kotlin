@@ -27,10 +27,10 @@ import org.jetbrains.jet.lang.resolve.java.resolver.JavaFunctionResolver;
 import org.jetbrains.jet.lang.resolve.java.resolver.JavaValueParameterResolver;
 import org.jetbrains.jet.lang.resolve.java.JavaTypeTransformer;
 import org.jetbrains.jet.lang.resolve.java.resolver.JavaSignatureResolver;
-import org.jetbrains.jet.lang.resolve.java.JavaSemanticServices;
 import org.jetbrains.jet.lang.resolve.java.resolver.DeserializedDescriptorResolver;
 import org.jetbrains.jet.lang.resolve.java.resolver.AnnotationDescriptorDeserializer;
 import org.jetbrains.jet.lang.resolve.java.resolver.JavaNamespaceResolver;
+import org.jetbrains.jet.lang.resolve.java.JavaSemanticServices;
 import org.jetbrains.jet.lang.resolve.java.resolver.JavaSupertypeResolver;
 import org.jetbrains.jet.lang.resolve.java.resolver.JavaConstructorResolver;
 import org.jetbrains.jet.lang.resolve.java.resolver.JavaInnerClassResolver;
@@ -52,10 +52,10 @@ public class InjectorForJavaDescriptorResolver {
     private JavaValueParameterResolver javaValueParameterResolver;
     private JavaTypeTransformer javaTypeTransformer;
     private JavaSignatureResolver javaSignatureResolver;
-    private JavaSemanticServices javaSemanticServices;
     private DeserializedDescriptorResolver deserializedDescriptorResolver;
     private AnnotationDescriptorDeserializer annotationDescriptorDeserializer;
     private JavaNamespaceResolver javaNamespaceResolver;
+    private JavaSemanticServices javaSemanticServices;
     private JavaSupertypeResolver javaSupertypeResolver;
     private JavaConstructorResolver javaConstructorResolver;
     private JavaInnerClassResolver javaInnerClassResolver;
@@ -76,10 +76,10 @@ public class InjectorForJavaDescriptorResolver {
         this.javaValueParameterResolver = new JavaValueParameterResolver();
         this.javaTypeTransformer = new JavaTypeTransformer();
         this.javaSignatureResolver = new JavaSignatureResolver();
-        this.javaSemanticServices = new JavaSemanticServices();
         this.deserializedDescriptorResolver = new DeserializedDescriptorResolver();
         this.annotationDescriptorDeserializer = new AnnotationDescriptorDeserializer();
         this.javaNamespaceResolver = new JavaNamespaceResolver();
+        this.javaSemanticServices = new JavaSemanticServices();
         this.javaSupertypeResolver = new JavaSupertypeResolver();
         this.javaConstructorResolver = new JavaConstructorResolver();
         this.javaInnerClassResolver = new JavaInnerClassResolver();
@@ -120,11 +120,7 @@ public class InjectorForJavaDescriptorResolver {
 
         javaTypeTransformer.setResolver(javaDescriptorResolver);
 
-        javaSignatureResolver.setJavaSemanticServices(javaSemanticServices);
-
-        javaSemanticServices.setDescriptorResolver(javaDescriptorResolver);
-        javaSemanticServices.setPsiClassFinder(psiClassFinder);
-        javaSemanticServices.setTypeTransformer(javaTypeTransformer);
+        javaSignatureResolver.setTypeTransformer(javaTypeTransformer);
 
         deserializedDescriptorResolver.setAnnotationDeserializer(annotationDescriptorDeserializer);
         deserializedDescriptorResolver.setJavaClassResolver(javaClassResolver);
@@ -138,6 +134,9 @@ public class InjectorForJavaDescriptorResolver {
         javaNamespaceResolver.setPsiClassFinder(psiClassFinder);
         javaNamespaceResolver.setTrace(bindingTrace);
 
+        javaSemanticServices.setDescriptorResolver(javaDescriptorResolver);
+        javaSemanticServices.setPsiClassFinder(psiClassFinder);
+
         javaSupertypeResolver.setClassResolver(javaClassResolver);
         javaSupertypeResolver.setTrace(bindingTrace);
         javaSupertypeResolver.setTypeTransformer(javaTypeTransformer);
@@ -149,8 +148,8 @@ public class InjectorForJavaDescriptorResolver {
         javaInnerClassResolver.setClassResolver(javaClassResolver);
 
         javaPropertyResolver.setAnnotationResolver(javaAnnotationResolver);
-        javaPropertyResolver.setSemanticServices(javaSemanticServices);
         javaPropertyResolver.setTrace(bindingTrace);
+        javaPropertyResolver.setTypeTransformer(javaTypeTransformer);
 
         psiClassFinder.initialize();
 
