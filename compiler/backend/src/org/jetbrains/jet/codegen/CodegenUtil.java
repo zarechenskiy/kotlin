@@ -107,11 +107,7 @@ public class CodegenUtil {
 
 
     public static JvmMethodSignature erasedInvokeSignature(FunctionDescriptor fd) {
-
         BothSignatureWriter signatureWriter = new BothSignatureWriter(BothSignatureWriter.Mode.METHOD, false);
-
-        signatureWriter.writeFormalTypeParametersStart();
-        signatureWriter.writeFormalTypeParametersEnd();
 
         boolean isExtensionFunction = fd.getReceiverParameter() != null;
         int paramCount = fd.getValueParameters().size();
@@ -123,14 +119,12 @@ public class CodegenUtil {
 
         for (int i = 0; i < paramCount; ++i) {
             signatureWriter.writeParameterType(JvmMethodParameterKind.VALUE);
-            signatureWriter.writeAsmType(OBJECT_TYPE, true);
+            signatureWriter.writeAsmType(OBJECT_TYPE);
             signatureWriter.writeParameterTypeEnd();
         }
 
-        signatureWriter.writeParametersEnd();
-
         signatureWriter.writeReturnType();
-        signatureWriter.writeAsmType(OBJECT_TYPE, true);
+        signatureWriter.writeAsmType(OBJECT_TYPE);
         signatureWriter.writeReturnTypeEnd();
 
         return signatureWriter.makeJvmMethodSignature("invoke");
