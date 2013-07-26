@@ -20,7 +20,10 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiComment;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiWhiteSpace;
 import com.intellij.psi.impl.CheckUtil;
 import com.intellij.psi.impl.source.codeStyle.CodeEditUtil;
 import com.intellij.psi.tree.IElementType;
@@ -156,12 +159,6 @@ public class JetPsiUtil {
         }
     }
 
-    @NotNull
-    public static FqName getFQName(@NotNull JetFile file) {
-        JetNamespaceHeader header = file.getNamespaceHeader();
-        return header != null ? header.getFqName() : FqName.ROOT;
-    }
-
     @Nullable
     public static FqName getFQName(@NotNull JetNamedDeclaration namedDeclaration) {
         if (namedDeclaration instanceof JetObjectDeclarationName) {
@@ -235,6 +232,12 @@ public class JetPsiUtil {
         }
 
         return FqName.fromSegments(ContainerUtil.reverse(reversedNames));
+    }
+
+    //TODO: inline
+    @NotNull
+    public static FqName getFQName(@NotNull JetFile file) {
+        return file.getNamespaceFqName();
     }
 
     @Nullable
