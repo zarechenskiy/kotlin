@@ -18,6 +18,7 @@ package org.jetbrains.jet.plugin.completion;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.Sets;
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.completion.JavaCompletionContributor;
@@ -32,7 +33,11 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.lang.descriptors.*;
 import org.jetbrains.jet.lang.psi.*;
 import org.jetbrains.jet.lang.resolve.BindingContext;
+import org.jetbrains.jet.lang.resolve.name.FqName;
 import org.jetbrains.jet.lang.resolve.scopes.JetScope;
+import org.jetbrains.jet.lang.types.ErrorUtils;
+import org.jetbrains.jet.lang.types.JetType;
+import org.jetbrains.jet.lang.types.expressions.ExpressionTypingUtils;
 import org.jetbrains.jet.lexer.JetTokens;
 import org.jetbrains.jet.plugin.caches.JetShortNamesCache;
 import org.jetbrains.jet.plugin.codeInsight.TipsManager;
@@ -41,7 +46,12 @@ import org.jetbrains.jet.plugin.project.AnalyzerFacadeWithCache;
 import org.jetbrains.jet.plugin.project.CancelableResolveSession;
 import org.jetbrains.jet.plugin.references.JetSimpleNameReference;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Set;
+
+import static org.jetbrains.jet.plugin.caches.TopLevelDeclarationIndexUtils.getExtensionFunctionFqNames;
+import static org.jetbrains.jet.plugin.caches.TopLevelDeclarationIndexUtils.getTopLevelNonExtensionFunctionFqNames;
 
 public class CompletionSession {
     @Nullable
@@ -116,12 +126,12 @@ public class CompletionSession {
 
         if (shouldRunTopLevelCompletion()) {
             JetTypesCompletionHelper.addJetTypes(parameters, jetResult);
-            addJetTopLevelFunctions();
+            addTopLevelFunctions();
             addJetTopLevelObjects();
         }
 
         if (shouldRunExtensionsCompletion()) {
-            addJetExtensions();
+            addExtensionFunctions();
         }
     }
 
@@ -129,17 +139,33 @@ public class CompletionSession {
         return PsiTreeUtil.getParentOfType(position, JetModifierList.class) != null;
     }
 
-    private void addJetExtensions() {
+    private void addExtensionFunctions() {
+        JetSimpleNameExpression expression = jetReference.getExpression();
+        CancelableResolveSession resolveSession = getResolveSession();
+        BindingContext context = resolveSession.resolveToElement(expression);
+        JetExpression receiverExpression = expression.getReceiverExpression();
+        if (receiverExpression == null) {
+            return;
+        }
+        JetType expressionType = context.get(BindingContext.EXPRESSION_TYPE, receiverExpression);
+        JetScope scope = context.get(BindingContext.RESOLUTION_SCOPE, receiverExpression);
+
+        if (expressionType == null || scope == null || ErrorUtils.isErrorType(expressionType)) {
+            return;
+        }
+
         Project project = getPosition().getProject();
-        JetShortNamesCache namesCache = JetShortNamesCache.getKotlinInstance(project);
-
-        Collection<DeclarationDescriptor> jetCallableExtensions = namesCache.getJetCallableExtensions(
-                jetResult.getShortNameFilter(),
-                jetReference.getExpression(),
-                getResolveSession(),
-                GlobalSearchScope.allScope(project));
-
-        jetResult.addAllElements(jetCallableExtensions);
+        Collection<FqName> functionFqNames =
+                getExtensionFunctionFqNames(jetResult.getShortNameFilter(), GlobalSearchScope.allScope(project));
+        Collection<DeclarationDescriptor> resultDescriptors = new ArrayList<DeclarationDescriptor>();
+        for (FqName functionFQN : functionFqNames) {
+            for (CallableDescriptor functionDescriptor : ExpressionTypingUtils.canFindSuitableCall(
+                    functionFQN, project, receiverExpression, expressionType, scope,
+                    resolveSession.getRootModuleDescriptor())) {
+                resultDescriptors.add(functionDescriptor);
+            }
+        }
+        jetResult.addAllElements(resultDescriptors);
     }
 
     public static boolean isPartOfTypeDeclaration(@NotNull DeclarationDescriptor descriptor) {
@@ -156,21 +182,19 @@ public class CompletionSession {
         return false;
     }
 
-    private void addJetTopLevelFunctions() {
-        String actualPrefix = jetResult.getResult().getPrefixMatcher().getPrefix();
+    private void addTopLevelFunctions() {
         Project project = getPosition().getProject();
-
-        JetShortNamesCache namesCache = JetShortNamesCache.getKotlinInstance(project);
-        GlobalSearchScope scope = GlobalSearchScope.allScope(project);
-        Collection<String> functionNames = namesCache.getAllTopLevelFunctionNames();
-
-        // TODO: Fix complete extension not only on contains
-        for (String name : functionNames) {
-            if (name.contains(actualPrefix)) {
-                jetResult.addAllElements(namesCache.getTopLevelFunctionDescriptorsByName(
-                        name, jetReference.getExpression(), getResolveSession(), scope));
-            }
+        Set<FunctionDescriptor> result = Sets.newHashSet();
+        Collection<FqName> functionFqNames =
+                getTopLevelNonExtensionFunctionFqNames(jetResult.getShortNameFilter(), GlobalSearchScope.allScope(project));
+        for (FqName topLevelFunctionFqName : functionFqNames) {
+            FqName packageFqName = topLevelFunctionFqName.parent();
+            NamespaceDescriptor packageDescriptor = getResolveSession().getPackageDescriptorByFqName(packageFqName);
+            assert packageDescriptor != null : "There's a function in stub index with invalid package: " + topLevelFunctionFqName;
+            JetScope memberScope = packageDescriptor.getMemberScope();
+            result.addAll(memberScope.getFunctions(topLevelFunctionFqName.shortName()));
         }
+        jetResult.addAllElements(result);
     }
 
     private void addJetTopLevelObjects() {
