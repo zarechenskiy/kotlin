@@ -28,10 +28,7 @@ import com.intellij.psi.FileViewProvider;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiLock;
-import com.intellij.psi.stubs.ObjectStubTree;
-import com.intellij.psi.stubs.StubBase;
-import com.intellij.psi.stubs.StubTree;
-import com.intellij.psi.stubs.StubTreeLoader;
+import com.intellij.psi.stubs.*;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.IStubFileElementType;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -39,6 +36,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.JetNodeTypes;
 import org.jetbrains.jet.lang.psi.stubs.PsiJetFileStub;
+import org.jetbrains.jet.lang.resolve.name.FqName;
 import org.jetbrains.jet.plugin.JetFileType;
 import org.jetbrains.jet.plugin.JetLanguage;
 
@@ -98,6 +96,22 @@ public class JetFile extends PsiFileBase implements JetDeclarationContainer, Jet
     public JetNamespaceHeader getNamespaceHeader() {
         ASTNode ast = getNode().findChildByType(JetNodeTypes.NAMESPACE_HEADER);
         return ast != null ? (JetNamespaceHeader) ast.getPsi() : null;
+    }
+
+    @Nullable
+    private String getNamespaceFqNameAsString() {
+        StubElement stub = getStub();
+        if (stub != null) {
+            return ((PsiJetFileStub) stub).getPackageName();
+        }
+        JetNamespaceHeader header = getNamespaceHeader();
+        return header != null ? header.getQualifiedName() : null;
+    }
+
+    @NotNull
+    public FqName getNamespaceFqName() {
+        String fqNameAsString = getNamespaceFqNameAsString();
+        return fqNameAsString != null ? new FqName(fqNameAsString) : FqName.ROOT;
     }
 
     @Nullable

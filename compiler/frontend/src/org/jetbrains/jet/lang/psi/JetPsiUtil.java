@@ -157,10 +157,10 @@ public class JetPsiUtil {
         }
     }
 
+    //TODO: inline
     @NotNull
     public static FqName getFQName(@NotNull JetFile file) {
-        JetNamespaceHeader header = file.getNamespaceHeader();
-        return header != null ? header.getFqName() : FqName.ROOT;
+        return file.getNamespaceFqName();
     }
 
     @Nullable

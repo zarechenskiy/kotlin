@@ -210,10 +210,8 @@ public class JetClass extends JetTypeParameterListOwnerStub<PsiJetClassStub> imp
         }
         PsiFile file = getContainingFile();
         if (!(file instanceof JetFile)) return null;
-        String fileQualifiedName = ((JetFile) file).getNamespaceHeader().getQualifiedName();
-        if (!fileQualifiedName.isEmpty()) {
-            parts.add(fileQualifiedName);
-        }
+        FqName fileQualifiedName = ((JetFile) file).getNamespaceFqName();
+        parts.add(fileQualifiedName.asString());
         Collections.reverse(parts);
         return StringUtil.join(parts, ".");
     }
