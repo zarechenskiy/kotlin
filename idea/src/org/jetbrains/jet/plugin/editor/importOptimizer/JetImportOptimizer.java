@@ -31,6 +31,8 @@ import org.jetbrains.jet.lang.resolve.BindingContext;
 import org.jetbrains.jet.lang.resolve.DescriptorUtils;
 import org.jetbrains.jet.lang.resolve.ImportPath;
 import org.jetbrains.jet.lang.resolve.calls.model.ResolvedCall;
+import org.jetbrains.jet.lang.resolve.lazy.ResolveSession;
+import org.jetbrains.jet.lang.resolve.lazy.ResolveSessionUtils;
 import org.jetbrains.jet.lang.resolve.java.DescriptorResolverUtils;
 import org.jetbrains.jet.lang.resolve.name.FqName;
 import org.jetbrains.jet.lang.resolve.name.FqNameUnsafe;
@@ -253,7 +255,7 @@ public class JetImportOptimizer implements ImportOptimizer {
                 return null;
             }
 
-            return combineClassFqNameWithMemberName(field.getContainingClass(), classFQN, field.getName());
+            return combineClassFqNameWithMemberName(classFQN, field.getName());
         }
 
         // TODO: Still problem with kotlin global properties imported from class files
@@ -268,7 +270,7 @@ public class JetImportOptimizer implements ImportOptimizer {
                 return classFQN;
             }
 
-            return combineClassFqNameWithMemberName(method.getContainingClass(), classFQN, method.getName());
+            return combineClassFqNameWithMemberName(classFQN, method.getName());
         }
 
         if (element instanceof PsiPackage) {
@@ -279,16 +281,11 @@ public class JetImportOptimizer implements ImportOptimizer {
     }
 
     @Nullable
-    private static FqName combineClassFqNameWithMemberName(PsiClass containingClass, FqName classFQN, String memberName) {
+    private static FqName combineClassFqNameWithMemberName(FqName classFQN, String memberName) {
         if (memberName == null) {
             return null;
         }
-        if (DescriptorResolverUtils.isCompiledKotlinPackageClass(containingClass)) {
-            return QualifiedNamesUtil.combine(classFQN.parent(), Name.identifier(memberName));
-        }
-        else {
-            return QualifiedNamesUtil.combine(classFQN, Name.identifier(memberName));
-        }
+        return QualifiedNamesUtil.combine(classFQN, Name.identifier(memberName));
     }
 
     @Nullable
