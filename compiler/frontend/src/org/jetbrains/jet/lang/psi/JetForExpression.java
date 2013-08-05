@@ -39,7 +39,7 @@ public class JetForExpression extends JetLoopExpression {
 
     @Nullable
     public JetParameter getLoopParameter() {
-        return (JetParameter) findChildByType(JetNodeTypes.LOOP_PARAMETER);
+        return (JetParameter) findChildByType(JetNodeTypes.VALUE_PARAMETER);
     }
 
     @Nullable
