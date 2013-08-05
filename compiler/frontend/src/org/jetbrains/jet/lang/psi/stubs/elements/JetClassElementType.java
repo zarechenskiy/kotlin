@@ -26,7 +26,6 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jet.lang.psi.JetClass;
 import org.jetbrains.jet.lang.psi.JetEnumEntry;
-import org.jetbrains.jet.lang.psi.JetPsiUtil;
 import org.jetbrains.jet.lang.psi.stubs.PsiJetClassStub;
 import org.jetbrains.jet.lang.psi.stubs.impl.PsiJetClassStubImpl;
 import org.jetbrains.jet.lang.resolve.name.FqName;
@@ -101,7 +100,8 @@ public class JetClassElementType extends JetStubElementType<PsiJetClassStub, Jet
         StubIndexServiceFactory.getInstance().indexClass(stub, sink);
     }
 
-    private static JetClassElementType getStubType(boolean isEnumEntry) {
+    @NotNull
+    public static JetClassElementType getStubType(boolean isEnumEntry) {
         return isEnumEntry ? JetStubElementTypes.ENUM_ENTRY : JetStubElementTypes.CLASS;
     }
 }
