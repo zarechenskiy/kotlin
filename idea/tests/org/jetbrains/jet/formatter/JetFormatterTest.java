@@ -59,6 +59,10 @@ public class JetFormatterTest extends AbstractJetFormatterTest {
         doTest();
     }
 
+    public void testLoopParameterWithExplicitType() throws Exception {
+        doTest();
+    }
+
     public void testFunctionWithNewLineBrace() throws Exception {
         doTest();
     }
