@@ -9,7 +9,6 @@ import org.jetbrains.jet.descriptors.serialization.Flags;
 import org.jetbrains.jet.descriptors.serialization.ProtoBuf;
 import org.jetbrains.jet.lang.psi.stubs.PsiJetFileStub;
 import org.jetbrains.jet.lang.psi.stubs.elements.JetClassElementType;
-import org.jetbrains.jet.lang.psi.stubs.elements.JetStubElementTypes;
 import org.jetbrains.jet.lang.psi.stubs.impl.PsiJetClassBodyStubImpl;
 import org.jetbrains.jet.lang.psi.stubs.impl.PsiJetClassStubImpl;
 import org.jetbrains.jet.lang.psi.stubs.impl.PsiJetFileStubImpl;
@@ -43,7 +42,7 @@ public class CompiledClassStubBuilder extends CompiledStubBuilderBase {
                 new PsiJetClassStubImpl(JetClassElementType.getStubType(isEnumEntry), fileStub, classFqName.asString(), name.asString(), getSuperList(),
                                         kind == ProtoBuf.Class.Kind.TRAIT, kind == ProtoBuf.Class.Kind.ENUM_CLASS,
                                         isEnumEntry, kind == ProtoBuf.Class.Kind.ANNOTATION_CLASS, false);
-        PsiJetClassBodyStubImpl classBody = new PsiJetClassBodyStubImpl(classStub, JetStubElementTypes.CLASS_BODY);
+        PsiJetClassBodyStubImpl classBody = new PsiJetClassBodyStubImpl(classStub);
         //TODO: primary constructor
         for (ProtoBuf.Callable callableProto : classProto.getMemberList()) {
             createCallableStub(classBody, callableProto);

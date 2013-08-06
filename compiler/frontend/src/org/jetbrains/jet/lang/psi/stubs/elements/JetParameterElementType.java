@@ -54,7 +54,7 @@ public class JetParameterElementType extends JetStubElementType<PsiJetParameterS
         JetTypeReference typeReference = psi.getTypeReference();
         JetExpression defaultValue = psi.getDefaultValue();
 
-        return new PsiJetParameterStubImpl(JetStubElementTypes.VALUE_PARAMETER, parentStub, psi.getFqName(),
+        return new PsiJetParameterStubImpl(parentStub, psi.getFqName(),
                 psi.getName(), psi.isMutable(), psi.isVarArg(),
                 typeReference != null ? typeReference.getText() : null,
                 defaultValue != null ? defaultValue.getText() : null);
@@ -90,7 +90,7 @@ public class JetParameterElementType extends JetStubElementType<PsiJetParameterS
         StringRef fqNameAsString = dataStream.readName();
         FqName fqName = fqNameAsString != null ? new FqName(fqNameAsString.toString()) : null;
 
-         return new PsiJetParameterStubImpl(JetStubElementTypes.VALUE_PARAMETER, parentStub, fqName, name, isMutable, isVarArg,
+         return new PsiJetParameterStubImpl(parentStub, fqName, name, isMutable, isVarArg,
                                            typeText, defaultValueText);
     }
 

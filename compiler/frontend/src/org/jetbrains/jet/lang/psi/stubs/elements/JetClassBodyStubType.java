@@ -47,7 +47,7 @@ public class JetClassBodyStubType extends JetStubElementType<StubElement, JetCla
     public StubElement createStub(
             @NotNull JetClassBody psi, StubElement parentStub
     ) {
-        return new PsiJetClassBodyStubImpl(parentStub, JetStubElementTypes.CLASS_BODY);
+        return new PsiJetClassBodyStubImpl(parentStub);
     }
 
     @Override
@@ -57,7 +57,7 @@ public class JetClassBodyStubType extends JetStubElementType<StubElement, JetCla
 
     @Override
     public StubElement deserialize(StubInputStream dataStream, StubElement parentStub) throws IOException {
-        return new PsiJetClassBodyStubImpl(parentStub, JetStubElementTypes.CLASS_BODY);
+        return new PsiJetClassBodyStubImpl(parentStub);
     }
 
     @Override

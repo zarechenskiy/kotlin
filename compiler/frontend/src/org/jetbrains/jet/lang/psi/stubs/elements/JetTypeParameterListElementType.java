@@ -46,7 +46,7 @@ public class JetTypeParameterListElementType extends JetStubElementType<PsiJetTy
 
     @Override
     public PsiJetTypeParameterListStub createStub(@NotNull JetTypeParameterList psi, StubElement parentStub) {
-        return new PsiJetTypeParameterListStubImpl(JetStubElementTypes.TYPE_PARAMETER_LIST, parentStub);
+        return new PsiJetTypeParameterListStubImpl(parentStub);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class JetTypeParameterListElementType extends JetStubElementType<PsiJetTy
 
     @Override
     public PsiJetTypeParameterListStub deserialize(StubInputStream dataStream, StubElement parentStub) throws IOException {
-        return new PsiJetTypeParameterListStubImpl(JetStubElementTypes.TYPE_PARAMETER_LIST, parentStub);
+        return new PsiJetTypeParameterListStubImpl(parentStub);
     }
 
     @Override

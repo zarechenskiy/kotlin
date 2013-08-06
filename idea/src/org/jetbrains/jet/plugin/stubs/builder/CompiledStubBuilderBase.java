@@ -6,7 +6,6 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.descriptors.serialization.Flags;
 import org.jetbrains.jet.descriptors.serialization.NameResolver;
 import org.jetbrains.jet.descriptors.serialization.ProtoBuf;
-import org.jetbrains.jet.lang.psi.stubs.elements.JetStubElementTypes;
 import org.jetbrains.jet.lang.psi.stubs.impl.PsiJetFileStubImpl;
 import org.jetbrains.jet.lang.psi.stubs.impl.PsiJetFunctionStubImpl;
 import org.jetbrains.jet.lang.psi.stubs.impl.PsiJetObjectStubImpl;
@@ -31,21 +30,21 @@ public abstract class CompiledStubBuilderBase {
         FqName callableFqName = getInternalFqName(callableName);
         switch (callableKind) {
             case FUN:
-                new PsiJetFunctionStubImpl(JetStubElementTypes.FUNCTION, parentStub, callableName,
+                new PsiJetFunctionStubImpl(parentStub, callableName,
                                            callableFqName != null, callableFqName, callableProto.hasReceiverType());
                 break;
             case VAL:
                 //TODO: type text
-                new PsiJetPropertyStubImpl(JetStubElementTypes.PROPERTY, parentStub, callableName, false, callableFqName != null, callableFqName, null, null);
+                new PsiJetPropertyStubImpl(parentStub, callableName, false, callableFqName != null, callableFqName, null, null);
                 break;
             case VAR:
                 //TODO: type text
-                new PsiJetPropertyStubImpl(JetStubElementTypes.PROPERTY, parentStub, callableName, true, callableFqName != null, callableFqName, null, null);
+                new PsiJetPropertyStubImpl(parentStub, callableName, true, callableFqName != null, callableFqName, null, null);
                 break;
             case CONSTRUCTOR:
                 throw new IllegalStateException("Stubs for constructors are not supported!");
             case OBJECT_PROPERTY:
-                new PsiJetObjectStubImpl(JetStubElementTypes.OBJECT_DECLARATION, parentStub, callableName, callableFqName, true, false);
+                new PsiJetObjectStubImpl(parentStub, callableName, callableFqName, true, false);
                 break;
         }
     }

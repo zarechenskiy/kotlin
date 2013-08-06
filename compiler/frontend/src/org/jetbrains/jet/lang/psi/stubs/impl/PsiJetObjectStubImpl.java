@@ -16,7 +16,6 @@
 
 package org.jetbrains.jet.lang.psi.stubs.impl;
 
-import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.stubs.StubBase;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.util.io.StringRef;
@@ -24,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.lang.psi.JetObjectDeclaration;
 import org.jetbrains.jet.lang.psi.stubs.PsiJetObjectStub;
+import org.jetbrains.jet.lang.psi.stubs.elements.JetStubElementTypes;
 import org.jetbrains.jet.lang.resolve.name.FqName;
 
 public class PsiJetObjectStubImpl extends StubBase<JetObjectDeclaration> implements PsiJetObjectStub {
@@ -33,24 +33,23 @@ public class PsiJetObjectStubImpl extends StubBase<JetObjectDeclaration> impleme
     private final boolean isClassObject;
 
     public PsiJetObjectStubImpl(
-            @NotNull IStubElementType elementType,
             @NotNull StubElement parent,
             @Nullable String name,
             @Nullable FqName fqName,
             boolean isTopLevel,
             boolean isClassObject
     ) {
-        this(elementType, parent, StringRef.fromString(name), fqName, isTopLevel, isClassObject);
+        this(parent, StringRef.fromString(name), fqName, isTopLevel, isClassObject);
     }
 
     public PsiJetObjectStubImpl(
-            @NotNull IStubElementType elementType,
             @NotNull StubElement parent,
             @Nullable StringRef name,
             @Nullable FqName fqName,
             boolean isTopLevel,
-            boolean isClassObject) {
-        super(parent, elementType);
+            boolean isClassObject
+    ) {
+        super(parent, JetStubElementTypes.OBJECT_DECLARATION);
 
         this.name = name;
         this.fqName = fqName;

@@ -69,7 +69,7 @@ public class JetFunctionElementType extends JetStubElementType<PsiJetFunctionStu
 
         FqName qualifiedName = psi.getFqName();
 
-        return new PsiJetFunctionStubImpl(JetStubElementTypes.FUNCTION, parentStub, psi.getName(), isTopLevel, qualifiedName, isExtension);
+        return new PsiJetFunctionStubImpl(parentStub, psi.getName(), isTopLevel, qualifiedName, isExtension);
     }
 
     @Override
@@ -93,7 +93,7 @@ public class JetFunctionElementType extends JetStubElementType<PsiJetFunctionStu
 
         boolean isExtension = dataStream.readBoolean();
 
-        return new PsiJetFunctionStubImpl(JetStubElementTypes.FUNCTION, parentStub, name, isTopLevel, fqName, isExtension);
+        return new PsiJetFunctionStubImpl(parentStub, name, isTopLevel, fqName, isExtension);
     }
 
     @Override
