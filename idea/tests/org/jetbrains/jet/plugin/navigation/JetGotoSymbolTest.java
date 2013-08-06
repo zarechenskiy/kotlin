@@ -30,6 +30,14 @@ public class JetGotoSymbolTest extends JetLightCodeInsightFixtureTestCase {
         doTest();
     }
 
+    public void testStdLibArrayListOf() {
+        doTest();
+    }
+
+    public void testStdLibMakeString() {
+        doTest();
+    }
+
     @Override
     protected String getTestDataPath() {
         return new File(PluginTestCaseBase.getTestDataPathBase(), "/navigation/gotoSymbol").getPath() + File.separator;

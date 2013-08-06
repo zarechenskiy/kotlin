@@ -21,10 +21,17 @@ import com.google.common.collect.Collections2;
 import com.intellij.navigation.ChooseByNameContributor;
 import com.intellij.navigation.NavigationItem;
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.impl.search.JavaSourceFilterScope;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StubIndex;
 import com.intellij.util.ArrayUtil;
+import com.intellij.util.Function;
+import com.intellij.util.containers.ContainerUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.jet.lang.psi.JetDeclaration;
+import org.jetbrains.jet.lang.psi.JetNamedFunction;
+import org.jetbrains.jet.lang.psi.JetProperty;
+import org.jetbrains.jet.plugin.libraries.JetSourceNavigationHelper;
 import org.jetbrains.jet.plugin.stubindex.JetFunctionShortNameIndex;
 import org.jetbrains.jet.plugin.stubindex.JetPropertyShortNameIndex;
 
@@ -45,17 +52,24 @@ public class JetGotoSymbolContributor implements ChooseByNameContributor {
     @NotNull
     @Override
     public NavigationItem[] getItemsByName(String name, String pattern, Project project, boolean includeNonProjectItems) {
-        GlobalSearchScope scope = includeNonProjectItems ? GlobalSearchScope.allScope(project) : GlobalSearchScope.projectScope(project);
+        GlobalSearchScope baseScope = includeNonProjectItems ? GlobalSearchScope.allScope(project) : GlobalSearchScope.projectScope(project);
+        GlobalSearchScope noLibrarySourcesScope = new JavaSourceFilterScope(baseScope);
 
-        Collection<? extends NavigationItem> functions = StubIndex.getInstance().get(
-                JetFunctionShortNameIndex.getInstance().getKey(), name, project, scope);
+        Collection<JetNamedFunction> functions = StubIndex.getInstance().get(
+                JetFunctionShortNameIndex.getInstance().getKey(), name, project, noLibrarySourcesScope);
 
-        Collection<? extends NavigationItem> properties = StubIndex.getInstance().get(
-                JetPropertyShortNameIndex.getInstance().getKey(), name, project, scope);
+        Collection<JetProperty> properties = StubIndex.getInstance().get(
+                JetPropertyShortNameIndex.getInstance().getKey(), name, project, noLibrarySourcesScope);
 
-        List<NavigationItem> items = new ArrayList<NavigationItem>(Collections2.filter(functions, Predicates.notNull()));
+        //TODO: lazily
+        List<JetDeclaration> items = new ArrayList<JetDeclaration>(Collections2.filter(functions, Predicates.notNull()));
         items.addAll(properties);
-
-        return ArrayUtil.toObjectArray(items, NavigationItem.class);
+        List<NavigationItem> result = ContainerUtil.map(items, new Function<JetDeclaration, NavigationItem>() {
+            @Override
+            public NavigationItem fun(JetDeclaration item) {
+                return JetSourceNavigationHelper.replaceBySourceDeclarationIfPresent(item);
+            }
+        });
+        return ArrayUtil.toObjectArray(result, NavigationItem.class);
     }
 }
