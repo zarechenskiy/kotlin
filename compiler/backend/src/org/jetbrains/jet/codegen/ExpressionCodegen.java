@@ -32,6 +32,8 @@ import org.jetbrains.asm4.MethodVisitor;
 import org.jetbrains.asm4.Type;
 import org.jetbrains.asm4.commons.InstructionAdapter;
 import org.jetbrains.asm4.commons.Method;
+import org.jetbrains.jet.codegen.asm.InlineCodegen;
+import org.jetbrains.jet.codegen.asm.Inliner;
 import org.jetbrains.jet.codegen.binding.CalculatedClosure;
 import org.jetbrains.jet.codegen.binding.CodegenBinding;
 import org.jetbrains.jet.codegen.binding.MutableClosure;
@@ -1357,17 +1359,24 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
         return StackValue.onStack(type);
     }
 
-    protected void pushClosureOnStack(CalculatedClosure closure, boolean ignoreThisAndReceiver) {
+    public void pushClosureOnStack(CalculatedClosure closure, boolean ignoreThisAndReceiver) {
+        pushClosureOnStack(closure, ignoreThisAndReceiver, Inliner.NOT_INLINE);
+    }
+
+    public void pushClosureOnStack(CalculatedClosure closure, boolean ignoreThisAndReceiver, Inliner inliner) {
         if (closure != null) {
             if (!ignoreThisAndReceiver) {
                 ClassDescriptor captureThis = closure.getCaptureThis();
                 if (captureThis != null) {
                     generateThisOrOuter(captureThis, false).put(OBJECT_TYPE, v);
+                    inliner.putInLocal(OBJECT_TYPE);
                 }
 
                 JetType captureReceiver = closure.getCaptureReceiverType();
                 if (captureReceiver != null) {
-                    v.load(context.isStatic() ? 0 : 1, typeMapper.mapType(captureReceiver));
+                    Type asmType = typeMapper.mapType(captureReceiver);
+                    v.load(context.isStatic() ? 0 : 1, asmType);
+                    inliner.putInLocal(asmType);
                 }
             }
 
@@ -1378,6 +1387,7 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
                     sharedVarType = typeMapper.mapType((VariableDescriptor) entry.getKey());
                 }
                 entry.getValue().getOuterValue(this).put(sharedVarType, v);
+                inliner.putInLocal(sharedVarType);
                 //}
             }
         }
@@ -2084,16 +2094,67 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
             @NotNull ResolvedCall<? extends CallableDescriptor> resolvedCall,
             @NotNull StackValue receiver
     ) {
+        //isInline = false;
+        boolean disable = false;
+        CallableDescriptor descriptor = resolvedCall.getResultingDescriptor();
+        boolean isInline = descriptor instanceof SimpleFunctionDescriptor && ((SimpleFunctionDescriptor) descriptor).isInline();
+        Inliner inliner = !isInline
+                          ? Inliner.NOT_INLINE
+                          : new InlineCodegen(this, true, state, disable, (SimpleFunctionDescriptor) callableMethod.getFunctionDescriptor());
+
+        int mask = 0;
+
+        ReceiverValue thisObject = resolvedCall.getThisObject();
+        boolean wrapClosureCall = getContext().isInlineFunction() &&
+                                  thisObject != null ? resolvedCall.getCandidateDescriptor().getName().asString()
+                                                                                 .equals("invoke") &&
+                                                       (thisObject.getType().getConstructor().getDeclarationDescriptor().getName().
+                                                               asString().startsWith("Function") || thisObject.getType().getConstructor().getDeclarationDescriptor().getName().
+                                                               asString().startsWith("ExtensionFunction"))
+                                                                       : false;
+
+        if (wrapClosureCall) {
+            mask = pushMethodArguments(resolvedCall, callableMethod.getValueParameterTypes(), inliner);
+        }
+
         if (resolvedCall instanceof VariableAsFunctionResolvedCall) {
             resolvedCall = ((VariableAsFunctionResolvedCall) resolvedCall).getFunctionCall();
         }
 
-        if (!(resolvedCall.getResultingDescriptor() instanceof ConstructorDescriptor)) { // otherwise already
+        if (!(descriptor instanceof ConstructorDescriptor)) { // otherwise already
             receiver = StackValue.receiver(resolvedCall, receiver, this, callableMethod);
             receiver.put(receiver.type, v);
+            inliner.putInLocal(receiver.type);
+            //if (calleeType != null) {
+            //    StackValue.onStack(receiver.type).put(boxType(receiver.type), v);
+            //    inliner.putInLocal(boxType(receiver.type));
+            //}
         }
 
-        pushArgumentsAndInvoke(resolvedCall, callableMethod);
+        if (!wrapClosureCall) {
+            mask = pushMethodArguments(resolvedCall, callableMethod.getValueParameterTypes(), inliner);
+        }
+
+        if (wrapClosureCall) {
+            FunctionDescriptor functionDescriptor = callableMethod.getFunctionDescriptor();
+            callableMethod = new CallableMethod(Type.getObjectType("jet/InlineRuntime"), null, null,
+                                                JetTypeMapper.erasedInvokeSignature(functionDescriptor,
+                                                typeMapper.mapType(functionDescriptor.getOriginal().getExpectedThisObject().getType())),
+                                                INVOKESTATIC, null, null, null);
+        }
+
+        if (mask == 0) {
+            if (isInline) {
+                inliner.inlineCall(callableMethod, getParentCodegen().getBuilder().getVisitor());
+            } else {
+                callableMethod.invokeWithNotNullAssertion(v, state, resolvedCall);
+            }
+        }
+        else {
+            callableMethod.invokeDefaultWithNotNullAssertion(v, state, resolvedCall, mask);
+        }
+
+        inliner.leaveTemps();
     }
 
     private void pushArgumentsAndInvoke(@NotNull ResolvedCall<?> resolvedCall, @NotNull CallableMethod callable) {
@@ -2278,10 +2339,18 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
     }
 
     private int pushMethodArguments(@NotNull ResolvedCall resolvedCall, List<Type> valueParameterTypes) {
-        return pushMethodArguments(resolvedCall, valueParameterTypes, false);
+        return pushMethodArguments(resolvedCall, valueParameterTypes, null);
     }
 
     private int pushMethodArguments(@NotNull ResolvedCall resolvedCall, List<Type> valueParameterTypes, boolean skipLast) {
+        return pushMethodArguments(resolvedCall, valueParameterTypes, skipLast, null);
+    }
+
+    private int pushMethodArguments(@NotNull ResolvedCall resolvedCall, List<Type> valueParameterTypes, Inliner inliner) {
+        return pushMethodArguments(resolvedCall, valueParameterTypes, false, inliner);
+    }
+
+    private int pushMethodArguments(@NotNull ResolvedCall resolvedCall, List<Type> valueParameterTypes, boolean skipLast, Inliner inliner) {
         @SuppressWarnings("unchecked")
         List<ResolvedValueArgument> valueArguments = resolvedCall.getValueArgumentsByIndex();
         CallableDescriptor fd = resolvedCall.getResultingDescriptor();
@@ -2291,14 +2360,16 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
             throw new IllegalStateException();
         }
 
+        inliner = inliner != null ? inliner : Inliner.NOT_INLINE;
         int mask = 0;
-
 
         for (Iterator<ValueParameterDescriptor> iterator = valueParameters.iterator(); iterator.hasNext(); ) {
             ValueParameterDescriptor valueParameter = iterator.next();
             if (skipLast && !iterator.hasNext()) {
                 continue;
             }
+
+            boolean putInLocal = true;
 
             ResolvedValueArgument resolvedValueArgument = valueArguments.get(valueParameter.getIndex());
             Type parameterType = valueParameterTypes.get(valueParameter.getIndex());
@@ -2308,9 +2379,13 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
                 JetExpression argumentExpression = valueArgument.getArgumentExpression();
                 assert argumentExpression != null : valueArgument.asElement().getText();
 
-                gen(argumentExpression, parameterType);
-            }
-            else if (resolvedValueArgument instanceof DefaultValueArgument) {
+                if (inliner.isInliningClosure(argumentExpression)) {
+                    inliner.rememberClosure((JetFunctionLiteralExpression) argumentExpression, parameterType);
+                    putInLocal = false;
+                } else {
+                    gen(argumentExpression, parameterType);
+                }
+            } else if (resolvedValueArgument instanceof DefaultValueArgument) {
                 pushDefaultValueOnStack(parameterType, v);
                 mask |= (1 << valueParameter.getIndex());
             }
@@ -2320,6 +2395,10 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
             }
             else {
                 throw new UnsupportedOperationException();
+            }
+
+            if (putInLocal) {
+                inliner.putInLocal(parameterType);
             }
         }
         return mask;
@@ -3274,8 +3353,8 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
 
         ConstructorDescriptor originalOfSamAdapter = (ConstructorDescriptor) SamCodegenUtil.getOriginalIfSamAdapter(constructorDescriptor);
         CallableMethod method = typeMapper.mapToCallableMethod(originalOfSamAdapter == null ? constructorDescriptor : originalOfSamAdapter);
-        invokeMethodWithArguments(method, resolvedCall, StackValue.none());
 
+        invokeMethodWithArguments(method, resolvedCall, StackValue.none());
         return StackValue.onStack(type);
     }
 
@@ -3426,8 +3505,9 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
     }
 
     @Override
-    public StackValue visitTryExpression(@NotNull JetTryExpression expression, StackValue receiver) {
-        return generateTryExpression(expression, false);
+    public StackValue visitTryExpression(JetTryExpression expression, StackValue receiver) {
+        boolean isStatement = bindingContext.get(STATEMENT, expression);
+        return generateTryExpression(expression, isStatement);
     }
 
     public StackValue generateTryExpression(JetTryExpression expression, boolean isStatement) {
@@ -3840,5 +3920,25 @@ The "returned" value of try expression with no finally is either the last expres
             codegen = codegen.getParentCodegen();
         }
         throw new IllegalStateException("Script codegen should be present in codegen tree");
+    }
+
+    public InstructionAdapter getInstructionAdapter() {
+        return v;
+    }
+
+    public JetTypeMapper getTypeMapper() {
+        return typeMapper;
+    }
+
+    public MethodVisitor getMethodVisitor() {
+        return methodVisitor;
+    }
+
+    public FrameMap getFrameMap() {
+        return myFrameMap;
+    }
+
+    public MethodContext getContext() {
+        return context;
     }
 }
