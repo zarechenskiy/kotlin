@@ -65,7 +65,7 @@ public class JetObjectElementType extends JetStubElementType<PsiJetObjectStub, J
     public PsiJetObjectStub createStub(@NotNull JetObjectDeclaration psi, @NotNull StubElement parentStub) {
         String name = psi.getName();
         FqName fqName = psi.getFqName();
-        return new PsiJetObjectStubImpl(JetStubElementTypes.OBJECT_DECLARATION, parentStub, name, fqName, psi.isTopLevel(), isClassObject(psi));
+        return new PsiJetObjectStubImpl(parentStub, name, fqName, psi.isTopLevel(), isClassObject(psi));
     }
 
     @Override
@@ -85,7 +85,7 @@ public class JetObjectElementType extends JetStubElementType<PsiJetObjectStub, J
         boolean isTopLevel = dataStream.readBoolean();
         boolean isClassObject = dataStream.readBoolean();
 
-        return new PsiJetObjectStubImpl(JetStubElementTypes.OBJECT_DECLARATION, parentStub, name, fqName, isTopLevel, isClassObject);
+        return new PsiJetObjectStubImpl(parentStub, name, fqName, isTopLevel, isClassObject);
     }
 
     @Override

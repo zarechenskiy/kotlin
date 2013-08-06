@@ -50,7 +50,7 @@ public class JetTypeParameterElementType extends JetStubElementType<PsiJetTypePa
     @Override
     public PsiJetTypeParameterStub createStub(@NotNull JetTypeParameter psi, StubElement parentStub) {
         JetTypeReference extendsBound = psi.getExtendsBound();
-        return new PsiJetTypeParameterStubImpl(JetStubElementTypes.TYPE_PARAMETER, parentStub,
+        return new PsiJetTypeParameterStubImpl(parentStub,
                 psi.getName(),
                 extendsBound != null ? extendsBound.getText() : null,
                 psi.getVariance() == Variance.IN_VARIANCE,
@@ -72,7 +72,7 @@ public class JetTypeParameterElementType extends JetStubElementType<PsiJetTypePa
         boolean isInVariance = dataStream.readBoolean();
         boolean isOutVariance = dataStream.readBoolean();
 
-        return new PsiJetTypeParameterStubImpl(JetStubElementTypes.TYPE_PARAMETER, parentStub,
+        return new PsiJetTypeParameterStubImpl(parentStub,
                 name, extendBoundTypeText, isInVariance, isOutVariance);
     }
 
