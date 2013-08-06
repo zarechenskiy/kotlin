@@ -53,6 +53,10 @@ public class SpecifyTypeExplicitlyTest extends LightIntentionActionTestCase {
         doTest();
     }
 
+    public void testAtEndOfLoopParameter() {
+        doTest();
+    }
+
     public void testOnType() {
         doTest();
     }
