@@ -17,6 +17,7 @@
 package org.jetbrains.jet.plugin.navigation;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.intellij.codeInsight.navigation.GotoImplementationHandler;
@@ -34,10 +35,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.InTextDirectivesUtils;
 import org.jetbrains.jet.testing.ReferenceUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public final class NavigationTestUtils {
     private NavigationTestUtils() {
@@ -72,21 +70,29 @@ public final class NavigationTestUtils {
 
     public static void assertGotoSymbol(@NotNull Project project, @NotNull Editor editor) {
 
-        List<String> searchTextList = InTextDirectivesUtils.findListWithPrefixes(editor.getDocument().getText(), "// SEARCH_TEXT:");
+        String documentText = editor.getDocument().getText();
+        List<String> searchTextList = InTextDirectivesUtils.findListWithPrefixes(documentText, "// SEARCH_TEXT:");
         Assert.assertFalse("There's no search text in test data file given. Use '// SEARCH_TEXT:' directive",
                            searchTextList.isEmpty());
 
-        List<String> expectedReferences = InTextDirectivesUtils.findListWithPrefixes(editor.getDocument().getText(), "// REF:");
+        Collection<String> expectedReferences = Collections2
+                .transform(InTextDirectivesUtils.findLinesWithPrefixesRemoved(documentText, "// REF:"), new Function<String, String>() {
+                    @Override
+                    public String apply(String input) {
+                        return input.trim();
+                    }
+                });
 
         String searchText = searchTextList.get(0);
 
         List<Object> elementsByName = new ArrayList<Object>();
 
         GotoSymbolModel2 model = new GotoSymbolModel2(project);
-        String[] names = model.getNames(false);
+        boolean includeNonProjectSymbols = InTextDirectivesUtils.isDirectiveDefined(documentText, "INCLUDE_NON_PROJECT_SYMBOLS");
+        String[] names = model.getNames(includeNonProjectSymbols);
         for (String name : names) {
             if (name != null && name.startsWith(searchText)) {
-                elementsByName.addAll(Arrays.asList(model.getElementsByName(name, false, name + "*", new ProgressIndicatorBase())));
+                elementsByName.addAll(Arrays.asList(model.getElementsByName(name, includeNonProjectSymbols, name + "*", new ProgressIndicatorBase())));
             }
         }
 
