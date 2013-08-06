@@ -31,7 +31,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.jet.JetNodeTypes;
 import org.jetbrains.jet.lang.descriptors.DeclarationDescriptor;
 import org.jetbrains.jet.lang.descriptors.SimpleFunctionDescriptor;
 import org.jetbrains.jet.lang.descriptors.VariableDescriptor;
@@ -46,13 +45,14 @@ import org.jetbrains.jet.lang.types.TypeConstructor;
 import org.jetbrains.jet.lang.types.TypeUtils;
 import org.jetbrains.jet.plugin.JetBundle;
 import org.jetbrains.jet.plugin.codeInsight.ReferenceToClassesShortening;
-import org.jetbrains.jet.plugin.project.AnalyzerFacadeWithCache;
 import org.jetbrains.jet.renderer.DescriptorRenderer;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
+import static org.jetbrains.jet.plugin.project.AnalyzerFacadeWithCache.analyzeFileWithCache;
 
 public class SpecifyTypeExplicitlyAction extends PsiElementBaseIntentionAction {
     @NotNull
@@ -63,12 +63,10 @@ public class SpecifyTypeExplicitlyAction extends PsiElementBaseIntentionAction {
 
     @Override
     public void invoke(@NotNull Project project, Editor editor, @NotNull PsiElement element) {
-        JetTypeReference typeRefParent = PsiTreeUtil.getTopmostParentOfType(element, JetTypeReference.class);
-        if (typeRefParent != null) {
-            element = typeRefParent;
-        }
-        PsiElement parent = element.getParent();
-        JetType type = getTypeForDeclaration((JetNamedDeclaration) parent);
+        JetNamedDeclaration parent = getDeclaration(element);
+        assert parent != null;
+        JetType type = getTypeForDeclaration(parent);
+        assert !ErrorUtils.isErrorType(type) : "Unexpected error type: " + element.getText();
         if (parent instanceof JetProperty) {
             JetProperty property = (JetProperty) parent;
             if (property.getTypeRef() == null) {
@@ -99,16 +97,10 @@ public class SpecifyTypeExplicitlyAction extends PsiElementBaseIntentionAction {
 
     @Override
     public boolean isAvailable(@NotNull Project project, Editor editor, @NotNull PsiElement element) {
-        JetTypeReference typeRefParent = PsiTreeUtil.getTopmostParentOfType(element, JetTypeReference.class);
-        if (typeRefParent != null) {
-            element = typeRefParent;
-        }
-        PsiElement parent = element.getParent();
-        if (!(parent instanceof JetNamedDeclaration)) {
+        JetNamedDeclaration declaration = getDeclaration(element);
+        if (declaration == null) {
             return false;
         }
-        JetNamedDeclaration declaration = (JetNamedDeclaration) parent;
-
         if (declaration instanceof JetProperty && !PsiTreeUtil.isAncestor(((JetProperty) declaration).getInitializer(), element, false)) {
             if (((JetProperty) declaration).getTypeRef() != null) {
                 setText(JetBundle.message("specify.type.explicitly.remove.action.name"));
@@ -141,9 +133,26 @@ public class SpecifyTypeExplicitlyAction extends PsiElementBaseIntentionAction {
         return !hasPublicMemberDiagnostic(declaration);
     }
 
+    @Nullable
+    private static JetNamedDeclaration getDeclaration(@NotNull PsiElement element) {
+        JetTypeReference typeRefParent = PsiTreeUtil.getTopmostParentOfType(element, JetTypeReference.class);
+        if (typeRefParent != null) {
+            element = typeRefParent;
+        }
+        PsiElement parent = element.getParent();
+        if (!(parent instanceof JetNamedDeclaration)) {
+            PsiElement sibling = element.getPrevSibling();
+            if (parent instanceof JetForExpression && sibling instanceof JetParameter && ((JetParameter) sibling).isLoopParameter()) {
+                return (JetNamedDeclaration) sibling;
+            }
+            return null;
+        }
+        return (JetNamedDeclaration) parent;
+    }
 
     private static boolean hasPublicMemberDiagnostic(@NotNull JetNamedDeclaration declaration) {
-        BindingContext bindingContext = AnalyzerFacadeWithCache.analyzeFileWithCache((JetFile) declaration.getContainingFile()).getBindingContext();
+        BindingContext bindingContext =
+                analyzeFileWithCache((JetFile) declaration.getContainingFile()).getBindingContext();
         for (Diagnostic diagnostic : bindingContext.getDiagnostics()) {
             //noinspection ConstantConditions
             if (Errors.PUBLIC_MEMBER_SHOULD_SPECIFY_TYPE == diagnostic.getFactory() && declaration == diagnostic.getPsiElement()) {
@@ -155,7 +164,7 @@ public class SpecifyTypeExplicitlyAction extends PsiElementBaseIntentionAction {
 
     @NotNull
     public static JetType getTypeForDeclaration(@NotNull JetNamedDeclaration declaration) {
-        BindingContext bindingContext = AnalyzerFacadeWithCache.analyzeFileWithCache((JetFile) declaration.getContainingFile()).getBindingContext();
+        BindingContext bindingContext = analyzeFileWithCache((JetFile) declaration.getContainingFile()).getBindingContext();
         DeclarationDescriptor descriptor = bindingContext.get(BindingContext.DECLARATION_TO_DESCRIPTOR, declaration);
 
         JetType type;

@@ -54,6 +54,10 @@ public class SpecifyTypeExplicitlyTest extends AbstractQuickFixTest {
         doTest();
     }
 
+    public void testAtEndOfLoopParameter() {
+        doTest();
+    }
+
     public void testOnType() {
         doTest();
     }
