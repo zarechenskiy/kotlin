@@ -23,7 +23,6 @@ import com.intellij.navigation.ItemPresentationProvider;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.jet.lang.psi.JetNamedFunction;
 import org.jetbrains.jet.lang.psi.JetParameter;
-import org.jetbrains.jet.lang.psi.JetPsiUtil;
 import org.jetbrains.jet.lang.psi.JetTypeReference;
 import org.jetbrains.jet.lang.resolve.name.FqName;
 
