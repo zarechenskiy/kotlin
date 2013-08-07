@@ -52,7 +52,7 @@ public final class DeserializedDescriptorResolver {
         @Nullable
         @Override
         public ClassDescriptor findClass(@NotNull ClassId classId) {
-            return javaClassResolver.resolveClass(kotlinFqNameToJavaFqName(classId.asSingleFqName()));
+            return javaClassResolver.resolveClass(kotlinFqNameToJavaFqName(classId.asSingleFqName()), INCLUDE_KOTLIN);
         }
 
         @Nullable
