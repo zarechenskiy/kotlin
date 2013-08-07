@@ -125,6 +125,10 @@ public class LightClassUtil {
     @Nullable
     public static PsiClass getPsiClass(@Nullable JetClassOrObject classOrObject) {
         if (classOrObject == null) return null;
+        if (((JetFile) classOrObject.getContainingFile()).isCompiled()) {
+            //TODO: light class for compiled kotlin class
+            return null;
+        }
         return LightClassGenerationSupport.getInstance(classOrObject.getProject()).getPsiClass(classOrObject);
     }
 
