@@ -19,30 +19,19 @@ package org.jetbrains.jet.descriptors.serialization;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jet.lang.descriptors.*;
 import org.jetbrains.jet.lang.descriptors.annotations.Annotated;
+import org.jetbrains.jet.lang.resolve.MemberComparator;
 import org.jetbrains.jet.lang.types.*;
 import org.jetbrains.jet.lang.types.lang.KotlinBuiltIns;
-import org.jetbrains.jet.renderer.DescriptorRenderer;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import static org.jetbrains.jet.lang.resolve.DescriptorUtils.isTopLevelOrInnerClass;
 
 public class DescriptorSerializer {
 
-    private static final DescriptorRenderer RENDERER = DescriptorRenderer.STARTS_FROM_NAME;
-    private static final Comparator<DeclarationDescriptor> DESCRIPTOR_COMPARATOR = new Comparator<DeclarationDescriptor>() {
-        @Override
-        public int compare(
-                DeclarationDescriptor o1, DeclarationDescriptor o2
-        ) {
-            int names = o1.getName().compareTo(o2.getName());
-            if (names != 0) return names;
-
-            String o1String = RENDERER.render(o1);
-            String o2String = RENDERER.render(o2);
-            return o1String.compareTo(o2String);
-        }
-    };
     private final NameTable nameTable;
     private final Interner<TypeParameterDescriptor> typeParameters;
     private final SerializerExtension extension;
@@ -420,7 +409,7 @@ public class DescriptorSerializer {
     @NotNull
     public static <T extends DeclarationDescriptor> List<T> sort(@NotNull Collection<T> descriptors) {
         List<T> result = new ArrayList<T>(descriptors);
-        Collections.sort(result, DESCRIPTOR_COMPARATOR);
+        Collections.sort(result, MemberComparator.INSTANCE);
         return result;
 
     }

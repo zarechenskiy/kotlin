@@ -97,6 +97,8 @@ public final class DecompiledDataFactory {
         }
     }
 
+    //NOTE: it is important that the ordering is the same as in DescriptorSerializer
+    // because this is the order in which stubs in Compiled*StubBuilder are processed
     private static List<DeclarationDescriptor> sortDeclarations(Collection<DeclarationDescriptor> input) {
         ArrayList<DeclarationDescriptor> r = new ArrayList<DeclarationDescriptor>(input);
         Collections.sort(r, MemberComparator.INSTANCE);
