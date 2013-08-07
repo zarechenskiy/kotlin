@@ -65,6 +65,9 @@ public class JetParameterElementType extends JetStubElementType<PsiJetParameterS
         if (!super.shouldCreateStub(node)) {
             return false;
         }
+        if (isInCompiledFile(node)) {
+            return false;
+        }
         PsiElement psi = node.getPsi();
         return psi instanceof JetParameter && !((JetParameter) psi).isLoopParameter();
     }

@@ -50,7 +50,7 @@ public class JetObjectElementType extends JetStubElementType<PsiJetObjectStub, J
 
     @Override
     public boolean shouldCreateStub(ASTNode node) {
-        if (super.shouldCreateStub(node)) {
+        if (super.shouldCreateStub(node) && !isInCompiledFile(node)) {
             PsiElement psiElement = node.getPsi();
             if (psiElement instanceof JetObjectDeclaration) {
                 JetObjectDeclaration objectDeclaration = (JetObjectDeclaration) psiElement;

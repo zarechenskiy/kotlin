@@ -36,8 +36,12 @@ public class CompiledClassStubBuilder extends CompiledStubBuilderBase {
         Name name = getNameResolver().getName(classProto.getName());
         int flags = classProto.getFlags();
         ProtoBuf.Class.Kind kind = Flags.CLASS_KIND.get(flags);
-        //TODO: inner classes
         boolean isEnumEntry = kind == ProtoBuf.Class.Kind.ENUM_ENTRY;
+        //TODO: create stubs for objects
+        if (kind == ProtoBuf.Class.Kind.OBJECT) {
+            return fileStub;
+        }
+        //TODO: inner classes
         PsiJetClassStubImpl classStub =
                 new PsiJetClassStubImpl(JetClassElementType.getStubType(isEnumEntry), fileStub, classFqName.asString(), name.asString(), getSuperList(),
                                         kind == ProtoBuf.Class.Kind.TRAIT, kind == ProtoBuf.Class.Kind.ENUM_CLASS,

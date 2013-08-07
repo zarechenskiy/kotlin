@@ -87,10 +87,7 @@ public class JetStubsTest extends LightCodeInsightFixtureTestCase {
 
     public void testFunctionInNotNamedObject() {
         doBuildTest("object { fun testing() = 12 }",
-                    "PsiJetFileStubImpl[package=]\n" +
-                    "  CLASS_BODY:PsiJetClassBodyStubImpl\n" +
-                    "    FUN:PsiJetFunctionStubImpl[name=testing]\n" +
-                    "      VALUE_PARAMETER_LIST:PsiJetParameterListStubImpl\n");
+                    "PsiJetFileStubImpl[package=]\n");
     }
 
     public void testFunctionParameters() {

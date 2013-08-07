@@ -1,4 +1,5 @@
 /*
+/*
  * Copyright 2010-2013 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,6 +33,11 @@ import java.io.IOException;
 public class JetTypeParameterListElementType extends JetStubElementType<PsiJetTypeParameterListStub, JetTypeParameterList> {
     public JetTypeParameterListElementType(@NotNull @NonNls String debugName) {
         super(debugName);
+    }
+
+    @Override
+    public boolean shouldCreateStub(ASTNode node) {
+        return super.shouldCreateStub(node) && !isInCompiledFile(node);
     }
 
     @Override

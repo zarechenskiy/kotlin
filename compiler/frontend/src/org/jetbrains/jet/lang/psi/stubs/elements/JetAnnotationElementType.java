@@ -49,6 +49,11 @@ public class JetAnnotationElementType extends JetStubElementType<PsiJetAnnotatio
     }
 
     @Override
+    public boolean shouldCreateStub(ASTNode node) {
+        return super.shouldCreateStub(node) && !isInCompiledFile(node);
+    }
+
+    @Override
     public PsiJetAnnotationStub createStub(@NotNull JetAnnotationEntry psi, StubElement parentStub) {
         Name shortName = JetPsiUtil.getShortName(psi);
         String resultName = shortName != null ? shortName.asString() : psi.getText();
