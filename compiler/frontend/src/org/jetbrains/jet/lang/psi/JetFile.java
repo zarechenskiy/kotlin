@@ -19,18 +19,10 @@ package org.jetbrains.jet.lang.psi;
 import com.intellij.extapi.psi.PsiFileBase;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.FileASTNode;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileTypes.FileType;
-import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.VirtualFileWithId;
 import com.intellij.psi.FileViewProvider;
 import com.intellij.psi.PsiElementVisitor;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiLock;
-import com.intellij.psi.stubs.*;
-import com.intellij.psi.tree.IElementType;
-import com.intellij.psi.tree.IStubFileElementType;
+import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -48,7 +40,11 @@ public class JetFile extends PsiFileBase implements JetDeclarationContainer, Jet
 
     public JetFile(FileViewProvider viewProvider, boolean compiled) {
         super(viewProvider, JetLanguage.INSTANCE);
+        String extension = viewProvider.getVirtualFile().getExtension();
         this.isCompiled = compiled;
+        if (!compiled && extension != null && extension.equals("class")) {
+            throw new IllegalStateException("Creating JetFile with wrong compiled flag!");
+        }
     }
 
     @Override
