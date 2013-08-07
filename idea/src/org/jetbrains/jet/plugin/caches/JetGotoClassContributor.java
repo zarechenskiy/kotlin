@@ -35,7 +35,7 @@ public class JetGotoClassContributor implements GotoClassContributor {
     public String getQualifiedName(NavigationItem item) {
         if (item instanceof JetNamedDeclaration) {
             JetNamedDeclaration jetClass = (JetNamedDeclaration) item;
-            FqName name = JetPsiUtil.getFQName(jetClass);
+            FqName name = jetClass.getFqName();
             if (name != null) {
                 return name.asString();
             }

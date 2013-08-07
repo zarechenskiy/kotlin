@@ -276,7 +276,7 @@ public fun PsiElement.getFqName(): FqName? {
             val prefix = getContainingClass()?.getQualifiedName()
             FqName(if (prefix != null) "$prefix.$name" else name)
         }
-        is JetNamedDeclaration -> JetPsiUtil.getFQName(this)
+        is JetNamedDeclaration -> getFqName()
         else -> null
     }
 }

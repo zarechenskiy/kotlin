@@ -91,7 +91,7 @@ public class NavigateToStdlibSourceRegressionTest extends NavigateToLibraryRegre
             assertEquals(expectedName, ((PsiClass) element).getQualifiedName());
         }
         else if (element instanceof JetClass) {
-            FqName name = JetPsiUtil.getFQName((JetClass) element);
+            FqName name = ((JetClass) element).getFqName();
             assert name != null;
             assertEquals(expectedName, name.asString());
         }

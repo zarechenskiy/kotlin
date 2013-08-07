@@ -58,7 +58,7 @@ public class ChangeVariableTypeFix extends JetIntentionAction<JetVariableDeclara
     @Override
     public String getText() {
         String propertyName = element.getName();
-        FqName fqName = JetPsiUtil.getFQName(element);
+        FqName fqName = element.getFqName();
         if (fqName != null) propertyName = fqName.asString();
 
         return JetBundle.message("change.element.type", propertyName, renderedType);
