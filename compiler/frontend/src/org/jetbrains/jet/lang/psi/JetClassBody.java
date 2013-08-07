@@ -18,13 +18,13 @@ package org.jetbrains.jet.lang.psi;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.JetNodeTypes;
+import org.jetbrains.jet.lang.psi.stubs.elements.JetStubElementTypes;
 import org.jetbrains.jet.lexer.JetTokens;
 
 import java.util.List;
@@ -34,8 +34,8 @@ public class JetClassBody extends JetElementImplStub<StubElement> implements Jet
         super(node);
     }
 
-    public JetClassBody(@NotNull StubElement stub, @NotNull IStubElementType nodeType) {
-        super(stub, nodeType);
+    public JetClassBody(@NotNull StubElement stub) {
+        super(stub, JetStubElementTypes.CLASS_BODY);
     }
 
     @Override
