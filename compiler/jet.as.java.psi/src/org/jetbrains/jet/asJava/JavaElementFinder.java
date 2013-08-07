@@ -112,7 +112,15 @@ public class JavaElementFinder extends PsiElementFinder implements JavaPsiFacade
     private void findPackageClass(FqName qualifiedName, GlobalSearchScope scope, List<PsiClass> answer) {
         Collection<JetFile> filesForPackage = lightClassGenerationSupport.findFilesForPackage(qualifiedName, scope);
 
-        if (!filesForPackage.isEmpty() && NamespaceCodegen.shouldGenerateNSClass(filesForPackage)) {
+        if (filesForPackage.isEmpty()) {
+            return;
+        }
+        boolean isCompiled = filesForPackage.iterator().next().isCompiled();
+        if (isCompiled) {
+            //TODO: LightClass for compiled package class
+            return;
+        }
+        if (NamespaceCodegen.shouldGenerateNSClass(filesForPackage)) {
             KotlinLightClassForPackage lightClass = KotlinLightClassForPackage.create(psiManager, qualifiedName, scope, filesForPackage);
             if (lightClass != null) {
                 answer.add(lightClass);
