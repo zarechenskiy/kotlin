@@ -106,12 +106,6 @@ public class JetNamedFunction extends JetTypeParameterListOwnerStub<PsiJetFuncti
         return null;
     }
 
-    @NotNull
-    @Override
-    public IStubElementType getElementType() {
-        return JetStubElementTypes.FUNCTION;
-    }
-    
     @Override
     public ItemPresentation getPresentation() {
         return ItemPresentationProviders.getItemPresentation(this);

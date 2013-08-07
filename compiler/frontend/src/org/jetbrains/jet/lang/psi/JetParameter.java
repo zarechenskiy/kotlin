@@ -46,12 +46,6 @@ public class JetParameter extends JetNamedDeclarationStub<PsiJetParameterStub> {
         super(stub, nodeType);
     }
 
-    @NotNull
-    @Override
-    public IStubElementType getElementType() {
-        return JetStubElementTypes.VALUE_PARAMETER;
-    }
-
     @Override
     public <R, D> R accept(@NotNull JetVisitor<R, D> visitor, D data) {
         return visitor.visitParameter(this, data);
