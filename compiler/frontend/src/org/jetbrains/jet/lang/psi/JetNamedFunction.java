@@ -76,35 +76,6 @@ public class JetNamedFunction extends JetTypeParameterListOwnerStub<PsiJetFuncti
         return PsiTreeUtil.getNextSiblingOfType(getEqualsToken(), JetExpression.class);
     }
 
-    /**
-    * Returns full qualified name for function "package_fqn.function_name"
-    * Not null for top level functions unless syntax errors are present.
-    * @return
-    */
-    @Nullable
-    public FqName getFqName() {
-        PsiJetFunctionStub stub = getStub();
-        if (stub != null) {
-            return stub.getTopFQName();
-        }
-
-        PsiElement parent = getParent();
-        if (parent instanceof JetFile) {
-            // fqname is different in scripts
-            if (((JetFile) parent).getPackageDirective() == null) {
-                return null;
-            }
-            JetFile jetFile = (JetFile) parent;
-            FqName fileFQN = JetPsiUtil.getFQName(jetFile);
-            Name nameAsName = getNameAsName();
-            if (nameAsName != null) {
-                return fileFQN.child(nameAsName);
-            }
-        }
-
-        return null;
-    }
-
     @Override
     public ItemPresentation getPresentation() {
         return ItemPresentationProviders.getItemPresentation(this);
