@@ -79,6 +79,7 @@ private fun buildDecompiledText(packageFqName: FqName, descriptors: List<Declara
 
     fun sortDeclarations(input: Collection<DeclarationDescriptor>): List<DeclarationDescriptor> {
         val r = ArrayList<DeclarationDescriptor>(input)
+        //NOTE: it is important to use the same comparator as in serialization
         Collections.sort(r, MemberComparator.INSTANCE)
         return r
     }
