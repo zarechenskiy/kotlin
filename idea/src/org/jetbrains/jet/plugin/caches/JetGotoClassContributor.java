@@ -20,12 +20,16 @@ import com.intellij.navigation.GotoClassContributor;
 import com.intellij.navigation.NavigationItem;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.impl.search.JavaSourceFilterScope;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.PsiShortNamesCache;
 import com.intellij.util.ArrayUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.jet.lang.psi.*;
+import org.jetbrains.jet.lang.psi.JetClass;
+import org.jetbrains.jet.lang.psi.JetClassOrObject;
+import org.jetbrains.jet.lang.psi.JetFqNamedDeclaration;
 import org.jetbrains.jet.lang.resolve.name.FqName;
+import org.jetbrains.jet.plugin.libraries.JetSourceNavigationHelper;
 import org.jetbrains.jet.plugin.stubindex.JetClassShortNameIndex;
 
 import java.util.ArrayList;
@@ -61,14 +65,15 @@ public class JetGotoClassContributor implements GotoClassContributor {
     @NotNull
     @Override
     public NavigationItem[] getItemsByName(String name, String pattern, Project project, boolean includeNonProjectItems) {
-        GlobalSearchScope scope = includeNonProjectItems ? GlobalSearchScope.allScope(project) : GlobalSearchScope.projectScope(project);
-        Collection<JetClassOrObject> classesOrObjects = JetClassShortNameIndex.getInstance().get(name, project, scope);
+        GlobalSearchScope baseScope = includeNonProjectItems ? GlobalSearchScope.allScope(project) : GlobalSearchScope.projectScope(project);
+        GlobalSearchScope noLibrarySourcesScope = new JavaSourceFilterScope(baseScope);
+        Collection<JetClassOrObject> classesOrObjects = JetClassShortNameIndex.getInstance().get(name, project, noLibrarySourcesScope);
 
         if (classesOrObjects.isEmpty()) {
             return NavigationItem.EMPTY_NAVIGATION_ITEM_ARRAY;
         }
 
-        PsiClass[] classes = PsiShortNamesCache.getInstance(project).getClassesByName(name, scope);
+        PsiClass[] classes = PsiShortNamesCache.getInstance(project).getClassesByName(name, noLibrarySourcesScope);
         Collection<String> javaQualifiedNames = new HashSet<String>();
         for (PsiClass aClass : classes) {
             String qualifiedName = aClass.getQualifiedName();
@@ -86,7 +91,8 @@ public class JetGotoClassContributor implements GotoClassContributor {
             }
 
             if (classOrObject instanceof JetClass) {
-                items.add(classOrObject);
+                //TODO: lazily
+                items.add(JetSourceNavigationHelper.replaceBySourceDeclarationIfPresent(classOrObject));
             }
         }
 
