@@ -8,7 +8,6 @@ import org.jetbrains.jet.descriptors.serialization.NameResolver;
 import org.jetbrains.jet.descriptors.serialization.ProtoBuf;
 import org.jetbrains.jet.lang.psi.stubs.impl.PsiJetFileStubImpl;
 import org.jetbrains.jet.lang.psi.stubs.impl.PsiJetFunctionStubImpl;
-import org.jetbrains.jet.lang.psi.stubs.impl.PsiJetObjectStubImpl;
 import org.jetbrains.jet.lang.psi.stubs.impl.PsiJetPropertyStubImpl;
 import org.jetbrains.jet.lang.resolve.name.FqName;
 
@@ -44,7 +43,7 @@ public abstract class CompiledStubBuilderBase {
             case CONSTRUCTOR:
                 throw new IllegalStateException("Stubs for constructors are not supported!");
             case OBJECT_PROPERTY:
-                new PsiJetObjectStubImpl(parentStub, callableName, callableFqName, true, false);
+               // new PsiJetObjectStubImpl(parentStub, callableName, callableFqName, true, false);
                 break;
         }
     }

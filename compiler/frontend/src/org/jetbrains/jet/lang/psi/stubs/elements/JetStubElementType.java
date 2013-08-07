@@ -74,6 +74,27 @@ public abstract class JetStubElementType<StubT extends StubElement, PsiT extends
             }
         }
 
+        //TODO: should be removed when correct stubs for inner class and objects are implemented
+        //Don't create stubs if it's inside a class that should not be stubbed
+        JetClass parentClass = PsiTreeUtil.getParentOfType(psi, JetClass.class);
+        boolean insideClassThatShouldNotBeStubbed =
+                parentClass != null && !parentClass.getElementType().shouldCreateStub(parentClass.getNode());
+        JetObjectDeclaration parentObject = PsiTreeUtil.getParentOfType(psi, JetObjectDeclaration.class);
+        boolean insideObjectThatShouldNotBeStubbed = parentObject != null && !parentObject.getElementType().shouldCreateStub(parentObject.getNode());
+        if (insideClassThatShouldNotBeStubbed || insideObjectThatShouldNotBeStubbed) {
+            return false;
+        }
         return super.shouldCreateStub(node);
+    }
+
+    // TODO: used to disable building certain types of stubs for compiled JetFiles
+    // provide better implementation of Compiled*StubBuilders to fix this limitation
+    protected static boolean isInCompiledFile(ASTNode node) {
+        JetFile file = PsiTreeUtil.getParentOfType(node.getPsi(), JetFile.class, true);
+        assert file != null : "Psi corrupted." + node.getPsi() + " should be contained in JetFile.";
+        if (file.isCompiled()) {
+            return true;
+        }
+        return false;
     }
 }

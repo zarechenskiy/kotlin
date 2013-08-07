@@ -21,10 +21,12 @@ import com.intellij.psi.stubs.IndexSink;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
 import com.intellij.psi.stubs.StubOutputStream;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.io.StringRef;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jet.lang.psi.JetClass;
+import org.jetbrains.jet.lang.psi.JetClassOrObject;
 import org.jetbrains.jet.lang.psi.JetEnumEntry;
 import org.jetbrains.jet.lang.psi.stubs.PsiJetClassStub;
 import org.jetbrains.jet.lang.psi.stubs.impl.PsiJetClassStubImpl;
@@ -47,6 +49,16 @@ public class JetClassElementType extends JetStubElementType<PsiJetClassStub, Jet
     @Override
     public JetClass createPsiFromAst(@NotNull ASTNode node) {
         return node.getElementType() != JetStubElementTypes.ENUM_ENTRY ? new JetClass(node) : new JetEnumEntry(node);
+    }
+
+    @Override
+    public boolean shouldCreateStub(ASTNode node) {
+        if (!super.shouldCreateStub(node)) {
+            return false;
+        }
+        //TODO: this disables stubs for inner classes in compiled files
+        boolean isInnerClass = PsiTreeUtil.getParentOfType(node.getPsi(), JetClassOrObject.class) != null;
+        return !(isInnerClass && isInCompiledFile(node));
     }
 
     @Override

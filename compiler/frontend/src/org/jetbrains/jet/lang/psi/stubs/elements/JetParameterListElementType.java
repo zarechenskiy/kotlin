@@ -40,6 +40,11 @@ public class JetParameterListElementType extends JetStubElementType<PsiJetParame
     }
 
     @Override
+    public boolean shouldCreateStub(ASTNode node) {
+        return super.shouldCreateStub(node) && !isInCompiledFile(node);
+    }
+
+    @Override
     public JetParameterList createPsi(@NotNull PsiJetParameterListStub stub) {
         return new JetParameterList(stub, JetStubElementTypes.VALUE_PARAMETER_LIST);
     }
