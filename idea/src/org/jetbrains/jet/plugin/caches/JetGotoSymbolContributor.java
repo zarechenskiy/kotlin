@@ -29,6 +29,7 @@ import com.intellij.util.Function;
 import com.intellij.util.containers.ContainerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jet.lang.psi.JetDeclaration;
+import org.jetbrains.jet.lang.psi.JetNamedDeclaration;
 import org.jetbrains.jet.lang.psi.JetNamedFunction;
 import org.jetbrains.jet.lang.psi.JetProperty;
 import org.jetbrains.jet.plugin.libraries.JetSourceNavigationHelper;
@@ -62,11 +63,11 @@ public class JetGotoSymbolContributor implements ChooseByNameContributor {
                 JetPropertyShortNameIndex.getInstance().getKey(), name, project, noLibrarySourcesScope);
 
         //TODO: lazily
-        List<JetDeclaration> items = new ArrayList<JetDeclaration>(Collections2.filter(functions, Predicates.notNull()));
+        List<JetNamedDeclaration> items = new ArrayList<JetNamedDeclaration>(Collections2.filter(functions, Predicates.notNull()));
         items.addAll(properties);
-        List<NavigationItem> result = ContainerUtil.map(items, new Function<JetDeclaration, NavigationItem>() {
+        List<NavigationItem> result = ContainerUtil.map(items, new Function<JetNamedDeclaration, NavigationItem>() {
             @Override
-            public NavigationItem fun(JetDeclaration item) {
+            public NavigationItem fun(JetNamedDeclaration item) {
                 return JetSourceNavigationHelper.replaceBySourceDeclarationIfPresent(item);
             }
         });

@@ -42,7 +42,7 @@ public final class DecompiledNavigationUtils {
             @NotNull Project project,
             @NotNull DeclarationDescriptor referencedDescriptor
     ) {
-        JetDeclaration declarationFromDecompiledClassFile = getDeclarationFromDecompiledClassFile(project, referencedDescriptor);
+        JetNamedDeclaration declarationFromDecompiledClassFile = getDeclarationFromDecompiledClassFile(project, referencedDescriptor);
         if (declarationFromDecompiledClassFile == null) {
             return null;
         }
@@ -50,7 +50,7 @@ public final class DecompiledNavigationUtils {
     }
 
     @Nullable
-    private static JetDeclaration getDeclarationFromDecompiledClassFile(
+    private static JetNamedDeclaration getDeclarationFromDecompiledClassFile(
             @NotNull Project project,
             @NotNull DeclarationDescriptor referencedDescriptor
     ) {
@@ -62,9 +62,9 @@ public final class DecompiledNavigationUtils {
         JetDecompiledData data = JetDecompiledData.getDecompiledData(virtualFile, project);
         PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
         if (psiFile instanceof JetFile) {
-            JetDeclaration jetDeclaration = data.getDeclarationForDescriptor((JetFile) psiFile, effectiveReferencedDescriptor);
-            if (jetDeclaration != null) {
-                return jetDeclaration;
+            JetNamedDeclaration declaration = data.getDeclarationForDescriptor((JetFile) psiFile, effectiveReferencedDescriptor);
+            if (declaration != null) {
+                return declaration;
             }
             else {
                 LOG.warn("Could not find an element to navigate to for descriptor " + getFQName(effectiveReferencedDescriptor));

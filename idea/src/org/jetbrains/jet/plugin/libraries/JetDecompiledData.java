@@ -27,6 +27,7 @@ import org.jetbrains.annotations.TestOnly;
 import org.jetbrains.jet.lang.descriptors.DeclarationDescriptor;
 import org.jetbrains.jet.lang.psi.JetDeclaration;
 import org.jetbrains.jet.lang.psi.JetFile;
+import org.jetbrains.jet.lang.psi.JetNamedDeclaration;
 
 import java.util.Map;
 
@@ -70,13 +71,13 @@ public class JetDecompiledData {
     }
 
     @Nullable
-    public JetDeclaration getDeclarationForDescriptor(@NotNull JetFile file, @NotNull DeclarationDescriptor descriptor) {
+    public JetNamedDeclaration getDeclarationForDescriptor(@NotNull JetFile file, @NotNull DeclarationDescriptor descriptor) {
         String key = descriptorToKey(descriptor);
         TextRange range = renderedDescriptorsToRanges.get(key);
         if (range == null) {
             return null;
         }
-        return PsiTreeUtil.findElementOfClassAtRange(file, range.getStartOffset(), range.getEndOffset(), JetDeclaration.class);
+        return PsiTreeUtil.findElementOfClassAtRange(file, range.getStartOffset(), range.getEndOffset(), JetNamedDeclaration.class);
     }
 
     //TODO: should use more accurate way to identify descriptors
