@@ -9,6 +9,6 @@ public class JetDeclarationNavigationStrategyImpl implements JetDeclarationNavig
     @Nullable
     @Override
     public JetNamedDeclaration getNavigationElement(@NotNull JetNamedDeclaration original) {
-        return JetSourceNavigationHelper.replaceBySourceDeclarationIfPresent(original);
+        return JetSourceNavigationHelper.findSourceDeclaration(original);
     }
 }
