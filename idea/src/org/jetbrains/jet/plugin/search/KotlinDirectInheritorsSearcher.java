@@ -31,7 +31,7 @@ import org.jetbrains.jet.lang.psi.JetFile;
 import org.jetbrains.jet.lang.resolve.DescriptorUtils;
 import org.jetbrains.jet.lang.resolve.lazy.KotlinCodeAnalyzer;
 import org.jetbrains.jet.lang.types.JetType;
-import org.jetbrains.jet.plugin.libraries.JetSourceNavigationHelper;
+import org.jetbrains.jet.plugin.JetPluginUtil;
 import org.jetbrains.jet.plugin.project.WholeProjectAnalyzerFacade;
 import org.jetbrains.jet.plugin.stubindex.JetSuperClassIndex;
 
@@ -70,7 +70,7 @@ public class KotlinDirectInheritorsSearcher extends QueryExecutorBase<PsiClass, 
                         if (declarationDescriptor != null) {
                             String fqName = DescriptorUtils.getFQName(declarationDescriptor).asString();
                             if (qualifiedName.equals(fqName)) {
-                                PsiClass psiClass = JetSourceNavigationHelper.getOriginalPsiClassOrCreateLightClass(candidate);
+                                PsiClass psiClass = JetPluginUtil.getJavaAnalogOrLightClass(candidate);
                                 if (psiClass != null) {
                                     consumer.process(psiClass);
                                 }

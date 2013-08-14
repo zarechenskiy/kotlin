@@ -18,31 +18,39 @@ package org.jetbrains.jet.plugin.caches.resolve;
 
 import com.google.common.collect.Sets;
 import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.OrderEntry;
+import com.intellij.openapi.roots.ProjectFileIndex;
+import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.roots.libraries.LibraryUtil;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.containers.MultiMap;
+import gnu.trove.THashSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.asJava.KotlinLightClassForExplicitDeclaration;
 import org.jetbrains.jet.asJava.LightClassConstructionContext;
 import org.jetbrains.jet.asJava.LightClassGenerationSupport;
+import org.jetbrains.jet.codegen.binding.PsiCodegenPredictor;
 import org.jetbrains.jet.lang.psi.JetClassOrObject;
 import org.jetbrains.jet.lang.psi.JetFile;
 import org.jetbrains.jet.lang.psi.JetPsiUtil;
+import org.jetbrains.jet.lang.resolve.java.JvmClassName;
 import org.jetbrains.jet.lang.resolve.java.PackageClassUtils;
 import org.jetbrains.jet.lang.resolve.name.FqName;
-import org.jetbrains.jet.plugin.libraries.JetSourceNavigationHelper;
 import org.jetbrains.jet.plugin.stubindex.JetAllPackagesIndex;
 import org.jetbrains.jet.plugin.stubindex.JetClassByPackageIndex;
 import org.jetbrains.jet.plugin.stubindex.JetFullClassNameIndex;
 import org.jetbrains.jet.util.QualifiedNamesUtil;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import static org.jetbrains.jet.plugin.stubindex.JetSourceFilterScope.kotlinSources;
@@ -126,7 +134,7 @@ public class IDELightClassGenerationSupport extends LightClassGenerationSupport 
     public PsiClass getPsiClass(@NotNull JetClassOrObject classOrObject) {
         VirtualFile virtualFile = classOrObject.getContainingFile().getVirtualFile();
         if (virtualFile != null && LibraryUtil.findLibraryEntry(virtualFile, classOrObject.getProject()) != null) {
-            return JetSourceNavigationHelper.getOriginalClass(classOrObject);
+            return getOriginalClass(classOrObject);
         }
 
         return  KotlinLightClassForExplicitDeclaration.create(classOrObject.getManager(), classOrObject);
@@ -143,5 +151,56 @@ public class IDELightClassGenerationSupport extends LightClassGenerationSupport 
         }
 
         return result;
+    }
+
+    // Find compiled PsiClass from library for source from library
+    @Nullable
+    private static PsiClass getOriginalClass(@NotNull JetClassOrObject classOrObject) {
+        // Copied from JavaPsiImplementationHelperImpl:getOriginalClass()
+        JvmClassName className = PsiCodegenPredictor.getPredefinedJvmClassName(classOrObject);
+        if (className == null) {
+            return null;
+        }
+        String fqName = className.getFqName().asString();
+
+        JetFile file = (JetFile) classOrObject.getContainingFile();
+
+        VirtualFile vFile = file.getVirtualFile();
+        Project project = file.getProject();
+
+        final ProjectFileIndex idx = ProjectRootManager.getInstance(project).getFileIndex();
+
+        if (vFile == null || !idx.isInLibrarySource(vFile)) return null;
+        final Set<OrderEntry> orderEntries = new THashSet<OrderEntry>(idx.getOrderEntriesForFile(vFile));
+
+        PsiClass original = JavaPsiFacade.getInstance(project).findClass(fqName, new GlobalSearchScope(project) {
+            @Override
+            public int compare(VirtualFile file1, VirtualFile file2) {
+                return 0;
+            }
+
+            @Override
+            public boolean contains(VirtualFile file) {
+                List<OrderEntry> entries = idx.getOrderEntriesForFile(file);
+                //noinspection ForLoopReplaceableByForEach
+                for (int i = 0; i < entries.size(); i++) {
+                    OrderEntry entry = entries.get(i);
+                    if (orderEntries.contains(entry)) return true;
+                }
+                return false;
+            }
+
+            @Override
+            public boolean isSearchInModuleContent(@NotNull Module aModule) {
+                return false;
+            }
+
+            @Override
+            public boolean isSearchInLibraries() {
+                return true;
+            }
+        });
+
+        return original;
     }
 }

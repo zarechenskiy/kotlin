@@ -21,15 +21,30 @@ import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
 import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.JavaPsiFacade;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.asm4.Type;
+import org.jetbrains.jet.asJava.LightClassUtil;
+import org.jetbrains.jet.codegen.AsmUtil;
+import org.jetbrains.jet.lang.descriptors.ClassDescriptor;
 import org.jetbrains.jet.lang.descriptors.DeclarationDescriptor;
 import org.jetbrains.jet.lang.descriptors.ModuleDescriptor;
 import org.jetbrains.jet.lang.descriptors.NamespaceDescriptor;
+import org.jetbrains.jet.lang.psi.JetClassOrObject;
+import org.jetbrains.jet.lang.psi.JetFile;
+import org.jetbrains.jet.lang.psi.JetPsiUtil;
 import org.jetbrains.jet.lang.resolve.java.JavaDescriptorResolver;
+import org.jetbrains.jet.lang.resolve.java.JvmClassName;
+import org.jetbrains.jet.lang.resolve.java.mapping.KotlinToJavaTypesMap;
+import org.jetbrains.jet.lang.resolve.name.Name;
 import org.jetbrains.jet.lang.resolve.scopes.JetScope;
 import org.jetbrains.jet.lang.types.DeferredType;
 import org.jetbrains.jet.lang.types.ErrorUtils;
 import org.jetbrains.jet.lang.types.JetType;
+import org.jetbrains.jet.lang.types.TypeUtils;
 import org.jetbrains.jet.lang.types.lang.KotlinBuiltIns;
 
 import java.util.LinkedList;
@@ -83,5 +98,31 @@ public class JetPluginUtil {
         IdeaPluginDescriptor plugin = PluginManager.getPlugin(PluginId.getId("org.jetbrains.kotlin"));
         assert plugin != null : "How can it be? Kotlin plugin is available, but its component is running. Complete nonsense.";
         return plugin.getVersion();
+    }
+
+    @Nullable
+    public static PsiClass getJavaAnalogOrLightClass(@NotNull JetClassOrObject classOrObject) {
+        if (LightClassUtil.belongsToKotlinBuiltIns((JetFile) classOrObject.getContainingFile())) {
+            Name className = classOrObject.getNameAsName();
+            assert className != null : "Class from BuiltIns should have a name";
+            ClassDescriptor classDescriptor = KotlinBuiltIns.getInstance().getBuiltInClassByName(className);
+            Type javaAnalog = KotlinToJavaTypesMap.getInstance().getJavaAnalog(classDescriptor.getDefaultType());
+            if (javaAnalog != null) {
+                if (AsmUtil.isPrimitive(javaAnalog)) {
+                    javaAnalog = KotlinToJavaTypesMap.getInstance().getJavaAnalog(TypeUtils.makeNullable(classDescriptor.getDefaultType()));
+                    assert javaAnalog != null : "Java analog should exists for primitive nullable type";
+                }
+                if (javaAnalog.getSort() != Type.OBJECT) {
+                    return null;
+                }
+                String fqName = JvmClassName.byType(javaAnalog).getFqName().asString();
+                return JavaPsiFacade.getInstance(classOrObject.getProject()).
+                        findClass(fqName, GlobalSearchScope.allScope(classOrObject.getProject()));
+            }
+        }
+        if (!JetPsiUtil.isLocalClass(classOrObject)) {
+            return LightClassUtil.getPsiClass(classOrObject);
+        }
+        return null;
     }
 }

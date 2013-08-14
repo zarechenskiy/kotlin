@@ -36,8 +36,8 @@ import org.jetbrains.jet.lang.psi.JetFile;
 import org.jetbrains.jet.lang.psi.JetNamedFunction;
 import org.jetbrains.jet.lang.resolve.BindingContext;
 import org.jetbrains.jet.lang.types.JetType;
+import org.jetbrains.jet.plugin.JetPluginUtil;
 import org.jetbrains.jet.plugin.caches.resolve.KotlinCacheManagerUtil;
-import org.jetbrains.jet.plugin.libraries.JetSourceNavigationHelper;
 import org.jetbrains.jet.plugin.stubindex.JetClassShortNameIndex;
 import org.jetbrains.jet.renderer.DescriptorRenderer;
 
@@ -62,7 +62,7 @@ public class KotlinTypeHierarchyProvider extends JavaTypeHierarchyProvider {
             }
 
             if (target instanceof JetClassOrObject) {
-                return JetSourceNavigationHelper.getOriginalPsiClassOrCreateLightClass((JetClassOrObject) target);
+                return JetPluginUtil.getJavaAnalogOrLightClass((JetClassOrObject) target);
             }
             // Factory methods
             else if (target instanceof JetNamedFunction) {
@@ -79,7 +79,7 @@ public class KotlinTypeHierarchyProvider extends JavaTypeHierarchyProvider {
                                     JetClassShortNameIndex.getInstance().get(functionName, project, GlobalSearchScope.allScope(project));
                             if (classOrObjects.size() == 1) {
                                 JetClassOrObject classOrObject = classOrObjects.iterator().next();
-                                return JetSourceNavigationHelper.getOriginalPsiClassOrCreateLightClass(classOrObject);
+                                return JetPluginUtil.getJavaAnalogOrLightClass(classOrObject);
                             }
                         }
                     }
@@ -92,13 +92,13 @@ public class KotlinTypeHierarchyProvider extends JavaTypeHierarchyProvider {
 
             JetClassOrObject classOrObject = PsiTreeUtil.getParentOfType(element, JetClassOrObject.class);
             if (classOrObject != null) {
-                return JetSourceNavigationHelper.getOriginalPsiClassOrCreateLightClass(classOrObject);
+                return JetPluginUtil.getJavaAnalogOrLightClass(classOrObject);
             }
         }
         else {
             PsiElement element = LangDataKeys.PSI_ELEMENT.getData(dataContext);
             if (element instanceof JetClassOrObject) {
-                return JetSourceNavigationHelper.getOriginalPsiClassOrCreateLightClass((JetClassOrObject) element);
+                return JetPluginUtil.getJavaAnalogOrLightClass((JetClassOrObject) element);
             }
         }
 
