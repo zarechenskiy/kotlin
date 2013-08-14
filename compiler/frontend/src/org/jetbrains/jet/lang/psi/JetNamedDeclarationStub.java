@@ -17,13 +17,13 @@
 package org.jetbrains.jet.lang.psi;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.stubs.NamedStub;
 import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.lang.resolve.name.Name;
 import org.jetbrains.jet.lexer.JetTokens;
 
@@ -34,6 +34,19 @@ abstract class JetNamedDeclarationStub<T extends NamedStub> extends JetDeclarati
 
     public JetNamedDeclarationStub(@NotNull ASTNode node) {
         super(node);
+    }
+
+    @NotNull
+    @Override
+    public PsiElement getNavigationElement() {
+        JetDeclarationNavigationStrategy navigationPolicy = ServiceManager.getService(JetDeclarationNavigationStrategy.class);
+        if (navigationPolicy != null) {
+            JetNamedDeclaration navigationElement = navigationPolicy.getNavigationElement(this);
+            if (navigationElement != null) {
+                return navigationElement;
+            }
+        }
+        return this;
     }
 
     @Override
