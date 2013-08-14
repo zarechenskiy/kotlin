@@ -55,7 +55,9 @@ public final class DecompiledNavigationUtils {
                 return declaration;
             }
             else {
-                LOG.warn("Could not find an element to navigate to for descriptor " + getFQName(effectiveReferencedDescriptor));
+                if (!(effectiveReferencedDescriptor instanceof NamespaceDescriptor)) {
+                    LOG.warn("Could not find an element to navigate to for descriptor " + getFQName(effectiveReferencedDescriptor));
+                }
             }
         }
         else if (psiFile != null) {
