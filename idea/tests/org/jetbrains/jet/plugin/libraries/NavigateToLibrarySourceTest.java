@@ -29,6 +29,7 @@ import com.intellij.psi.PsiReference;
 import com.intellij.util.containers.MultiMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jet.JetTestUtils;
+import org.jetbrains.jet.lang.psi.JetFile;
 import org.jetbrains.jet.plugin.references.JetPsiReference;
 
 import java.util.*;
@@ -116,11 +117,14 @@ public class NavigateToLibrarySourceTest extends AbstractNavigateToLibraryTest {
             if (ref instanceof JetPsiReference && !referenceContainersToReferences.containsKey(ref.getElement())) {
                 PsiElement target = ref.resolve();
                 if (target == null) continue;
-                PsiFile targetNavPsiFile = target.getNavigationElement().getContainingFile();
-                if (targetNavPsiFile == null) continue;
-                VirtualFile targetNavFile = targetNavPsiFile.getVirtualFile();
-                if (targetNavFile == null) continue;
-                if (VfsUtilCore.isAncestor(librarySourceDir, targetNavFile, true)) {
+                PsiElement targetNavigationElement = target.getNavigationElement();
+                PsiFile targetPsiFile = targetNavigationElement.getContainingFile();
+                if (targetPsiFile == null) continue;
+                VirtualFile targetFile = targetPsiFile.getVirtualFile();
+                if (targetFile == null) continue;
+                if (VfsUtilCore.isAncestor(librarySourceDir, targetFile, true)) {
+                    assert !((JetFile) targetNavigationElement.getContainingFile()).isCompiled();
+                    assert ((JetFile) target.getContainingFile()).isCompiled();
                     referenceContainersToReferences.put(ref.getElement(), (JetPsiReference)ref);
                 }
             }

@@ -25,14 +25,9 @@ import com.intellij.psi.impl.search.JavaSourceFilterScope;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StubIndex;
 import com.intellij.util.ArrayUtil;
-import com.intellij.util.Function;
-import com.intellij.util.containers.ContainerUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.jet.lang.psi.JetDeclaration;
-import org.jetbrains.jet.lang.psi.JetNamedDeclaration;
 import org.jetbrains.jet.lang.psi.JetNamedFunction;
 import org.jetbrains.jet.lang.psi.JetProperty;
-import org.jetbrains.jet.plugin.libraries.JetSourceNavigationHelper;
 import org.jetbrains.jet.plugin.stubindex.JetFunctionShortNameIndex;
 import org.jetbrains.jet.plugin.stubindex.JetPropertyShortNameIndex;
 
@@ -62,15 +57,8 @@ public class JetGotoSymbolContributor implements ChooseByNameContributor {
         Collection<JetProperty> properties = StubIndex.getInstance().get(
                 JetPropertyShortNameIndex.getInstance().getKey(), name, project, noLibrarySourcesScope);
 
-        //TODO: lazily
-        List<JetNamedDeclaration> items = new ArrayList<JetNamedDeclaration>(Collections2.filter(functions, Predicates.notNull()));
+        List<NavigationItem> items = new ArrayList<NavigationItem>(Collections2.filter(functions, Predicates.notNull()));
         items.addAll(properties);
-        List<NavigationItem> result = ContainerUtil.map(items, new Function<JetNamedDeclaration, NavigationItem>() {
-            @Override
-            public NavigationItem fun(JetNamedDeclaration item) {
-                return JetSourceNavigationHelper.replaceBySourceDeclarationIfPresent(item);
-            }
-        });
-        return ArrayUtil.toObjectArray(result, NavigationItem.class);
+        return ArrayUtil.toObjectArray(items, NavigationItem.class);
     }
 }

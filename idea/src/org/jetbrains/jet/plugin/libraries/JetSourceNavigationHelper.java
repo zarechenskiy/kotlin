@@ -197,6 +197,10 @@ public class JetSourceNavigationHelper {
                                             + decompiledContainer.getClass().getSimpleName());
         }
 
+        if (candidates.isEmpty()) {
+            return null;
+        }
+
         if (!forceResolve) {
             candidates = filterByReceiverPresenceAndParametersCount(decompiledDeclaration, candidates);
 
@@ -212,7 +216,6 @@ public class JetSourceNavigationHelper {
                 }
             }
         }
-
         Project project = decompiledDeclaration.getProject();
         LockBasedStorageManager storageManager = new LockBasedStorageManager();
         FileBasedDeclarationProviderFactory providerFactory = new FileBasedDeclarationProviderFactory(storageManager, getContainingFiles(candidates),
@@ -422,7 +425,7 @@ public class JetSourceNavigationHelper {
     }
 
     @NotNull
-    public static JetNamedDeclaration replaceBySourceDeclarationIfPresent(@NotNull JetNamedDeclaration original) {
+    static JetNamedDeclaration replaceBySourceDeclarationIfPresent(@NotNull JetNamedDeclaration original) {
         JetNamedDeclaration sourceElement = original.accept(new SourceForDecompiledExtractingVisitor(), null);
         return sourceElement != null ? sourceElement : original;
     }

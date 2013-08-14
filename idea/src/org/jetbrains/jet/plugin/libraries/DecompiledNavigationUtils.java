@@ -38,19 +38,7 @@ public final class DecompiledNavigationUtils {
     private static final Logger LOG = Logger.getInstance(DecompiledNavigationUtils.class);
 
     @Nullable
-    public static JetDeclaration findDeclarationForReference(
-            @NotNull Project project,
-            @NotNull DeclarationDescriptor referencedDescriptor
-    ) {
-        JetNamedDeclaration declarationFromDecompiledClassFile = getDeclarationFromDecompiledClassFile(project, referencedDescriptor);
-        if (declarationFromDecompiledClassFile == null) {
-            return null;
-        }
-        return JetSourceNavigationHelper.replaceBySourceDeclarationIfPresent(declarationFromDecompiledClassFile);
-    }
-
-    @Nullable
-    private static JetNamedDeclaration getDeclarationFromDecompiledClassFile(
+    public static JetNamedDeclaration getDeclarationFromDecompiledClassFile(
             @NotNull Project project,
             @NotNull DeclarationDescriptor referencedDescriptor
     ) {

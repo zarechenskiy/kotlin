@@ -91,8 +91,7 @@ public class JetGotoClassContributor implements GotoClassContributor {
             }
 
             if (classOrObject instanceof JetClass) {
-                //TODO: lazily
-                items.add(JetSourceNavigationHelper.replaceBySourceDeclarationIfPresent(classOrObject));
+                items.add(classOrObject);
             }
         }
 

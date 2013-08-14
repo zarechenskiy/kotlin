@@ -116,7 +116,7 @@ public abstract class JetPsiReference implements PsiPolyVariantReference {
         DeclarationDescriptor referencedDescriptor = bindingContext.get(BindingContext.REFERENCE_TARGET, myExpression);
         if (referencedDescriptor != null) {
             JetDeclaration declarationInDecompiledFile =
-                    DecompiledNavigationUtils.findDeclarationForReference(myExpression.getProject(), referencedDescriptor);
+                    DecompiledNavigationUtils.getDeclarationFromDecompiledClassFile(myExpression.getProject(), referencedDescriptor);
             if (declarationInDecompiledFile != null) {
                 return declarationInDecompiledFile;
             }
