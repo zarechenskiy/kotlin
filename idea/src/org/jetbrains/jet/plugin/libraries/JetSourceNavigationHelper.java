@@ -79,7 +79,7 @@ public class JetSourceNavigationHelper {
     }
 
     @Nullable
-    public static JetClassOrObject getSourceClassOrObject(@NotNull JetClassOrObject decompiledClassOrObject) {
+    private static JetClassOrObject getSourceClassOrObject(@NotNull JetClassOrObject decompiledClassOrObject) {
         if (decompiledClassOrObject instanceof JetObjectDeclaration && decompiledClassOrObject.getParent() instanceof JetClassObject) {
             // class object case
 
@@ -334,12 +334,12 @@ public class JetSourceNavigationHelper {
     }
 
     @Nullable
-    public static JetFqNamedDeclaration getSourceProperty(@NotNull JetProperty decompiledProperty) {
+    private static JetFqNamedDeclaration getSourceProperty(@NotNull JetProperty decompiledProperty) {
         return getSourcePropertyOrFunction(decompiledProperty);
     }
 
     @Nullable
-    public static JetFqNamedDeclaration getSourceFunction(@NotNull JetNamedFunction decompiledFunction) {
+    private static JetFqNamedDeclaration getSourceFunction(@NotNull JetNamedFunction decompiledFunction) {
         return getSourcePropertyOrFunction(decompiledFunction);
     }
 
@@ -424,10 +424,9 @@ public class JetSourceNavigationHelper {
         return original;
     }
 
-    @NotNull
-    static JetNamedDeclaration replaceBySourceDeclarationIfPresent(@NotNull JetNamedDeclaration original) {
-        JetNamedDeclaration sourceElement = original.accept(new SourceForDecompiledExtractingVisitor(), null);
-        return sourceElement != null ? sourceElement : original;
+    @Nullable
+    static JetNamedDeclaration findSourceDeclaration(@NotNull JetNamedDeclaration original) {
+        return original.accept(new SourceForDecompiledExtractingVisitor(), null);
     }
 
     private static class SourceForDecompiledExtractingVisitor extends JetVisitor<JetNamedDeclaration, Void> {
