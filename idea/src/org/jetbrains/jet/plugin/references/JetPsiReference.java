@@ -87,8 +87,7 @@ public abstract class JetPsiReference implements PsiPolyVariantReference {
 
     @Override
     public boolean isReferenceTo(PsiElement element) {
-        PsiElement target = resolve();
-        return target == element || target != null && target.getNavigationElement() == element;
+        return resolve() == element;
     }
 
     @NotNull
