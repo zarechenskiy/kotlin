@@ -16,21 +16,14 @@
 
 package org.jetbrains.jet.lang.psi.stubs.impl;
 
-import com.google.common.collect.Lists;
-import com.intellij.psi.PsiClass;
-import com.intellij.psi.impl.java.stubs.PsiClassStub;
-import com.intellij.psi.stubs.PsiClassHolderFileStub;
 import com.intellij.psi.stubs.PsiFileStubImpl;
-import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.tree.IStubFileElementType;
 import com.intellij.util.io.StringRef;
 import org.jetbrains.jet.lang.psi.JetFile;
 import org.jetbrains.jet.lang.psi.stubs.PsiJetFileStub;
 import org.jetbrains.jet.lang.psi.stubs.elements.JetStubElementTypes;
 
-import java.util.List;
-
-public class PsiJetFileStubImpl extends PsiFileStubImpl<JetFile> implements PsiJetFileStub, PsiClassHolderFileStub<JetFile> {
+public class PsiJetFileStubImpl extends PsiFileStubImpl<JetFile> implements PsiJetFileStub {
 
     private final StringRef packageName;
     private final boolean isScript;
@@ -71,16 +64,5 @@ public class PsiJetFileStubImpl extends PsiFileStubImpl<JetFile> implements PsiJ
         builder.append("]");
 
         return builder.toString();
-    }
-
-    @Override
-    public PsiClass[] getClasses() {
-        List<PsiClass> result = Lists.newArrayList();
-        for (StubElement child : getChildrenStubs()) {
-            if (child instanceof PsiClassStub) {
-                result.add((PsiClass) child.getPsi());
-            }
-        }
-        return result.toArray(new PsiClass[result.size()]);
     }
 }
