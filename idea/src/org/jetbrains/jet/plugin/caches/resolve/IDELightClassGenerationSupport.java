@@ -18,30 +18,33 @@ package org.jetbrains.jet.plugin.caches.resolve;
 
 import com.google.common.collect.Sets;
 import com.intellij.openapi.components.ServiceManager;
-import com.intellij.openapi.module.Module;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.OrderEntry;
-import com.intellij.openapi.roots.ProjectFileIndex;
-import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.roots.libraries.LibraryUtil;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.JavaPsiFacade;
+import com.intellij.psi.ClassFileViewProvider;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiManager;
+import com.intellij.psi.impl.PsiManagerImpl;
+import com.intellij.psi.impl.compiled.ClsFileImpl;
+import com.intellij.psi.impl.compiled.InnerClassSourceStrategy;
+import com.intellij.psi.impl.compiled.StubBuildingVisitor;
+import com.intellij.psi.impl.java.stubs.impl.PsiJavaFileStubImpl;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.stubs.PsiClassHolderFileStub;
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.containers.MultiMap;
-import gnu.trove.THashSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.asm4.ClassReader;
+import org.jetbrains.jet.asJava.ClsWrapperStubPsiFactory;
 import org.jetbrains.jet.asJava.KotlinLightClassForExplicitDeclaration;
 import org.jetbrains.jet.asJava.LightClassConstructionContext;
 import org.jetbrains.jet.asJava.LightClassGenerationSupport;
-import org.jetbrains.jet.codegen.binding.PsiCodegenPredictor;
 import org.jetbrains.jet.lang.psi.JetClassOrObject;
 import org.jetbrains.jet.lang.psi.JetFile;
 import org.jetbrains.jet.lang.psi.JetPsiUtil;
-import org.jetbrains.jet.lang.resolve.java.JvmClassName;
 import org.jetbrains.jet.lang.resolve.java.PackageClassUtils;
 import org.jetbrains.jet.lang.resolve.name.FqName;
 import org.jetbrains.jet.plugin.stubindex.JetAllPackagesIndex;
@@ -49,13 +52,14 @@ import org.jetbrains.jet.plugin.stubindex.JetClassByPackageIndex;
 import org.jetbrains.jet.plugin.stubindex.JetFullClassNameIndex;
 import org.jetbrains.jet.util.QualifiedNamesUtil;
 
+import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
-import static org.jetbrains.jet.plugin.stubindex.JetSourceFilterScope.kotlinSources;
+import static org.jetbrains.jet.plugin.stubindex.JetSourceFilterScope.kotlinSourcesAndBinaries;
 
 public class IDELightClassGenerationSupport extends LightClassGenerationSupport {
+    private static final Logger LOG = Logger.getInstance(IDELightClassGenerationSupport.class);
 
     public static IDELightClassGenerationSupport getInstanceForIDE(@NotNull Project project) {
         return (IDELightClassGenerationSupport) ServiceManager.getService(project, LightClassGenerationSupport.class);
@@ -78,13 +82,13 @@ public class IDELightClassGenerationSupport extends LightClassGenerationSupport 
     @NotNull
     @Override
     public Collection<JetClassOrObject> findClassOrObjectDeclarations(@NotNull FqName fqName, @NotNull GlobalSearchScope searchScope) {
-        return JetFullClassNameIndex.getInstance().get(fqName.asString(), project, kotlinSources(searchScope));
+        return JetFullClassNameIndex.getInstance().get(fqName.asString(), project, kotlinSourcesAndBinaries(searchScope));
     }
 
     @NotNull
     @Override
     public Collection<JetFile> findFilesForPackage(@NotNull final FqName fqName, @NotNull GlobalSearchScope searchScope) {
-        Collection<JetFile> files = JetAllPackagesIndex.getInstance().get(fqName.asString(), project, kotlinSources(searchScope));
+        Collection<JetFile> files = JetAllPackagesIndex.getInstance().get(fqName.asString(), project, kotlinSourcesAndBinaries(searchScope));
         return ContainerUtil.filter(files, new Condition<JetFile>() {
             @Override
             public boolean value(JetFile file) {
@@ -98,20 +102,20 @@ public class IDELightClassGenerationSupport extends LightClassGenerationSupport 
     public Collection<JetClassOrObject> findClassOrObjectDeclarationsInPackage(
             @NotNull FqName packageFqName, @NotNull GlobalSearchScope searchScope
     ) {
-        return JetClassByPackageIndex.getInstance().get(packageFqName.asString(), project, kotlinSources(searchScope));
+        return JetClassByPackageIndex.getInstance().get(packageFqName.asString(), project, kotlinSourcesAndBinaries(searchScope));
     }
 
     @Override
     public boolean packageExists(
             @NotNull FqName fqName, @NotNull GlobalSearchScope scope
     ) {
-        return !JetAllPackagesIndex.getInstance().get(fqName.asString(), project, kotlinSources(scope)).isEmpty();
+        return !JetAllPackagesIndex.getInstance().get(fqName.asString(), project, kotlinSourcesAndBinaries(scope)).isEmpty();
     }
 
     @NotNull
     @Override
     public Collection<FqName> getSubPackages(@NotNull FqName fqn, @NotNull GlobalSearchScope scope) {
-        Collection<JetFile> files = JetAllPackagesIndex.getInstance().get(fqn.asString(), project, kotlinSources(scope));
+        Collection<JetFile> files = JetAllPackagesIndex.getInstance().get(fqn.asString(), project, kotlinSourcesAndBinaries(scope));
 
         Set<FqName> result = Sets.newHashSet();
         for (JetFile file : files) {
@@ -134,10 +138,16 @@ public class IDELightClassGenerationSupport extends LightClassGenerationSupport 
     public PsiClass getPsiClass(@NotNull JetClassOrObject classOrObject) {
         VirtualFile virtualFile = classOrObject.getContainingFile().getVirtualFile();
         if (virtualFile != null && LibraryUtil.findLibraryEntry(virtualFile, classOrObject.getProject()) != null) {
-            return getOriginalClass(classOrObject);
+            return getLightClassForDecompiled((JetFile) classOrObject.getContainingFile());
         }
 
-        return  KotlinLightClassForExplicitDeclaration.create(classOrObject.getManager(), classOrObject);
+        return KotlinLightClassForExplicitDeclaration.create(classOrObject.getManager(), classOrObject);
+    }
+
+    @Nullable
+    @Override
+    public PsiClass getPsiClassForDecompiledNamespaceFile(@NotNull JetFile decompiledFile) {
+        return getLightClassForDecompiled(decompiledFile);
     }
 
     @NotNull
@@ -153,54 +163,64 @@ public class IDELightClassGenerationSupport extends LightClassGenerationSupport 
         return result;
     }
 
-    // Find compiled PsiClass from library for source from library
     @Nullable
-    private static PsiClass getOriginalClass(@NotNull JetClassOrObject classOrObject) {
-        // Copied from JavaPsiImplementationHelperImpl:getOriginalClass()
-        JvmClassName className = PsiCodegenPredictor.getPredefinedJvmClassName(classOrObject);
-        if (className == null) {
+    private static PsiClass getLightClassForDecompiled(@NotNull JetFile file) {
+        VirtualFile vFile = file.getVirtualFile();
+        if (vFile == null) {
             return null;
         }
-        String fqName = className.getFqName().asString();
-
-        JetFile file = (JetFile) classOrObject.getContainingFile();
-
-        VirtualFile vFile = file.getVirtualFile();
         Project project = file.getProject();
 
-        final ProjectFileIndex idx = ProjectRootManager.getInstance(project).getFileIndex();
+        PsiManager manager = PsiManager.getInstance(project);
 
-        if (vFile == null || !idx.isInLibrarySource(vFile)) return null;
-        final Set<OrderEntry> orderEntries = new THashSet<OrderEntry>(idx.getOrderEntriesForFile(vFile));
+        final PsiJavaFileStubImpl javaFileStub = new PsiJavaFileStubImpl(file.getPackageName(), true);
+        javaFileStub.setPsiFactory(new ClsWrapperStubPsiFactory());
 
-        PsiClass original = JavaPsiFacade.getInstance(project).findClass(fqName, new GlobalSearchScope(project) {
-            @Override
-            public int compare(VirtualFile file1, VirtualFile file2) {
-                return 0;
-            }
+        ClsFileImpl fakeFile = new ClsFileImpl((PsiManagerImpl) manager, new ClassFileViewProvider(manager, vFile)) {
+                    @NotNull
+                    @Override
+                    public PsiClassHolderFileStub getStub() {
+                        return javaFileStub;
+                    }
+                };
 
-            @Override
-            public boolean contains(VirtualFile file) {
-                List<OrderEntry> entries = idx.getOrderEntriesForFile(file);
-                //noinspection ForLoopReplaceableByForEach
-                for (int i = 0; i < entries.size(); i++) {
-                    OrderEntry entry = entries.get(i);
-                    if (orderEntries.contains(entry)) return true;
-                }
-                return false;
-            }
+        fakeFile.setPhysical(false);
+        javaFileStub.setPsi(fakeFile);
 
-            @Override
-            public boolean isSearchInModuleContent(@NotNull Module aModule) {
-                return false;
-            }
+        try {
+            new ClassReader(vFile.contentsToByteArray()).accept(
+                    new StubBuildingVisitor<VirtualFile>(vFile, VirtualFileInnerClassStrategy.INSTANCE, javaFileStub, 0), ClassReader.SKIP_CODE);
+        }
+        catch (IOException e) {
+            LOG.error(e);
+        }
 
-            @Override
-            public boolean isSearchInLibraries() {
-                return true;
-            }
-        });
-
-        return original;
+        return javaFileStub.getClasses()[0];
     }
+
+    private static class VirtualFileInnerClassStrategy implements InnerClassSourceStrategy<VirtualFile> {
+        public static VirtualFileInnerClassStrategy INSTANCE = new VirtualFileInnerClassStrategy();
+
+        @Nullable
+        @Override
+        public VirtualFile findInnerClass(String innerName, VirtualFile outerClass) {
+            String baseName = outerClass.getNameWithoutExtension();
+            VirtualFile dir = outerClass.getParent();
+            assert dir != null;
+
+            return dir.findChild(baseName + "$" + innerName + ".class");
+        }
+
+        @Nullable
+        @Override
+        public ClassReader readerForInnerClass(VirtualFile innerClass) {
+            try {
+                return new ClassReader(innerClass.contentsToByteArray());
+            }
+            catch (IOException e) {
+                return null;
+            }
+        }
+    }
+
 }

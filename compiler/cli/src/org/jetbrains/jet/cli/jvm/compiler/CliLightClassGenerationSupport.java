@@ -184,6 +184,12 @@ public class CliLightClassGenerationSupport extends LightClassGenerationSupport 
     @Nullable
     @Override
     public PsiClass getPsiClass(@NotNull JetClassOrObject classOrObject) {
-        return  KotlinLightClassForExplicitDeclaration.create(classOrObject.getManager(), classOrObject);
+        return KotlinLightClassForExplicitDeclaration.create(classOrObject.getManager(), classOrObject);
+    }
+
+    @Nullable
+    @Override
+    public PsiClass getPsiClassForDecompiledNamespaceFile(@NotNull JetFile decompiledFile) {
+        return null;
     }
 }

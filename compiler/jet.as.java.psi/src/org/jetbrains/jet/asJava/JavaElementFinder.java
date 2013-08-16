@@ -21,6 +21,7 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.Sets;
 import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElementFinder;
 import com.intellij.psi.PsiManager;
@@ -117,7 +118,13 @@ public class JavaElementFinder extends PsiElementFinder implements JavaPsiFacade
         }
         boolean isCompiled = filesForPackage.iterator().next().isCompiled();
         if (isCompiled) {
-            //TODO: LightClass for compiled package class
+            String packageClassName = PackageClassUtils.getPackageClassName(qualifiedName);
+            for (JetFile fileForPackage : filesForPackage) {
+                VirtualFile virtualFile = fileForPackage.getVirtualFile();
+                if (virtualFile != null && virtualFile.getNameWithoutExtension().equals(packageClassName)) {
+                    answer.add(LightClassGenerationSupport.getInstance(project).getPsiClassForDecompiledNamespaceFile(fileForPackage));
+                }
+            }
             return;
         }
         if (NamespaceCodegen.shouldGenerateNSClass(filesForPackage)) {
