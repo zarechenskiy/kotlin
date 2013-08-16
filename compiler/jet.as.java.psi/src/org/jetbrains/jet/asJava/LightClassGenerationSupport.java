@@ -65,4 +65,7 @@ public abstract class LightClassGenerationSupport {
 
     @Nullable
     public abstract PsiClass getPsiClass(@NotNull JetClassOrObject classOrObject);
+
+    @Nullable
+    public abstract PsiClass getPsiClassForDecompiledNamespaceFile(@NotNull JetFile decompiledFile);
 }

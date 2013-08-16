@@ -30,16 +30,16 @@ public class JetSourceFilterScope extends DelegatingGlobalSearchScope {
         return new JetSourceFilterScope(delegate, true);
     }
 
-    public static JetSourceFilterScope kotlinSources(@NotNull GlobalSearchScope delegate) {
+    public static JetSourceFilterScope kotlinSourcesAndBinaries(@NotNull GlobalSearchScope delegate) {
         return new JetSourceFilterScope(delegate, false);
     }
 
     private final ProjectFileIndex index;
-    private final boolean includeLibraries;
+    private final boolean includeLibrarySources;
 
-    private JetSourceFilterScope(@NotNull GlobalSearchScope delegate, boolean includeLibraries) {
+    private JetSourceFilterScope(@NotNull GlobalSearchScope delegate, boolean includeLibrarySources) {
         super(delegate);
-        this.includeLibraries = includeLibraries;
+        this.includeLibrarySources = includeLibrarySources;
         index = ProjectRootManager.getInstance(getProject()).getFileIndex();
     }
 
@@ -49,11 +49,11 @@ public class JetSourceFilterScope extends DelegatingGlobalSearchScope {
             return false;
         }
 
-        if (includeLibraries && StdFileTypes.CLASS == file.getFileType()) {
+        if (StdFileTypes.CLASS == file.getFileType()) {
             return index.isInLibraryClasses(file);
         }
 
         return file.getFileType().equals(JetFileType.INSTANCE) &&
-               (index.isInSourceContent(file) || includeLibraries && index.isInLibrarySource(file));
+               (index.isInSourceContent(file) || includeLibrarySources && index.isInLibrarySource(file));
     }
 }

@@ -40,6 +40,7 @@ import org.jetbrains.jet.lang.resolve.name.FqName;
 import org.jetbrains.jet.plugin.caches.resolve.IDELightClassGenerationSupport;
 import org.jetbrains.jet.plugin.stubindex.JetClassShortNameIndex;
 import org.jetbrains.jet.plugin.stubindex.JetFullClassNameIndex;
+import org.jetbrains.jet.plugin.stubindex.JetSourceFilterScope;
 import org.jetbrains.jet.plugin.stubindex.JetTopLevelNonExtensionFunctionShortNameIndex;
 
 import java.util.*;
@@ -108,7 +109,8 @@ public class JetShortNamesCache extends PsiShortNamesCache {
         }
 
         // Quick check for classes from getAllClassNames()
-        Collection<JetClassOrObject> classOrObjects = JetClassShortNameIndex.getInstance().get(name, project, scope);
+        Collection<JetClassOrObject> classOrObjects = JetClassShortNameIndex.getInstance().get(
+                name, project, JetSourceFilterScope.kotlinSourcesAndBinaries(scope));
         if (classOrObjects.isEmpty()) {
             return result.toArray(new PsiClass[result.size()]);
         }
