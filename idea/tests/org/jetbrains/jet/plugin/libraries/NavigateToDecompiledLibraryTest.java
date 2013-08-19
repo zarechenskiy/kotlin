@@ -19,12 +19,17 @@ package org.jetbrains.jet.plugin.libraries;
 import com.beust.jcommander.internal.Maps;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.roots.LibraryOrderEntry;
+import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.roots.OrderEntry;
+import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.lang.psi.JetDeclaration;
 import org.jetbrains.jet.lang.psi.JetFile;
 import org.junit.Assert;
@@ -122,8 +127,21 @@ public class NavigateToDecompiledLibraryTest extends AbstractNavigateToLibraryTe
         return document.getText();
     }
 
+    @Nullable
+    private LibraryOrderEntry findOurTestLibrary() {
+        for (OrderEntry orderEntry : ModuleRootManager.getInstance(getModule()).getOrderEntries()) {
+            if (orderEntry instanceof LibraryOrderEntry) {
+                return (LibraryOrderEntry) orderEntry;
+            }
+        }
+        return null;
+    }
+
     private VirtualFile getClassFile() {
-        VirtualFile packageDir = libraryDir.findFileByRelativePath(PACKAGE.replace(".", "/"));
+        LibraryOrderEntry library = findOurTestLibrary();
+        assertNotNull(library);
+
+        VirtualFile packageDir = library.getFiles(OrderRootType.CLASSES)[0].findFileByRelativePath(PACKAGE.replace(".", "/"));
         assertNotNull(packageDir);
         VirtualFile classFile = packageDir.findChild(getTestName(false) + ".class");
         assertNotNull(classFile);
