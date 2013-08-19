@@ -19,15 +19,14 @@ package org.jetbrains.jet.plugin.libraries;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.util.Pair;
-import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
 import com.intellij.util.containers.MultiMap;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jet.JetTestUtils;
 import org.jetbrains.jet.lang.psi.JetFile;
 import org.jetbrains.jet.plugin.references.JetPsiReference;
@@ -122,24 +121,14 @@ public class NavigateToLibrarySourceTest extends AbstractNavigateToLibraryTest {
                 if (targetPsiFile == null) continue;
                 VirtualFile targetFile = targetPsiFile.getVirtualFile();
                 if (targetFile == null) continue;
-                if (VfsUtilCore.isAncestor(librarySourceDir, targetFile, true)) {
-                    assert !((JetFile) targetNavigationElement.getContainingFile()).isCompiled();
+                if (ProjectFileIndex.SERVICE.getInstance(getProject()).isInLibrarySource(targetFile)) {
+                    assert !((JetFile) targetPsiFile).isCompiled();
                     assert ((JetFile) target.getContainingFile()).isCompiled();
                     referenceContainersToReferences.put(ref.getElement(), (JetPsiReference)ref);
                 }
             }
         }
         return referenceContainersToReferences.values();
-    }
-
-    @NotNull
-    private String getRelativePath(@NotNull PsiFile librarySourceFile) {
-        VirtualFile virtualFile = librarySourceFile.getVirtualFile();
-        if (virtualFile == null) {
-            return "";
-        }
-        String relativePath = VfsUtilCore.getRelativePath(virtualFile, librarySourceDir, '/');
-        return relativePath == null ? "" : relativePath;
     }
 
     private String getActualAnnotatedLibraryCode() {
@@ -161,7 +150,7 @@ public class NavigateToLibrarySourceTest extends AbstractNavigateToLibraryTest {
         Collections.sort(files, new Comparator<PsiFile>() {
             @Override
             public int compare(PsiFile o1, PsiFile o2) {
-                return getRelativePath(o1).compareTo(getRelativePath(o2));
+                return o1.getName().compareTo(o2.getName());
             }
         });
 
@@ -195,7 +184,7 @@ public class NavigateToLibrarySourceTest extends AbstractNavigateToLibraryTest {
             Document annotated = EditorFactory.getInstance().createDocument(resultForFile);
             String filePart = annotated.getText().substring(annotated.getLineStartOffset(minLine),
                                                              annotated.getLineEndOffset(maxLine));
-            result.append(" ").append(getRelativePath(file)).append("\n");
+            result.append(" ").append(file.getName()).append("\n");
             result.append(filePart).append("\n");
         }
         return result.toString();
