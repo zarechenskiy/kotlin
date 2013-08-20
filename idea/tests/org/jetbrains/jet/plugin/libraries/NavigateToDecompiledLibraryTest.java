@@ -28,10 +28,12 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.testFramework.LightProjectDescriptor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.lang.psi.JetDeclaration;
 import org.jetbrains.jet.lang.psi.JetFile;
+import org.jetbrains.jet.plugin.JdkAndTestLibraryProjectDescriptor;
 import org.junit.Assert;
 
 import java.util.Map;
@@ -129,7 +131,7 @@ public class NavigateToDecompiledLibraryTest extends AbstractNavigateToLibraryTe
 
     @Nullable
     private LibraryOrderEntry findOurTestLibrary() {
-        for (OrderEntry orderEntry : ModuleRootManager.getInstance(getModule()).getOrderEntries()) {
+        for (OrderEntry orderEntry : ModuleRootManager.getInstance(myModule).getOrderEntries()) {
             if (orderEntry instanceof LibraryOrderEntry) {
                 return (LibraryOrderEntry) orderEntry;
             }
@@ -148,11 +150,6 @@ public class NavigateToDecompiledLibraryTest extends AbstractNavigateToLibraryTe
         return classFile;
     }
 
-    @Override
-    protected boolean isWithSources() {
-        return false;
-    }
-
     @NotNull
     private static Map<String, JetDeclaration> getRenderedDescriptorToKotlinPsiMap(
             @NotNull JetFile file, @NotNull Map<String, TextRange> renderedDescriptorsToRanges
@@ -168,5 +165,11 @@ public class NavigateToDecompiledLibraryTest extends AbstractNavigateToLibraryTe
             renderedDescriptorsToJetDeclarations.put(renderedDescriptor, jetDeclaration);
         }
         return renderedDescriptorsToJetDeclarations;
+    }
+
+    @NotNull
+    @Override
+    protected LightProjectDescriptor getProjectDescriptor() {
+        return new JdkAndTestLibraryProjectDescriptor(TEST_DATA_PATH + "/library", true);
     }
 }
