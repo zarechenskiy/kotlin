@@ -15,6 +15,6 @@ public abstract class AbstractCompiledKotlinInJavaCompletionTest extends JetFixt
     @NotNull
     @Override
     protected LightProjectDescriptor getProjectDescriptor() {
-        return new JdkAndMockLibraryProjectDescriptor(PluginTestCaseBase.getTestDataPathBase() + "/completion/injava/compiled/mockLib", false);
+        return new JdkAndMockLibraryProjectDescriptor(PluginTestCaseBase.getTestDataPathBase() + "/completion/injava/mockLib", false);
     }
 }

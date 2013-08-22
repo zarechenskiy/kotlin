@@ -307,12 +307,12 @@ public class GenerateTests {
                 "idea/tests",
                 "KotlinSourceInJavaCompletionTestGenerated",
                 AbstractKotlinSourceInJavaCompletionTest.class,
-                testModel("idea/testData/completion/injava/compiled", true, "java", "doTest"));
+                testModel("idea/testData/completion/injava", true, "java", "doTest"));
         generateTest(
                 "idea/tests",
                 "CompiledKotlinInJavaCompletionTestGenerated",
                 AbstractCompiledKotlinInJavaCompletionTest.class,
-                testModel("idea/testData/completion/injava/compiled", true, "java", "doTest"));
+                testModel("idea/testData/completion/injava", true, "java", "doTest"));
 
         generateTest(
                 "idea/tests",
