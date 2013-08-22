@@ -30,6 +30,7 @@ import org.jetbrains.jet.lang.psi.JetNamedFunction;
 import org.jetbrains.jet.lang.psi.JetProperty;
 import org.jetbrains.jet.plugin.stubindex.JetFunctionShortNameIndex;
 import org.jetbrains.jet.plugin.stubindex.JetPropertyShortNameIndex;
+import org.jetbrains.jet.plugin.stubindex.JetSourceFilterScope;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -49,7 +50,7 @@ public class JetGotoSymbolContributor implements ChooseByNameContributor {
     @Override
     public NavigationItem[] getItemsByName(String name, String pattern, Project project, boolean includeNonProjectItems) {
         GlobalSearchScope baseScope = includeNonProjectItems ? GlobalSearchScope.allScope(project) : GlobalSearchScope.projectScope(project);
-        GlobalSearchScope noLibrarySourcesScope = new JavaSourceFilterScope(baseScope);
+        GlobalSearchScope noLibrarySourcesScope = JetSourceFilterScope.kotlinSourcesAndBinaries(baseScope);
 
         Collection<JetNamedFunction> functions = StubIndex.getInstance().get(
                 JetFunctionShortNameIndex.getInstance().getKey(), name, project, noLibrarySourcesScope);
