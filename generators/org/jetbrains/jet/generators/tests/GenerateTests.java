@@ -27,10 +27,7 @@ import org.jetbrains.jet.codegen.AbstractTopLevelMembersInvocationTest;
 import org.jetbrains.jet.codegen.defaultConstructor.AbstractDefaultConstructorCodegenTest;
 import org.jetbrains.jet.codegen.flags.AbstractWriteFlagsTest;
 import org.jetbrains.jet.codegen.generated.AbstractBlackBoxCodegenTest;
-import org.jetbrains.jet.completion.AbstractJavaCompletionTest;
-import org.jetbrains.jet.completion.AbstractJavaWithLibCompletionTest;
-import org.jetbrains.jet.completion.AbstractJetJSCompletionTest;
-import org.jetbrains.jet.completion.AbstractKeywordCompletionTest;
+import org.jetbrains.jet.completion.*;
 import org.jetbrains.jet.descriptors.serialization.AbstractDescriptorSerializationTest;
 import org.jetbrains.jet.editor.quickDoc.AbstractJetQuickDocProviderTest;
 import org.jetbrains.jet.jvm.compiler.*;
@@ -305,6 +302,12 @@ public class GenerateTests {
                 "JetJavaLibCompletionTestGenerated",
                 AbstractJavaWithLibCompletionTest.class,
                 testModel("idea/testData/completion/basic/custom", false, "doTestWithJar"));
+
+        generateTest(
+                "idea/tests",
+                "CompiledKotlinInJavaCompletionTestGenerated",
+                AbstractCompiledKotlinInJavaCompletionTest.class,
+                testModel("idea/testData/completion/injava/compiled", true, "java", "doTest"));
 
         generateTest(
                 "idea/tests",
