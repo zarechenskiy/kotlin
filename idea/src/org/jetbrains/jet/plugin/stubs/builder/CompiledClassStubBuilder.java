@@ -8,10 +8,12 @@ import org.jetbrains.jet.descriptors.serialization.ClassData;
 import org.jetbrains.jet.descriptors.serialization.Flags;
 import org.jetbrains.jet.descriptors.serialization.ProtoBuf;
 import org.jetbrains.jet.lang.psi.stubs.PsiJetFileStub;
+import org.jetbrains.jet.lang.psi.stubs.PsiJetStubWithFqName;
 import org.jetbrains.jet.lang.psi.stubs.elements.JetClassElementType;
 import org.jetbrains.jet.lang.psi.stubs.impl.PsiJetClassBodyStubImpl;
 import org.jetbrains.jet.lang.psi.stubs.impl.PsiJetClassStubImpl;
 import org.jetbrains.jet.lang.psi.stubs.impl.PsiJetFileStubImpl;
+import org.jetbrains.jet.lang.psi.stubs.impl.PsiJetObjectStubImpl;
 import org.jetbrains.jet.lang.resolve.name.FqName;
 import org.jetbrains.jet.lang.resolve.name.Name;
 
@@ -37,16 +39,17 @@ public class CompiledClassStubBuilder extends CompiledStubBuilderBase {
         int flags = classProto.getFlags();
         ProtoBuf.Class.Kind kind = Flags.CLASS_KIND.get(flags);
         boolean isEnumEntry = kind == ProtoBuf.Class.Kind.ENUM_ENTRY;
-        //TODO: create stubs for objects
-        if (kind == ProtoBuf.Class.Kind.OBJECT) {
-            return fileStub;
-        }
         //TODO: inner classes
-        PsiJetClassStubImpl classStub =
-                new PsiJetClassStubImpl(JetClassElementType.getStubType(isEnumEntry), fileStub, classFqName.asString(), name.asString(), getSuperList(),
-                                        kind == ProtoBuf.Class.Kind.TRAIT, kind == ProtoBuf.Class.Kind.ENUM_CLASS,
-                                        isEnumEntry, kind == ProtoBuf.Class.Kind.ANNOTATION_CLASS, false);
-        PsiJetClassBodyStubImpl classBody = new PsiJetClassBodyStubImpl(classStub);
+        PsiJetStubWithFqName<?> classOrObjectStub;
+        if (kind == ProtoBuf.Class.Kind.OBJECT) {
+            classOrObjectStub = new PsiJetObjectStubImpl(fileStub, name.asString(), classFqName, true, false);
+        }
+        else {
+            classOrObjectStub = new PsiJetClassStubImpl(JetClassElementType.getStubType(isEnumEntry), fileStub, classFqName.asString(), name.asString(), getSuperList(),
+                                                kind == ProtoBuf.Class.Kind.TRAIT, kind == ProtoBuf.Class.Kind.ENUM_CLASS,
+                                                isEnumEntry, kind == ProtoBuf.Class.Kind.ANNOTATION_CLASS, false);
+        }
+        PsiJetClassBodyStubImpl classBody = new PsiJetClassBodyStubImpl(classOrObjectStub);
         //TODO: primary constructor
         for (ProtoBuf.Callable callableProto : classProto.getMemberList()) {
             createCallableStub(classBody, callableProto);
