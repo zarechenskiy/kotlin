@@ -280,13 +280,13 @@ public class ExpectedCompletionUtils {
     }
 
     public static String listToString(Collection<CompletionProposal> items) {
-        return StringUtil.join(
-            Collections2.transform(items, new Function<CompletionProposal, String>() {
-                @Override
-                public String apply(@Nullable CompletionProposal proposal) {
-                    assert proposal != null;
-                    return proposal.toString();
-                }
-            }), "\n");
+        return items.isEmpty() ? "empty completion lookup" : StringUtil.join(
+                Collections2.transform(items, new Function<CompletionProposal, String>() {
+                    @Override
+                    public String apply(@Nullable CompletionProposal proposal) {
+                        assert proposal != null;
+                        return proposal.toString();
+                    }
+                }), "\n");
     }
 }
