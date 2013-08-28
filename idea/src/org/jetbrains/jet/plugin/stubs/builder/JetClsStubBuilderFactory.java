@@ -3,16 +3,19 @@ package org.jetbrains.jet.plugin.stubs.builder;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.impl.compiled.ClsStubBuilderFactory;
 import com.intellij.psi.stubs.PsiFileStub;
+import com.intellij.util.Function;
 import com.intellij.util.cls.ClsFormatException;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.lang.psi.JetFile;
+import org.jetbrains.jet.lang.psi.stubs.impl.PsiJetFileStubImpl;
 import org.jetbrains.jet.lang.resolve.java.resolver.KotlinClassFileHeader;
 import org.jetbrains.jet.lang.resolve.name.FqName;
+import org.jetbrains.jet.lang.resolve.name.Name;
 
 public class JetClsStubBuilderFactory extends ClsStubBuilderFactory<JetFile> {
     @Nullable
     @Override
-    public PsiFileStub<JetFile> buildFileStub(VirtualFile file, byte[] bytes) throws ClsFormatException {
+    public PsiFileStub<JetFile> buildFileStub(final VirtualFile file, byte[] bytes) throws ClsFormatException {
         KotlinClassFileHeader header = KotlinClassFileHeader.readKotlinHeaderFromClassFile(file);
         if (!header.isKotlinCompiledFile()) {
             return null;
@@ -23,8 +26,11 @@ public class JetClsStubBuilderFactory extends ClsStubBuilderFactory<JetFile> {
             return new CompiledPackageClassStubBuilder(header.readPackageData(), packageFqName).createStub();
         }
         if (header.getType() == KotlinClassFileHeader.HeaderType.CLASS) {
-            return new CompiledClassStubBuilder(header.readClassData(), classFqName, packageFqName).createStub();
+            PsiJetFileStubImpl fileStub = new PsiJetFileStubImpl(null, packageFqName.asString(), packageFqName.isRoot());
+            new CompiledClassStubBuilder(header.readClassData(), classFqName, packageFqName, fileStub, file).createStub();
+            return fileStub;
         }
+
         throw new IllegalStateException("Should have processed " + file.getPath());
     }
 
