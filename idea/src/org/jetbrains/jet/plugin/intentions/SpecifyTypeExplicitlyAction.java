@@ -66,7 +66,6 @@ public class SpecifyTypeExplicitlyAction extends PsiElementBaseIntentionAction {
         JetNamedDeclaration parent = getDeclaration(element);
         assert parent != null;
         JetType type = getTypeForDeclaration(parent);
-        assert !ErrorUtils.isErrorType(type) : "Unexpected error type: " + element.getText();
         if (parent instanceof JetProperty) {
             JetProperty property = (JetProperty) parent;
             if (property.getTypeRef() == null) {
