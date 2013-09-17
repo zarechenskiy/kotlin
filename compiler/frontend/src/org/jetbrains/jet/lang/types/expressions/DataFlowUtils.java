@@ -24,7 +24,6 @@ import org.jetbrains.jet.lang.diagnostics.Diagnostic;
 import org.jetbrains.jet.lang.psi.*;
 import org.jetbrains.jet.lang.resolve.BindingContext;
 import org.jetbrains.jet.lang.resolve.BindingTrace;
-import org.jetbrains.jet.lang.resolve.calls.context.ContextDependency;
 import org.jetbrains.jet.lang.resolve.calls.context.ResolutionContext;
 import org.jetbrains.jet.lang.resolve.calls.autocasts.DataFlowInfo;
 import org.jetbrains.jet.lang.resolve.calls.autocasts.DataFlowValue;
@@ -158,11 +157,10 @@ public class DataFlowUtils {
     }
 
     @Nullable
-    public static JetType checkType(@Nullable JetType expressionType, @NotNull JetExpression possiblyWrappedInBlockExpression,
+    public static JetType checkType(@Nullable JetType expressionType, @NotNull JetExpression expressionToCheck,
             @NotNull JetType expectedType, @NotNull DataFlowInfo dataFlowInfo, @NotNull BindingTrace trace
     ) {
-        // non-block 'if' branches are wrapped in a block, but here genuine expressions (not wrappers) should be checked
-        JetExpression expression = JetPsiUtil.unwrapFromBlock(possiblyWrappedInBlockExpression);
+        JetExpression expression = JetPsiUtil.safeDeparenthesize(expressionToCheck, false);
         recordExpectedType(trace, expression, expectedType);
 
         if (expressionType == null || noExpectedType(expectedType) ||
