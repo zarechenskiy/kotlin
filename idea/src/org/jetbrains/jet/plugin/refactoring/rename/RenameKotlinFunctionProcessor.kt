@@ -32,22 +32,23 @@ import com.intellij.psi.PsiMirrorElement
 import com.intellij.psi.SyntheticElement
 import com.intellij.refactoring.util.RefactoringUtil
 import com.intellij.refactoring.rename.RenameProcessor
+import com.intellij.refactoring.rename.RenameJavaMethodProcessor
 
 public class RenameKotlinFunctionProcessor : RenamePsiElementProcessor() {
-    override fun canProcessElement(element: PsiElement): Boolean {
-        if (element is PsiMethod && element.getContainingClass() is KotlinLightClass) {
-            return true;
-        }
-
-        return element is JetNamedFunction;
-    }
+    override fun canProcessElement(element: PsiElement) = (element is JetNamedFunction) || unwrapPsiMethod(element) != null
 
     override fun substituteElementToRename(element: PsiElement?, editor: Editor?): PsiElement?  {
-        if (element is PsiMethod && element is PsiCompiledElement && element.getContainingClass() is KotlinLightClass) {
-            return element.getMirror();
+        if (element is JetNamedFunction) {
+            val wrappedMethod = ApplicationManager.getApplication()!!.runReadAction(Computable { LightClassUtil.getLightClassMethod(element) })
+            if (wrappedMethod != null) {
+                val jetFun = unwrapPsiMethod(RenameJavaMethodProcessor().substituteElementToRename(wrappedMethod, editor))
+                if (jetFun != null) {
+                    return jetFun
+                }
+            }
         }
 
-        return super.substituteElementToRename(element, editor);
+        return unwrapPsiMethod(element) ?: super.substituteElementToRename(element, editor);
     }
 
     override fun prepareRenaming(element: PsiElement?, newName: String?, allRenames: MutableMap<PsiElement, String>, scope: SearchScope) {
@@ -61,8 +62,8 @@ public class RenameKotlinFunctionProcessor : RenamePsiElementProcessor() {
 
                     if (overriderMethod is PsiMirrorElement) {
                         val prototype = (overriderMethod as PsiMirrorElement).getPrototype()
-                        if (prototype is PsiMethod) {
-                            overriderMethod = prototype
+                            if (prototype is PsiMethod) {
+                                overriderMethod = prototype
                         }
                     }
 
@@ -72,18 +73,13 @@ public class RenameKotlinFunctionProcessor : RenamePsiElementProcessor() {
                         val newOverriderName = RefactoringUtil.suggestNewOverriderName(overriderName, baseName, newName)
 
                         if (newOverriderName != null) {
-                            if (overriderMethod is PsiCompiledElement) {
-                                val originalElement = (overriderMethod as PsiCompiledElement).getMirror()
-
-                                if (originalElement is JetNamedFunction) {
-                                    allRenames[originalElement] = newOverriderName
-                                }
-                                else {
-                                    RenameProcessor.assertNonCompileElement(overriderMethod)
-                                }
+                            val unwrappedJetFunction = unwrapPsiMethod(overriderMethod)
+                            if (unwrappedJetFunction != null) {
+                                allRenames[unwrappedJetFunction] = newOverriderName
                             }
                             else {
-                                allRenames[overrider] = newOverriderName
+                                RenameProcessor.assertNonCompileElement(overriderMethod)
+                                allRenames[overriderMethod] = newOverriderName
                             }
                         }
                     }
@@ -92,5 +88,17 @@ public class RenameKotlinFunctionProcessor : RenamePsiElementProcessor() {
                 }
             }
         }
+    }
+
+    private fun unwrapPsiMethod(element: PsiElement?): JetNamedFunction? {
+        if (element is PsiMethod && element is PsiCompiledElement) {
+            val originalElement = (element as PsiCompiledElement).getMirror()
+
+            if (originalElement is JetNamedFunction) {
+                return originalElement
+            }
+        }
+
+        return null
     }
 }
