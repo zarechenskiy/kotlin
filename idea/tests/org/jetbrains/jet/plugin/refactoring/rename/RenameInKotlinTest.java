@@ -56,6 +56,10 @@ public class RenameInKotlinTest extends MultiFileTestCase {
         doTestWithRenameClass(new FqName("testing.rename.First"), "Third");
     }
 
+    public void testRenameKotlinBaseMethod() throws Exception {
+        doTestWithRenameMethod(new FqName("testing.rename.A"), "first", "second");
+    }
+
     public void testRenameKotlinMethod() throws Exception {
         doTestWithRenameMethod(new FqName("testing.rename.C"), "first", "second");
     }
