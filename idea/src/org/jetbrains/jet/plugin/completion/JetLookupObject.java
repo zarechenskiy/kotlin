@@ -58,50 +58,31 @@ public final class JetLookupObject {
 
     @Override
     public String toString() {
-        return super.toString() + " " +
-               descriptor + " " +
-               psiElement;
+        return super.toString() + " " + descriptor + " " + psiElement;
     }
 
     @Override
     public int hashCode() {
-        // Always check with equals
-        return 0;
+        int result = descriptor != null ? descriptor.hashCode() : 0;
+        result = 31 * result + (psiElement != null ? psiElement.hashCode() : 0);
+        return result;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj == null || obj.getClass() != getClass()) {
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        JetLookupObject object = (JetLookupObject) o;
+
+        if (!analyzer.equals(object.analyzer)) {
+            LOG.warn("Descriptors from different resolve sessions");
             return false;
         }
 
-        JetLookupObject other = (JetLookupObject)obj;
+        if (descriptor != null ? !descriptor.equals(object.descriptor) : object.descriptor != null) return false;
+        if (psiElement != null ? !psiElement.equals(object.psiElement) : object.psiElement != null) return false;
 
-        // Same descriptor - same lookup element
-        if (descriptor != null && other.descriptor != null) {
-            if (analyzer == other.analyzer) {
-                if (descriptor.equals(other.descriptor)) {
-                    return true;
-                }
-            }
-            else {
-                LOG.warn("Descriptors from different resolve sessions");
-
-                String descriptorText = DescriptorRenderer.TEXT.render(descriptor);
-                @SuppressWarnings("ConstantConditions")
-                String otherDescriptorText = DescriptorRenderer.TEXT.render(other.descriptor);
-                if (descriptorText.equals(otherDescriptorText)) {
-                    return true;
-                }
-            }
-        }
-
-        if (psiElement != null && psiElement.equals(other.psiElement)) {
-            LOG.warn("Different descriptors for same psi elements");
-            return true;
-        }
-
-        return (descriptor == null && other.descriptor == null &&
-                psiElement == null && other.psiElement == null);
+        return true;
     }
 }
