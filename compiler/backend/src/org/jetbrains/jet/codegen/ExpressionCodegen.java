@@ -1766,14 +1766,15 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
             boolean forceField,
             @Nullable JetSuperExpression superExpression
     ) {
-        return intermediateValueForProperty(propertyDescriptor, forceField, superExpression, MethodKind.GENERAL);
+        return intermediateValueForProperty(propertyDescriptor, forceField, superExpression, MethodKind.GENERAL, context);
     }
 
     public StackValue.Property intermediateValueForProperty(
             @NotNull PropertyDescriptor propertyDescriptor,
             boolean forceField,
             @Nullable JetSuperExpression superExpression,
-            @NotNull MethodKind methodKind
+            @NotNull MethodKind methodKind,
+            @NotNull MethodContext methodContext
     ) {
         JetTypeMapper typeMapper = state.getTypeMapper();
 
@@ -1808,7 +1809,7 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
         }
 
         if (!skipPropertyAccessors) {
-            if (couldUseDirectAccessToProperty(propertyDescriptor, true, isInsideClass, isDelegatedProperty)) {
+            if (couldUseDirectAccessToProperty(propertyDescriptor, true, isInsideClass, isDelegatedProperty, methodContext)) {
                 callableGetter = null;
             }
             else {
@@ -1832,7 +1833,7 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
             if (propertyDescriptor.isVar()) {
                 PropertySetterDescriptor setter = propertyDescriptor.getSetter();
                 if (setter != null) {
-                    if (couldUseDirectAccessToProperty(propertyDescriptor, false, isInsideClass, isDelegatedProperty)) {
+                    if (couldUseDirectAccessToProperty(propertyDescriptor, false, isInsideClass, isDelegatedProperty, methodContext)) {
                         callableSetter = null;
                     }
                     else {
