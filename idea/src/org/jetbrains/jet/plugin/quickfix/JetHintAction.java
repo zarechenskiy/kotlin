@@ -31,7 +31,7 @@ public abstract class JetHintAction<T extends PsiElement> extends JetIntentionAc
         super(element);
     }
 
-    protected boolean isCaretNearRef(Editor editor, T ref) {
+    protected boolean isCaretNearRef(Editor editor) {
         TextRange range = element.getTextRange();
         int offset = editor.getCaretModel().getOffset();
 

@@ -235,6 +235,10 @@ public class AutoImportFix extends JetHintAction<JetSimpleNameExpression> implem
             return false;
         }
 
+        if (!isCaretNearRef(editor)) {
+            return false;
+        }
+
         if (HintManager.getInstance().hasShownHintsThatWillHideByOtherHint(true)) {
             return false;
         }
