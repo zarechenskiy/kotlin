@@ -17,9 +17,10 @@
 package org.jetbrains.jet.lang.resolve.java.jetAsJava;
 
 import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiMirrorElement;
 import org.jetbrains.jet.lang.psi.JetDeclaration;
 
 /** ClsMethod created for Kotlin declaration for it to be resolved from Java */
-public interface JetClsMethod extends PsiMethod {
+public interface JetClsMethod extends PsiMethod, PsiMirrorElement {
     JetDeclaration getOrigin();
 }

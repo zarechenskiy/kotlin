@@ -21,7 +21,6 @@ import com.intellij.psi.PsiCompiledElement
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMethod
 import com.intellij.refactoring.rename.RenamePsiElementProcessor
-import org.jetbrains.jet.asJava.KotlinLightClass
 import com.intellij.psi.search.SearchScope
 import com.intellij.psi.search.searches.OverridingMethodsSearch
 import com.intellij.openapi.application.ApplicationManager
@@ -33,9 +32,10 @@ import com.intellij.psi.SyntheticElement
 import com.intellij.refactoring.util.RefactoringUtil
 import com.intellij.refactoring.rename.RenameProcessor
 import com.intellij.refactoring.rename.RenameJavaMethodProcessor
+import com.intellij.psi.PsiNamedElement
 
 public class RenameKotlinFunctionProcessor : RenamePsiElementProcessor() {
-    override fun canProcessElement(element: PsiElement) = (element is JetNamedFunction) || unwrapPsiMethod(element) != null
+    override fun canProcessElement(element: PsiElement) = element is JetNamedFunction
 
     override fun substituteElementToRename(element: PsiElement?, editor: Editor?): PsiElement?  {
         if (element is JetNamedFunction) {
@@ -48,7 +48,7 @@ public class RenameKotlinFunctionProcessor : RenamePsiElementProcessor() {
             }
         }
 
-        return unwrapPsiMethod(element) ?: super.substituteElementToRename(element, editor);
+        return super.substituteElementToRename(element, editor);
     }
 
     override fun prepareRenaming(element: PsiElement?, newName: String?, allRenames: MutableMap<PsiElement, String>, scope: SearchScope) {
@@ -58,29 +58,26 @@ public class RenameKotlinFunctionProcessor : RenamePsiElementProcessor() {
             val psiMethod = ApplicationManager.getApplication()!!.runReadAction(Computable { LightClassUtil.getLightClassMethod(element) })
             if (psiMethod != null) {
                 OverridingMethodsSearch.search(psiMethod, scope, true)?.forEach { overrider ->
-                    var overriderMethod = overrider
+                    var overriderMethod: PsiNamedElement = overrider
 
                     if (overriderMethod is PsiMirrorElement) {
                         val prototype = (overriderMethod as PsiMirrorElement).getPrototype()
-                            if (prototype is PsiMethod) {
-                                overriderMethod = prototype
+                        overriderMethod = when (prototype) {
+                            is PsiMethod -> prototype
+                            is JetNamedFunction -> prototype
+                            else -> overriderMethod
                         }
                     }
 
                     if (!(overriderMethod is SyntheticElement)) {
                         val overriderName = overriderMethod.getName()
                         val baseName = element.getName()
+
                         val newOverriderName = RefactoringUtil.suggestNewOverriderName(overriderName, baseName, newName)
 
                         if (newOverriderName != null) {
-                            val unwrappedJetFunction = unwrapPsiMethod(overriderMethod)
-                            if (unwrappedJetFunction != null) {
-                                allRenames[unwrappedJetFunction] = newOverriderName
-                            }
-                            else {
-                                RenameProcessor.assertNonCompileElement(overriderMethod)
-                                allRenames[overriderMethod] = newOverriderName
-                            }
+                            RenameProcessor.assertNonCompileElement(overriderMethod)
+                            allRenames[overriderMethod] = newOverriderName
                         }
                     }
 

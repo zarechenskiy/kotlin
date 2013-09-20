@@ -49,6 +49,12 @@ public class JetClsMethodImpl extends ClsMethodImpl implements JetClsMethod {
         return (JetDeclaration) origin;
     }
 
+    @NotNull
+    @Override
+    public PsiElement getPrototype() {
+        return origin;
+    }
+
     @Override
     public void delete() throws IncorrectOperationException {
         origin.delete();
