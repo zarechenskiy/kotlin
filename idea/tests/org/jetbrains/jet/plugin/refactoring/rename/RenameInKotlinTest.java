@@ -29,6 +29,7 @@ import com.intellij.util.Function;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.jet.lang.descriptors.ClassDescriptor;
 import org.jetbrains.jet.lang.descriptors.FunctionDescriptor;
+import org.jetbrains.jet.lang.descriptors.VariableDescriptor;
 import org.jetbrains.jet.lang.psi.JetFile;
 import org.jetbrains.jet.lang.resolve.BindingContext;
 import org.jetbrains.jet.lang.resolve.BindingContextUtils;
@@ -60,6 +61,10 @@ public class RenameInKotlinTest extends MultiFileTestCase {
         doTestWithRenameMethod(new FqName("testing.rename.A"), "first", "second");
     }
 
+    public void testRenameKotlinBaseProperty() throws Exception {
+        doTestWithRenameProperty(new FqName("testing.rename.AP"), "first", "second");
+    }
+
     public void testRenameKotlinMethod() throws Exception {
         doTestWithRenameMethod(new FqName("testing.rename.C"), "first", "second");
     }
@@ -82,6 +87,21 @@ public class RenameInKotlinTest extends MultiFileTestCase {
                 return BindingContextUtils.callableDescriptorToDeclaration(bindingContext, methodDescriptor);
             }
         }, newMethodName);
+    }
+
+    private void doTestWithRenameProperty(final FqName qClassName, final String oldPropertyName, String newPropertyName) throws Exception {
+        doTestWithRename(new Function<PsiFile, PsiElement>() {
+            @Override
+            public PsiElement fun(PsiFile file) {
+                BindingContext bindingContext = AnalyzerFacadeWithCache.analyzeFileWithCache((JetFile) file).getBindingContext();
+                ClassDescriptor classDescriptor = bindingContext.get(BindingContext.FQNAME_TO_CLASS_DESCRIPTOR, qClassName);
+                assertNotNull(classDescriptor);
+
+                JetScope scope = classDescriptor.getMemberScope(Collections.<TypeProjection>emptyList());
+                VariableDescriptor propertyName = scope.getProperties(Name.identifier(oldPropertyName)).iterator().next();
+                return BindingContextUtils.descriptorToDeclaration(bindingContext, propertyName);
+            }
+        }, newPropertyName);
     }
 
     private void doTestWithRenameClass(@NonNls final FqName qClassName, @NonNls String newName) throws Exception {
