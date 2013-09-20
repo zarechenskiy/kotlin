@@ -26,6 +26,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.codegen.binding.CalculatedClosure;
 import org.jetbrains.jet.codegen.context.CodegenContext;
 import org.jetbrains.jet.codegen.context.PackageContext;
+import org.jetbrains.jet.codegen.context.MethodContext;
 import org.jetbrains.jet.codegen.signature.BothSignatureWriter;
 import org.jetbrains.jet.codegen.signature.JvmMethodParameterKind;
 import org.jetbrains.jet.codegen.signature.JvmMethodSignature;
@@ -229,7 +230,16 @@ public class CodegenUtil {
         return false;
     }
 
-    public static boolean couldUseDirectAccessToProperty(@NotNull PropertyDescriptor propertyDescriptor, boolean forGetter, boolean isInsideClass, boolean isDelegated) {
+    public static boolean couldUseDirectAccessToProperty(
+            @NotNull PropertyDescriptor propertyDescriptor,
+            boolean forGetter,
+            boolean isInsideClass,
+            boolean isDelegated,
+            MethodContext context
+    ) {
+        if (context.isInlineFunction()) {
+            return false;
+        }
         PropertyAccessorDescriptor accessorDescriptor = forGetter ? propertyDescriptor.getGetter() : propertyDescriptor.getSetter();
         boolean isExtensionProperty = propertyDescriptor.getReceiverParameter() != null;
         boolean specialTypeProperty = isDelegated ||
