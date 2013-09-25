@@ -17,6 +17,7 @@
 package org.jetbrains.jet.lang.resolve;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.jetbrains.annotations.NotNull;
@@ -482,5 +483,15 @@ public class DescriptorUtils {
         ClassDescriptor classObject = enumClass.getClassObjectDescriptor();
         assert classObject != null : "Enum class should have a class object: " + enumClass;
         return classObject.getDefaultType().getMemberScope();
+    }
+
+    @NotNull
+    public static CallableDescriptor getDeepestOverridden(@NotNull CallableDescriptor callableDescriptor) {
+        CallableDescriptor deepestOverridden = callableDescriptor;
+        while (!deepestOverridden.getOverriddenDescriptors().isEmpty()) {
+            deepestOverridden = deepestOverridden.getOverriddenDescriptors().iterator().next();
+        }
+
+        return deepestOverridden;
     }
 }
