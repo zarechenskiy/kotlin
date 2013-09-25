@@ -25,6 +25,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.refactoring.MultiFileTestCase;
 import com.intellij.refactoring.rename.RenameProcessor;
+import com.intellij.refactoring.rename.RenamePsiElementProcessor;
 import com.intellij.util.Function;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.jet.lang.descriptors.ClassDescriptor;
@@ -119,32 +120,30 @@ public class RenameInKotlinTest extends MultiFileTestCase {
         }, newName);
     }
 
-    private void doTestWithRename(@NonNls final Function<PsiFile, PsiElement> elementToRenameCallback, @NonNls final String newName) throws Exception {
+    private void doTestWithRename(@NonNls final Function<PsiFile, PsiElement> elementToRenameCallback, final @NonNls String newName) throws Exception {
         doTest(new PerformAction() {
             @Override
             public void performAction(VirtualFile rootDir, VirtualFile rootAfter) throws Exception {
                 VirtualFile child = rootDir.findChild(getTestName(false) + ".kt");
-                if (child == null) {
-                    return;
-                }
+                assertNotNull(child);
 
                 Document document = FileDocumentManager.getInstance().getDocument(child);
-                if (document == null) {
-                    return;
-                }
+                assertNotNull(document);
 
                 PsiFile file = PsiDocumentManager.getInstance(getProject()).getPsiFile(document);
-                if (!(file instanceof JetFile)) {
-                    return;
-                }
+                assertTrue(file instanceof JetFile);
 
                 PsiElement psiElement = elementToRenameCallback.fun(file);
                 assertNotNull(psiElement);
 
-                new RenameProcessor(myProject, psiElement, newName, true, true).run();
+                PsiElement substitution = RenamePsiElementProcessor.forElement(psiElement).substituteElementToRename(psiElement, null);
+                assert substitution != null;
+
+                new RenameProcessor(myProject, substitution, newName, true, true).run();
+
                 PsiDocumentManager.getInstance(myProject).commitAllDocuments();
                 FileDocumentManager.getInstance().saveAllDocuments();
-                VirtualFileManager.getInstance().refresh(false);
+                VirtualFileManager.getInstance().syncRefresh();
             }
         });
     }
