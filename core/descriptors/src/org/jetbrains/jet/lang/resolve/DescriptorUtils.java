@@ -487,4 +487,14 @@ public class DescriptorUtils {
         return isTopLevelDeclaration(descriptor) ||
                containing instanceof ClassDescriptor && isTopLevelOrInnerClass((ClassDescriptor) containing);
     }
+
+    @NotNull
+    public static CallableDescriptor getDeepestOverridden(@NotNull CallableDescriptor callableDescriptor) {
+        CallableDescriptor deepestOverridden = callableDescriptor;
+        while (!deepestOverridden.getOverriddenDescriptors().isEmpty()) {
+            deepestOverridden = deepestOverridden.getOverriddenDescriptors().iterator().next();
+        }
+
+        return deepestOverridden;
+    }
 }
