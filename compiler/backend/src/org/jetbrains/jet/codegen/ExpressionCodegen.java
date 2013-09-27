@@ -1368,27 +1368,30 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
             if (!ignoreThisAndReceiver) {
                 ClassDescriptor captureThis = closure.getCaptureThis();
                 if (captureThis != null) {
-                    generateThisOrOuter(captureThis, false).put(OBJECT_TYPE, v);
-                    inliner.putInLocal(OBJECT_TYPE);
+                    StackValue thisOrOuter = generateThisOrOuter(captureThis, false);
+                    thisOrOuter.put(OBJECT_TYPE, v);
+                    inliner.putInLocal(OBJECT_TYPE, thisOrOuter);
                 }
 
                 JetType captureReceiver = closure.getCaptureReceiverType();
                 if (captureReceiver != null) {
                     Type asmType = typeMapper.mapType(captureReceiver);
-                    v.load(context.isStatic() ? 0 : 1, asmType);
-                    inliner.putInLocal(asmType);
+                    StackValue.Local capturedReceiver = StackValue.local(context.isStatic() ? 0 : 1, asmType);
+                    capturedReceiver.put(asmType, v);
+                    inliner.putInLocal(asmType, capturedReceiver);
                 }
             }
 
             for (Map.Entry<DeclarationDescriptor, EnclosedValueDescriptor> entry : closure.getCaptureVariables().entrySet()) {
-                //if (entry.getKey() instanceof VariableDescriptor && !(entry.getKey() instanceof PropertyDescriptor)) {
                 Type sharedVarType = typeMapper.getSharedVarType(entry.getKey());
                 if (sharedVarType == null) {
                     sharedVarType = typeMapper.mapType((VariableDescriptor) entry.getKey());
                 }
-                entry.getValue().getOuterValue(this).put(sharedVarType, v);
-                inliner.putInLocal(sharedVarType);
-                //}
+                StackValue capturedVar = entry.getValue().getOuterValue(this);
+                if (inliner.shouldPutValue(sharedVarType, capturedVar, context)) {
+                    capturedVar.put(sharedVarType, v);
+                }
+                inliner.putInLocal(sharedVarType, capturedVar);
             }
         }
     }
@@ -2110,7 +2113,6 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
         if (!(descriptor instanceof ConstructorDescriptor)) { // otherwise already
             receiver = StackValue.receiver(resolvedCall, receiver, this, callableMethod);
             receiver.put(receiver.type, v);
-            inliner.putInLocal(receiver.type);
             //if (calleeType != null) {
             //    StackValue.onStack(receiver.type).put(boxType(receiver.type), v);
             //    inliner.putInLocal(boxType(receiver.type));
@@ -2353,6 +2355,7 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
             }
 
             boolean putInLocal = true;
+            StackValue valueIfPresent = null;
 
             ResolvedValueArgument resolvedValueArgument = valueArguments.get(valueParameter.getIndex());
             Type parameterType = valueParameterTypes.get(valueParameter.getIndex());
@@ -2366,7 +2369,11 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
                     inliner.rememberClosure((JetFunctionLiteralExpression) argumentExpression, parameterType);
                     putInLocal = false;
                 } else {
-                    gen(argumentExpression, parameterType);
+                    StackValue value = gen(argumentExpression);
+                    if (inliner.shouldPutValue(parameterType, value, context)) {
+                        value.put(parameterType, v);
+                    }
+                    valueIfPresent = value;
                 }
             } else if (resolvedValueArgument instanceof DefaultValueArgument) {
                 pushDefaultValueOnStack(parameterType, v);
@@ -2381,7 +2388,7 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
             }
 
             if (putInLocal) {
-                inliner.putInLocal(parameterType);
+                inliner.putInLocal(parameterType, valueIfPresent);
             }
         }
         return mask;
