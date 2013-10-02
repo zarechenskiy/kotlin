@@ -1980,7 +1980,7 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
 
     @NotNull
     public StackValue invokeFunction(
-            Call call,
+            @NotNull Call call,
             StackValue receiver,
             ResolvedCall<? extends CallableDescriptor> resolvedCall
     ) {
@@ -2116,7 +2116,8 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
         boolean disable = false;
         Inliner inliner = !isInline
                           ? Inliner.NOT_INLINE
-                          : new InlineCodegen(this, isInline, state, disable, (SimpleFunctionDescriptor) callableMethod.getFunctionDescriptor());
+                          : new InlineCodegen(this, isInline, state, disable,
+                                              (SimpleFunctionDescriptor) callableMethod.getFunctionDescriptor(), callToGenerateCallee);
 
         Type calleeType = callableMethod.getGenerateCalleeType();
 
