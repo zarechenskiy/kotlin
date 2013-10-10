@@ -25,6 +25,7 @@ import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.lang.descriptors.*;
+import org.jetbrains.jet.lang.descriptors.annotations.AnnotationDescriptor;
 import org.jetbrains.jet.lang.descriptors.impl.FunctionDescriptorUtil;
 import org.jetbrains.jet.lang.psi.*;
 import org.jetbrains.jet.lang.resolve.*;
@@ -49,10 +50,7 @@ import org.jetbrains.jet.lang.types.expressions.ExpressionTypingUtils;
 import org.jetbrains.jet.lang.types.lang.KotlinBuiltIns;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.jetbrains.jet.lang.diagnostics.Errors.*;
 import static org.jetbrains.jet.lang.resolve.calls.CallResolverUtil.DONT_CARE;
@@ -505,7 +503,13 @@ public class CandidateResolver {
         JetType effectiveExpectedType = getEffectiveExpectedType(valueParameterDescriptor, valueArgument);
         JetType expectedType = constraintSystem.getCurrentSubstitutor().substitute(effectiveExpectedType, Variance.INVARIANT);
         if (expectedType == null || expectedType == DONT_CARE) {
-            expectedType = argumentTypeResolver.getFunctionLiteralType(functionLiteralExpression, context.scope, context.trace);
+            if (functionLiteralExpression.getFunctionLiteral().getValueParameterList() == null) {
+                expectedType = KotlinBuiltIns.getInstance().getFunctionType(
+                        Collections.<AnnotationDescriptor>emptyList(), null, Collections.<JetType>emptyList(), DONT_CARE);
+            }
+            else {
+                expectedType = argumentTypeResolver.getFunctionLiteralType(functionLiteralExpression, context.scope, context.trace);
+            }
         }
         if (expectedType == null || !KotlinBuiltIns.getInstance().isFunctionOrExtensionFunctionType(expectedType)
                 || CallResolverUtil.hasUnknownFunctionParameter(expectedType)) {
