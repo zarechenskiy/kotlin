@@ -233,9 +233,13 @@ public class InjectorForTopDownAnalyzerForJvm implements InjectorForTopDownAnaly
         this.javaBridgeConfiguration.setJavaDescriptorResolver(javaDescriptorResolver);
 
         javaDescriptorResolver.setClassResolver(javaClassResolver);
+        javaDescriptorResolver.setErrorReporter(traceBasedErrorReporter);
         javaDescriptorResolver.setExternalAnnotationResolver(psiBasedExternalAnnotationResolver);
+        javaDescriptorResolver.setExternalSignatureResolver(traceBasedExternalSignatureResolver);
         javaDescriptorResolver.setJavaClassFinder(javaClassFinder);
+        javaDescriptorResolver.setJavaResolverCache(traceBasedJavaResolverCache);
         javaDescriptorResolver.setNamespaceResolver(javaNamespaceResolver);
+        javaDescriptorResolver.setSignatureChecker(psiBasedMethodSignatureChecker);
 
         javaClassFinder.setProject(project);
 
