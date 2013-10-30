@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.lang.PlatformToKotlinClassMap;
 import org.jetbrains.jet.lang.descriptors.ClassDescriptor;
+import org.jetbrains.jet.lang.descriptors.ModuleDescriptor;
 import org.jetbrains.jet.lang.descriptors.ModuleDescriptorImpl;
 import org.jetbrains.jet.lang.descriptors.NamespaceDescriptor;
 import org.jetbrains.jet.lang.resolve.DescriptorUtils;
@@ -53,6 +54,9 @@ public class JavaDescriptorResolver implements DependencyClassByQualifiedNameRes
     }
 
     public static final Name JAVA_ROOT = Name.special("<java_root>");
+    public static final ModuleDescriptor FAKE_JAVA_MODULE = new ModuleDescriptorImpl(Name.special("<java module>"), Collections.<ImportPath>emptyList(),
+                                                                                     PlatformToKotlinClassMap.EMPTY);
+
     private final LockBasedStorageManager storageManager = new LockBasedStorageManager();
 
     private final MemoizedFunctionToNullable<FqName, ClassDescriptor> kotlinClassesFromBinaries = storageManager.createMemoizedFunctionWithNullableValues(
@@ -83,6 +87,7 @@ public class JavaDescriptorResolver implements DependencyClassByQualifiedNameRes
     private JavaResolverCache javaResolverCache;
     private DeserializedDescriptorResolver deserializedDescriptorResolver;
     private KotlinClassFinder kotlinClassFinder;
+    private ModuleDescriptor module;
 
     @Inject
     public void setClassResolver(JavaClassResolver classResolver) {
@@ -134,6 +139,11 @@ public class JavaDescriptorResolver implements DependencyClassByQualifiedNameRes
         this.kotlinClassFinder = kotlinClassFinder;
     }
 
+    @Inject
+    public void setModule(ModuleDescriptor module) {
+        this.module = module;
+    }
+
     @NotNull
     private LazyJavaSubModule getSubModule() {
         if (subModule == null) {
@@ -173,7 +183,7 @@ public class JavaDescriptorResolver implements DependencyClassByQualifiedNameRes
                             signatureChecker,
                             javaResolverCache
                     ),
-                    new ModuleDescriptorImpl(Name.special("<java module>"), Collections.<ImportPath>emptyList(), PlatformToKotlinClassMap.EMPTY)
+                    module
             );
         }
         return subModule;
