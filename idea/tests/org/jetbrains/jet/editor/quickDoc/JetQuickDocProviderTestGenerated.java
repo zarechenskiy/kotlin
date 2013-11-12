@@ -36,6 +36,11 @@ public class JetQuickDocProviderTestGenerated extends AbstractJetQuickDocProvide
         JetTestUtils.assertAllTestsPresentByMetadata(this.getClass(), "org.jetbrains.jet.generators.tests.GenerateTests", new File("idea/testData/editor/quickDoc"), Pattern.compile("^(.+)\\.kt$"), true);
     }
     
+    @TestMetadata("FakeOverrideFromJdk.kt")
+    public void testFakeOverrideFromJdk() throws Exception {
+        doTest("idea/testData/editor/quickDoc/FakeOverrideFromJdk.kt");
+    }
+    
     @TestMetadata("MethodFromStdLib.kt")
     public void testMethodFromStdLib() throws Exception {
         doTest("idea/testData/editor/quickDoc/MethodFromStdLib.kt");

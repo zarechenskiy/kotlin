@@ -30,6 +30,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.kdoc.lexer.KDocTokens;
 import org.jetbrains.jet.kdoc.psi.api.KDoc;
+import org.jetbrains.jet.lang.descriptors.CallableDescriptor;
+import org.jetbrains.jet.lang.descriptors.CallableMemberDescriptor;
 import org.jetbrains.jet.lang.descriptors.DeclarationDescriptor;
 import org.jetbrains.jet.lang.psi.*;
 import org.jetbrains.jet.lang.resolve.BindingContext;
@@ -40,6 +42,7 @@ import org.jetbrains.jet.plugin.references.BuiltInsReferenceResolver;
 import org.jetbrains.jet.renderer.DescriptorRenderer;
 
 import java.util.Collection;
+import java.util.List;
 
 public class JetQuickDocumentationProvider extends AbstractDocumentationProvider {
     private static final Predicate<PsiElement> SKIP_WHITESPACE_AND_EMPTY_NAMESPACE = new Predicate<PsiElement>() {
@@ -86,6 +89,7 @@ public class JetQuickDocumentationProvider extends AbstractDocumentationProvider
             @NotNull DeclarationDescriptor declarationDescriptor, @NotNull BindingContext bindingContext,
             PsiElement element, PsiElement originalElement, boolean mergeKotlinAndJava) {
         String renderedDecl = DescriptorRenderer.HTML.render(declarationDescriptor);
+        //TODO: deal with situation when declarationDescriptor is fake override with several overridden descriptors
         if (isKotlinDeclaration(declarationDescriptor, bindingContext, element)) {
             KDoc comment = findElementKDoc(element);
             if (comment != null) {
@@ -110,17 +114,26 @@ public class JetQuickDocumentationProvider extends AbstractDocumentationProvider
             PsiElement element
     ) {
         if (JetLanguage.INSTANCE == element.getLanguage()) return true;
-        PsiElement declaration = BindingContextUtils.descriptorToDeclaration(bindingContext, descriptor);
-        if (declaration == null) {
+
+        List<PsiElement> declarations = BindingContextUtils.descriptorToDeclarations(bindingContext, descriptor);
+        if (declarations.isEmpty()) {
             BuiltInsReferenceResolver libraryReferenceResolver = element.getProject().getComponent(BuiltInsReferenceResolver.class);
             Collection<PsiElement> elements = libraryReferenceResolver.resolveBuiltInSymbol(descriptor);
             return !elements.isEmpty();
         }
 
-        ClsClassImpl clsClass = PsiTreeUtil.getParentOfType(declaration, ClsClassImpl.class);
-        if (clsClass == null) return false;
-        VirtualFile file = clsClass.getContainingFile().getVirtualFile();
-        return file != null && DecompiledUtils.isKotlinCompiledFile(file);
+        if (declarations.size() == 1) {
+            PsiElement declaration = declarations.iterator().next();
+            ClsClassImpl clsClass = PsiTreeUtil.getParentOfType(declaration, ClsClassImpl.class);
+            if (clsClass == null) return false;
+            VirtualFile file = clsClass.getContainingFile().getVirtualFile();
+            return file != null && DecompiledUtils.isKotlinCompiledFile(file);
+        }
+
+        assert descriptor instanceof CallableMemberDescriptor
+               && ((CallableMemberDescriptor) descriptor).getKind() != CallableMemberDescriptor.Kind.DECLARATION
+                : "Callable descriptor with no declaration expected, but was: " + descriptor;
+        return false;
     }
 
     @Override

@@ -18,6 +18,7 @@ package org.jetbrains.jet.editor.quickDoc;
 
 import com.intellij.codeInsight.documentation.DocumentationManager;
 import com.intellij.codeInsight.navigation.CtrlMouseHandler;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiElement;
 import com.intellij.testFramework.LightProjectDescriptor;
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
@@ -40,7 +41,9 @@ public abstract class AbstractJetQuickDocProviderTest extends LightCodeInsightFi
         List<String> directives = InTextDirectivesUtils.findLinesWithPrefixesRemoved(myFixture.getFile().getText(), "INFO:");
         assertTrue("Documentation to check should be added to test file with // INFO: directive " + path, 1 == directives.size());
 
-        assertEquals(directives.get(0), CtrlMouseHandler.getInfo(targetElement, element));
+        String info = CtrlMouseHandler.getInfo(targetElement, element);
+        assertNotNull("Quick doc should be present", info);
+        assertEquals(directives.get(0), StringUtil.convertLineSeparators(info).replaceAll("\n", ""));
     }
 
     @NotNull
