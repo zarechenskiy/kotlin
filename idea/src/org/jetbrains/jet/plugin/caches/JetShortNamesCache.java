@@ -214,13 +214,13 @@ public class JetShortNamesCache extends PsiShortNamesCache {
 
     @NotNull
     public Collection<FunctionDescriptor> getTopLevelFunctionDescriptorsByName(
-            @NotNull final String name,
+            @NotNull String name,
             @NotNull JetSimpleNameExpression expression,
             @NotNull CancelableResolveSession resolveSession,
             @NotNull GlobalSearchScope scope
     ) {
         // name parameter can differ from expression.getReferenceName() when expression contains completion suffix
-        Name referenceName = expression.getIdentifier() == null ? JetPsiUtil.getConventionName(expression) : Name.identifier(name);
+        final Name referenceName = expression.getIdentifier() == null ? JetPsiUtil.getConventionName(expression) : Name.identifier(name);
         if (referenceName == null || referenceName.toString().isEmpty()) {
             return Collections.emptyList();
         }
@@ -238,7 +238,7 @@ public class JetShortNamesCache extends PsiShortNamesCache {
                 ContainerUtil.filter(getTopLevelFunctionFqNames(project, scope, false), new Condition<FqName>() {
                     @Override
                     public boolean value(FqName fqName) {
-                        return fqName.lastSegmentIs(Name.identifier(name));
+                        return fqName.lastSegmentIs(referenceName);
                     }
                 });
         for (FqName fqName : topLevelFunctionFqNames) {
