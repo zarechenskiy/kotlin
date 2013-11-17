@@ -86,6 +86,11 @@ public class RenameTestGenerated extends AbstractRenameTest {
         doTest("idea/testData/refactoring/rename/renameKotlinMethod/renameKotlinMethod.test");
     }
     
+    @TestMetadata("renameKotlinPackagePropertyFromJava/renameKotlinPackagePropertyFromJava.test")
+    public void testRenameKotlinPackagePropertyFromJava_RenameKotlinPackagePropertyFromJava() throws Exception {
+        doTest("idea/testData/refactoring/rename/renameKotlinPackagePropertyFromJava/renameKotlinPackagePropertyFromJava.test");
+    }
+    
     @TestMetadata("renameKotlinProperty/renameKotlinPackageFunctionFromJava.test")
     public void testRenameKotlinProperty_RenameKotlinPackageFunctionFromJava() throws Exception {
         doTest("idea/testData/refactoring/rename/renameKotlinProperty/renameKotlinPackageFunctionFromJava.test");
