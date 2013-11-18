@@ -147,45 +147,38 @@ public class JetPsiChecker implements Annotator, HighlightRangeExtension {
             assert diagnostic.getPsiElement() == element;
 
             List<TextRange> textRanges = diagnostic.getTextRanges();
-            if (diagnostic.getSeverity() == Severity.ERROR) {
-                if (Errors.UNRESOLVED_REFERENCE_DIAGNOSTICS.contains(diagnostic.getFactory())) {
-                    JetReferenceExpression referenceExpression = (JetReferenceExpression)diagnostic.getPsiElement();
-                    PsiReference reference = referenceExpression.getReference();
-                    if (reference instanceof MultiRangeReference) {
-                        MultiRangeReference mrr = (MultiRangeReference)reference;
-                        for (TextRange range : mrr.getRanges()) {
-                            Annotation annotation = holder.createErrorAnnotation(range.shiftRight(referenceExpression.getTextOffset()), getDefaultMessage(diagnostic));
-                            setUpAnnotation(diagnostic, annotation, ProblemHighlightType.LIKE_UNKNOWN_SYMBOL);
-                        }
+            if (Errors.UNRESOLVED_REFERENCE_DIAGNOSTICS.contains(diagnostic.getFactory())) {
+                JetReferenceExpression referenceExpression = (JetReferenceExpression)diagnostic.getPsiElement();
+                PsiReference reference = referenceExpression.getReference();
+                if (reference instanceof MultiRangeReference) {
+                    MultiRangeReference mrr = (MultiRangeReference)reference;
+                    for (TextRange range : mrr.getRanges()) {
+                        Annotation annotation = holder.createErrorAnnotation(range.shiftRight(referenceExpression.getTextOffset()), getDefaultMessage(diagnostic));
+                        setUpAnnotation(diagnostic, annotation, ProblemHighlightType.LIKE_UNKNOWN_SYMBOL);
                     }
-                    else {
-                        for (TextRange textRange : textRanges) {
-                            Annotation annotation = holder.createErrorAnnotation(textRange, getDefaultMessage(diagnostic));
-                            setUpAnnotation(diagnostic, annotation, ProblemHighlightType.LIKE_UNKNOWN_SYMBOL);
-                        }
-                    }
-
-                    return;
                 }
-
-                if (diagnostic.getFactory() == Errors.ILLEGAL_ESCAPE) {
-                    for (TextRange textRange : diagnostic.getTextRanges()) {
+                else {
+                    for (TextRange textRange : textRanges) {
                         Annotation annotation = holder.createErrorAnnotation(textRange, getDefaultMessage(diagnostic));
-                        annotation.setTooltip(getMessage(diagnostic));
-                        annotation.setTextAttributes(JetHighlightingColors.INVALID_STRING_ESCAPE);
+                        setUpAnnotation(diagnostic, annotation, ProblemHighlightType.LIKE_UNKNOWN_SYMBOL);
                     }
-                    return;
                 }
-
-                if (diagnostic.getFactory() == Errors.REDECLARATION) {
-                    if (!isMarkedWithRedeclaration) {
-                        isMarkedWithRedeclaration = true;
-                        Annotation annotation = holder.createErrorAnnotation(diagnostic.getTextRanges().get(0), "");
-                        setUpAnnotation(diagnostic, annotation, null);
-                    }
-                    return;
+            }
+            else if (diagnostic.getFactory() == Errors.ILLEGAL_ESCAPE) {
+                for (TextRange textRange : diagnostic.getTextRanges()) {
+                    Annotation annotation = holder.createErrorAnnotation(textRange, getDefaultMessage(diagnostic));
+                    annotation.setTooltip(getMessage(diagnostic));
+                    annotation.setTextAttributes(JetHighlightingColors.INVALID_STRING_ESCAPE);
                 }
-
+            }
+            else if (diagnostic.getFactory() == Errors.REDECLARATION) {
+                if (!isMarkedWithRedeclaration) {
+                    isMarkedWithRedeclaration = true;
+                    Annotation annotation = holder.createErrorAnnotation(diagnostic.getTextRanges().get(0), "");
+                    setUpAnnotation(diagnostic, annotation, null);
+                }
+            }
+            else if (diagnostic.getSeverity() == Severity.ERROR) {
                 // Generic annotation
                 for (TextRange textRange : textRanges) {
                     Annotation errorAnnotation = holder.createErrorAnnotation(textRange, getDefaultMessage(diagnostic));
