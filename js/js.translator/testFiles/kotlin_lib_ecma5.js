@@ -123,12 +123,24 @@ var Kotlin = {};
         return metadata;
     }
 
+    /**
+     * @this {{object_initializer$: (function(): Object)}}
+     * @returns {Object}
+     */
     function class_object() {
         var object = this.object_initializer$();
         Object.defineProperty(this, "object", {value: object});
         return object;
     }
 
+    /**
+     * @param {(Array|Object|null)=} bases
+     * @param {(function(new: T, ?, ?, ?, ?, ?, ?, ?): T)|null=} constructor
+     * @param {Object=} properties
+     * @param {Object=} staticProperties
+     * @returns {function(new: T): T}
+     * @template T
+     */
     Kotlin.createClassNow = function (bases, constructor, properties, staticProperties) {
         if (constructor == null) {
             constructor = emptyFunction();
@@ -189,6 +201,13 @@ var Kotlin = {};
         }
     }
 
+    /**
+     * @param {(function():Array.<*>)|null} basesFun
+     * @param {?=} constructor
+     * @param {Object=} properties
+     * @param {Object=} staticProperties
+     * @returns {*}
+     */
     Kotlin.createClass = function (basesFun, constructor, properties, staticProperties) {
         function $o() {
             var klass = Kotlin.createClassNow(getBases(basesFun), constructor, properties, staticProperties);
@@ -199,6 +218,12 @@ var Kotlin = {};
         return $o;
     };
 
+    /**
+     * @param {(function():Array.<*>)|null} basesFun
+     * @param {Object=} properties
+     * @param {Object=} staticProperties
+     * @returns {*}
+     */
     Kotlin.createTrait = function (basesFun, properties, staticProperties) {
         function $o() {
             var klass = Kotlin.createTraitNow(getBases(basesFun), properties, staticProperties);
@@ -209,6 +234,13 @@ var Kotlin = {};
         return $o;
     };
 
+    /**
+     * @param {function()|null} basesFun
+     * @param {(function(new: T): T)|null=} constructor
+     * @param {Object=} functions
+     * @returns {Object}
+     * @template T
+     */
     Kotlin.createObject = function (basesFun, constructor, functions) {
         return Kotlin.createObjectNow(getBases(basesFun), constructor, functions);
     };
@@ -298,6 +330,11 @@ var Kotlin = {};
         return definition;
     }
 
+    /**
+     * @param {function()|null=} initializer
+     * @param {Object=} members
+     * @returns {Object}
+     */
     Kotlin.definePackage = function (initializer, members) {
         var definition = createDefinition(members);
         if (initializer === null) {
@@ -320,6 +357,10 @@ var Kotlin = {};
         return definition;
       };
 
+    /**
+     * @param {string} id
+     * @param {Object} declaration
+     */
     Kotlin.defineModule = function (id, declaration) {
         if (id in Kotlin.modules) {
             throw new Error("Module " + id + " is already defined");
