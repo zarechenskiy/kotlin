@@ -713,6 +713,11 @@ public class QuickFixTestGenerated extends AbstractQuickFixTest {
             doTest("idea/testData/quickfix/expressions/beforeDanglingFunctionLiteralArgument.kt");
         }
         
+        @TestMetadata("beforeTooManyArgumentsDanglingFunctionLiteral.kt")
+        public void testTooManyArgumentsDanglingFunctionLiteral() throws Exception {
+            doTest("idea/testData/quickfix/expressions/beforeTooManyArgumentsDanglingFunctionLiteral.kt");
+        }
+        
         @TestMetadata("beforeUnnecessaryNonNullAssertion1.kt")
         public void testUnnecessaryNonNullAssertion1() throws Exception {
             doTest("idea/testData/quickfix/expressions/beforeUnnecessaryNonNullAssertion1.kt");
@@ -761,6 +766,11 @@ public class QuickFixTestGenerated extends AbstractQuickFixTest {
         @TestMetadata("beforeUselessElvis.kt")
         public void testUselessElvis() throws Exception {
             doTest("idea/testData/quickfix/expressions/beforeUselessElvis.kt");
+        }
+        
+        @TestMetadata("beforeVarargOutsideParentheses.kt")
+        public void testVarargOutsideParentheses() throws Exception {
+            doTest("idea/testData/quickfix/expressions/beforeVarargOutsideParentheses.kt");
         }
         
     }

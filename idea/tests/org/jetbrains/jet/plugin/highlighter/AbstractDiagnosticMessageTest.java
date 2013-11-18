@@ -110,7 +110,7 @@ public abstract class AbstractDiagnosticMessageTest extends JetLiteFixture {
             String errorMessageFileName = name + index;
             String path = getTestDataPath() + "/" + errorMessageFileName + "." + extension;
             String actualText = "<!-- " + errorMessageFileName + " -->\n" + readableDiagnosticText;
-            assertSameLinesWithFile(path, actualText);
+            JetTestUtils.assertEqualsToFile(new File(path), actualText);
 
             index++;
         }

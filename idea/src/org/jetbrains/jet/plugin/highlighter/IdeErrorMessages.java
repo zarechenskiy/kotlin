@@ -98,6 +98,24 @@ public class IdeErrorMessages {
         MAP.put(DELEGATE_SPECIAL_FUNCTION_NONE_APPLICABLE, "<html>Property delegate must have a ''{0}'' method. None of the following functions is suitable. <ul>{1}</ul></html>",
                 TO_STRING, HTML_NONE_APPLICABLE_CALLS);
 
+        String dangling = "This expression is treated as an argument to a function called on the previous line.<br/>" +
+                          "Separate it with a semicolon (;) if it is not intended to be an argument.";
+        String hintForDangling = "<br/><br/><b>Hint</b>: <i>" + dangling + "</i>";
+        MAP.put(TOO_MANY_ARGUMENTS_POSSIBLY_DANGLING_FUNCTION_LITERAL,
+                "<html>" +
+                "Too many arguments for {0}" +
+                hintForDangling +
+                "</html>",
+                DescriptorRenderer.HTML);
+
+        MAP.put(VARARG_OUTSIDE_PARENTHESES,
+                "<html>" +
+                "Passing value as a vararg is only allowed inside a parenthesized argument list" +
+                hintForDangling +
+                "</html>");
+
+        MAP.put(DANGLING_FUNCTION_LITERAL_ARGUMENT_SUSPECTED, "<html>" + dangling + "</html>");
+
         MAP.setImmutable();
     }
 

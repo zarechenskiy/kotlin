@@ -106,7 +106,6 @@ public class DefaultErrorMessages {
         MAP.put(MIXING_NAMED_AND_POSITIONED_ARGUMENTS, "Mixing named and positioned arguments in not allowed");
         MAP.put(ARGUMENT_PASSED_TWICE, "An argument is already passed for this parameter");
         MAP.put(NAMED_PARAMETER_NOT_FOUND, "Cannot find a parameter with this name: {0}", ELEMENT_TEXT);
-        MAP.put(VARARG_OUTSIDE_PARENTHESES, "Passing value as a vararg is only allowed inside a parenthesized argument list");
         MAP.put(NON_VARARG_SPREAD, "The spread operator (*foo) may only be applied in a vararg position");
 
         MAP.put(MANY_FUNCTION_LITERAL_ARGUMENTS, "Only one function literal is allowed outside a parenthesized argument list");
@@ -294,6 +293,17 @@ public class DefaultErrorMessages {
 
         MAP.put(TOO_MANY_ARGUMENTS, "Too many arguments for {0}", DescriptorRenderer.TEXT);
 
+        String dangling = "This expression is treated as an argument to a function called on the previous line.\n" +
+                          "Separate it with a semicolon (;) if it is not intended to be an argument.";
+        String hintForDangling = "\n----\nHint: " + dangling;
+
+        MAP.put(TOO_MANY_ARGUMENTS_POSSIBLY_DANGLING_FUNCTION_LITERAL,
+                "Too many arguments for {0}." + hintForDangling, DescriptorRenderer.TEXT);
+        MAP.put(VARARG_OUTSIDE_PARENTHESES,
+                "Passing value as a vararg is only allowed inside a parenthesized argument list" + hintForDangling);
+
+        MAP.put(DANGLING_FUNCTION_LITERAL_ARGUMENT_SUSPECTED, dangling);
+
         MAP.put(CONSTANT_EXPECTED_TYPE_MISMATCH, "An {0} literal does not conform to the expected type {1}", TO_STRING, RENDER_TYPE);
         MAP.put(INT_LITERAL_OUT_OF_RANGE, "The value is out of range");
         MAP.put(FLOAT_LITERAL_OUT_OF_RANGE, "The value is out of range");
@@ -437,10 +447,6 @@ public class DefaultErrorMessages {
         MAP.put(WRONG_NUMBER_OF_TYPE_ARGUMENTS, "{0,choice,0#No type arguments|1#Type argument|1<{0,number,integer} type arguments} expected", null);
         MAP.put(NO_TYPE_ARGUMENTS_ON_RHS, "{0,choice,0#No type arguments|1#Type argument|1<{0,number,integer} type arguments} expected. " +
                                                            "Use ''{1}'' if you don''t want to pass type arguments", null, TO_STRING);
-
-        MAP.put(DANGLING_FUNCTION_LITERAL_ARGUMENT_SUSPECTED,
-                "This expression is treated as an argument to the function call on the previous line. " +
-                "Separate it with a semicolon (;) if it is not intended to be an argument.");
 
         MAP.put(TYPE_PARAMETER_AS_REIFIED, "Cannot use ''{0}'' as reified type parameter. Use a class instead.", NAME);
 

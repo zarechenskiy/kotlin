@@ -103,6 +103,11 @@ public class JetPsiCheckerTestGenerated extends AbstractJetPsiCheckerTest {
             doTest("idea/testData/checker/CyclicHierarchy.kt");
         }
         
+        @TestMetadata("DanglingFunctionLiteral.kt")
+        public void testDanglingFunctionLiteral() throws Exception {
+            doTest("idea/testData/checker/DanglingFunctionLiteral.kt");
+        }
+        
         @TestMetadata("ExtensionFunctions.kt")
         public void testExtensionFunctions() throws Exception {
             doTest("idea/testData/checker/ExtensionFunctions.kt");

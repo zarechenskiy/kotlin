@@ -212,7 +212,7 @@ import static org.jetbrains.jet.lang.resolve.calls.ValueArgumentsToParametersMap
                 JetExpression possiblyLabeledFunctionLiteral = functionLiteralArguments.get(0);
 
                 if (valueParameters.isEmpty()) {
-                    report(TOO_MANY_ARGUMENTS.on(possiblyLabeledFunctionLiteral, candidate));
+                    report(TOO_MANY_ARGUMENTS_POSSIBLY_DANGLING_FUNCTION_LITERAL.on(possiblyLabeledFunctionLiteral, candidate));
                     setStatus(ERROR);
                 }
                 else {
@@ -223,7 +223,7 @@ import static org.jetbrains.jet.lang.resolve.calls.ValueArgumentsToParametersMap
                     }
                     else {
                         if (!usedParameters.add(valueParameterDescriptor)) {
-                            report(TOO_MANY_ARGUMENTS.on(possiblyLabeledFunctionLiteral, candidate));
+                            report(TOO_MANY_ARGUMENTS_POSSIBLY_DANGLING_FUNCTION_LITERAL.on(possiblyLabeledFunctionLiteral, candidate));
                             setStatus(WEAK_ERROR);
                         }
                         else {

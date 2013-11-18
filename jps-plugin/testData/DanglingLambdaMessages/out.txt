@@ -1,0 +1,41 @@
+ERROR: $TEST_DATA$/danglingLambda.kt: (9, 5)
+Too many arguments for internal fun (jet.Int) -> jet.Int.inlineExt2(p: jet.Int): jet.Unit defined in root package.
+----
+Hint: This expression is treated as an argument to a function called on the previous line.
+Separate it with a semicolon (;) if it is not intended to be an argument.
+
+ERROR: $TEST_DATA$/danglingLambda.kt: (20, 5)
+Passing value as a vararg is only allowed inside a parenthesized argument list
+----
+Hint: This expression is treated as an argument to a function called on the previous line.
+Separate it with a semicolon (;) if it is not intended to be an argument.
+
+ERROR: $TEST_DATA$/danglingLambda.kt: (27, 13)
+None of the following functions can be called with the arguments supplied:
+internal fun foo(): jet.Unit defined in root package
+internal fun foo(i: jet.Int): jet.Unit defined in root package
+
+
+WARNING: $TEST_DATA$/danglingLambda.kt: (1, 37)
+Parameter 'p' is never used
+
+WARNING: $TEST_DATA$/danglingLambda.kt: (3, 36)
+Parameter 'p' is never used
+
+WARNING: $TEST_DATA$/danglingLambda.kt: (9, 5)
+This expression is treated as an argument to a function called on the previous line.
+Separate it with a semicolon (;) if it is not intended to be an argument.
+
+WARNING: $TEST_DATA$/danglingLambda.kt: (16, 16)
+Parameter 'a' is never used
+
+WARNING: $TEST_DATA$/danglingLambda.kt: (20, 5)
+This expression is treated as an argument to a function called on the previous line.
+Separate it with a semicolon (;) if it is not intended to be an argument.
+
+WARNING: $TEST_DATA$/danglingLambda.kt: (25, 9)
+Parameter 'i' is never used
+
+WARNING: $TEST_DATA$/danglingLambda.kt: (29, 5)
+This expression is treated as an argument to a function called on the previous line.
+Separate it with a semicolon (;) if it is not intended to be an argument.

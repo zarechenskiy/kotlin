@@ -41,6 +41,11 @@ public class DiagnosticMessageTestGenerated extends AbstractDiagnosticMessageTes
         doTest("idea/testData/diagnosticMessage/conflictingSubstitutions.kt");
     }
     
+    @TestMetadata("danglingFunctionLiteralArgumentSuspected.kt")
+    public void testDanglingFunctionLiteralArgumentSuspected() throws Exception {
+        doTest("idea/testData/diagnosticMessage/danglingFunctionLiteralArgumentSuspected.kt");
+    }
+    
     @TestMetadata("functionPlaceholder.kt")
     public void testFunctionPlaceholder() throws Exception {
         doTest("idea/testData/diagnosticMessage/functionPlaceholder.kt");
@@ -66,6 +71,11 @@ public class DiagnosticMessageTestGenerated extends AbstractDiagnosticMessageTes
         doTest("idea/testData/diagnosticMessage/renderCollectionOfTypes.kt");
     }
     
+    @TestMetadata("tooManyArgumentsDanglingFunctionLiteral.kt")
+    public void testTooManyArgumentsDanglingFunctionLiteral() throws Exception {
+        doTest("idea/testData/diagnosticMessage/tooManyArgumentsDanglingFunctionLiteral.kt");
+    }
+    
     @TestMetadata("typeInferenceExpectedTypeMismatch.kt")
     public void testTypeInferenceExpectedTypeMismatch() throws Exception {
         doTest("idea/testData/diagnosticMessage/typeInferenceExpectedTypeMismatch.kt");
@@ -79,6 +89,11 @@ public class DiagnosticMessageTestGenerated extends AbstractDiagnosticMessageTes
     @TestMetadata("upperBoundViolated.kt")
     public void testUpperBoundViolated() throws Exception {
         doTest("idea/testData/diagnosticMessage/upperBoundViolated.kt");
+    }
+    
+    @TestMetadata("varargOutsideParentheses.kt")
+    public void testVarargOutsideParentheses() throws Exception {
+        doTest("idea/testData/diagnosticMessage/varargOutsideParentheses.kt");
     }
     
 }

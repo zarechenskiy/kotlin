@@ -212,6 +212,8 @@ public class QuickFixes {
 
         factories.put(NOT_AN_ANNOTATION_CLASS, MakeClassAnAnnotationClassFix.createFactory());
 
+        factories.put(TOO_MANY_ARGUMENTS_POSSIBLY_DANGLING_FUNCTION_LITERAL, AddSemicolonAfterFunctionCallFix.createFactory());
+        factories.put(VARARG_OUTSIDE_PARENTHESES, AddSemicolonAfterFunctionCallFix.createFactory());
         factories.put(DANGLING_FUNCTION_LITERAL_ARGUMENT_SUSPECTED, AddSemicolonAfterFunctionCallFix.createFactory());
 
         JetIntentionActionsFactory changeVariableTypeFix = ChangeVariableTypeFix.createFactoryForPropertyOrReturnTypeMismatchOnOverride();
