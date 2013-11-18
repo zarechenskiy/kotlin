@@ -64,7 +64,7 @@ public class CodegenBinding {
 
     public static void initTrace(BindingTrace bindingTrace, Collection<JetFile> files) {
         CodegenAnnotatingVisitor visitor = new CodegenAnnotatingVisitor(bindingTrace);
-        for (JetFile file : allFilesInNamespaces(bindingTrace.getBindingContext(), files)) {
+        for (JetFile file : files) {
             file.accept(visitor);
         }
     }
