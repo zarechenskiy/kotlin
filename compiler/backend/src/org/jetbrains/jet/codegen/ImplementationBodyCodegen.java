@@ -251,14 +251,14 @@ public class ImplementationBodyCodegen extends ClassBodyCodegen {
     }
 
     @NotNull
-    private static String getOuterClassName(@NotNull ClassDescriptor classDescriptor, @NotNull JetTypeMapper typeMapper) {
-        ClassDescriptor container = DescriptorUtils.getParentOfType(classDescriptor, ClassDescriptor.class);
+    public static String getOuterClassName(@NotNull MemberDescriptor memberDescriptor, @NotNull JetTypeMapper typeMapper) {
+        ClassDescriptor container = DescriptorUtils.getParentOfType(memberDescriptor, ClassDescriptor.class);
         if (container != null) {
             return typeMapper.mapClass(container).getInternalName();
         }
 
-        JetFile containingFile = BindingContextUtils.getContainingFile(typeMapper.getBindingContext(), classDescriptor);
-        assert containingFile != null : "Containing file should be present for " + classDescriptor;
+        JetFile containingFile = BindingContextUtils.getContainingFile(typeMapper.getBindingContext(), memberDescriptor);
+        assert containingFile != null : "Containing file should be present for " + memberDescriptor;
         return NamespaceCodegen.getNamespacePartInternalName(containingFile);
     }
 

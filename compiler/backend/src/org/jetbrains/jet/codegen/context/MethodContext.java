@@ -29,24 +29,32 @@ import org.jetbrains.jet.lang.descriptors.PropertyAccessorDescriptor;
 
 public class MethodContext extends CodegenContext {
 
+    protected final FunctionDescriptor contextFunction;
+
     public MethodContext(
-            @NotNull FunctionDescriptor contextType,
+            @NotNull FunctionDescriptor contextFunction,
             @NotNull OwnerKind contextKind,
             @NotNull CodegenContext parentContext
     ) {
-        this(contextType, contextKind, parentContext, null);
+        this(contextFunction, contextKind, parentContext, null);
     }
 
     protected MethodContext(
-            @NotNull FunctionDescriptor contextType,
+            @NotNull FunctionDescriptor contextFunction,
             @NotNull OwnerKind contextKind,
             @NotNull CodegenContext parentContext,
             @Nullable MutableClosure closure
     ) {
-        super(contextType instanceof PropertyAccessorDescriptor
-              ? ((PropertyAccessorDescriptor) contextType).getCorrespondingProperty()
-              : contextType, contextKind, parentContext, closure,
+        super(contextFunction instanceof PropertyAccessorDescriptor
+              ? ((PropertyAccessorDescriptor) contextFunction).getCorrespondingProperty()
+              : contextFunction, contextKind, parentContext, closure,
               parentContext.hasThisDescriptor() ? parentContext.getThisDescriptor() : null, null);
+        this.contextFunction = contextFunction;
+    }
+
+    @NotNull
+    public FunctionDescriptor getContextFunction() {
+        return contextFunction;
     }
 
     @Override

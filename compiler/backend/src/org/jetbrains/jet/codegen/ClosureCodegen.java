@@ -28,12 +28,14 @@ import org.jetbrains.asm4.commons.Method;
 import org.jetbrains.jet.codegen.binding.CalculatedClosure;
 import org.jetbrains.jet.codegen.context.CodegenContext;
 import org.jetbrains.jet.codegen.context.LocalLookup;
+import org.jetbrains.jet.codegen.context.MethodContext;
 import org.jetbrains.jet.codegen.signature.BothSignatureWriter;
 import org.jetbrains.jet.codegen.signature.JvmMethodSignature;
 import org.jetbrains.jet.codegen.state.GenerationState;
 import org.jetbrains.jet.codegen.state.JetTypeMapper;
 import org.jetbrains.jet.lang.descriptors.*;
 import org.jetbrains.jet.lang.resolve.BindingContext;
+import org.jetbrains.jet.lang.resolve.DescriptorUtils;
 import org.jetbrains.jet.lang.resolve.java.JvmAbi;
 import org.jetbrains.jet.lang.resolve.java.sam.SingleAbstractMethodUtils;
 import org.jetbrains.jet.lang.resolve.name.Name;
@@ -111,6 +113,15 @@ public class ClosureCodegen extends ParentCodegenAwareImpl {
                        superClass.getInternalName(),
                        superInterfaces
         );
+
+        ClassDescriptor outerClass = DescriptorUtils.getParentOfType(funDescriptor, ClassDescriptor.class);
+        if (outerClass != null) {
+            // If there's no outer class (i.e. it is a top-level function, there should not be an INNERCLASS attribute
+            cv.visitInnerClass(asmType.getInternalName(), null, null, 0);
+        }
+
+        writeEnclosingMethod(cv);
+
         cv.visitSource(fun.getContainingFile().getName(), null);
 
 
@@ -136,6 +147,35 @@ public class ClosureCodegen extends ParentCodegenAwareImpl {
                                    DefaultParameterValueLoader.DEFAULT);
 
         cv.done();
+    }
+
+    private void writeEnclosingMethod(ClassBuilder cv) {
+        CodegenContext parentContext = context.getParentContext();
+        if (parentContext == null) return;
+
+        DeclarationDescriptor contextDescriptor = parentContext.getContextDescriptor();
+
+        Method method = null;
+        if (contextDescriptor instanceof FunctionDescriptor) {
+            FunctionDescriptor functionDescriptor = (FunctionDescriptor) contextDescriptor;
+            method = typeMapper.mapSignature(functionDescriptor).getAsmMethod();
+        }
+        else if (contextDescriptor instanceof PropertyDescriptor && parentContext instanceof MethodContext) {
+            PropertyAccessorDescriptor accessor = (PropertyAccessorDescriptor) ((MethodContext) parentContext).getContextFunction();
+            PropertyDescriptor property = accessor.getCorrespondingProperty();
+            if (accessor instanceof PropertyGetterDescriptor) {
+                method = typeMapper.mapGetterSignature(property, OwnerKind.IMPLEMENTATION).getAsmMethod();
+            }
+            else {
+                method = typeMapper.mapSetterSignature(property, OwnerKind.IMPLEMENTATION).getAsmMethod();
+            }
+        }
+
+        cv.visitOuterClass(
+                ImplementationBodyCodegen.getOuterClassName(funDescriptor, typeMapper),
+                method == null ? null : method.getName(),
+                method == null ? null : method.getDescriptor()
+        );
     }
 
     @NotNull
