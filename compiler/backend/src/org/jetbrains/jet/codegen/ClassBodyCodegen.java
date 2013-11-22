@@ -21,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.asm4.MethodVisitor;
 import org.jetbrains.asm4.Type;
 import org.jetbrains.jet.codegen.context.ClassContext;
+import org.jetbrains.jet.codegen.context.FieldOwnerContext;
 import org.jetbrains.jet.codegen.state.GenerationState;
 import org.jetbrains.jet.lang.descriptors.*;
 import org.jetbrains.jet.lang.descriptors.annotations.AnnotationDescriptor;
@@ -28,6 +29,7 @@ import org.jetbrains.jet.lang.descriptors.impl.SimpleFunctionDescriptorImpl;
 import org.jetbrains.jet.lang.psi.*;
 import org.jetbrains.jet.lang.resolve.BindingContext;
 import org.jetbrains.jet.lang.resolve.name.Name;
+import org.jetbrains.jet.lang.types.lang.KotlinBuiltIns;
 
 import java.util.Collections;
 import java.util.List;
@@ -168,26 +170,41 @@ public abstract class ClassBodyCodegen extends MemberCodegen {
     @NotNull
     protected MethodVisitor createOrGetClInitMethod() {
         if (clInitMethod == null) {
-            clInitMethod = v.newMethod(null, ACC_STATIC, "<clinit>", "()V", null, null);
+            clInitMethod = createClInitMethodVisitor(v);
         }
         return clInitMethod;
+    }
+
+    @NotNull
+    public static MethodVisitor createClInitMethodVisitor(@NotNull ClassBuilder cv) {
+        return cv.newMethod(null, ACC_STATIC, "<clinit>", "()V", null, null);
     }
 
     @NotNull
     protected ExpressionCodegen createOrGetClInitCodegen() {
         assert state.getClassBuilderMode() == ClassBuilderMode.FULL;
         if (clInitCodegen == null) {
-            MethodVisitor method = createOrGetClInitMethod();
-            method.visitCode();
-            SimpleFunctionDescriptorImpl clInit =
-                    new SimpleFunctionDescriptorImpl(descriptor, Collections.<AnnotationDescriptor>emptyList(),
-                                                     Name.special("<clinit>"),
-                                                     CallableMemberDescriptor.Kind.SYNTHESIZED);
-            clInit.initialize(null, null, Collections.<TypeParameterDescriptor>emptyList(),
-                              Collections.<ValueParameterDescriptor>emptyList(), null, null, Visibilities.PRIVATE, false);
-
-            clInitCodegen = new ExpressionCodegen(method, new FrameMap(), Type.VOID_TYPE, context.intoFunction(clInit), state, this);
+            clInitCodegen = createClInitCodegen(createOrGetClInitMethod(), context, this);
         }
         return clInitCodegen;
+    }
+
+    @NotNull
+    public static ExpressionCodegen createClInitCodegen(
+            @NotNull MethodVisitor method,
+            @NotNull FieldOwnerContext<?> context,
+            @NotNull MemberCodegen parentCodegen
+    ) {
+        method.visitCode();
+        SimpleFunctionDescriptorImpl clInit =
+                new SimpleFunctionDescriptorImpl(context.getContextDescriptor(), Collections.<AnnotationDescriptor>emptyList(),
+                                                 Name.special("<clinit>"),
+                                                 CallableMemberDescriptor.Kind.SYNTHESIZED);
+        clInit.initialize(null, null, Collections.<TypeParameterDescriptor>emptyList(),
+                          Collections.<ValueParameterDescriptor>emptyList(),
+                          KotlinBuiltIns.getInstance().getUnitType(),
+                          null, Visibilities.PRIVATE, false);
+
+        return new ExpressionCodegen(method, new FrameMap(), Type.VOID_TYPE, context.intoFunction(clInit), parentCodegen.getState(), parentCodegen);
     }
 }

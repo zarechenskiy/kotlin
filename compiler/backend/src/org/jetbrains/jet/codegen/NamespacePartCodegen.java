@@ -23,16 +23,12 @@ import org.jetbrains.asm4.MethodVisitor;
 import org.jetbrains.asm4.Type;
 import org.jetbrains.jet.codegen.context.FieldOwnerContext;
 import org.jetbrains.jet.codegen.state.GenerationState;
-import org.jetbrains.jet.lang.descriptors.*;
-import org.jetbrains.jet.lang.descriptors.annotations.AnnotationDescriptor;
-import org.jetbrains.jet.lang.descriptors.impl.SimpleFunctionDescriptorImpl;
+import org.jetbrains.jet.lang.descriptors.NamespaceDescriptor;
 import org.jetbrains.jet.lang.psi.*;
 import org.jetbrains.jet.lang.resolve.BindingContext;
 import org.jetbrains.jet.lang.resolve.java.JvmAbi;
 import org.jetbrains.jet.lang.resolve.java.JvmAnnotationNames;
-import org.jetbrains.jet.lang.resolve.name.Name;
 
-import java.util.Collections;
 import java.util.List;
 
 import static org.jetbrains.asm4.Opcodes.*;
@@ -101,20 +97,9 @@ public class NamespacePartCodegen extends MemberCodegen {
         List<JetProperty> properties = collectPropertiesToInitialize();
         if (properties.isEmpty()) return;
 
-        MethodVisitor mv = v.newMethod(jetFile, ACC_STATIC, "<clinit>", "()V", null, null);
+        MethodVisitor mv = ClassBodyCodegen.createClInitMethodVisitor(v);
         if (state.getClassBuilderMode() == ClassBuilderMode.FULL) {
-            mv.visitCode();
-
-            FrameMap frameMap = new FrameMap();
-
-            SimpleFunctionDescriptorImpl clInit =
-                    new SimpleFunctionDescriptorImpl(this.descriptor, Collections.<AnnotationDescriptor>emptyList(),
-                                                     Name.special("<clinit>"),
-                                                     CallableMemberDescriptor.Kind.SYNTHESIZED);
-            clInit.initialize(null, null, Collections.<TypeParameterDescriptor>emptyList(),
-                              Collections.<ValueParameterDescriptor>emptyList(), null, null, Visibilities.PRIVATE, false);
-
-            ExpressionCodegen codegen = new ExpressionCodegen(mv, frameMap, Type.VOID_TYPE, this.context.intoFunction(clInit), state, this);
+            ExpressionCodegen codegen = ClassBodyCodegen.createClInitCodegen(mv, context, this);
 
             for (JetDeclaration declaration : properties) {
                 ImplementationBodyCodegen.

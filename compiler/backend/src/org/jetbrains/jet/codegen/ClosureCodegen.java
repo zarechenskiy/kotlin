@@ -155,7 +155,7 @@ public class ClosureCodegen extends ParentCodegenAwareImpl {
 
 
     private void generateConstInstance(@NotNull ClassBuilder cv) {
-        MethodVisitor mv = cv.newMethod(fun, ACC_STATIC | ACC_SYNTHETIC, "<clinit>", "()V", null, ArrayUtil.EMPTY_STRING_ARRAY);
+        MethodVisitor mv = ClassBodyCodegen.createClInitMethodVisitor(cv);
         InstructionAdapter iv = new InstructionAdapter(mv);
 
         cv.newField(fun, ACC_STATIC | ACC_FINAL, JvmAbi.INSTANCE_FIELD, asmType.getDescriptor(), null, null);
