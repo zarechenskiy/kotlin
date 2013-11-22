@@ -51,11 +51,6 @@ public class RenameTestGenerated extends AbstractRenameTest {
         doTest("idea/testData/refactoring/rename/renameKotlinBaseMethod/kotlinBaseFunction.test");
     }
     
-    @TestMetadata("renameKotlinClass/javaWrapperForKotlinClass.test")
-    public void testRenameKotlinClass_JavaWrapperForKotlinClass() throws Exception {
-        doTest("idea/testData/refactoring/rename/renameKotlinClass/javaWrapperForKotlinClass.test");
-    }
-
     @TestMetadata("renameKotlinBaseProperty/javaGetterForKotlinProperty.test")
     public void testRenameKotlinBaseProperty_JavaGetterForKotlinProperty() throws Exception {
         doTest("idea/testData/refactoring/rename/renameKotlinBaseProperty/javaGetterForKotlinProperty.test");
@@ -71,6 +66,11 @@ public class RenameTestGenerated extends AbstractRenameTest {
         doTest("idea/testData/refactoring/rename/renameKotlinBaseProperty/kotlinBaseProperty.test");
     }
     
+    @TestMetadata("renameKotlinClass/javaWrapperForKotlinClass.test")
+    public void testRenameKotlinClass_JavaWrapperForKotlinClass() throws Exception {
+        doTest("idea/testData/refactoring/rename/renameKotlinClass/javaWrapperForKotlinClass.test");
+    }
+    
     @TestMetadata("renameKotlinClass/kotlinClass.test")
     public void testRenameKotlinClass_KotlinClass() throws Exception {
         doTest("idea/testData/refactoring/rename/renameKotlinClass/kotlinClass.test");
@@ -79,6 +79,11 @@ public class RenameTestGenerated extends AbstractRenameTest {
     @TestMetadata("renameKotlinClassConstructor/renameKotlinConstructor.test")
     public void testRenameKotlinClassConstructor_RenameKotlinConstructor() throws Exception {
         doTest("idea/testData/refactoring/rename/renameKotlinClassConstructor/renameKotlinConstructor.test");
+    }
+    
+    @TestMetadata("renameKotlinMethod/javaWrapperForKotlinMethod.test")
+    public void testRenameKotlinMethod_JavaWrapperForKotlinMethod() throws Exception {
+        doTest("idea/testData/refactoring/rename/renameKotlinMethod/javaWrapperForKotlinMethod.test");
     }
     
     @TestMetadata("renameKotlinMethod/renameKotlinMethod.test")
