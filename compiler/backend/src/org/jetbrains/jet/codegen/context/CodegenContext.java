@@ -137,7 +137,7 @@ public abstract class CodegenContext<T extends DeclarationDescriptor> {
                 return null;
             }
             else {
-                throw new UnsupportedOperationException();
+                throw new UnsupportedOperationException("No outer expression for " + contextDescriptor + " in " + thisDescriptor);
             }
         }
         if (captureThis) {
