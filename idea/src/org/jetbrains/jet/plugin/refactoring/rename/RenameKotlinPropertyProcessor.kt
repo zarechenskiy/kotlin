@@ -80,7 +80,7 @@ public class RenameKotlinPropertyProcessor : RenamePsiElementProcessor() {
             return when(result) {
                 Messages.YES -> superProperty
                 Messages.NO -> jetProperty
-                else -> null
+                else -> /* Cancel rename */ null
             }
         }
 
