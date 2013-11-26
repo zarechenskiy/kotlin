@@ -840,6 +840,11 @@ public class BlackBoxWithStdlibCodegenTestGenerated extends AbstractBlackBoxCode
             doTestWithStdlib("compiler/testData/codegen/boxWithStdlib/reflection/lambdaInMemberFunctionInNestedClass.kt");
         }
         
+        @TestMetadata("lambdaInObjectExpression.kt")
+        public void testLambdaInObjectExpression() throws Exception {
+            doTestWithStdlib("compiler/testData/codegen/boxWithStdlib/reflection/lambdaInObjectExpression.kt");
+        }
+        
         @TestMetadata("lambdaInPackage.kt")
         public void testLambdaInPackage() throws Exception {
             doTestWithStdlib("compiler/testData/codegen/boxWithStdlib/reflection/lambdaInPackage.kt");

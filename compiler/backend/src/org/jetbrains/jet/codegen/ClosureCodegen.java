@@ -26,6 +26,7 @@ import org.jetbrains.asm4.Type;
 import org.jetbrains.asm4.commons.InstructionAdapter;
 import org.jetbrains.asm4.commons.Method;
 import org.jetbrains.jet.codegen.binding.CalculatedClosure;
+import org.jetbrains.jet.codegen.binding.CodegenBinding;
 import org.jetbrains.jet.codegen.context.CodegenContext;
 import org.jetbrains.jet.codegen.context.LocalLookup;
 import org.jetbrains.jet.codegen.context.MethodContext;
@@ -156,9 +157,18 @@ public class ClosureCodegen extends ParentCodegenAwareImpl {
         DeclarationDescriptor contextDescriptor = parentContext.getContextDescriptor();
 
         Method method = null;
+        String outerClassName = null;
         if (contextDescriptor instanceof FunctionDescriptor) {
             FunctionDescriptor functionDescriptor = (FunctionDescriptor) contextDescriptor;
-            method = typeMapper.mapSignature(functionDescriptor).getAsmMethod();
+            ClassDescriptor classForFunction = bindingTrace.get(CodegenBinding.CLASS_FOR_FUNCTION, functionDescriptor);
+            if (classForFunction != null) {
+                // anonymous class for lambda or local function
+                method = typeMapper.mapToFunctionInvokeCallableMethod(functionDescriptor).getSignature().getAsmMethod();
+                outerClassName = typeMapper.mapClass(classForFunction).getInternalName();
+            }
+            else {
+                method = typeMapper.mapSignature(functionDescriptor).getAsmMethod();
+            }
         }
         else if (contextDescriptor instanceof PropertyDescriptor && parentContext instanceof MethodContext) {
             PropertyAccessorDescriptor accessor = (PropertyAccessorDescriptor) ((MethodContext) parentContext).getContextFunction();
@@ -172,7 +182,7 @@ public class ClosureCodegen extends ParentCodegenAwareImpl {
         }
 
         cv.visitOuterClass(
-                ImplementationBodyCodegen.getOuterClassName(funDescriptor, typeMapper),
+                outerClassName != null ? outerClassName : ImplementationBodyCodegen.getOuterClassName(funDescriptor, typeMapper),
                 method == null ? null : method.getName(),
                 method == null ? null : method.getDescriptor()
         );
