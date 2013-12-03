@@ -53,7 +53,7 @@ import org.jetbrains.jet.lang.psi.JetElement
 import org.jetbrains.jet.lang.resolve.java.jetAsJava.KotlinLightMethod
 
 public class RenameKotlinPropertyProcessor : RenamePsiElementProcessor() {
-    override fun canProcessDoSomeInterestingElement(element: PsiElement): Boolean = unwrapToJetProperty(element) != null
+    override fun canProcessElement(element: PsiElement): Boolean = unwrapToJetProperty(element) != null
 
     override fun substituteElementToRename(element: PsiElement?, editor: Editor?): PsiElement? {
         val jetProperty: JetProperty = when (element) {
