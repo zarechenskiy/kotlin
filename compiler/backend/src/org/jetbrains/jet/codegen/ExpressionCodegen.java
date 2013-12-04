@@ -1371,7 +1371,7 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
                 if (captureThis != null) {
                     StackValue thisOrOuter = generateThisOrOuter(captureThis, false);
                     thisOrOuter.put(OBJECT_TYPE, v);
-                    inliner.putInLocal(OBJECT_TYPE, thisOrOuter);
+                    inliner.putInLocal(OBJECT_TYPE, thisOrOuter, null);
                 }
 
                 JetType captureReceiver = closure.getCaptureReceiverType();
@@ -1379,7 +1379,7 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
                     Type asmType = typeMapper.mapType(captureReceiver);
                     StackValue.Local capturedReceiver = StackValue.local(context.isStatic() ? 0 : 1, asmType);
                     capturedReceiver.put(asmType, v);
-                    inliner.putInLocal(asmType, capturedReceiver);
+                    inliner.putInLocal(asmType, capturedReceiver, null);
                 }
             }
 
@@ -1389,10 +1389,10 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
                     sharedVarType = typeMapper.mapType((VariableDescriptor) entry.getKey());
                 }
                 StackValue capturedVar = entry.getValue().getOuterValue(this);
-                if (inliner.shouldPutValue(sharedVarType, capturedVar, context)) {
+                if (inliner.shouldPutValue(sharedVarType, capturedVar, context, null)) {
                     capturedVar.put(sharedVarType, v);
                 }
-                inliner.putInLocal(sharedVarType, capturedVar);
+                inliner.putInLocal(sharedVarType, capturedVar, null);
             }
         }
     }
@@ -2367,12 +2367,12 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
                 JetExpression argumentExpression = valueArgument.getArgumentExpression();
                 assert argumentExpression != null : valueArgument.asElement().getText();
 
-                if (inliner.isInliningClosure(argumentExpression)) {
+                if (inliner.isInliningClosure(argumentExpression, valueParameter)) {
                     inliner.rememberClosure((JetFunctionLiteralExpression) argumentExpression, parameterType);
                     putInLocal = false;
                 } else {
                     StackValue value = gen(argumentExpression);
-                    if (inliner.shouldPutValue(parameterType, value, context)) {
+                    if (inliner.shouldPutValue(parameterType, value, context, valueParameter)) {
                         value.put(parameterType, v);
                     }
                     valueIfPresent = value;
@@ -2390,7 +2390,7 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
             }
 
             if (putInLocal) {
-                inliner.putInLocal(parameterType, valueIfPresent);
+                inliner.putInLocal(parameterType, valueIfPresent, valueParameter);
             }
         }
         return mask;
