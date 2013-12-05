@@ -45,7 +45,7 @@ import static org.jetbrains.jet.lang.resolve.DescriptorUtils.getFQName;
 
 public class InlineCodegenUtil {
 
-    private final static int API = Opcodes.ASM4;
+    public final static int API = Opcodes.ASM4;
 
     @Nullable
     public static MethodNode getMethodNode(
@@ -81,7 +81,7 @@ public class InlineCodegenUtil {
                 FqName namespaceFqName =
                         PackageClassUtils.getPackageClassFqName(((NamespaceDescriptor) parentDeclatation).getFqName()).parent().child(
                                 name);
-                file = findVirtualFile(state.getProject(), namespaceFqName);
+                file = findVirtualFile(state.getProject(), namespaceFqName, true);
             } else {
                 assert false : "Function in namespace should have implClassName property in proto: " + deserializedDescriptor;
             }
@@ -97,7 +97,7 @@ public class InlineCodegenUtil {
     }
 
     @Nullable
-    public static VirtualFile findVirtualFile(@NotNull Project project, @NotNull FqName containerFqName) {
+    public static VirtualFile findVirtualFile(@NotNull Project project, @NotNull FqName containerFqName, boolean onlyKotlin) {
         ClassFileFinder fileFinder = ServiceManager.getService(project, ClassFileFinder.class);
         return fileFinder.find(containerFqName.asString().replace('.', '/'));
     }
@@ -129,7 +129,7 @@ public class InlineCodegenUtil {
         if (containerFqName == null) {
             return null;
         }
-        return findVirtualFile(project, containerFqName);
+        return findVirtualFile(project, containerFqName, true);
     }
 
 }
