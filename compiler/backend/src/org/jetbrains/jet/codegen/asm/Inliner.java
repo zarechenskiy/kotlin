@@ -41,6 +41,13 @@ public interface Inliner {
         }
 
         @Override
+        public void putCapturedInLocal(
+                Type type, StackValue stackValue, ValueParameterDescriptor valueParameterDescriptor, int index
+        ) {
+
+        }
+
+        @Override
         public void leaveTemps() {
 
         }
@@ -72,6 +79,8 @@ public interface Inliner {
     void inlineCall(CallableMethod callableMethod, ClassVisitor visitor);
 
     void putInLocal(Type type, StackValue stackValue, ValueParameterDescriptor valueParameterDescriptor);
+
+    void putCapturedInLocal(Type type, StackValue stackValue, ValueParameterDescriptor valueParameterDescriptor, int index);
 
     boolean shouldPutValue(Type type, StackValue stackValue, MethodContext context, ValueParameterDescriptor descriptor);
 

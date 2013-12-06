@@ -81,6 +81,7 @@ public class CompiledFunctionTransformer extends InlineTransformer {
                 VarInsnNode previous = (VarInsnNode) fieldNode.getPrevious();
                 int varIndex = previous.var;
                 paramMapping.put(fieldNode.name, varIndex);
+                System.out.println(fieldNode.name + " "  + varIndex);
             }
             cur = cur.getNext();
             index++;
@@ -155,4 +156,10 @@ public class CompiledFunctionTransformer extends InlineTransformer {
 
     }
 
+    @Override
+    public void putCapturedInLocal(
+            Type type, StackValue stackValue, ValueParameterDescriptor valueParameterDescriptor, int index
+    ) {
+
+    }
 }

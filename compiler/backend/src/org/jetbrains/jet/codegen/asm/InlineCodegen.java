@@ -20,16 +20,18 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.asm4.*;
+import org.jetbrains.asm4.ClassVisitor;
+import org.jetbrains.asm4.Opcodes;
+import org.jetbrains.asm4.Type;
 import org.jetbrains.asm4.commons.Method;
-import org.jetbrains.asm4.tree.*;
-import org.jetbrains.asm4.tree.analysis.*;
-import org.jetbrains.asm4.tree.analysis.Frame;
+import org.jetbrains.asm4.tree.AbstractInsnNode;
+import org.jetbrains.asm4.tree.FieldInsnNode;
+import org.jetbrains.asm4.tree.MethodNode;
+import org.jetbrains.asm4.tree.VarInsnNode;
 import org.jetbrains.asm4.util.Textifier;
 import org.jetbrains.asm4.util.TraceMethodVisitor;
 import org.jetbrains.jet.codegen.*;
 import org.jetbrains.jet.codegen.context.CodegenContext;
-import org.jetbrains.jet.codegen.context.EnclosedValueDescriptor;
 import org.jetbrains.jet.codegen.context.MethodContext;
 import org.jetbrains.jet.codegen.context.NamespaceContext;
 import org.jetbrains.jet.codegen.signature.JvmMethodParameterKind;
@@ -48,7 +50,10 @@ import org.jetbrains.jet.renderer.DescriptorRenderer;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.ListIterator;
 
 import static org.jetbrains.jet.codegen.AsmUtil.getMethodAsmFlags;
 
@@ -76,6 +81,7 @@ public class InlineCodegen extends InlineTransformer implements ParentCodegenAwa
 
     private final Call call;
 
+    private LambdaInfo activeLambda;
 
     public InlineCodegen(
             @NotNull ExpressionCodegen codegen,
@@ -158,65 +164,59 @@ public class InlineCodegen extends InlineTransformer implements ParentCodegenAwa
                                                                                               functionDescriptor,
                                                                                               (JetDeclarationWithBody) element));
             //TODO
-            node.visitMaxs(20, 20);
+            node.visitMaxs(30, 30);
             node.visitEnd();
         }
         return node;
     }
 
     private void inlineCall(MethodNode node, boolean inlineClosures) {
-        if (inlineClosures) {
-            removeClosureAssertions(node);
-            try {
-                markPlacesForInlineAndRemoveInlinable(node);
-            }
-            catch (AnalyzerException e) {
-                throw new RuntimeException(e);
-            }
-        }
 
-        int valueParamSize = originalFunctionFrame.getCurrentSize();
-        int originalSize = codegen.getFrameMap().getCurrentSize();
         generateClosuresBodies();
+
+        ArrayList realParams = new ArrayList(tempTypes);
+
         putClosureParametersOnStack();
-        int additionalParams = codegen.getFrameMap().getCurrentSize() - originalSize;
-        VarRemapper remapper = new VarRemapper.ParamRemapper(initialFrameSize, valueParamSize, additionalParams, tempTypes);
 
-        doInline(node.access, node.desc, codegen.getMethodVisitor(), node, remapper.doRemap(valueParamSize + additionalParams), inlineClosures, remapper);
-    }
+        List<CapturedParamInfo> captured = getAllCaptured();
 
-    private void removeClosureAssertions(MethodNode node) {
-        AbstractInsnNode cur = node.instructions.getFirst();
-        while (cur != null && cur.getNext() != null) {
-            AbstractInsnNode next = cur.getNext();
-            if (next.getType() == AbstractInsnNode.METHOD_INSN) {
-                MethodInsnNode methodInsnNode = (MethodInsnNode) next;
-                if (methodInsnNode.name.equals("checkParameterIsNotNull") && methodInsnNode.owner.equals("jet/runtime/Intrinsics")) {
-                    AbstractInsnNode prev = cur.getPrevious();
-                    assert prev.getType() == AbstractInsnNode.VAR_INSN && prev.getOpcode() == Opcodes.ALOAD;
-                    int varIndex = ((VarInsnNode) prev).var;
-                    ClosureInfo closure = expressionMap.get(varIndex);
-                    if (closure != null) {
-                        node.instructions.remove(prev);
-                        node.instructions.remove(cur);
-                        cur = next.getNext();
-                        node.instructions.remove(next);
-                        next = cur;
-                    }
-                }
-            }
-            cur = next;
-        }
+        Parameters parameters = new Parameters(realParams, Parameters.addStubs(captured, realParams.size()));
+
+        InliningInfo info = new InliningInfo(expressionMap, null, null, null, state);
+        MethodInliner inliner = new MethodInliner(node, parameters, info, null); //with captured
+
+        VarRemapper.ParamRemapper remapper = new VarRemapper.ParamRemapper(tempTypes.size(), 0, parameters, new VarRemapper.ShiftRemapper(initialFrameSize, null));
+
+        inliner.doTransformAndMerge(codegen.getInstructionAdapter(), remapper);
+        generateClosuresBodies();
+        //if (inlineClosures) {
+        //    removeClosureAssertions(node);
+        //    try {
+        //        markPlacesForInlineAndRemoveInlinable(node);
+        //    }
+        //    catch (AnalyzerException e) {
+        //        throw new RuntimeException(e);
+        //    }
+        //}
+        //
+        //int valueParamSize = originalFunctionFrame.getCurrentSize();
+        //int originalSize = codegen.getFrameMap().getCurrentSize();
+        //generateClosuresBodies();
+        //putClosureParametersOnStack();
+        //int additionalParams = codegen.getFrameMap().getCurrentSize() - originalSize;
+        //VarRemapper remapper = new VarRemapper.ParamRemapper(initialFrameSize, valueParamSize, additionalParams, tempTypes);
+        //
+        //doInline(node.access, node.desc, codegen.getMethodVisitor(), node, remapper.doRemap(valueParamSize + additionalParams), inlineClosures, remapper);
     }
 
 
     private void generateClosuresBodies() {
-        for (ClosureInfo info : expressionMap.values()) {
+        for (LambdaInfo info : expressionMap.values()) {
             info.setNode(generateClosureBody(info));
         }
     }
 
-    private MethodNode generateClosureBody(ClosureInfo info) {
+    private MethodNode generateClosureBody(LambdaInfo info) {
         JetFunctionLiteral declaration = info.getFunctionLiteral();
         FunctionDescriptor descriptor = info.getFunctionDescriptor();
 
@@ -229,18 +229,24 @@ public class InlineCodegen extends InlineTransformer implements ParentCodegenAwa
         Method asmMethod = jvmMethodSignature.getAsmMethod();
         MethodNode methodNode = new MethodNode(Opcodes.ASM4, getMethodAsmFlags(descriptor, context.getContextKind()), asmMethod.getName(), asmMethod.getDescriptor(), jvmMethodSignature.getGenericsSignature(), null);
 
-        functionCodegen.generateMethodBody(methodNode, descriptor, context, jvmMethodSignature, new FunctionGenerationStrategy.FunctionDefault(state, descriptor, declaration) {
+        //AnalyzerAdapter adapter = new AnalyzerAdapter("fake", methodNode.access, methodNode.name, methodNode.desc, methodNode);
+        MethodNode adapter = methodNode;
+
+
+        functionCodegen.generateMethodBody(adapter, descriptor, context, jvmMethodSignature, new FunctionGenerationStrategy.FunctionDefault(state, descriptor, declaration) {
             @Override
             public boolean generateLocalVarTable() {
                 return false;
             }
         });
+        adapter.visitMaxs(30, 30);
 
-        return transformClosure(methodNode, info);
+        //return transformClosure(methodNode, info);
+        return methodNode;
     }
 
     @NotNull
-    private static MethodNode transformClosure(@NotNull MethodNode node, @NotNull ClosureInfo info) {
+    private static MethodNode transformClosure(@NotNull MethodNode node, @NotNull LambdaInfo info) {
         //remove all this and shift all variables to captured ones size
         final int localVarSHift = info.getCapturedVarsSize();
         MethodNode transformedNode = new MethodNode(node.access, node.name, node.desc, node.signature, null) {
@@ -261,15 +267,15 @@ public class InlineCodegen extends InlineTransformer implements ParentCodegenAwa
                 FieldInsnNode fieldInsnNode = (FieldInsnNode) cur;
                 //TODO check closure
                 String owner = fieldInsnNode.owner;
-                if (info.getClosureClassType().getInternalName().equals(fieldInsnNode.owner)) {
+                if (info.getLambdaClassType().getInternalName().equals(fieldInsnNode.owner)) {
                     int opcode = fieldInsnNode.getOpcode();
                     String name = fieldInsnNode.name;
                     String desc = fieldInsnNode.desc;
 
-                    Collection<EnclosedValueDescriptor> vars = info.getCapturedVars();
+                    Collection<CapturedParamInfo> vars = info.getCapturedVars();
                     int index = 0;//skip this
                     boolean found = false;
-                    for (EnclosedValueDescriptor valueDescriptor : vars) {
+                    for (CapturedParamInfo valueDescriptor : vars) {
                         Type type = valueDescriptor.getType();
                         if (valueDescriptor.getFieldName().equals(name)) {
                             opcode = opcode == Opcodes.GETFIELD ? type.getOpcode(Opcodes.ILOAD) : type.getOpcode(Opcodes.ISTORE);
@@ -316,6 +322,13 @@ public class InlineCodegen extends InlineTransformer implements ParentCodegenAwa
 
     @Override
     public void putInLocal(Type type, StackValue stackValue, ValueParameterDescriptor valueParameterDescriptor) {
+        putCapturedInLocal(type, stackValue, valueParameterDescriptor, -1);
+    }
+
+    @Override
+    public void putCapturedInLocal(
+            Type type, StackValue stackValue, ValueParameterDescriptor valueParameterDescriptor, int index
+    ) {
         if (!disabled && notSeparateInline && Type.VOID_TYPE != type) {
             //TODO remap only inlinable closure => otherwise we could get a lot of problem
             boolean couldBeRemapped = !shouldPutValue(type, stackValue, codegen.getContext(), valueParameterDescriptor);
@@ -323,19 +336,25 @@ public class InlineCodegen extends InlineTransformer implements ParentCodegenAwa
 
             ParameterInfo info = new ParameterInfo(type, false, remappedIndex, couldBeRemapped ? -1 : codegen.getFrameMap().enterTemp(type));
 
+            if (index >= 0 && couldBeRemapped) {
+                CapturedParamInfo capturedParamInfo = activeLambda.getCapturedVars().get(index);
+                capturedParamInfo.setRemapIndex(info.getInlinedIndex());
+            }
+
             doWithParameter(info);
         }
     }
 
     @Override
     public boolean shouldPutValue(Type type, StackValue stackValue, MethodContext context, ValueParameterDescriptor descriptor) {
-        if (stackValue != null && context.isInlineFunction() && stackValue instanceof StackValue.Local) {
-            if (isInvokeOnInlinable(type.getClassName(), "invoke") && (descriptor == null || !InlineUtil.hasNoinlineAnnotation(descriptor))) {
-                //TODO remap only inlinable closure => otherwise we could get a lot of problem
-                return false;
-            }
-        }
-        return true;
+        //boolean isInline = true/*context.isInlineFunction() || context.getParentContext() instanceof ClosureContext*/;
+        //if (stackValue != null && isInline && stackValue instanceof StackValue.Local) {
+        //    if (isInvokeOnInlinable(type.getClassName(), "invoke") && (descriptor == null || !InlineUtil.hasNoinlineAnnotation(descriptor))) {
+        //        //TODO remap only inlinable closure => otherwise we could get a lot of problem
+        //        return false;
+        //    }
+        //}
+        return false == (stackValue != null && stackValue instanceof StackValue.Local);
     }
 
     private void doWithParameter(ParameterInfo info) {
@@ -357,7 +376,7 @@ public class InlineCodegen extends InlineTransformer implements ParentCodegenAwa
 
     private void putParameterOnStack(ParameterInfo info) {
         if (!info.isSkippedOrRemapped()) {
-            int index = info.index;
+            int index = info.getIndex();
             Type type = info.type;
             StackValue.local(index, type).store(type, codegen.getInstructionAdapter());
         }
@@ -382,7 +401,7 @@ public class InlineCodegen extends InlineTransformer implements ParentCodegenAwa
             recordParamInfo(info, false);
         }
 
-        for (ListIterator<ParameterInfo> iterator = tempTypes.listIterator(tempTypes.size()); iterator.hasPrevious(); ) {
+        for (ListIterator<? extends ParameterInfo> iterator = tempTypes.listIterator(tempTypes.size()); iterator.hasPrevious(); ) {
             ParameterInfo param = iterator.previous();
             putParameterOnStack(param);
         }
@@ -391,7 +410,7 @@ public class InlineCodegen extends InlineTransformer implements ParentCodegenAwa
     @Override
     public void leaveTemps() {
         FrameMap frameMap = codegen.getFrameMap();
-        for (ListIterator<ParameterInfo> iterator = tempTypes.listIterator(tempTypes.size()); iterator.hasPrevious(); ) {
+        for (ListIterator<? extends ParameterInfo> iterator = tempTypes.listIterator(tempTypes.size()); iterator.hasPrevious(); ) {
             ParameterInfo param = iterator.previous();
             if (!param.isSkippedOrRemapped()) {
                 frameMap.leaveTemp(param.type);
@@ -415,19 +434,35 @@ public class InlineCodegen extends InlineTransformer implements ParentCodegenAwa
         ParameterInfo closureInfo = new ParameterInfo(type, true, -1, -1);
         int index = recordParamInfo(closureInfo, true);
 
-        ClosureInfo info = new ClosureInfo(expression, typeMapper);
+        LambdaInfo info = new LambdaInfo(expression, typeMapper);
         expressionMap.put(index, info);
+
+        closureInfo.setLambda(info);
     }
 
     private void putClosureParametersOnStack() {
         //TODO: SORT
-        for (ClosureInfo next : expressionMap.values()) {
+        int currentSize = tempTypes.size();
+        for (LambdaInfo next : expressionMap.values()) {
             if (next.closure != null) {
-                int size = tempTypes.size();
-                next.setParamOffset(size);
+                activeLambda = next;
+                next.setParamOffset(currentSize);
                 codegen.pushClosureOnStack(next.closure, false, this);
+                currentSize += next.getCapturedVarsSize();
             }
         }
+        activeLambda = null;
+    }
+
+    private List<CapturedParamInfo> getAllCaptured() {
+        //TODO: SORT
+        ArrayList result = new ArrayList();
+        for (LambdaInfo next : expressionMap.values()) {
+            if (next.closure != null) {
+                result.addAll(next.getCapturedVars());
+            }
+        }
+        return result;
     }
 
     @Nullable
@@ -458,7 +493,7 @@ public class InlineCodegen extends InlineTransformer implements ParentCodegenAwa
     }
 
     @NotNull
-    private static String getNodeText(@Nullable MethodNode node) {
+    public static String getNodeText(@Nullable MethodNode node) {
         if (node == null) {
             return "Not generated";
         }

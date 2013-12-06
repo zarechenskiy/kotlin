@@ -1366,20 +1366,25 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
 
     public void pushClosureOnStack(CalculatedClosure closure, boolean ignoreThisAndReceiver, Inliner inliner) {
         if (closure != null) {
+            int paramIndex = 0;
             if (!ignoreThisAndReceiver) {
                 ClassDescriptor captureThis = closure.getCaptureThis();
                 if (captureThis != null) {
                     StackValue thisOrOuter = generateThisOrOuter(captureThis, false);
-                    thisOrOuter.put(OBJECT_TYPE, v);
-                    inliner.putInLocal(OBJECT_TYPE, thisOrOuter, null);
+                    if (inliner.shouldPutValue(OBJECT_TYPE, thisOrOuter, context, null)) {
+                        thisOrOuter.put(OBJECT_TYPE, v);
+                    }
+                    inliner.putCapturedInLocal(OBJECT_TYPE, thisOrOuter, null, paramIndex++);
                 }
 
                 JetType captureReceiver = closure.getCaptureReceiverType();
                 if (captureReceiver != null) {
                     Type asmType = typeMapper.mapType(captureReceiver);
                     StackValue.Local capturedReceiver = StackValue.local(context.isStatic() ? 0 : 1, asmType);
-                    capturedReceiver.put(asmType, v);
-                    inliner.putInLocal(asmType, capturedReceiver, null);
+                    if (inliner.shouldPutValue(asmType, capturedReceiver, context, null)) {
+                        capturedReceiver.put(asmType, v);
+                    }
+                    inliner.putCapturedInLocal(asmType, capturedReceiver, null, paramIndex++);
                 }
             }
 
@@ -1392,7 +1397,7 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
                 if (inliner.shouldPutValue(sharedVarType, capturedVar, context, null)) {
                     capturedVar.put(sharedVarType, v);
                 }
-                inliner.putInLocal(sharedVarType, capturedVar, null);
+                inliner.putCapturedInLocal(sharedVarType, capturedVar, null, paramIndex++);
             }
         }
     }
