@@ -18,17 +18,22 @@ package org.jetbrains.jet.codegen.asm;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 class InlinableAccess {
 
     public final int index;
 
     public final boolean inlinable;
 
-    private ClosureInfo info;
+    private List<ParameterInfo> parameters;
 
-    InlinableAccess(int index, boolean isInlinable) {
+    private LambdaInfo info;
+
+    InlinableAccess(int index, boolean isInlinable, List<ParameterInfo> parameterInfos) {
         this.index = index;
         inlinable = isInlinable;
+        this.parameters = parameterInfos;
     }
 
     public boolean isInlinable() {
@@ -36,11 +41,15 @@ class InlinableAccess {
     }
 
     @Nullable
-    public ClosureInfo getInfo() {
+    public LambdaInfo getInfo() {
         return info;
     }
 
-    public void setInfo(ClosureInfo info) {
+    public void setInfo(LambdaInfo info) {
         this.info = info;
+    }
+
+    public List<ParameterInfo> getParameters() {
+        return parameters;
     }
 }
