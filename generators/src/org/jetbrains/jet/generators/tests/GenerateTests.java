@@ -60,6 +60,7 @@ import org.jetbrains.jet.plugin.navigation.JetAbstractGotoSuperTest;
 import org.jetbrains.jet.plugin.quickfix.AbstractQuickFixMultiFileTest;
 import org.jetbrains.jet.plugin.quickfix.AbstractQuickFixTest;
 import org.jetbrains.jet.plugin.refactoring.inline.AbstractInlineTest;
+import org.jetbrains.jet.plugin.refactoring.rename.AbstractPortTest;
 import org.jetbrains.jet.plugin.refactoring.rename.AbstractRenameTest;
 import org.jetbrains.jet.psi.AbstractJetPsiMatcherTest;
 import org.jetbrains.jet.resolve.AbstractResolveBaseTest;
@@ -560,6 +561,14 @@ public class GenerateTests {
                 AbstractRenameTest.class,
                 new SingleClassTestModel(new File("idea/testData/refactoring/rename"), Pattern.compile("^(.+)\\.test$"), "doTest")
         );
+
+        generateTest(
+                "idea/tests/",
+                "PortTestGenerated",
+                AbstractPortTest.class,
+                new SingleClassTestModel(new File("idea/testData/refactoring/rename"), Pattern.compile("^(.+)\\.test$"), "doTest")
+        );
+
 
         generateTest(
                 "compiler/tests",
