@@ -63,6 +63,8 @@ fun JsonObject.getString(name: String): String {
 
 fun JsonObject.getNullableString(name: String): String? = this[name]?.getAsString()
 
+val a = 0f
+
 public abstract class AbstractRenameTest : MultiFileTestCase() {
     inner class TestContext(
             val project: Project = getProject()!!,
@@ -70,6 +72,8 @@ public abstract class AbstractRenameTest : MultiFileTestCase() {
             val module: Module = getModule()!!)
 
     public open fun doTest(path : String) {
+        val a = 0.0f
+
         val fileText = FileUtil.loadFile(File(path))
 
         val jsonParser = JsonParser()
