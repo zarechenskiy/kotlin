@@ -58,7 +58,6 @@ public class CompileTimeConstantChecker {
             @NotNull JetType expectedType
     ) {
         IElementType elementType = expression.getNode().getElementType();
-        0c
 
         if (elementType == JetNodeTypes.INTEGER_CONSTANT) {
             return checkIntegerValue(compileTimeConstant, expectedType, expression);
