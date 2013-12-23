@@ -33,7 +33,7 @@ import org.jetbrains.asm4.util.TraceMethodVisitor;
 import org.jetbrains.jet.codegen.*;
 import org.jetbrains.jet.codegen.context.CodegenContext;
 import org.jetbrains.jet.codegen.context.MethodContext;
-import org.jetbrains.jet.codegen.context.NamespaceContext;
+import org.jetbrains.jet.codegen.context.PackageContext;
 import org.jetbrains.jet.codegen.signature.JvmMethodParameterKind;
 import org.jetbrains.jet.codegen.signature.JvmMethodParameterSignature;
 import org.jetbrains.jet.codegen.signature.JvmMethodSignature;
@@ -472,8 +472,8 @@ public class InlineCodegen extends InlineTransformer implements ParentCodegenAwa
     }
 
     public static CodegenContext getContext(DeclarationDescriptor descriptor, GenerationState state) {
-        if (descriptor instanceof NamespaceDescriptor) {
-            return new NamespaceContext((NamespaceDescriptor) descriptor, null);
+        if (descriptor instanceof PackageFragmentDescriptor) {
+            return new PackageContext((PackageFragmentDescriptor) descriptor, null);
         }
 
         CodegenContext parent = getContext(descriptor.getContainingDeclaration(), state);

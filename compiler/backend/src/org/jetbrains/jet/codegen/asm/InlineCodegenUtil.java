@@ -40,7 +40,7 @@ import org.jetbrains.jet.lang.resolve.name.Name;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static org.jetbrains.jet.lang.resolve.DescriptorUtils.getFQName;
+import static org.jetbrains.jet.lang.resolve.DescriptorUtils.getFqName;
 
 public class InlineCodegenUtil {
 
@@ -75,12 +75,12 @@ public class InlineCodegenUtil {
     public static VirtualFile getVirtualFileForCallable(DeserializedSimpleFunctionDescriptor deserializedDescriptor, GenerationState state) {
         VirtualFile file = null;
         DeclarationDescriptor parentDeclatation = deserializedDescriptor.getContainingDeclaration();
-        if (parentDeclatation instanceof NamespaceDescriptor) {
+        if (parentDeclatation instanceof PackageFragmentDescriptor) {
             ProtoBuf.Callable proto = deserializedDescriptor.getFunctionProto();
             if (proto.hasExtension(JavaProtoBuf.implClassName)) {
                 Name name = deserializedDescriptor.getNameResolver().getName(proto.getExtension(JavaProtoBuf.implClassName));
                 FqName namespaceFqName =
-                        PackageClassUtils.getPackageClassFqName(((NamespaceDescriptor) parentDeclatation).getFqName()).parent().child(
+                        PackageClassUtils.getPackageClassFqName(((PackageFragmentDescriptor) parentDeclatation).getFqName()).parent().child(
                                 name);
                 file = findVirtualFile(state.getProject(), namespaceFqName, true);
             } else {
@@ -108,15 +108,15 @@ public class InlineCodegenUtil {
     private static FqName getContainerFqName(@NotNull DeclarationDescriptor referencedDescriptor) {
         ClassOrNamespaceDescriptor
                 containerDescriptor = DescriptorUtils.getParentOfType(referencedDescriptor, ClassOrNamespaceDescriptor.class, false);
-        if (containerDescriptor instanceof NamespaceDescriptor) {
-            return PackageClassUtils.getPackageClassFqName(getFQName(containerDescriptor).toSafe());
+        if (containerDescriptor instanceof PackageFragmentDescriptor) {
+            return PackageClassUtils.getPackageClassFqName(getFqName(containerDescriptor).toSafe());
         }
         if (containerDescriptor instanceof ClassDescriptor) {
             ClassKind classKind = ((ClassDescriptor) containerDescriptor).getKind();
             if (classKind == ClassKind.CLASS_OBJECT || classKind == ClassKind.ENUM_ENTRY) {
                 return getContainerFqName(containerDescriptor.getContainingDeclaration());
             }
-            return getFQName(containerDescriptor).toSafe();
+            return getFqName(containerDescriptor).toSafe();
         }
         return null;
     }
