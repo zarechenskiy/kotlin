@@ -101,7 +101,7 @@ public abstract class InlineTransformer implements Inliner {
                 if (inlineClosures && isFunctionLiteralClass(type.getInternalName())) {
                     ConstructorInvocation invocation = constructorInvocation.get(0);
                     if (invocation.isInlinable()) {
-                        CompiledFunctionTransformer transformer = new CompiledFunctionTransformer(state, invocation);
+                        LambdaTransformer transformer = new LambdaTransformer(state, invocation);
                         //transformer.doTransform(null);
                     } else {
                         super.anew(type);

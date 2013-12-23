@@ -19,8 +19,6 @@ package org.jetbrains.jet.codegen.asm;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.asm4.*;
 import org.jetbrains.asm4.tree.*;
-import org.jetbrains.asm4.tree.analysis.Frame;
-import org.jetbrains.asm4.tree.analysis.SourceValue;
 import org.jetbrains.jet.codegen.CallableMethod;
 import org.jetbrains.jet.codegen.ClassBuilder;
 import org.jetbrains.jet.codegen.StackValue;
@@ -32,22 +30,28 @@ import org.jetbrains.jet.lang.psi.JetFunctionLiteralExpression;
 import org.jetbrains.jet.lang.resolve.name.FqName;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CompiledFunctionTransformer extends InlineTransformer {
+public class LambdaTransformer extends InlineTransformer {
 
-    private ConstructorInvocation invocation;
+    private final MethodNode constructor;
 
-    private Map<String, Integer> paramMapping = new HashMap<String, Integer>();
+    private final MethodNode invoke;
+
+    private final ConstructorInvocation invocation;
+
+    private final Map<String, Integer> paramMapping = new HashMap<String, Integer>();
+
+    private final String lambdaClass;
 
     private MethodNode transformedConstructor;
 
-    public CompiledFunctionTransformer(GenerationState state, ConstructorInvocation invocation) {
+    public LambdaTransformer(GenerationState state, ConstructorInvocation invocation) {
         super(state);
         this.invocation = invocation;
+        this.lambdaClass = invocation.getTypeDesc();
 
         VirtualFile file = InlineCodegenUtil.findVirtualFile(state.getProject(), new FqName(invocation.getTypeDesc()), false);
         if (file == null) {
@@ -62,8 +66,15 @@ public class CompiledFunctionTransformer extends InlineTransformer {
         catch (IOException e) {
             throw new RuntimeException(e);
         }
-        MethodNode constructor = getClassConstructor(reader);
+        constructor = getMethodNode(reader, "<init>");
         extractParametersMapping(constructor);
+
+        invoke = getMethodNode(reader, "invoke");
+        extractParametersMapping(constructor);
+    }
+
+    public void capturedFieldsInfo(MethodNode invokeNode) {
+        //List<FieldAccess> fieldAccesses = MethodInliner.transformCaptured(invokeNode, null, lambdaClass, true);
     }
 
     public void doTransform(ClassBuilder builder) throws IOException {
@@ -88,13 +99,13 @@ public class CompiledFunctionTransformer extends InlineTransformer {
         }
     }
 
-    public MethodNode getClassConstructor(ClassReader reader) {
+    public MethodNode getMethodNode(ClassReader reader, final String methodName) {
         final MethodNode[] methodNode = new MethodNode[1];
         reader.accept(new ClassVisitor(InlineCodegenUtil.API) {
 
             @Override
             public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
-                if ("<init>".equals(name)) {
+                if (methodName.equals(name)) {
                     assert methodNode[0] == null;
                     return methodNode[0] = new MethodNode(access, name, desc, signature, exceptions);
                 }
@@ -103,7 +114,7 @@ public class CompiledFunctionTransformer extends InlineTransformer {
         }, ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
 
         if (methodNode[0] == null) {
-            throw new RuntimeException("Coudn't find constructor of lambda class " + invocation.getTypeDesc());
+            throw new RuntimeException("Couldn't find '" + methodName + "' method of lambda class " + invocation.getTypeDesc());
         }
 
         return methodNode[0];
