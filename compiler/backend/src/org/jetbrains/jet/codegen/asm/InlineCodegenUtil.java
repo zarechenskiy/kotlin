@@ -138,15 +138,15 @@ public class InlineCodegenUtil {
         return INVOKE.equals(name) && /*TODO: check type*/owner.contains("Function");
     }
 
-    public static boolean isFunctionConstructorCall(@NotNull String internalName, @NotNull String name) {
+    public static boolean isLambdaConstructorCall(@NotNull String internalName, @NotNull String name) {
         if (!"<init>".equals(name)) {
             return false;
         }
 
-        return isFunctionLiteralClass(internalName);
+        return isLambdaClass(internalName);
     }
 
-    public static boolean isFunctionLiteralClass(String internalName) {
+    public static boolean isLambdaClass(String internalName) {
         String shortName = getLastNamePart(internalName);
         int index = shortName.lastIndexOf("$");
 
