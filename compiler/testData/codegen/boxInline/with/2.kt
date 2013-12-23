@@ -17,7 +17,7 @@ public inline fun <R> use(block: ()-> R) : R {
     return block()
 }
 
-public fun <R> use2(block: ()-> R) : R {
+public fun <R> useNoInline(block: ()-> R) : R {
     return block()
 }
 

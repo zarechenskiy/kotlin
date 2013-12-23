@@ -41,6 +41,11 @@ public class CompileKotlinAgainstInlineKotlinTestGenerated extends AbstractCompi
         doBoxTest("compiler/testData/codegen/boxInline/captureInlinable");
     }
     
+    @TestMetadata("captureInlinableAndOther")
+    public void testCaptureInlinableAndOther() throws Exception {
+        doBoxTest("compiler/testData/codegen/boxInline/captureInlinableAndOther");
+    }
+    
     @TestMetadata("captureThisAndReceiver")
     public void testCaptureThisAndReceiver() throws Exception {
         doBoxTest("compiler/testData/codegen/boxInline/captureThisAndReceiver");

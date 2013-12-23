@@ -41,6 +41,11 @@ public class BlackBoxInlineCodegenTestGenerated extends AbstractBlackBoxCodegenT
         doTestMultiFile("compiler/testData/codegen/boxInline/captureInlinable");
     }
     
+    @TestMetadata("captureInlinableAndOther")
+    public void testCaptureInlinableAndOther() throws Exception {
+        doTestMultiFile("compiler/testData/codegen/boxInline/captureInlinableAndOther");
+    }
+    
     @TestMetadata("captureThisAndReceiver")
     public void testCaptureThisAndReceiver() throws Exception {
         doTestMultiFile("compiler/testData/codegen/boxInline/captureThisAndReceiver");

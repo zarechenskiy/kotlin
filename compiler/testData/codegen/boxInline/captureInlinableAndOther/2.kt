@@ -1,5 +1,6 @@
 inline fun <R> doWork(job: ()-> R) : R {
-    return notInline({job()})
+    val k = 10;
+    return notInline({k; job()})
 }
 
 fun <R> notInline(job: ()-> R) : R {

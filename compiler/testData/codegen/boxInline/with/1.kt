@@ -1,13 +1,12 @@
 import test.*
 
-
 fun Data.test1(d: Data) : Long  {
     val input = Input(this)
     var result = 10.toLong()
     with(input) {
          result = use<Long>{
             val output = Output(d)
-            use2<Long>{
+             useNoInline<Long>{
                 data()
                 copyTo(output, 10)
             }
