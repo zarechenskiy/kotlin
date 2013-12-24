@@ -7,7 +7,6 @@ import org.jetbrains.asm4.Label;
 import org.jetbrains.asm4.MethodVisitor;
 import org.jetbrains.asm4.Opcodes;
 import org.jetbrains.asm4.Type;
-import org.jetbrains.asm4.commons.InstructionAdapter;
 import org.jetbrains.asm4.commons.Method;
 import org.jetbrains.asm4.tree.*;
 import org.jetbrains.asm4.tree.analysis.*;
@@ -31,7 +30,7 @@ public class MethodInliner {
     private final InliningInfo parent;
 
     @Nullable
-    private LambdaInfo capturedInfo;
+    private final LambdaInfo lambdaInfo;
 
     private final JetTypeMapper typeMapper;
 
@@ -39,11 +38,18 @@ public class MethodInliner {
 
     private final List<ConstructorInvocation> constructorInvocation = new ArrayList<ConstructorInvocation>();
 
-    public MethodInliner(@NotNull MethodNode node, Parameters parameters, @NotNull InliningInfo parent, @Nullable LambdaInfo capturedInfo) {
+    /*
+     *
+     * @param node
+     * @param parameters
+     * @param parent
+     * @param lambdaInfo - in case on lambda 'invoke' inlining
+     */
+    public MethodInliner(@NotNull MethodNode node, Parameters parameters, @NotNull InliningInfo parent, @Nullable LambdaInfo lambdaInfo) {
         this.node = node;
         this.parameters = parameters;
         this.parent = parent;
-        this.capturedInfo = capturedInfo;
+        this.lambdaInfo = lambdaInfo;
         this.typeMapper = parent.state.getTypeMapper();
     }
 
@@ -98,9 +104,9 @@ public class MethodInliner {
 
                     Parameters params = new Parameters(lambdaParameters, Parameters.transformList(info.getCapturedVars(), lambdaParameters.size()));
 
-                    MethodInliner inliner = new MethodInliner(info.getNode(), params, new InliningInfo(null, null, null, null, parent.state), info);
+                    MethodInliner inliner = new MethodInliner(info.getNode(), params, parent.subInline(parent.nameGenerator.subGenerator("lambda")), info);
 
-                    VarRemapper.ParamRemapper remapper = new VarRemapper.ParamRemapper(lambdaParameters.size(), 0, params, new VarRemapper.ShiftRemapper(valueParamShift, null));
+                    VarRemapper.ParamRemapper remapper = new VarRemapper.ParamRemapper(params, new VarRemapper.ShiftRemapper(valueParamShift, null));
                     inliner.doTransformAndMerge(this.mv, remapper); //TODO add skipped this and receiver
 
                     Method bridge = typeMapper.mapSignature(ClosureCodegen.getInvokeFunction(info.getFunctionDescriptor())).getAsmMethod();
@@ -110,8 +116,9 @@ public class MethodInliner {
                 else if (isLambdaConstructorCall(owner, name)) { //TODO add method
                     ConstructorInvocation invocation = constructorInvocation.remove(0);
                     if (invocation.isInlinable()) {
-                        LambdaTransformer transformer = new LambdaTransformer(parent.state, invocation);
+                        LambdaTransformer transformer = new LambdaTransformer(invocation.getOwnerInternalName(), parent.subInline(parent.nameGenerator));
 
+                        transformer.doTransform(invocation);
                         //TODO regenerate class
                     } else {
                         super.visitMethodInsn(opcode, owner, name, desc);
@@ -124,10 +131,10 @@ public class MethodInliner {
 
             @Override
             public void visitFieldInsn(int opcode, String owner, String name, String desc) {
-                if (capturedInfo != null && capturedInfo.getLambdaClassType().getInternalName().equals(owner)) {
+                if (lambdaInfo != null && lambdaInfo.getLambdaClassType().getInternalName().equals(owner)) {
                     //todo check only inlinable
 
-                    Collection<CapturedParamInfo> vars = capturedInfo.getCapturedVars();
+                    Collection<CapturedParamInfo> vars = lambdaInfo.getCapturedVars();
                     CapturedParamInfo result = null;
                     for (CapturedParamInfo valueDescriptor : vars) {
                         if (valueDescriptor.getFieldName().equals(name)) {
@@ -143,7 +150,7 @@ public class MethodInliner {
                                                                 " (" +
                                                                 desc +
                                                                 ") in captured vars of " +
-                                                                capturedInfo.getFunctionLiteral().getText());
+                                                                lambdaInfo.getFunctionLiteral().getText());
                     }
 
                     opcode = opcode == Opcodes.GETFIELD ? result.getType().getOpcode(Opcodes.ILOAD) : result.getType().getOpcode(
@@ -203,8 +210,8 @@ public class MethodInliner {
             node.accept(transformedNode);
             transformedNode.visitMaxs(30, 30);
 
-            if (capturedInfo != null) {
-                transformCaptured(node, parameters, capturedInfo.getLambdaClassType(), false);
+            if (lambdaInfo != null) {
+                transformCaptured(node, parameters, lambdaInfo.getLambdaClassType(), false);
             }
             return transformedNode;
         }

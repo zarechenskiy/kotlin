@@ -16,28 +16,21 @@
 
 package org.jetbrains.jet.codegen.asm;
 
-import java.util.List;
+public class NameGenerator {
 
-public class ConstructorInvocation {
+    private final String ownerMethod;
 
-    private final String ownerInternalName;
+    private int nextIndex = 1;
 
-    private final List<InlinableAccess> access;
-
-    ConstructorInvocation(String ownerInternalName, List<InlinableAccess> access) {
-        this.ownerInternalName = ownerInternalName;
-        this.access = access;
+    public NameGenerator(String onwerMethod) {
+        this.ownerMethod = onwerMethod;
     }
 
-    public String getOwnerInternalName() {
-        return ownerInternalName;
+    public String genLambdaClassName() {
+        return ownerMethod + "$" + nextIndex++;
     }
 
-    public boolean isInlinable() {
-        return !access.isEmpty();
-    }
-
-    public List<InlinableAccess> getAccess() {
-        return access;
+    public NameGenerator subGenerator(String inliningMethod) {
+        return new NameGenerator(ownerMethod+ "$" + inliningMethod + nextIndex++);
     }
 }

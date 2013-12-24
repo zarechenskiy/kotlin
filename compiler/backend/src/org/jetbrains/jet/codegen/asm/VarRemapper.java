@@ -61,17 +61,15 @@ public abstract class VarRemapper {
 
     public static class ParamRemapper extends VarRemapper {
 
-        private final int paramSize;
-        private final int capturedParamSize;
+        private final int allParamsSize;
         private final Parameters params;
         private final int actualParamsSize;
 
         private final int [] remapIndex;
 
-        public ParamRemapper(int paramSize, int capturedParamSize, Parameters params, VarRemapper parent) {
+        public ParamRemapper(Parameters params, VarRemapper parent) {
             super(parent);
-            this.paramSize = params.totalSize();
-            this.capturedParamSize = capturedParamSize;
+            this.allParamsSize = params.totalSize();
             this.params = params;
 
             int realSize = 0;
@@ -95,7 +93,7 @@ public abstract class VarRemapper {
         public int doRemap(int index) {
             int remappedIndex;
 
-            if (index < paramSize) {
+            if (index < allParamsSize) {
                 ParameterInfo info = params.get(index);
                 remappedIndex = remapIndex[index];
                 if (info.isSkipped || remappedIndex == -1) {

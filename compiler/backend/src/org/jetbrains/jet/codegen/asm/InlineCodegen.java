@@ -43,7 +43,9 @@ import org.jetbrains.jet.lang.descriptors.*;
 import org.jetbrains.jet.lang.psi.*;
 import org.jetbrains.jet.lang.resolve.BindingContext;
 import org.jetbrains.jet.lang.resolve.BindingContextUtils;
+import org.jetbrains.jet.lang.resolve.DescriptorUtils;
 import org.jetbrains.jet.lang.resolve.java.AsmTypeConstants;
+import org.jetbrains.jet.lang.resolve.name.FqName;
 import org.jetbrains.jet.lang.types.lang.InlineUtil;
 import org.jetbrains.jet.renderer.DescriptorRenderer;
 
@@ -178,11 +180,14 @@ public class InlineCodegen extends InlineTransformer implements ParentCodegenAwa
         List<CapturedParamInfo> captured = getAllCaptured();
 
         Parameters parameters = new Parameters(realParams, Parameters.addStubs(captured, realParams.size()));
-
-        InliningInfo info = new InliningInfo(expressionMap, null, null, null, state);
+        FqName fqName = InlineCodegenUtil.getContainerFqName(codegen.getContext().getContextDescriptor());
+        InliningInfo info =
+                new InliningInfo(expressionMap, null, null, null, state,
+                                 new NameGenerator(fqName.toString().replace('.', '/') + "$" +codegen.getContext().getContextDescriptor().getName() + "$$inline"),
+                                 (FunctionDescriptor) codegen.getContext().getContextDescriptor());
         MethodInliner inliner = new MethodInliner(node, parameters, info, null); //with captured
 
-        VarRemapper.ParamRemapper remapper = new VarRemapper.ParamRemapper(tempTypes.size(), 0, parameters, new VarRemapper.ShiftRemapper(initialFrameSize, null));
+        VarRemapper.ParamRemapper remapper = new VarRemapper.ParamRemapper(parameters, new VarRemapper.ShiftRemapper(initialFrameSize, null));
 
         inliner.doTransformAndMerge(codegen.getInstructionAdapter(), remapper);
         generateClosuresBodies();

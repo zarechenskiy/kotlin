@@ -106,7 +106,7 @@ public class InlineCodegenUtil {
 
     //TODO: navigate to inner classes
     @Nullable
-    private static FqName getContainerFqName(@NotNull DeclarationDescriptor referencedDescriptor) {
+    public static FqName getContainerFqName(@NotNull DeclarationDescriptor referencedDescriptor) {
         ClassOrNamespaceDescriptor
                 containerDescriptor = DescriptorUtils.getParentOfType(referencedDescriptor, ClassOrNamespaceDescriptor.class, false);
         if (containerDescriptor instanceof PackageFragmentDescriptor) {
