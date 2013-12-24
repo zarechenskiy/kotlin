@@ -30,6 +30,7 @@ import org.jetbrains.jet.lang.psi.JetFunctionLiteralExpression;
 import org.jetbrains.jet.lang.resolve.name.FqName;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,13 +46,17 @@ public class LambdaTransformer extends InlineTransformer {
     private final Map<String, Integer> paramMapping = new HashMap<String, Integer>();
 
     private final String lambdaClass;
+    private final Type lambdaType;
 
     private MethodNode transformedConstructor;
+
+    private ParametersBuilder builder;
 
     public LambdaTransformer(GenerationState state, ConstructorInvocation invocation) {
         super(state);
         this.invocation = invocation;
         this.lambdaClass = invocation.getTypeDesc();
+        lambdaType = Type.getType(lambdaClass);
 
         VirtualFile file = InlineCodegenUtil.findVirtualFile(state.getProject(), new FqName(invocation.getTypeDesc()), false);
         if (file == null) {
@@ -67,14 +72,29 @@ public class LambdaTransformer extends InlineTransformer {
             throw new RuntimeException(e);
         }
         constructor = getMethodNode(reader, "<init>");
-        extractParametersMapping(constructor);
-
         invoke = getMethodNode(reader, "invoke");
-        extractParametersMapping(constructor);
+
+        builder = new ParametersBuilder().newBuilder();
+        buildInvokeParams(builder);
+
+        extractParametersMapping(constructor, builder);
+        capturedFieldsInfo(invoke);
     }
 
+    private void buildInvokeParams(ParametersBuilder builder) {
+        builder.addThis(lambdaType, false);
+
+        Type[] types = Type.getArgumentTypes(invoke.desc);
+        for (int i = 0; i < types.length; i++) {
+            Type type = types[i];
+            builder.addNextParameter(type, false, null);
+        }
+    }
+
+
     public void capturedFieldsInfo(MethodNode invokeNode) {
-        //List<FieldAccess> fieldAccesses = MethodInliner.transformCaptured(invokeNode, null, lambdaClass, true);
+        List<FieldAccess> fieldAccesses = MethodInliner
+                .transformCaptured(invokeNode, builder.buildParameters(), lambdaType, true);
     }
 
     public void doTransform(ClassBuilder builder) throws IOException {
@@ -82,10 +102,9 @@ public class LambdaTransformer extends InlineTransformer {
 
     }
 
-    private void extractParametersMapping(MethodNode constructor) {
+    private void extractParametersMapping(MethodNode constructor, ParametersBuilder builder) {
         AbstractInsnNode cur = constructor.instructions.getFirst();
         cur = cur.getNext(); //skip super call
-        int index = 0;
         while (cur != null) {
             if (cur.getType() == AbstractInsnNode.FIELD_INSN) {
                 FieldInsnNode fieldNode = (FieldInsnNode) cur;
@@ -93,9 +112,9 @@ public class LambdaTransformer extends InlineTransformer {
                 int varIndex = previous.var;
                 paramMapping.put(fieldNode.name, varIndex);
                 System.out.println(fieldNode.name + " "  + varIndex);
+                builder.addCapturedParam(fieldNode.name, Type.getType(fieldNode.desc), false, null);
             }
             cur = cur.getNext();
-            index++;
         }
     }
 

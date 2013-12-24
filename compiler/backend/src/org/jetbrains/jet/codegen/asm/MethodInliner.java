@@ -391,7 +391,7 @@ public class MethodInliner {
                         cur = insn;
                     }
 
-                    FieldAccess fieldAccess = new FieldAccess(fieldInsnNode.name, fieldInsnNode.owner, new FieldAccess("" + loadThis.var, lambdaClassType.getInternalName()));
+                    FieldAccess fieldAccess = new FieldAccess(fieldInsnNode.name, fieldInsnNode.desc, new FieldAccess("" + loadThis.var, lambdaClassType.getInternalName()));
                     capturedFields.add(fieldAccess);
                 }
             }

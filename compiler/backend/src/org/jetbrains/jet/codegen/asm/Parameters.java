@@ -86,7 +86,7 @@ public class Parameters implements Iterable<ParameterInfo> {
         return result;
     }
 
-    public static List<ParameterInfo> transformWithStubs(List<ParameterInfo> params) {
+    public static List<ParameterInfo> addStubs(List<ParameterInfo> params) {
         ArrayList result = new ArrayList();
         for (ParameterInfo newInfo : params) {
             result.add(newInfo);
