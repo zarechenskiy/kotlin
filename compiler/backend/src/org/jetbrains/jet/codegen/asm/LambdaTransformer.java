@@ -16,14 +16,15 @@
 
 package org.jetbrains.jet.codegen.asm;
 
+import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.asm4.*;
+import org.jetbrains.asm4.commons.Method;
 import org.jetbrains.asm4.tree.*;
 import org.jetbrains.jet.OutputFile;
-import org.jetbrains.jet.codegen.CallableMethod;
-import org.jetbrains.jet.codegen.ClassBuilder;
-import org.jetbrains.jet.codegen.StackValue;
+import org.jetbrains.jet.codegen.*;
 import org.jetbrains.jet.codegen.context.MethodContext;
 import org.jetbrains.jet.lang.descriptors.ValueParameterDescriptor;
 import org.jetbrains.jet.lang.psi.JetExpression;
@@ -103,21 +104,40 @@ public class LambdaTransformer extends InlineTransformer {
                                  superName,
                                  interfaces
         );
-        Parameters parameters = getLambdaParameters(invocation);
+        ParametersBuilder builder = ParametersBuilder.newBuilder();
+        Parameters parameters = getLambdaParameters(builder, invocation);
 
         MethodVisitor invokeVisitor = newMethod(classBuilder, invoke);
         MethodInliner inliner = new MethodInliner(invoke, parameters, info.subInline(info.nameGenerator.subGenerator("lambda")), oldLambdaType);
         inliner.doTransformAndMerge(invokeVisitor, new VarRemapper.ParamRemapper(parameters, null), false);
+        invokeVisitor.visitMaxs(-1, -1);
 
-        MethodVisitor constructorVisitor = newMethod(classBuilder, constructor);
-        constructor.accept(constructorVisitor);
-        constructorVisitor.visitMaxs(-1, -1);
+        generateConstructorAndFields(classBuilder, builder, invocation);
 
         classBuilder.done();
+
+        invocation.setNewLambdaType(newLambdaType);
     }
 
-    private Parameters getLambdaParameters(ConstructorInvocation invocation) {
-        ParametersBuilder builder = ParametersBuilder.newBuilder();
+    private void generateConstructorAndFields(@NotNull ClassBuilder classBuilder, @NotNull ParametersBuilder builder, @NotNull ConstructorInvocation invocation) {
+        List<CapturedParamInfo> infos = builder.buildCaptured();
+        List<Pair<String, Type>> newConstructorSignature = new ArrayList<Pair<String, Type>>();
+        for (CapturedParamInfo capturedParamInfo : infos) {
+            if (capturedParamInfo.getLambda() == null) { //not inlined
+                newConstructorSignature.add(new Pair<String, Type>(capturedParamInfo.getFieldName(), capturedParamInfo.getType()));
+            }
+        }
+
+        List<Pair<String, Type>> captured = newConstructorSignature;
+        List<FieldInfo> fields = AsmUtil.transformCapturedParams(newConstructorSignature, newLambdaType);
+
+        AsmUtil.genClosureFields(captured, classBuilder);
+
+        Method newConstructor = ClosureCodegen.generateConstructor(classBuilder, fields, null, Type.getObjectType(superName), state);
+        invocation.setNewConstructorDescriptor(newConstructor.getDescriptor());
+    }
+
+    private Parameters getLambdaParameters(ParametersBuilder builder, ConstructorInvocation invocation) {
         buildInvokeParams(builder);
         extractParametersMapping(constructor, builder, invocation);
         return builder.buildParameters();
@@ -157,7 +177,10 @@ public class LambdaTransformer extends InlineTransformer {
                 System.out.println(fieldNode.name + " "  + varIndex);
 
                 CapturedParamInfo info = builder.addCapturedParam(fieldNode.name, Type.getType(fieldNode.desc), false, null);
-                info.setLambda(indexToLambda.get(varIndex).getInfo());
+                InlinableAccess access = indexToLambda.get(varIndex);
+                if (access != null) {
+                    info.setLambda(access.getInfo());
+                }
             }
             cur = cur.getNext();
         }
@@ -245,5 +268,9 @@ public class LambdaTransformer extends InlineTransformer {
             Type type, StackValue stackValue, ValueParameterDescriptor valueParameterDescriptor, int index
     ) {
 
+    }
+
+    public Type getNewLambdaType() {
+        return newLambdaType;
     }
 }

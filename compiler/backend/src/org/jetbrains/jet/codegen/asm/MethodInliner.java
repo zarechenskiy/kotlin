@@ -89,6 +89,23 @@ public class MethodInliner {
         CounterAdapter inliner = new CounterAdapter(resultNode, parameters.totalSize()) {
 
             @Override
+            public void anew(Type type) {
+                if (isLambdaConstructorCall(type.getInternalName(), "<init>")) {
+                    ConstructorInvocation invocation = constructorInvocation.get(0);
+                    if (invocation.isInlinable()) {
+                        LambdaTransformer transformer = new LambdaTransformer(invocation.getOwnerInternalName(), parent.subInline(parent.nameGenerator));
+                        transformer.doTransform(invocation);
+
+                        super.anew(transformer.getNewLambdaType());
+                    } else {
+                        super.anew(type);
+                    }
+                } else {
+                    super.anew(type);
+                }
+            }
+
+            @Override
             public void visitMethodInsn(int opcode, String owner, String name, String desc) {
                 if (/*INLINE_RUNTIME.equals(owner) &&*/ isInvokeOnInlinable(owner, name)) { //TODO add method
                     assert !infos.isEmpty();
@@ -121,10 +138,7 @@ public class MethodInliner {
                 else if (isLambdaConstructorCall(owner, name)) { //TODO add method
                     ConstructorInvocation invocation = constructorInvocation.remove(0);
                     if (invocation.isInlinable()) {
-                        LambdaTransformer transformer = new LambdaTransformer(invocation.getOwnerInternalName(), parent.subInline(parent.nameGenerator));
-
-                        transformer.doTransform(invocation);
-                        //TODO regenerate class
+                        super.visitMethodInsn(opcode, invocation.getNewLambdaType().getInternalName(), name, invocation.getNewConstructorDescriptor());
                     } else {
                         super.visitMethodInsn(opcode, owner, name, desc);
                     }

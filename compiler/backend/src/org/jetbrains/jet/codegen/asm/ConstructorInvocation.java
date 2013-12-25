@@ -16,7 +16,8 @@
 
 package org.jetbrains.jet.codegen.asm;
 
-import java.util.List;
+import org.jetbrains.asm4.Type;
+
 import java.util.Map;
 
 public class ConstructorInvocation {
@@ -24,6 +25,10 @@ public class ConstructorInvocation {
     private final String ownerInternalName;
 
     private final Map<Integer, InlinableAccess> access;
+
+    private Type newLambdaType;
+
+    private String newConstructorDescriptor;
 
     ConstructorInvocation(String ownerInternalName, Map<Integer, InlinableAccess> access) {
         this.ownerInternalName = ownerInternalName;
@@ -40,5 +45,22 @@ public class ConstructorInvocation {
 
     public Map<Integer, InlinableAccess> getAccess() {
         return access;
+    }
+
+
+    public Type getNewLambdaType() {
+        return newLambdaType;
+    }
+
+    public void setNewLambdaType(Type newLambdaType) {
+        this.newLambdaType = newLambdaType;
+    }
+
+    public String getNewConstructorDescriptor() {
+        return newConstructorDescriptor;
+    }
+
+    public void setNewConstructorDescriptor(String newConstructorDescriptor) {
+        this.newConstructorDescriptor = newConstructorDescriptor;
     }
 }
