@@ -64,6 +64,8 @@ public class Parameters implements Iterable<ParameterInfo> {
                     new CapturedParamInfo(capturedParamInfo.getFieldName(), capturedParamInfo.getType(), capturedParamInfo.isSkipped,
                                           capturedParamInfo.getIndex(), result.size() + realSize);
 
+            newInfo.setLambda(capturedParamInfo.getLambda());
+
             result.add(newInfo);
 
             if (capturedParamInfo.getType().getSize() == 2) {
@@ -78,6 +80,7 @@ public class Parameters implements Iterable<ParameterInfo> {
         for (CapturedParamInfo capturedParamInfo : capturedParams) {
             CapturedParamInfo newInfo = new CapturedParamInfo(capturedParamInfo.getFieldName(), capturedParamInfo.getType(), capturedParamInfo.isSkipped,
                                                               capturedParamInfo.getRemapIndex(), result.size() + realSize);
+            newInfo.setLambda(capturedParamInfo.getLambda());
             result.add(newInfo);
             if (capturedParamInfo.getType().getSize() == 2) {
                 result.add(CapturedParamInfo.STUB);

@@ -30,7 +30,7 @@ public class MethodInliner {
     private final InliningInfo parent;
 
     @Nullable
-    private final LambdaInfo lambdaInfo;
+    private final Type lambdaInfo;
 
     private final JetTypeMapper typeMapper;
 
@@ -45,7 +45,7 @@ public class MethodInliner {
      * @param parent
      * @param lambdaInfo - in case on lambda 'invoke' inlining
      */
-    public MethodInliner(@NotNull MethodNode node, Parameters parameters, @NotNull InliningInfo parent, @Nullable LambdaInfo lambdaInfo) {
+    public MethodInliner(@NotNull MethodNode node, Parameters parameters, @NotNull InliningInfo parent, @Nullable Type lambdaInfo) {
         this.node = node;
         this.parameters = parameters;
         this.parent = parent;
@@ -53,7 +53,12 @@ public class MethodInliner {
         this.typeMapper = parent.state.getTypeMapper();
     }
 
+
     public void doTransformAndMerge(MethodVisitor adapter, VarRemapper.ParamRemapper remapper) {
+        doTransformAndMerge(adapter, remapper, true);
+    }
+
+    public void doTransformAndMerge(MethodVisitor adapter, VarRemapper.ParamRemapper remapper, boolean remapReturn) {
         //analyze body
         MethodNode transformedNode = node;
         try {
@@ -68,7 +73,7 @@ public class MethodInliner {
         transformedNode.instructions.resetLabels();
 
         Label end = new Label();
-        RemapVisitor visitor = new RemapVisitor(adapter, end, remapper);
+        RemapVisitor visitor = new RemapVisitor(adapter, end, remapper, remapReturn);
         transformedNode.accept(visitor);
         visitor.visitLabel(end);
 
@@ -104,7 +109,7 @@ public class MethodInliner {
 
                     Parameters params = new Parameters(lambdaParameters, Parameters.transformList(info.getCapturedVars(), lambdaParameters.size()));
 
-                    MethodInliner inliner = new MethodInliner(info.getNode(), params, parent.subInline(parent.nameGenerator.subGenerator("lambda")), info);
+                    MethodInliner inliner = new MethodInliner(info.getNode(), params, parent.subInline(parent.nameGenerator.subGenerator("lambda")), info.getLambdaClassType());
 
                     VarRemapper.ParamRemapper remapper = new VarRemapper.ParamRemapper(params, new VarRemapper.ShiftRemapper(valueParamShift, null));
                     inliner.doTransformAndMerge(this.mv, remapper); //TODO add skipped this and receiver
@@ -126,39 +131,6 @@ public class MethodInliner {
                 }
                 else {
                     super.visitMethodInsn(opcode, owner, name, desc);
-                }
-            }
-
-            @Override
-            public void visitFieldInsn(int opcode, String owner, String name, String desc) {
-                if (lambdaInfo != null && lambdaInfo.getLambdaClassType().getInternalName().equals(owner)) {
-                    //todo check only inlinable
-
-                    Collection<CapturedParamInfo> vars = lambdaInfo.getCapturedVars();
-                    CapturedParamInfo result = null;
-                    for (CapturedParamInfo valueDescriptor : vars) {
-                        if (valueDescriptor.getFieldName().equals(name)) {
-                            result = valueDescriptor;
-                            break;
-                        }
-                    }
-                    if (result == null) {
-                        throw new UnsupportedOperationException("Coudn't find field " +
-                                                                owner +
-                                                                "." +
-                                                                name +
-                                                                " (" +
-                                                                desc +
-                                                                ") in captured vars of " +
-                                                                lambdaInfo.getFunctionLiteral().getText());
-                    }
-
-                    opcode = opcode == Opcodes.GETFIELD ? result.getType().getOpcode(Opcodes.ILOAD) : result.getType().getOpcode(
-                            Opcodes.ISTORE);
-
-                    visitVarInsn(opcode, -(result.getRemapIndex() + 1)); //to be shure it negative
-                } else {
-                    super.visitFieldInsn(opcode, owner, name, desc);
                 }
             }
         };
@@ -211,7 +183,7 @@ public class MethodInliner {
             transformedNode.visitMaxs(30, 30);
 
             if (lambdaInfo != null) {
-                transformCaptured(node, parameters, lambdaInfo.getLambdaClassType(), false);
+                transformCaptured(transformedNode, parameters, lambdaInfo, false);
             }
             return transformedNode;
         }
@@ -255,7 +227,7 @@ public class MethodInliner {
                 }
                 else if (isLambdaConstructorCall(owner, name)) {
                     Frame<SourceValue> frame = sources[index];
-                    ArrayList<InlinableAccess> infos = new ArrayList<InlinableAccess>();
+                    Map<Integer, InlinableAccess> infos = new HashMap<Integer, InlinableAccess>();
                     int paramStart = frame.getStackSize() - paramLength;
 
                     for (int i = 0; i < paramLength; i++) {
@@ -268,7 +240,7 @@ public class MethodInliner {
                                 if (lambdaInfo != null) {
                                     InlinableAccess inlinableAccess = new InlinableAccess(varIndex, true, null);
                                     inlinableAccess.setInfo(lambdaInfo);
-                                    infos.add(inlinableAccess);
+                                    infos.put(i, inlinableAccess);
 
                                     //remove inlinable access
                                     node.instructions.remove(insnNode);
@@ -381,25 +353,29 @@ public class MethodInliner {
                                                                 ") in captured vars of " + lambdaClassType);
                     }
 
-                    AbstractInsnNode prev = getPreviousNoLableNoLine(cur);
+                    if (result.isSkipped()) {
+                        //lambda class transformation skip this captured
+                    } else {
+                        AbstractInsnNode prev = getPreviousNoLableNoLine(cur);
 
-                    assert prev.getType() == AbstractInsnNode.VAR_INSN;
-                    VarInsnNode loadThis = (VarInsnNode) prev;
-                    assert /*loadThis.var == info.getCapturedVarsSize() - 1 && */loadThis.getOpcode() == Opcodes.ALOAD;
+                        assert prev.getType() == AbstractInsnNode.VAR_INSN;
+                        VarInsnNode loadThis = (VarInsnNode) prev;
+                        assert /*loadThis.var == info.getCapturedVarsSize() - 1 && */loadThis.getOpcode() == Opcodes.ALOAD;
 
-                    int opcode = fieldInsnNode.getOpcode() == Opcodes.GETFIELD ? result.getType().getOpcode(Opcodes.ILOAD) : result.getType().getOpcode(Opcodes.ISTORE);
-                    VarInsnNode insn = new VarInsnNode(opcode, result.getIndex());
+                        int opcode = fieldInsnNode.getOpcode() == Opcodes.GETFIELD ? result.getType().getOpcode(Opcodes.ILOAD) : result.getType().getOpcode(Opcodes.ISTORE);
+                        VarInsnNode insn = new VarInsnNode(opcode, result.getIndex());
 
-                    if (!justStatistics) {
-                        node.instructions.remove(prev); //remove aload this
-                        node.instructions.insertBefore(cur, insn);
-                        node.instructions.remove(cur); //remove aload field
+                        if (!justStatistics) {
+                            node.instructions.remove(prev); //remove aload this
+                            node.instructions.insertBefore(cur, insn);
+                            node.instructions.remove(cur); //remove aload field
 
-                        cur = insn;
+                            cur = insn;
+                        }
+
+                        FieldAccess fieldAccess = new FieldAccess(fieldInsnNode.name, fieldInsnNode.desc, new FieldAccess("" + loadThis.var, lambdaClassType.getInternalName()));
+                        capturedFields.add(fieldAccess);
                     }
-
-                    FieldAccess fieldAccess = new FieldAccess(fieldInsnNode.name, fieldInsnNode.desc, new FieldAccess("" + loadThis.var, lambdaClassType.getInternalName()));
-                    capturedFields.add(fieldAccess);
                 }
             }
             cur = cur.getNext();

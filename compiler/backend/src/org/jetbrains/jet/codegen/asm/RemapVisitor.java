@@ -28,15 +28,17 @@ public class RemapVisitor extends InstructionAdapter
 
     private Label end;
     private VarRemapper remapper;
+    private boolean remapReturn;
 
-    protected RemapVisitor(MethodVisitor mv, Label end, VarRemapper remapper) {
+    protected RemapVisitor(MethodVisitor mv, Label end, VarRemapper remapper, boolean remapReturn) {
         super(InlineCodegenUtil.API, mv);
         this.end = end;
         this.remapper = remapper;
+        this.remapReturn = remapReturn;
     }
 
     public void visitInsn(int opcode) {
-        if (opcode >= Opcodes.IRETURN && opcode <= Opcodes.RETURN) {
+        if (remapReturn && opcode >= Opcodes.IRETURN && opcode <= Opcodes.RETURN) {
             super.visitJumpInsn(Opcodes.GOTO, end);
         }
         else {

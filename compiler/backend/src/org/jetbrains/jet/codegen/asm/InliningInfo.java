@@ -35,6 +35,7 @@ public class InliningInfo {
     public final GenerationState state;
 
     public final NameGenerator nameGenerator;
+
     public final FunctionDescriptor startFunction;
 
     public InliningInfo(

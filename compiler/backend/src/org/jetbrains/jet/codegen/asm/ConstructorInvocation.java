@@ -17,14 +17,15 @@
 package org.jetbrains.jet.codegen.asm;
 
 import java.util.List;
+import java.util.Map;
 
 public class ConstructorInvocation {
 
     private final String ownerInternalName;
 
-    private final List<InlinableAccess> access;
+    private final Map<Integer, InlinableAccess> access;
 
-    ConstructorInvocation(String ownerInternalName, List<InlinableAccess> access) {
+    ConstructorInvocation(String ownerInternalName, Map<Integer, InlinableAccess> access) {
         this.ownerInternalName = ownerInternalName;
         this.access = access;
     }
@@ -37,7 +38,7 @@ public class ConstructorInvocation {
         return !access.isEmpty();
     }
 
-    public List<InlinableAccess> getAccess() {
+    public Map<Integer, InlinableAccess> getAccess() {
         return access;
     }
 }

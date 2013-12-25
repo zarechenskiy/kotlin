@@ -18,23 +18,19 @@ package org.jetbrains.jet.codegen.asm;
 
 import com.google.common.collect.Lists;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.asm4.Label;
 import org.jetbrains.asm4.MethodVisitor;
 import org.jetbrains.asm4.Opcodes;
 import org.jetbrains.asm4.Type;
 import org.jetbrains.asm4.commons.InstructionAdapter;
-import org.jetbrains.asm4.commons.Method;
-import org.jetbrains.asm4.tree.AbstractInsnNode;
-import org.jetbrains.asm4.tree.MethodInsnNode;
 import org.jetbrains.asm4.tree.MethodNode;
-import org.jetbrains.asm4.tree.VarInsnNode;
-import org.jetbrains.asm4.tree.analysis.*;
-import org.jetbrains.jet.codegen.ClosureCodegen;
 import org.jetbrains.jet.codegen.StackValue;
 import org.jetbrains.jet.codegen.state.GenerationState;
 import org.jetbrains.jet.codegen.state.JetTypeMapper;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public abstract class InlineTransformer implements Inliner {
 
@@ -126,69 +122,5 @@ public abstract class InlineTransformer implements Inliner {
 
     private boolean isInitCallOfFunction(String owner, String name) {
         return "<init>".equals(name);
-    }
-
-    protected void markPlacesForInlineAndRemoveInlinable(@NotNull MethodNode node) throws AnalyzerException {
-        Analyzer<SourceValue> analyzer = new Analyzer<SourceValue>(new SourceInterpreter());
-        Frame<SourceValue>[] sources = analyzer.analyze("fake", node);
-
-        AbstractInsnNode cur = node.instructions.getFirst();
-        int index = 0;
-        while (cur != null) {
-            if (cur.getType() == AbstractInsnNode.METHOD_INSN) {
-                MethodInsnNode methodInsnNode = (MethodInsnNode) cur;
-                String owner = methodInsnNode.owner;
-                String desc = methodInsnNode.desc;
-                String name = methodInsnNode.name;
-                //TODO check closure
-                int paramLength = Type.getArgumentTypes(desc).length + 1;//non static
-                if (isInvokeOnInlinable(owner, name) /*&& methodInsnNode.owner.equals(INLINE_RUNTIME)*/) {
-                    Frame<SourceValue> frame = sources[index];
-                    SourceValue sourceValue = frame.getStack(frame.getStackSize() - paramLength);
-                    assert sourceValue.insns.size() == 1;
-
-                    AbstractInsnNode insnNode = sourceValue.insns.iterator().next();
-                    assert insnNode.getType() == AbstractInsnNode.VAR_INSN && insnNode.getOpcode() == Opcodes.ALOAD;
-
-                    int varIndex = ((VarInsnNode) insnNode).var;
-                    LambdaInfo lambdaInfo = expressionMap.get(varIndex);
-                    boolean isInlinable = lambdaInfo != null;
-                    if (isInlinable) { //TODO: maybe add separate map for noninlinable inlinableInvocation
-                        //remove inlinable access
-                        node.instructions.remove(insnNode);
-                    }
-                    inlinableInvocation.add(new InlinableAccess(varIndex, isInlinable, null));
-                }
-                else if (isFunctionConstructorCall(owner, name)) {
-                    Frame<SourceValue> frame = sources[index];
-                    ArrayList<InlinableAccess> infos = new ArrayList<InlinableAccess>();
-                    int paramStart = frame.getStackSize() - paramLength;
-
-                    for (int i = 0; i < paramLength; i++) {
-                        SourceValue sourceValue = frame.getStack(paramStart + i);
-                        if (sourceValue.insns.size() == 1) {
-                            AbstractInsnNode insnNode = sourceValue.insns.iterator().next();
-                            if (insnNode.getType() == AbstractInsnNode.VAR_INSN && insnNode.getOpcode() == Opcodes.ALOAD) {
-                                int varIndex = ((VarInsnNode) insnNode).var;
-                                LambdaInfo lambdaInfo = expressionMap.get(varIndex);
-                                if (lambdaInfo != null) {
-                                    InlinableAccess inlinableAccess = new InlinableAccess(varIndex, true, null);
-                                    inlinableAccess.setInfo(lambdaInfo);
-                                    infos.add(inlinableAccess);
-
-                                    //remove inlinable access
-                                    node.instructions.remove(insnNode);
-                                }
-                            }
-                        }
-                    }
-
-                    ConstructorInvocation invocation = new ConstructorInvocation(owner, infos);
-                    constructorInvocation.add(invocation);
-                }
-            }
-            cur = cur.getNext();
-            index++;
-        }
     }
 }

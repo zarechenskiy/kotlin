@@ -31,7 +31,7 @@ public class  ParametersBuilder {
     private int nextIndex = 0;
     private int nextCaptured = 0;
 
-    public ParametersBuilder newBuilder() {
+    public static ParametersBuilder newBuilder() {
         return new ParametersBuilder();
     }
 
@@ -45,9 +45,8 @@ public class  ParametersBuilder {
         return this;
     }
 
-    public ParametersBuilder addCapturedParam(String fieldName, Type type, boolean skipped, @Nullable ParameterInfo original) {
-        addCapturedParameter(new CapturedParamInfo(fieldName, type, skipped, original != null ? original.getIndex() : -1, nextCaptured));
-        return this;
+    public CapturedParamInfo addCapturedParam(String fieldName, Type type, boolean skipped, @Nullable ParameterInfo original) {
+        return addCapturedParameter(new CapturedParamInfo(fieldName, type, skipped, original != null ? original.getIndex() : -1, nextCaptured));
     }
 
     private void addParameter(ParameterInfo info) {
@@ -55,9 +54,10 @@ public class  ParametersBuilder {
         nextIndex += info.getType().getSize();
     }
 
-    private void addCapturedParameter(CapturedParamInfo info) {
+    private CapturedParamInfo addCapturedParameter(CapturedParamInfo info) {
         capturedParams.add(info);
         nextCaptured += info.getType().getSize();
+        return info;
     }
 
     public List<ParameterInfo> build() {

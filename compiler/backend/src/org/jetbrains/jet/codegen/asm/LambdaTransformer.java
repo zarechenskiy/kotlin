@@ -32,9 +32,7 @@ import org.jetbrains.jet.lang.resolve.BindingContextUtils;
 import org.jetbrains.jet.lang.resolve.name.FqName;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.jetbrains.asm4.Opcodes.V1_6;
 
@@ -49,10 +47,6 @@ public class LambdaTransformer extends InlineTransformer {
     private final Map<String, Integer> paramMapping = new HashMap<String, Integer>();
 
     private final Type oldLambdaType;
-
-    private MethodNode transformedConstructor;
-
-    private ParametersBuilder builder;
 
     private final Type newLambdaType;
 
@@ -87,12 +81,6 @@ public class LambdaTransformer extends InlineTransformer {
 
         constructor = getMethodNode(reader, "<init>");
         invoke = getMethodNode(reader, "invoke");
-
-        builder = new ParametersBuilder().newBuilder();
-        buildInvokeParams(builder);
-
-        extractParametersMapping(constructor, builder);
-        capturedFieldsInfo(invoke);
     }
 
     private void buildInvokeParams(ParametersBuilder builder) {
@@ -104,17 +92,8 @@ public class LambdaTransformer extends InlineTransformer {
         }
     }
 
-
-    public void capturedFieldsInfo(MethodNode invokeNode) {
-        List<FieldAccess> fieldAccesses = MethodInliner
-                .transformCaptured(invokeNode, builder.buildParameters(), oldLambdaType, true);
-    }
-
     public void doTransform(ConstructorInvocation invocation) {
-        PsiElement element = BindingContextUtils.descriptorToDeclaration(state.getBindingContext(), info.startFunction);
-        assert element != null : "Couldn't find declaration for " + info.startFunction;
-
-        ClassBuilder classBuilder = state.getFactory().forLambdaInlining(newLambdaType, element.getContainingFile());
+        ClassBuilder classBuilder = createClassBuilder();
 
         classBuilder.defineClass(null,
                                  V1_6,
@@ -124,15 +103,31 @@ public class LambdaTransformer extends InlineTransformer {
                                  superName,
                                  interfaces
         );
+        Parameters parameters = getLambdaParameters(invocation);
 
         MethodVisitor invokeVisitor = newMethod(classBuilder, invoke);
-        invokeVisitor.visitMaxs(-1, -1);
+        MethodInliner inliner = new MethodInliner(invoke, parameters, info.subInline(info.nameGenerator.subGenerator("lambda")), oldLambdaType);
+        inliner.doTransformAndMerge(invokeVisitor, new VarRemapper.ParamRemapper(parameters, null), false);
 
         MethodVisitor constructorVisitor = newMethod(classBuilder, constructor);
         constructor.accept(constructorVisitor);
         constructorVisitor.visitMaxs(-1, -1);
 
         classBuilder.done();
+    }
+
+    private Parameters getLambdaParameters(ConstructorInvocation invocation) {
+        ParametersBuilder builder = ParametersBuilder.newBuilder();
+        buildInvokeParams(builder);
+        extractParametersMapping(constructor, builder, invocation);
+        return builder.buildParameters();
+    }
+
+    private ClassBuilder createClassBuilder() {
+        PsiElement element = BindingContextUtils.descriptorToDeclaration(state.getBindingContext(), info.startFunction);
+        assert element != null : "Couldn't find declaration for " + info.startFunction;
+
+        return state.getFactory().forLambdaInlining(newLambdaType, element.getContainingFile());
     }
 
     private MethodVisitor newMethod(ClassBuilder builder, MethodNode original) {
@@ -148,7 +143,9 @@ public class LambdaTransformer extends InlineTransformer {
         return visitor;
     }
 
-    private void extractParametersMapping(MethodNode constructor, ParametersBuilder builder) {
+    private void extractParametersMapping(MethodNode constructor, ParametersBuilder builder, ConstructorInvocation invocation) {
+        Map<Integer, InlinableAccess> indexToLambda = invocation.getAccess();
+
         AbstractInsnNode cur = constructor.instructions.getFirst();
         cur = cur.getNext(); //skip super call
         while (cur != null) {
@@ -158,7 +155,9 @@ public class LambdaTransformer extends InlineTransformer {
                 int varIndex = previous.var;
                 paramMapping.put(fieldNode.name, varIndex);
                 System.out.println(fieldNode.name + " "  + varIndex);
-                builder.addCapturedParam(fieldNode.name, Type.getType(fieldNode.desc), false, null);
+
+                CapturedParamInfo info = builder.addCapturedParam(fieldNode.name, Type.getType(fieldNode.desc), false, null);
+                info.setLambda(indexToLambda.get(varIndex).getInfo());
             }
             cur = cur.getNext();
         }
