@@ -108,8 +108,9 @@ public class LambdaTransformer extends InlineTransformer {
         Parameters parameters = getLambdaParameters(builder, invocation);
 
         MethodVisitor invokeVisitor = newMethod(classBuilder, invoke);
-        MethodInliner inliner = new MethodInliner(invoke, parameters, info.subInline(info.nameGenerator.subGenerator("lambda")), oldLambdaType);
-        inliner.doTransformAndMerge(invokeVisitor, new VarRemapper.ParamRemapper(parameters, null), false);
+        MethodInliner inliner = new MethodInliner(invoke, parameters, info.subInline(info.nameGenerator.subGenerator("lambda")), oldLambdaType,
+                                                  new LambdaFieldRemapper());
+        inliner.doTransformAndMerge(invokeVisitor, new VarRemapper.ParamRemapper(parameters, null), new InlineFieldRemapper(oldLambdaType.getInternalName(), newLambdaType.getInternalName()), false);
         invokeVisitor.visitMaxs(-1, -1);
 
         generateConstructorAndFields(classBuilder, builder, invocation);
@@ -194,7 +195,7 @@ public class LambdaTransformer extends InlineTransformer {
         for (LambdaInfo info : additionalCaptured) {
             List<CapturedParamInfo> vars = info.getCapturedVars();
             for (CapturedParamInfo var : vars) {
-                builder.addCapturedParam(var.getFieldName() + "$inlined", var.getType(), true, var);
+                CapturedParamInfo recapturedParamInfo = builder.addCapturedParam(getNewFieldName(var.getFieldName()), var.getType(), true, var);
                 recaptured.add(var);
             }
         }
@@ -288,5 +289,9 @@ public class LambdaTransformer extends InlineTransformer {
 
     public Type getNewLambdaType() {
         return newLambdaType;
+    }
+
+    public static String getNewFieldName(String oldName) {
+        return oldName + "$inlined";
     }
 }

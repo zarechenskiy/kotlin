@@ -43,7 +43,6 @@ import org.jetbrains.jet.lang.descriptors.*;
 import org.jetbrains.jet.lang.psi.*;
 import org.jetbrains.jet.lang.resolve.BindingContext;
 import org.jetbrains.jet.lang.resolve.BindingContextUtils;
-import org.jetbrains.jet.lang.resolve.DescriptorUtils;
 import org.jetbrains.jet.lang.resolve.java.AsmTypeConstants;
 import org.jetbrains.jet.lang.resolve.name.FqName;
 import org.jetbrains.jet.lang.types.lang.InlineUtil;
@@ -185,7 +184,7 @@ public class InlineCodegen extends InlineTransformer implements ParentCodegenAwa
                 new InliningInfo(expressionMap, null, null, null, state,
                                  new NameGenerator(fqName.toString().replace('.', '/') + "$" +codegen.getContext().getContextDescriptor().getName() + "$$inline"),
                                  (FunctionDescriptor) codegen.getContext().getContextDescriptor());
-        MethodInliner inliner = new MethodInliner(node, parameters, info, null); //with captured
+        MethodInliner inliner = new MethodInliner(node, parameters, info, null, new LambdaFieldRemapper()); //with captured
 
         VarRemapper.ParamRemapper remapper = new VarRemapper.ParamRemapper(parameters, new VarRemapper.ShiftRemapper(initialFrameSize, null));
 
