@@ -24,10 +24,7 @@ import org.jetbrains.asm4.ClassVisitor;
 import org.jetbrains.asm4.Opcodes;
 import org.jetbrains.asm4.Type;
 import org.jetbrains.asm4.commons.Method;
-import org.jetbrains.asm4.tree.AbstractInsnNode;
-import org.jetbrains.asm4.tree.FieldInsnNode;
 import org.jetbrains.asm4.tree.MethodNode;
-import org.jetbrains.asm4.tree.VarInsnNode;
 import org.jetbrains.asm4.util.Textifier;
 import org.jetbrains.asm4.util.TraceMethodVisitor;
 import org.jetbrains.jet.codegen.*;
@@ -38,6 +35,7 @@ import org.jetbrains.jet.codegen.signature.JvmMethodParameterKind;
 import org.jetbrains.jet.codegen.signature.JvmMethodParameterSignature;
 import org.jetbrains.jet.codegen.signature.JvmMethodSignature;
 import org.jetbrains.jet.codegen.state.GenerationState;
+import org.jetbrains.jet.codegen.state.JetTypeMapper;
 import org.jetbrains.jet.descriptors.serialization.descriptors.DeserializedSimpleFunctionDescriptor;
 import org.jetbrains.jet.lang.descriptors.*;
 import org.jetbrains.jet.lang.psi.*;
@@ -51,15 +49,14 @@ import org.jetbrains.jet.renderer.DescriptorRenderer;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 
 
 import static org.jetbrains.jet.codegen.AsmUtil.*;
 
-public class InlineCodegen extends InlineTransformer implements ParentCodegenAware, Inliner {
+public class InlineCodegen implements ParentCodegenAware, Inliner {
+
+    private final JetTypeMapper typeMapper;
 
     private final ExpressionCodegen codegen;
 
@@ -68,7 +65,8 @@ public class InlineCodegen extends InlineTransformer implements ParentCodegenAwa
     private final GenerationState state;
 
     private final boolean disabled;
-    private Call call;
+
+    private final Call call;
 
     private final SimpleFunctionDescriptor functionDescriptor;
 
@@ -84,6 +82,10 @@ public class InlineCodegen extends InlineTransformer implements ParentCodegenAwa
 
     private LambdaInfo activeLambda;
 
+    protected final List<ParameterInfo> tempTypes = new ArrayList<ParameterInfo>();
+
+    protected final Map<Integer, LambdaInfo> expressionMap = new HashMap<Integer, LambdaInfo>();
+
     public InlineCodegen(
             @NotNull ExpressionCodegen codegen,
             boolean notSeparateInline,
@@ -92,10 +94,11 @@ public class InlineCodegen extends InlineTransformer implements ParentCodegenAwa
             @NotNull SimpleFunctionDescriptor functionDescriptor,
             @NotNull Call call
     ) {
-        super(state);
+        this.state = state;
+        this.typeMapper = state.getTypeMapper();
+
         this.codegen = codegen;
         this.notSeparateInline = notSeparateInline;
-        this.state = state;
         this.disabled = disabled;
         this.call = call;
         this.functionDescriptor = functionDescriptor.getOriginal();
@@ -114,7 +117,7 @@ public class InlineCodegen extends InlineTransformer implements ParentCodegenAwa
 
         try {
             node = createMethodNode(callableMethod);
-            inlineCall(node, true);
+            inlineCall(node);
         }
         catch (CompilationException e) {
             throw e;
@@ -171,11 +174,10 @@ public class InlineCodegen extends InlineTransformer implements ParentCodegenAwa
         return node;
     }
 
-    private void inlineCall(MethodNode node, boolean inlineClosures) {
-
+    private void inlineCall(MethodNode node) {
         generateClosuresBodies();
 
-        ArrayList realParams = new ArrayList(tempTypes);
+        List<ParameterInfo> realParams = new ArrayList<ParameterInfo>(tempTypes);
 
         putClosureParametersOnStack();
 
@@ -193,24 +195,6 @@ public class InlineCodegen extends InlineTransformer implements ParentCodegenAwa
 
         inliner.doTransformAndMerge(codegen.getInstructionAdapter(), remapper);
         generateClosuresBodies();
-        //if (inlineClosures) {
-        //    removeClosureAssertions(node);
-        //    try {
-        //        markPlacesForInlineAndRemoveInlinable(node);
-        //    }
-        //    catch (AnalyzerException e) {
-        //        throw new RuntimeException(e);
-        //    }
-        //}
-        //
-        //int valueParamSize = originalFunctionFrame.getCurrentSize();
-        //int originalSize = codegen.getFrameMap().getCurrentSize();
-        //generateClosuresBodies();
-        //putClosureParametersOnStack();
-        //int additionalParams = codegen.getFrameMap().getCurrentSize() - originalSize;
-        //VarRemapper remapper = new VarRemapper.ParamRemapper(initialFrameSize, valueParamSize, additionalParams, tempTypes);
-        //
-        //doInline(node.access, node.desc, codegen.getMethodVisitor(), node, remapper.doRemap(valueParamSize + additionalParams), inlineClosures, remapper);
     }
 
 
@@ -245,84 +229,10 @@ public class InlineCodegen extends InlineTransformer implements ParentCodegenAwa
         });
         adapter.visitMaxs(30, 30);
 
-        //return transformClosure(methodNode, info);
         return methodNode;
     }
 
-    @NotNull
-    private static MethodNode transformClosure(@NotNull MethodNode node, @NotNull LambdaInfo info) {
-        //remove all this and shift all variables to captured ones size
-        final int localVarSHift = info.getCapturedVarsSize();
-        MethodNode transformedNode = new MethodNode(node.access, node.name, node.desc, node.signature, null) {
 
-            private boolean remappingCaptured = false;
-            @Override
-            public void visitVarInsn(int opcode, int var) {
-                super.visitVarInsn(opcode, var + (remappingCaptured ? 0 : localVarSHift - 1/*remove this*/));
-            }
-        };
-        node.accept(transformedNode);
-
-
-        //remove all field access to local var
-        AbstractInsnNode cur = transformedNode.instructions.getFirst();
-        while (cur != null) {
-            if (cur.getType() == AbstractInsnNode.FIELD_INSN) {
-                FieldInsnNode fieldInsnNode = (FieldInsnNode) cur;
-                //TODO check closure
-                String owner = fieldInsnNode.owner;
-                if (info.getLambdaClassType().getInternalName().equals(fieldInsnNode.owner)) {
-                    int opcode = fieldInsnNode.getOpcode();
-                    String name = fieldInsnNode.name;
-                    String desc = fieldInsnNode.desc;
-
-                    Collection<CapturedParamInfo> vars = info.getCapturedVars();
-                    int index = 0;//skip this
-                    boolean found = false;
-                    for (CapturedParamInfo valueDescriptor : vars) {
-                        Type type = valueDescriptor.getType();
-                        if (valueDescriptor.getFieldName().equals(name)) {
-                            opcode = opcode == Opcodes.GETFIELD ? type.getOpcode(Opcodes.ILOAD) : type.getOpcode(Opcodes.ISTORE);
-                            found = true;
-                            break;
-                        }
-                        index += type.getSize();
-                    }
-                    if (!found) {
-                        throw new UnsupportedOperationException("Coudn't find field " +
-                                                                owner +
-                                                                "." +
-                                                                name +
-                                                                " (" +
-                                                                desc +
-                                                                ") in captured vars of " +
-                                                                info.getFunctionLiteral().getText());
-                    }
-
-
-                    VarInsnNode varInsNode = new VarInsnNode(opcode, index);
-
-                    AbstractInsnNode prev = cur.getPrevious();
-                    while (prev.getType() == AbstractInsnNode.LABEL || prev.getType() == AbstractInsnNode.LINE) {
-                        prev = prev.getPrevious();
-                    }
-
-                    assert prev.getType() == AbstractInsnNode.VAR_INSN;
-                    VarInsnNode loadThis = (VarInsnNode) prev;
-                    assert /*loadThis.var == info.getCapturedVarsSize() - 1 && */loadThis.getOpcode() == Opcodes.ALOAD;
-
-                    transformedNode.instructions.remove(prev);
-                    transformedNode.instructions.insertBefore(cur, varInsNode);
-                    transformedNode.instructions.remove(cur);
-                    cur = varInsNode;
-
-                }
-            }
-            cur = cur.getNext();
-        }
-
-        return transformedNode;
-    }
 
     @Override
     public void putInLocal(Type type, StackValue stackValue, ValueParameterDescriptor valueParameterDescriptor) {
@@ -460,7 +370,7 @@ public class InlineCodegen extends InlineTransformer implements ParentCodegenAwa
 
     private List<CapturedParamInfo> getAllCaptured() {
         //TODO: SORT
-        ArrayList result = new ArrayList();
+        List<CapturedParamInfo> result = new ArrayList<CapturedParamInfo>();
         for (LambdaInfo next : expressionMap.values()) {
             if (next.closure != null) {
                 result.addAll(next.getCapturedVars());

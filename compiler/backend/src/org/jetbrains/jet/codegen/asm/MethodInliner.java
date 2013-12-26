@@ -1,5 +1,6 @@
 package org.jetbrains.jet.codegen.asm;
 
+import com.google.common.collect.Lists;
 import com.intellij.util.ArrayUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -7,6 +8,7 @@ import org.jetbrains.asm4.Label;
 import org.jetbrains.asm4.MethodVisitor;
 import org.jetbrains.asm4.Opcodes;
 import org.jetbrains.asm4.Type;
+import org.jetbrains.asm4.commons.InstructionAdapter;
 import org.jetbrains.asm4.commons.Method;
 import org.jetbrains.asm4.tree.*;
 import org.jetbrains.asm4.tree.analysis.*;
@@ -19,7 +21,6 @@ import java.util.*;
 
 import static org.jetbrains.jet.codegen.asm.InlineCodegenUtil.isLambdaConstructorCall;
 import static org.jetbrains.jet.codegen.asm.InlineCodegenUtil.isInvokeOnInlinable;
-import static org.jetbrains.jet.codegen.asm.InlineTransformer.putStackValuesIntoLocals;
 
 public class MethodInliner {
 
@@ -320,8 +321,7 @@ public class MethodInliner {
                 }
             }
         } else {
-            for (int i = 0; i < types.length; i++) {
-                Type type = types[i];
+            for (Type type : types) {
                 int paramIndex = index++;
                 result.add(new ParameterInfo(type, false, -1, paramIndex));
                 if (type.getSize() == 2) {
@@ -369,7 +369,7 @@ public class MethodInliner {
             @NotNull Type lambdaClassType,
             @NotNull LambdaFieldRemapper lambdaFieldRemapper
     ) {
-        ArrayList capturedFields = new ArrayList();
+        List<FieldAccess> capturedFields = new ArrayList<FieldAccess>();
 
         //remove all this and shift all variables to captured ones size
         AbstractInsnNode cur = node.instructions.getFirst();
@@ -431,11 +431,33 @@ public class MethodInliner {
         return capturedFields;
     }
 
-    public static AbstractInsnNode getPreviousNoLableNoLine(AbstractInsnNode cur) {
+    public static AbstractInsnNode getPreviousNoLabelNoLine(AbstractInsnNode cur) {
         AbstractInsnNode prev = cur.getPrevious();
         while (prev.getType() == AbstractInsnNode.LABEL || prev.getType() == AbstractInsnNode.LINE) {
             prev = prev.getPrevious();
         }
         return prev;
+    }
+
+    public static void putStackValuesIntoLocals(List<Type> directOrder, int shift, InstructionAdapter mv, String descriptor) {
+        Type[] actualParams = Type.getArgumentTypes(descriptor); //last param is closure itself
+        assert actualParams.length == directOrder.size() : "Number of expected and actual params should be equals!";
+
+        int size = 0;
+        for (Type next : directOrder) {
+            size += next.getSize();
+        }
+
+        shift += size;
+        int index = directOrder.size();
+
+        for (Type next : Lists.reverse(directOrder)) {
+            shift -= next.getSize();
+            Type typeOnStack = actualParams[--index];
+            if (!typeOnStack.equals(next)) {
+                StackValue.onStack(typeOnStack).put(next, mv);
+            }
+            mv.visitVarInsn(next.getOpcode(Opcodes.ISTORE), shift);
+        }
     }
 }

@@ -17,7 +17,6 @@
 package org.jetbrains.jet.codegen.asm;
 
 import org.jetbrains.jet.codegen.state.GenerationState;
-import org.jetbrains.jet.lang.descriptors.FunctionDescriptor;
 import org.jetbrains.jet.lang.descriptors.DeclarationDescriptor;
 
 import java.util.List;

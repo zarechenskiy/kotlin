@@ -124,9 +124,8 @@ public class LambdaInfo {
     }
 
     @NotNull
-    public CapturedParamInfo getCapturedParamInfo(@NotNull EnclosedValueDescriptor descriptor, int index) {
-        CapturedParamInfo info = new CapturedParamInfo(descriptor.getFieldName(), descriptor.getType(), false, -1, index);
-        return info;
+    public static CapturedParamInfo getCapturedParamInfo(@NotNull EnclosedValueDescriptor descriptor, int index) {
+        return new CapturedParamInfo(descriptor.getFieldName(), descriptor.getType(), false, -1, index);
     }
 
     private void shiftParams(int shift) {
@@ -151,8 +150,7 @@ public class LambdaInfo {
 
     public int getCapturedVarsSize() {
         int size = 0;
-        for (Iterator<CapturedParamInfo> iterator = getCapturedVars().iterator(); iterator.hasNext(); ) {
-            CapturedParamInfo next = iterator.next();
+        for (CapturedParamInfo next : getCapturedVars()) {
             size += next.getType().getSize();
         }
         return size;

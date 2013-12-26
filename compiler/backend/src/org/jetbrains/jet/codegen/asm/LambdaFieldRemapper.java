@@ -22,12 +22,12 @@ import org.jetbrains.asm4.tree.FieldInsnNode;
 import org.jetbrains.asm4.tree.MethodNode;
 import org.jetbrains.asm4.tree.VarInsnNode;
 
-import static org.jetbrains.jet.codegen.asm.MethodInliner.getPreviousNoLableNoLine;
+import static org.jetbrains.jet.codegen.asm.MethodInliner.getPreviousNoLabelNoLine;
 
 public class LambdaFieldRemapper {
 
     public AbstractInsnNode doTransform(MethodNode node, FieldInsnNode fieldInsnNode, CapturedParamInfo capturedField) {
-        AbstractInsnNode prev = getPreviousNoLableNoLine(fieldInsnNode);
+        AbstractInsnNode prev = getPreviousNoLabelNoLine(fieldInsnNode);
 
         assert prev.getType() == AbstractInsnNode.VAR_INSN;
         VarInsnNode loadThis = (VarInsnNode) prev;

@@ -26,7 +26,7 @@ class InlinableAccess {
 
     public final boolean inlinable;
 
-    private List<ParameterInfo> parameters;
+    private final List<ParameterInfo> parameters;
 
     private LambdaInfo info;
 

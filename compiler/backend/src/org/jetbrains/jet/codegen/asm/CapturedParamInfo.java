@@ -37,7 +37,7 @@ public class CapturedParamInfo extends ParameterInfo {
         return fieldName;
     }
 
-//    @Override
+    @Override
     public int getIndex() {
         return shift + super.getIndex();
     }

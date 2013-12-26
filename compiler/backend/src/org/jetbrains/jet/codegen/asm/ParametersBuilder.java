@@ -25,9 +25,9 @@ import java.util.List;
 
 public class  ParametersBuilder {
 
-    private List<ParameterInfo> params = new ArrayList<ParameterInfo>();
-    private List<CapturedParamInfo> capturedParams = new ArrayList<CapturedParamInfo>();
-    private List<CapturedParamInfo> additionalCapturedParams = new ArrayList<CapturedParamInfo>();
+    private final List<ParameterInfo> params = new ArrayList<ParameterInfo>();
+    private final List<CapturedParamInfo> capturedParams = new ArrayList<CapturedParamInfo>();
+    private final List<CapturedParamInfo> additionalCapturedParams = new ArrayList<CapturedParamInfo>();
 
     private int nextIndex = 0;
     private int nextCaptured = 0;
