@@ -168,6 +168,7 @@ public class LambdaTransformer extends InlineTransformer {
 
         AbstractInsnNode cur = constructor.instructions.getFirst();
         cur = cur.getNext(); //skip super call
+        List<LambdaInfo> additionalCaptured = new ArrayList<LambdaInfo>(); //captured var of inlined parameter
         while (cur != null) {
             if (cur.getType() == AbstractInsnNode.FIELD_INSN) {
                 FieldInsnNode fieldNode = (FieldInsnNode) cur;
@@ -179,10 +180,21 @@ public class LambdaTransformer extends InlineTransformer {
                 CapturedParamInfo info = builder.addCapturedParam(fieldNode.name, Type.getType(fieldNode.desc), false, null);
                 InlinableAccess access = indexToLambda.get(varIndex);
                 if (access != null) {
-                    info.setLambda(access.getInfo());
+                    LambdaInfo accessInfo = access.getInfo();
+                    if (accessInfo != null) {
+                        info.setLambda(accessInfo);
+                        additionalCaptured.add(accessInfo);
+                    }
                 }
             }
             cur = cur.getNext();
+        }
+
+        for (LambdaInfo info : additionalCaptured) {
+            List<CapturedParamInfo> vars = info.getCapturedVars();
+            for (CapturedParamInfo var : vars) {
+                builder.addCapturedParam(var.getFieldName() + "$inlined", var.getType(), true, var);
+            }
         }
     }
 

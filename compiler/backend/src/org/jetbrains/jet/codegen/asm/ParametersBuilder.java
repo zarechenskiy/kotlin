@@ -27,6 +27,7 @@ public class  ParametersBuilder {
 
     private List<ParameterInfo> params = new ArrayList<ParameterInfo>();
     private List<CapturedParamInfo> capturedParams = new ArrayList<CapturedParamInfo>();
+    private List<CapturedParamInfo> additionalCapturedParams = new ArrayList<CapturedParamInfo>();
 
     private int nextIndex = 0;
     private int nextCaptured = 0;
@@ -47,6 +48,13 @@ public class  ParametersBuilder {
 
     public CapturedParamInfo addCapturedParam(String fieldName, Type type, boolean skipped, @Nullable ParameterInfo original) {
         return addCapturedParameter(new CapturedParamInfo(fieldName, type, skipped, original != null ? original.getIndex() : -1, nextCaptured));
+    }
+
+    public CapturedParamInfo addAdditionalCapturedParam(String fieldName, Type type, boolean skipped, @Nullable ParameterInfo original) {
+        CapturedParamInfo capturedParamInfo =
+                new CapturedParamInfo(fieldName, type, skipped, original != null ? original.getIndex() : -1, nextCaptured);
+        additionalCapturedParams.add(capturedParamInfo);
+        return capturedParamInfo;
     }
 
     private void addParameter(ParameterInfo info) {
