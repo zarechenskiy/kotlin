@@ -18,6 +18,7 @@ package org.jetbrains.jet.codegen.asm;
 
 import org.jetbrains.asm4.Type;
 
+import java.util.List;
 import java.util.Map;
 
 public class ConstructorInvocation {
@@ -29,6 +30,8 @@ public class ConstructorInvocation {
     private Type newLambdaType;
 
     private String newConstructorDescriptor;
+
+    private List<CapturedParamInfo> recaptured;
 
     ConstructorInvocation(String ownerInternalName, Map<Integer, InlinableAccess> access) {
         this.ownerInternalName = ownerInternalName;
@@ -62,5 +65,13 @@ public class ConstructorInvocation {
 
     public void setNewConstructorDescriptor(String newConstructorDescriptor) {
         this.newConstructorDescriptor = newConstructorDescriptor;
+    }
+
+    public List<CapturedParamInfo> getRecaptured() {
+        return recaptured;
+    }
+
+    public void setRecaptured(List<CapturedParamInfo> recaptured) {
+        this.recaptured = recaptured;
     }
 }

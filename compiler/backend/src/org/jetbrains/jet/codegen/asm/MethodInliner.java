@@ -1,6 +1,7 @@
 package org.jetbrains.jet.codegen.asm;
 
 import com.intellij.util.ArrayUtil;
+import com.sun.org.apache.bcel.internal.generic.ILOAD;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.asm4.Label;
@@ -138,6 +139,12 @@ public class MethodInliner {
                 else if (isLambdaConstructorCall(owner, name)) { //TODO add method
                     ConstructorInvocation invocation = constructorInvocation.remove(0);
                     if (invocation.isInlinable()) {
+                        //put additional captured parameters on stack
+                        List<CapturedParamInfo> recaptured = invocation.getRecaptured();
+                        for (CapturedParamInfo capturedParamInfo : recaptured) {
+                            Type type = capturedParamInfo.getType();
+                            super.visitVarInsn(type.getOpcode(Opcodes.ILOAD), capturedParamInfo.getIndex());
+                        }
                         super.visitMethodInsn(opcode, invocation.getNewLambdaType().getInternalName(), name, invocation.getNewConstructorDescriptor());
                     } else {
                         super.visitMethodInsn(opcode, owner, name, desc);

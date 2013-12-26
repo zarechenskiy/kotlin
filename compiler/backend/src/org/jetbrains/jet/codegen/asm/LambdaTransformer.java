@@ -190,12 +190,16 @@ public class LambdaTransformer extends InlineTransformer {
             cur = cur.getNext();
         }
 
+        ArrayList recaptured = new ArrayList();
         for (LambdaInfo info : additionalCaptured) {
             List<CapturedParamInfo> vars = info.getCapturedVars();
             for (CapturedParamInfo var : vars) {
                 builder.addCapturedParam(var.getFieldName() + "$inlined", var.getType(), true, var);
+                recaptured.add(var);
             }
         }
+
+        invocation.setRecaptured(recaptured);
     }
 
     public MethodNode getMethodNode(ClassReader reader, final String methodName) {
