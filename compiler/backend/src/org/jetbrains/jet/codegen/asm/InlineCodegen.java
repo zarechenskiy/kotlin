@@ -68,6 +68,7 @@ public class InlineCodegen extends InlineTransformer implements ParentCodegenAwa
     private final GenerationState state;
 
     private final boolean disabled;
+    private Call call;
 
     private final SimpleFunctionDescriptor functionDescriptor;
 
@@ -88,13 +89,15 @@ public class InlineCodegen extends InlineTransformer implements ParentCodegenAwa
             boolean notSeparateInline,
             @NotNull GenerationState state,
             boolean disabled,
-            @NotNull SimpleFunctionDescriptor functionDescriptor
+            @NotNull SimpleFunctionDescriptor functionDescriptor,
+            @NotNull Call call
     ) {
         super(state);
         this.codegen = codegen;
         this.notSeparateInline = notSeparateInline;
         this.state = state;
         this.disabled = disabled;
+        this.call = call;
         this.functionDescriptor = functionDescriptor.getOriginal();
         bindingContext = codegen.getBindingContext();
         initialFrameSize = codegen.getFrameMap().getCurrentSize();
@@ -122,7 +125,7 @@ public class InlineCodegen extends InlineTransformer implements ParentCodegenAwa
                                        functionDescriptor.getName() +
                                        "' into \n" + BindingContextUtils.descriptorToDeclaration(bindingContext, codegen.getContext().getContextDescriptor()).getText() +
                                        "\ncause: " +
-                                       text, e, null);
+                                       text, e, call.getCallElement());
         }
     }
 

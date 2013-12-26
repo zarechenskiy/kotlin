@@ -2023,9 +2023,10 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
     ) {
         if (callable instanceof CallableMethod) {
             CallableMethod callableMethod = (CallableMethod) callable;
-            invokeMethodWithArguments(callableMethod, resolvedCall, receiver);
+            invokeMethodWithArguments(call, callableMethod, resolvedCall, receiver);
+            //noinspection ConstantConditions
             Type returnType = typeMapper.mapReturnType(resolvedCall.getResultingDescriptor());
-            StackValue.coerce(callableMethod.getReturnType(), returnType, v);
+            StackValue.coerce(callableMethod.getAsmMethod().getReturnType(), returnType, v);
             return StackValue.onStack(returnType);
         }
         else {
@@ -2099,16 +2100,18 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
 
 
     public void invokeMethodWithArguments(
+            @Nullable Call call,
             @NotNull CallableMethod callableMethod,
             @NotNull ResolvedCall<? extends CallableDescriptor> resolvedCall,
             @NotNull StackValue receiver
     ) {
         boolean disable = false;
         CallableDescriptor descriptor = resolvedCall.getResultingDescriptor();
-        boolean isInline = descriptor instanceof SimpleFunctionDescriptor && ((SimpleFunctionDescriptor) descriptor).isInline();
+        boolean isInline = call != null && descriptor instanceof SimpleFunctionDescriptor && ((SimpleFunctionDescriptor) descriptor).isInline();
         Inliner inliner = !isInline || tailRecursionCodegen.isTailRecursion(resolvedCall)
                           ? Inliner.NOT_INLINE
-                          : new InlineCodegen(this, true, state, disable, (SimpleFunctionDescriptor) callableMethod.getFunctionDescriptor());
+                          : new InlineCodegen(this, true, state, disable, (SimpleFunctionDescriptor) callableMethod.getFunctionDescriptor(),
+                                              call);
 
         if (resolvedCall instanceof VariableAsFunctionResolvedCall) {
             resolvedCall = ((VariableAsFunctionResolvedCall) resolvedCall).getFunctionCall();
@@ -3364,7 +3367,7 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
         ConstructorDescriptor originalOfSamAdapter = (ConstructorDescriptor) SamCodegenUtil.getOriginalIfSamAdapter(constructorDescriptor);
         CallableMethod method = typeMapper.mapToCallableMethod(originalOfSamAdapter == null ? constructorDescriptor : originalOfSamAdapter);
 
-        invokeMethodWithArguments(method, resolvedCall, StackValue.none());
+        invokeMethodWithArguments(null, method, resolvedCall, StackValue.none());
         return StackValue.onStack(type);
     }
 
