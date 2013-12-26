@@ -18,6 +18,7 @@ package org.jetbrains.jet.codegen.asm;
 
 import org.jetbrains.jet.codegen.state.GenerationState;
 import org.jetbrains.jet.lang.descriptors.FunctionDescriptor;
+import org.jetbrains.jet.lang.descriptors.DeclarationDescriptor;
 
 import java.util.List;
 import java.util.Map;
@@ -36,7 +37,7 @@ public class InliningInfo {
 
     public final NameGenerator nameGenerator;
 
-    public final FunctionDescriptor startFunction;
+    public final DeclarationDescriptor startFunction;
 
     public InliningInfo(
             Map<Integer, LambdaInfo> map,
@@ -45,7 +46,7 @@ public class InliningInfo {
             VarRemapper remapper,
             GenerationState state,
             NameGenerator nameGenerator,
-            FunctionDescriptor startFunction
+            DeclarationDescriptor startFunction
     ) {
         expresssionMap = map;
         inlinableAccesses = accesses;

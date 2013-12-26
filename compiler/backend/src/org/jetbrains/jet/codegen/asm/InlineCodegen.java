@@ -186,7 +186,7 @@ public class InlineCodegen extends InlineTransformer implements ParentCodegenAwa
         InliningInfo info =
                 new InliningInfo(expressionMap, null, null, null, state,
                                  new NameGenerator(fqName.toString().replace('.', '/') + "$" +codegen.getContext().getContextDescriptor().getName() + "$$inline"),
-                                 (FunctionDescriptor) codegen.getContext().getContextDescriptor());
+                                 codegen.getContext().getContextDescriptor());
         MethodInliner inliner = new MethodInliner(node, parameters, info, null, new LambdaFieldRemapper()); //with captured
 
         VarRemapper.ParamRemapper remapper = new VarRemapper.ParamRemapper(parameters, new VarRemapper.ShiftRemapper(initialFrameSize, null));
