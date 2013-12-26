@@ -2103,7 +2103,6 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
             @NotNull ResolvedCall<? extends CallableDescriptor> resolvedCall,
             @NotNull StackValue receiver
     ) {
-        //isInline = false;
         boolean disable = false;
         CallableDescriptor descriptor = resolvedCall.getResultingDescriptor();
         boolean isInline = descriptor instanceof SimpleFunctionDescriptor && ((SimpleFunctionDescriptor) descriptor).isInline();
@@ -2118,10 +2117,6 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
         if (!(descriptor instanceof ConstructorDescriptor)) { // otherwise already
             receiver = StackValue.receiver(resolvedCall, receiver, this, callableMethod);
             receiver.put(receiver.type, v);
-            //if (calleeType != null) {
-            //    StackValue.onStack(receiver.type).put(boxType(receiver.type), v);
-            //    inliner.putInLocal(boxType(receiver.type));
-            //}
         }
 
         if (hasDefaults(resolvedCall)) {
