@@ -20,10 +20,8 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.asm4.ClassReader;
-import org.jetbrains.asm4.ClassVisitor;
-import org.jetbrains.asm4.MethodVisitor;
-import org.jetbrains.asm4.Type;
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.asm4.*;
 import org.jetbrains.asm4.commons.Method;
 import org.jetbrains.asm4.tree.AbstractInsnNode;
 import org.jetbrains.asm4.tree.FieldInsnNode;
@@ -42,6 +40,7 @@ import org.jetbrains.jet.lang.resolve.name.FqName;
 import java.io.IOException;
 import java.util.*;
 
+import static org.jetbrains.asm4.Opcodes.ASM4;
 import static org.jetbrains.asm4.Opcodes.V1_6;
 
 public class LambdaTransformer {
@@ -53,6 +52,8 @@ public class LambdaTransformer {
     private final MethodNode constructor;
 
     private final MethodNode invoke;
+
+    private final MethodNode bridge;
 
     private final InliningInfo info;
 
@@ -92,8 +93,9 @@ public class LambdaTransformer {
             throw new RuntimeException(e);
         }
 
-        constructor = getMethodNode(reader, "<init>");
-        invoke = getMethodNode(reader, "invoke");
+        constructor = getMethodNode(reader, true, false);
+        invoke = getMethodNode(reader, false, false);
+        bridge = getMethodNode(reader, false, true);
     }
 
     private void buildInvokeParams(ParametersBuilder builder) {
@@ -126,6 +128,20 @@ public class LambdaTransformer {
         invokeVisitor.visitMaxs(-1, -1);
 
         generateConstructorAndFields(classBuilder, builder, invocation);
+
+        if (bridge != null) {
+            MethodVisitor invokeBridge = newMethod(classBuilder, bridge);
+            bridge.accept(new MethodVisitor(ASM4, invokeBridge) {
+                @Override
+                public void visitMethodInsn(int opcode, String owner, String name, String desc) {
+                    if (owner.equals(oldLambdaType.getInternalName())) {
+                        super.visitMethodInsn(opcode, newLambdaType.getInternalName(), name, desc);
+                    } else {
+                        super.visitMethodInsn(opcode, owner, name, desc);
+                    }
+                }
+            });
+        }
 
         classBuilder.done();
 
@@ -211,7 +227,8 @@ public class LambdaTransformer {
         invocation.setRecaptured(recaptured);
     }
 
-    public MethodNode getMethodNode(ClassReader reader, final String methodName) {
+    @Nullable
+    public MethodNode getMethodNode(@NotNull ClassReader reader, final boolean findConstructor, final boolean findBridge) {
         final MethodNode[] methodNode = new MethodNode[1];
         reader.accept(new ClassVisitor(InlineCodegenUtil.API) {
 
@@ -226,16 +243,17 @@ public class LambdaTransformer {
 
             @Override
             public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
-                if (methodName.equals(name)) {
-                    assert methodNode[0] == null;
+                boolean isConstructorMethod = "<init>".equals(name);
+                if (findConstructor && isConstructorMethod || (!findConstructor && !isConstructorMethod && ((access & Opcodes.ACC_BRIDGE) == (findBridge ? Opcodes.ACC_BRIDGE : 0)))) {
+                    assert methodNode[0] == null : "Wrong lambda/sam structure: " + methodNode[0].name + " conflicts with " + name;
                     return methodNode[0] = new MethodNode(access, name, desc, signature, exceptions);
                 }
                 return null;
             }
         }, ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
 
-        if (methodNode[0] == null) {
-            throw new RuntimeException("Couldn't find '" + methodName + "' method of lambda class " + oldLambdaType.getInternalName());
+        if (methodNode[0] == null && !findBridge) {
+            throw new RuntimeException("Couldn't find operation method of lambda/sam class " + oldLambdaType.getInternalName());
         }
 
         return methodNode[0];
