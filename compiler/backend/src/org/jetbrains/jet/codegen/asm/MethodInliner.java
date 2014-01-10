@@ -16,6 +16,7 @@ import org.jetbrains.jet.codegen.ClosureCodegen;
 import org.jetbrains.jet.codegen.StackValue;
 import org.jetbrains.jet.codegen.state.JetTypeMapper;
 import org.jetbrains.jet.lang.descriptors.ValueParameterDescriptor;
+import org.jetbrains.jet.lang.resolve.java.AsmTypeConstants;
 
 import java.util.*;
 
@@ -307,7 +308,11 @@ public class MethodInliner {
         Type[] types = Type.getArgumentTypes(desc);
 
         //add skipped this cause closure doesn't have it
-        result.add(ParameterInfo.STUB);
+        //result.add(ParameterInfo.STUB);
+        ParameterInfo thiz = new ParameterInfo(AsmTypeConstants.OBJECT_TYPE, true, -1, -1);
+        thiz.setLambda(info);
+
+        result.add(thiz);
         int index = 1;
 
         if (info != null) {
