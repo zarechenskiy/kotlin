@@ -187,7 +187,7 @@ public class InlineCodegen implements ParentCodegenAware, Inliner {
         FqName fqName = InlineCodegenUtil.getContainerFqName(codegen.getContext().getContextDescriptor());
         InliningInfo info =
                 new InliningInfo(expressionMap, null, null, null, state,
-                                 new NameGenerator(fqName.toString().replace('.', '/') + "$" +codegen.getContext().getContextDescriptor().getName() + "$$inline"),
+                                 codegen.getInlineNameGenerator().subGenerator(functionDescriptor.getName().asString()),
                                  codegen.getContext().getContextDescriptor());
         MethodInliner inliner = new MethodInliner(node, parameters, info, null, new LambdaFieldRemapper()); //with captured
 

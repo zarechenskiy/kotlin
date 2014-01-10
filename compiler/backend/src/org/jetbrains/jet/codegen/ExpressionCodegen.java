@@ -32,8 +32,7 @@ import org.jetbrains.asm4.MethodVisitor;
 import org.jetbrains.asm4.Type;
 import org.jetbrains.asm4.commons.InstructionAdapter;
 import org.jetbrains.asm4.commons.Method;
-import org.jetbrains.jet.codegen.asm.InlineCodegen;
-import org.jetbrains.jet.codegen.asm.Inliner;
+import org.jetbrains.jet.codegen.asm.*;
 import org.jetbrains.jet.codegen.binding.CalculatedClosure;
 import org.jetbrains.jet.codegen.binding.CodegenBinding;
 import org.jetbrains.jet.codegen.binding.MutableClosure;
@@ -59,6 +58,7 @@ import org.jetbrains.jet.lang.resolve.java.AsmTypeConstants;
 import org.jetbrains.jet.lang.resolve.java.JvmAbi;
 import org.jetbrains.jet.lang.resolve.java.descriptor.JavaClassDescriptor;
 import org.jetbrains.jet.lang.resolve.java.descriptor.SamConstructorDescriptor;
+import org.jetbrains.jet.lang.resolve.name.FqName;
 import org.jetbrains.jet.lang.resolve.name.Name;
 import org.jetbrains.jet.lang.resolve.scopes.receivers.*;
 import org.jetbrains.jet.lang.types.JetType;
@@ -104,6 +104,8 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
 
     @Nullable
     private final MemberCodegen parentCodegen;
+
+    private NameGenerator inlineNameGenerator;
 
     /*
      * When we create a temporary variable to hold some value not to compute it many times
@@ -3955,5 +3957,21 @@ The "returned" value of try expression with no finally is either the last expres
     @NotNull
     public MethodContext getContext() {
         return context;
+    }
+
+    public NameGenerator getInlineNameGenerator() {
+        if (inlineNameGenerator == null) {
+            CodegenContext context = getContext();
+            FqName fqName = InlineCodegenUtil.getContainerFqName(context.getContextDescriptor());
+
+            Name name = context.getContextDescriptor().getName();
+            while (name.isSpecial()) {
+                context = context.getParentContext();
+                name = context.getContextDescriptor().getName();
+            }
+
+            inlineNameGenerator = new NameGenerator(fqName.toString().replace('.', '/') + "$" + name + "$$inline");
+        }
+        return inlineNameGenerator;
     }
 }
