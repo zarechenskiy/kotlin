@@ -22,6 +22,8 @@ import org.jetbrains.asm4.tree.FieldInsnNode;
 import org.jetbrains.asm4.tree.MethodNode;
 import org.jetbrains.asm4.tree.VarInsnNode;
 
+import java.util.List;
+
 import static org.jetbrains.jet.codegen.asm.MethodInliner.getPreviousNoLabelNoLine;
 
 public class LambdaFieldRemapper {
@@ -41,6 +43,10 @@ public class LambdaFieldRemapper {
         node.instructions.remove(fieldInsnNode); //remove aload field
 
         return insn;
+    }
+
+    public List<CapturedParamInfo> markRecaptured(List<CapturedParamInfo> originalCaptured, LambdaInfo lambda) {
+        return originalCaptured;
     }
 
 }
