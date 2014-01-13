@@ -184,7 +184,7 @@ public class InlineCodegen implements ParentCodegenAware, Inliner {
         List<CapturedParamInfo> captured = getAllCaptured();
 
         Parameters parameters = new Parameters(realParams, Parameters.addStubs(captured, realParams.size()));
-        FqName fqName = InlineCodegenUtil.getContainerFqName(codegen.getContext().getContextDescriptor());
+
         InliningInfo info =
                 new InliningInfo(expressionMap, null, null, null, state,
                                  codegen.getInlineNameGenerator().subGenerator(functionDescriptor.getName().asString()),

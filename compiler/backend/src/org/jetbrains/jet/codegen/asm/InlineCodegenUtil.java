@@ -21,12 +21,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.asm4.ClassReader;
-import org.jetbrains.asm4.ClassVisitor;
-import org.jetbrains.asm4.MethodVisitor;
-import org.jetbrains.asm4.Opcodes;
+import org.jetbrains.asm4.*;
 import org.jetbrains.asm4.tree.MethodNode;
 import org.jetbrains.jet.codegen.state.GenerationState;
+import org.jetbrains.jet.codegen.state.JetTypeMapper;
 import org.jetbrains.jet.descriptors.serialization.JavaProtoBuf;
 import org.jetbrains.jet.descriptors.serialization.ProtoBuf;
 import org.jetbrains.jet.descriptors.serialization.descriptors.DeserializedSimpleFunctionDescriptor;
@@ -120,6 +118,25 @@ public class InlineCodegenUtil {
             return getFqName(containerDescriptor).toSafe();
         }
         return null;
+    }
+
+    public static String getInlineName(@NotNull DeclarationDescriptor referencedDescriptor, @NotNull JetTypeMapper typeMapper) {
+        ClassOrNamespaceDescriptor
+                containerDescriptor = DescriptorUtils.getParentOfType(referencedDescriptor, ClassOrNamespaceDescriptor.class, true);
+
+        if (containerDescriptor instanceof PackageFragmentDescriptor) {
+            return PackageClassUtils.getPackageClassFqName(getFqName(containerDescriptor).toSafe()).asString().replace('.', '/');
+        }
+        else if (containerDescriptor instanceof ClassifierDescriptor) {
+            Type type = typeMapper.mapType((ClassifierDescriptor) containerDescriptor);
+            return type.getInternalName();
+        }
+
+        assert containerDescriptor != null : "Wrong descriptor hierarchy " + referencedDescriptor;
+
+        String suffix = referencedDescriptor.getName().isSpecial() ? "" : referencedDescriptor.getName().asString();
+
+        return getInlineName(containerDescriptor, typeMapper) + "$" + suffix;
     }
 
     @Nullable
