@@ -82,7 +82,7 @@ public class LambdaTransformer {
             if (outputFile != null) {
                 reader = new ClassReader(outputFile.asByteArray());
             } else {
-                VirtualFile file = InlineCodegenUtil.findVirtualFile(state.getProject(), new FqName(lambdaInternalName), false);
+                VirtualFile file = InlineCodegenUtil.findVirtualFile(state.getProject(), new FqName(lambdaInternalName.replace('/', '.')), false);
                 if (file == null) {
                     throw new RuntimeException("Couldn't find virtual file for " + lambdaInternalName);
                 }
