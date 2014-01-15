@@ -76,6 +76,11 @@ public class CompileKotlinAgainstInlineKotlinTestGenerated extends AbstractCompi
         doBoxTest("compiler/testData/codegen/boxInline/inlineChain");
     }
     
+    @TestMetadata("localFunInLambda")
+    public void testLocalFunInLambda() throws Exception {
+        doBoxTest("compiler/testData/codegen/boxInline/localFunInLambda");
+    }
+    
     @TestMetadata("namespace")
     public void testNamespace() throws Exception {
         doBoxTest("compiler/testData/codegen/boxInline/namespace");
