@@ -16,6 +16,7 @@
 
 package org.jetbrains.jet.codegen.asm;
 
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.asm4.Opcodes;
 import org.jetbrains.asm4.Type;
 import org.jetbrains.asm4.tree.AbstractInsnNode;
@@ -23,7 +24,9 @@ import org.jetbrains.asm4.tree.FieldInsnNode;
 import org.jetbrains.asm4.tree.MethodNode;
 import org.jetbrains.asm4.tree.VarInsnNode;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import static org.jetbrains.jet.codegen.asm.MethodInliner.getPreviousNoLabelNoLine;
 
@@ -35,17 +38,22 @@ public class InlineFieldRemapper extends LambdaFieldRemapper {
 
     private final Parameters parameters;
 
-    public InlineFieldRemapper(String oldOwnerType, String newOwnerType, Parameters parameters) {
+    private Map<String, LambdaInfo> recapturedLambdas;
+
+    public InlineFieldRemapper(String oldOwnerType, String newOwnerType, Parameters parameters, Map<String, LambdaInfo> recapturedLambdas) {
         this.oldOwnerType = oldOwnerType;
         this.newOwnerType = newOwnerType;
         this.parameters = parameters;
+        this.recapturedLambdas = recapturedLambdas;
     }
 
     @Override
     public AbstractInsnNode doTransform(
             MethodNode node, FieldInsnNode fieldInsnNode, CapturedParamInfo capturedField
     ) {
-        if (capturedField.getLambda() != null) {
+        boolean isRecaptured = isRecapruredLambdaType(fieldInsnNode.owner);
+
+        if (!isRecaptured && capturedField.getLambda() != null) {
             //strict inlining
             return super.doTransform(node, fieldInsnNode, capturedField);
         }
@@ -66,7 +74,7 @@ public class InlineFieldRemapper extends LambdaFieldRemapper {
         node.instructions.remove(loadThis);
 
         fieldInsnNode.owner = newOwnerType;
-        fieldInsnNode.name = capturedField.getRecapturedFrom() != null ? LambdaTransformer.getNewFieldName(capturedField.getFieldName()) : capturedField.getFieldName();
+        fieldInsnNode.name = isRecaptured || capturedField.getRecapturedFrom() != null ? LambdaTransformer.getNewFieldName(capturedField.getFieldName()) : capturedField.getFieldName();
 
         return fieldInsnNode;
     }
@@ -83,5 +91,26 @@ public class InlineFieldRemapper extends LambdaFieldRemapper {
             }
         }
         return originalCaptured;
+    }
+
+    @Override
+    public boolean canProcess(String owner, String currentLambdaType) {
+        return super.canProcess(owner, currentLambdaType) || isRecapruredLambdaType(owner);
+    }
+
+    private boolean isRecapruredLambdaType(String owner) {
+        return recapturedLambdas.containsKey(owner);
+    }
+
+
+    @Nullable
+    @Override
+    public CapturedParamInfo findField(FieldInsnNode fieldInsnNode, Collection<CapturedParamInfo> captured) {
+        if (!isRecapruredLambdaType(fieldInsnNode.owner)) {
+            return super.findField(fieldInsnNode, captured);
+        } else {
+            LambdaInfo info = recapturedLambdas.get(fieldInsnNode.owner);
+            return super.findField(fieldInsnNode, info.getCapturedVars());
+        }
     }
 }
