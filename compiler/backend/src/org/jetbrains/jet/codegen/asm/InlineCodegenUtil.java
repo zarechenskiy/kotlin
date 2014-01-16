@@ -33,6 +33,7 @@ import org.jetbrains.jet.descriptors.serialization.descriptors.DeserializedSimpl
 import org.jetbrains.jet.lang.descriptors.*;
 import org.jetbrains.jet.lang.resolve.DescriptorUtils;
 import org.jetbrains.jet.lang.resolve.java.PackageClassUtils;
+import org.jetbrains.jet.lang.resolve.kotlin.ClassFileFinder;
 import org.jetbrains.jet.lang.resolve.kotlin.VirtualFileFinder;
 import org.jetbrains.jet.lang.resolve.name.FqName;
 import org.jetbrains.jet.lang.resolve.name.Name;
@@ -97,8 +98,8 @@ public class InlineCodegenUtil {
 
     @Nullable
     public static VirtualFile findVirtualFile(@NotNull Project project, @NotNull FqName containerFqName) {
-        VirtualFileFinder fileFinder = ServiceManager.getService(project, VirtualFileFinder.class);
-        return fileFinder.find(containerFqName);
+        ClassFileFinder fileFinder = ServiceManager.getService(project, ClassFileFinder.class);
+        return fileFinder.find(containerFqName.asString().replace('.', '/'));
     }
 
     //TODO: navigate to inner classes
