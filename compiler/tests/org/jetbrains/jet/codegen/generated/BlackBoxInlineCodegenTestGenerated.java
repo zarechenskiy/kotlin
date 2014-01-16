@@ -76,6 +76,11 @@ public class BlackBoxInlineCodegenTestGenerated extends AbstractBlackBoxCodegenT
         doTestMultiFile("compiler/testData/codegen/boxInline/inlineChain");
     }
     
+    @TestMetadata("lambdaClassClash")
+    public void testLambdaClassClash() throws Exception {
+        doTestMultiFile("compiler/testData/codegen/boxInline/lambdaClassClash");
+    }
+    
     @TestMetadata("localFunInLambda")
     public void testLocalFunInLambda() throws Exception {
         doTestMultiFile("compiler/testData/codegen/boxInline/localFunInLambda");
