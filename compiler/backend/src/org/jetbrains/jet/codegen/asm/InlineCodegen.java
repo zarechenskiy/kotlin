@@ -124,9 +124,10 @@ public class InlineCodegen implements ParentCodegenAware, Inliner {
         }
         catch (Exception e) {
             String text = getNodeText(node);
+            PsiElement element = BindingContextUtils.descriptorToDeclaration(bindingContext, codegen.getContext().getContextDescriptor());
             throw new CompilationException("Couldn't inline method call '" +
                                        functionDescriptor.getName() +
-                                       "' into \n" + BindingContextUtils.descriptorToDeclaration(bindingContext, codegen.getContext().getContextDescriptor()).getText() +
+                                       "' into \n" + (element != null ? element.getText() : "null psi element " + codegen.getContext().getContextDescriptor()) +
                                        "\ncause: " +
                                        text, e, call.getCallElement());
         }
