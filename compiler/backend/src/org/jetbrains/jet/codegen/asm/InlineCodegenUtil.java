@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.asm4.*;
 import org.jetbrains.asm4.tree.MethodNode;
+import org.jetbrains.jet.codegen.binding.CodegenBinding;
 import org.jetbrains.jet.codegen.state.GenerationState;
 import org.jetbrains.jet.codegen.state.JetTypeMapper;
 import org.jetbrains.jet.descriptors.serialization.JavaProtoBuf;
@@ -124,28 +125,36 @@ public class InlineCodegenUtil {
     }
 
     public static String getInlineName(@NotNull DeclarationDescriptor referencedDescriptor, @NotNull JetTypeMapper typeMapper) {
-        ClassOrNamespaceDescriptor
-                containerDescriptor = DescriptorUtils.getParentOfType(referencedDescriptor, ClassOrNamespaceDescriptor.class, true);
+        return getInlineName(referencedDescriptor, referencedDescriptor, typeMapper);
+    }
 
-        if (containerDescriptor instanceof PackageFragmentDescriptor) {
+    private static String getInlineName(@NotNull DeclarationDescriptor referencedDescriptor, @NotNull DeclarationDescriptor currentDescriptor, @NotNull JetTypeMapper typeMapper) {
+        if (currentDescriptor instanceof PackageFragmentDescriptor) {
             PsiElement psiElement = BindingContextUtils.descriptorToDeclaration(typeMapper.getBindingContext(), referencedDescriptor);
 
             Type packageFragmentType =
-                    getNamespacePartType(PackageClassUtils.getPackageClassFqName(getFqName(containerDescriptor).toSafe()),
+                    getNamespacePartType(PackageClassUtils.getPackageClassFqName(getFqName(currentDescriptor).toSafe()),
                                          psiElement.getContainingFile().getVirtualFile());
 
             return packageFragmentType.getInternalName().replace('.', '/');
         }
-        else if (containerDescriptor instanceof ClassifierDescriptor) {
-            Type type = typeMapper.mapType((ClassifierDescriptor) containerDescriptor);
+        else if (currentDescriptor instanceof ClassifierDescriptor) {
+            Type type = typeMapper.mapType((ClassifierDescriptor) currentDescriptor);
             return type.getInternalName();
+        } else if (currentDescriptor instanceof FunctionDescriptor) {
+            ClassDescriptor descriptor =
+                    typeMapper.getBindingContext().get(CodegenBinding.CLASS_FOR_FUNCTION, (FunctionDescriptor) currentDescriptor);
+            if (descriptor != null) {
+                Type type = typeMapper.mapType(descriptor);
+                return type.getInternalName();
+            }
         }
 
-        assert containerDescriptor != null : "Wrong descriptor hierarchy " + referencedDescriptor;
+        assert currentDescriptor != null : "Wrong descriptor hierarchy " + currentDescriptor;
 
-        String suffix = referencedDescriptor.getName().isSpecial() ? "" : referencedDescriptor.getName().asString();
+        String suffix = currentDescriptor.getName().isSpecial() ? "" : currentDescriptor.getName().asString();
 
-        return getInlineName(containerDescriptor, typeMapper) + "$" + suffix;
+        return getInlineName(referencedDescriptor, currentDescriptor.getContainingDeclaration(), typeMapper) + "$" + suffix;
     }
 
     @Nullable
