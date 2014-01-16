@@ -19,6 +19,7 @@ package org.jetbrains.jet.codegen.asm;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.asm4.*;
@@ -29,6 +30,7 @@ import org.jetbrains.jet.descriptors.serialization.JavaProtoBuf;
 import org.jetbrains.jet.descriptors.serialization.ProtoBuf;
 import org.jetbrains.jet.descriptors.serialization.descriptors.DeserializedSimpleFunctionDescriptor;
 import org.jetbrains.jet.lang.descriptors.*;
+import org.jetbrains.jet.lang.resolve.BindingContextUtils;
 import org.jetbrains.jet.lang.resolve.DescriptorUtils;
 import org.jetbrains.jet.lang.resolve.java.PackageClassUtils;
 import org.jetbrains.jet.lang.resolve.kotlin.ClassFileFinder;
@@ -39,6 +41,7 @@ import org.jetbrains.jet.lang.resolve.name.Name;
 import java.io.IOException;
 import java.io.InputStream;
 
+import static org.jetbrains.jet.codegen.NamespaceCodegen.getNamespacePartType;
 import static org.jetbrains.jet.lang.resolve.DescriptorUtils.getFqName;
 
 public class InlineCodegenUtil {
@@ -125,7 +128,13 @@ public class InlineCodegenUtil {
                 containerDescriptor = DescriptorUtils.getParentOfType(referencedDescriptor, ClassOrNamespaceDescriptor.class, true);
 
         if (containerDescriptor instanceof PackageFragmentDescriptor) {
-            return PackageClassUtils.getPackageClassFqName(getFqName(containerDescriptor).toSafe()).asString().replace('.', '/');
+            PsiElement psiElement = BindingContextUtils.descriptorToDeclaration(typeMapper.getBindingContext(), referencedDescriptor);
+
+            Type packageFragmentType =
+                    getNamespacePartType(PackageClassUtils.getPackageClassFqName(getFqName(containerDescriptor).toSafe()),
+                                         psiElement.getContainingFile().getVirtualFile());
+
+            return packageFragmentType.getInternalName().replace('.', '/');
         }
         else if (containerDescriptor instanceof ClassifierDescriptor) {
             Type type = typeMapper.mapType((ClassifierDescriptor) containerDescriptor);
