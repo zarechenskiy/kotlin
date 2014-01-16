@@ -38,6 +38,7 @@ import org.jetbrains.jet.lang.resolve.kotlin.ClassFileFinder;
 import org.jetbrains.jet.lang.resolve.kotlin.VirtualFileFinder;
 import org.jetbrains.jet.lang.resolve.name.FqName;
 import org.jetbrains.jet.lang.resolve.name.Name;
+import org.jetbrains.jet.renderer.DescriptorRenderer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -102,8 +103,13 @@ public class InlineCodegenUtil {
 
     @Nullable
     public static VirtualFile findVirtualFile(@NotNull Project project, @NotNull FqName containerFqName, boolean onlyKotlin) {
-        ClassFileFinder fileFinder = ServiceManager.getService(project, ClassFileFinder.class);
-        return fileFinder.find(containerFqName.asString().replace('.', '/'));
+        if (onlyKotlin) {
+            VirtualFileFinder fileFinder = ServiceManager.getService(project, VirtualFileFinder.class);
+            return fileFinder.find(containerFqName);
+        } else {
+            ClassFileFinder fileFinder = ServiceManager.getService(project, ClassFileFinder.class);
+            return fileFinder.find(containerFqName.asString().replace('.', '/'));
+        }
     }
 
     //TODO: navigate to inner classes
@@ -130,14 +136,19 @@ public class InlineCodegenUtil {
 
     private static String getInlineName(@NotNull DeclarationDescriptor referencedDescriptor, @NotNull DeclarationDescriptor currentDescriptor, @NotNull JetTypeMapper typeMapper) {
         if (currentDescriptor instanceof PackageFragmentDescriptor) {
-            //PsiElement psiElement = BindingContextUtils.descriptorToDeclaration(typeMapper.getBindingContext(), referencedDescriptor);
-            //
-            //Type packageFragmentType =
-            //        getNamespacePartType(PackageClassUtils.getPackageClassFqName(getFqName(currentDescriptor).toSafe()),
-            //                             psiElement.getContainingFile().getVirtualFile());
-            //
-            //return packageFragmentType.getInternalName().replace('.', '/');
-            return PackageClassUtils.getPackageClassFqName(getFqName(referencedDescriptor).toSafe()).asString().replace('.', '/');
+            PsiElement psiElement = BindingContextUtils.descriptorToDeclaration(typeMapper.getBindingContext(), referencedDescriptor);
+            if (psiElement == null) {
+                psiElement = BindingContextUtils.descriptorToDeclaration(typeMapper.getBindingContext(), referencedDescriptor.getContainingDeclaration());
+                if (psiElement == null) {
+                    throw new RuntimeException("Couldn't find declaration for " + referencedDescriptor.getContainingDeclaration().getName() + "." + referencedDescriptor.getName() );
+                }
+            }
+
+            Type packageFragmentType =
+                    getNamespacePartType(PackageClassUtils.getPackageClassFqName(getFqName(currentDescriptor).toSafe()),
+                                         psiElement.getContainingFile().getVirtualFile());
+
+            return packageFragmentType.getInternalName().replace('.', '/');
         }
         else if (currentDescriptor instanceof ClassifierDescriptor) {
             Type type = typeMapper.mapType((ClassifierDescriptor) currentDescriptor);
