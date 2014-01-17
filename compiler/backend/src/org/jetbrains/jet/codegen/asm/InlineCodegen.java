@@ -107,7 +107,7 @@ public class InlineCodegen implements ParentCodegenAware, Inliner {
 
         context = (MethodContext) getContext(functionDescriptor, state);
         originalFunctionFrame = context.prepareFrame(typeMapper);
-        jvmSignature = typeMapper.mapSignature(functionDescriptor, true, context.getContextKind());
+        jvmSignature = typeMapper.mapSignature(functionDescriptor, context.getContextKind());
     }
 
 
@@ -140,7 +140,7 @@ public class InlineCodegen implements ParentCodegenAware, Inliner {
         if (functionDescriptor instanceof DeserializedSimpleFunctionDescriptor) {
             VirtualFile file = InlineCodegenUtil.getVirtualFileForCallable((DeserializedSimpleFunctionDescriptor) functionDescriptor, state);
             node = InlineCodegenUtil.getMethodNode(file.getInputStream(), functionDescriptor.getName().asString(),
-                                 callableMethod.getSignature().getAsmMethod().getDescriptor());
+                                 callableMethod.getAsmMethod().getDescriptor());
 
             if (node == null) {
                 throw new RuntimeException("Couldn't obtain compiled function body for " + descriptorName(functionDescriptor));
@@ -153,7 +153,7 @@ public class InlineCodegen implements ParentCodegenAware, Inliner {
                 throw new RuntimeException("Couldn't find declaration for function " + descriptorName(functionDescriptor));
             }
 
-            JvmMethodSignature jvmSignature = typeMapper.mapSignature(functionDescriptor, true, context.getContextKind());
+            JvmMethodSignature jvmSignature = typeMapper.mapSignature(functionDescriptor, context.getContextKind());
             Method asmMethod = jvmSignature.getAsmMethod();
             node = new MethodNode(Opcodes.ASM4,
                                            getMethodAsmFlags(functionDescriptor, context.getContextKind()),
@@ -299,7 +299,7 @@ public class InlineCodegen implements ParentCodegenAware, Inliner {
 
     @Override
     public void putHiddenParams() {
-        List<JvmMethodParameterSignature> types = jvmSignature.getKotlinParameterTypes();
+        List<JvmMethodParameterSignature> types = jvmSignature.getValueParameters();
 
         if (!isStaticMethod(functionDescriptor, context)) {
             Type type = AsmTypeConstants.OBJECT_TYPE;
