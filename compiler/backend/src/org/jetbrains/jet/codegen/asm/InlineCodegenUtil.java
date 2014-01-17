@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.asm4.*;
 import org.jetbrains.asm4.tree.MethodNode;
+import org.jetbrains.jet.codegen.PackageCodegen;
 import org.jetbrains.jet.codegen.binding.CodegenBinding;
 import org.jetbrains.jet.codegen.state.GenerationState;
 import org.jetbrains.jet.codegen.state.JetTypeMapper;
@@ -38,12 +39,10 @@ import org.jetbrains.jet.lang.resolve.kotlin.ClassFileFinder;
 import org.jetbrains.jet.lang.resolve.kotlin.VirtualFileFinder;
 import org.jetbrains.jet.lang.resolve.name.FqName;
 import org.jetbrains.jet.lang.resolve.name.Name;
-import org.jetbrains.jet.renderer.DescriptorRenderer;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-import static org.jetbrains.jet.codegen.NamespaceCodegen.getNamespacePartType;
 import static org.jetbrains.jet.lang.resolve.DescriptorUtils.getFqName;
 
 public class InlineCodegenUtil {
@@ -105,7 +104,7 @@ public class InlineCodegenUtil {
     public static VirtualFile findVirtualFile(@NotNull Project project, @NotNull FqName containerFqName, boolean onlyKotlin) {
         if (onlyKotlin) {
             VirtualFileFinder fileFinder = ServiceManager.getService(project, VirtualFileFinder.class);
-            return fileFinder.find(containerFqName);
+            return fileFinder.findVirtualFile(containerFqName);
         } else {
             ClassFileFinder fileFinder = ServiceManager.getService(project, ClassFileFinder.class);
             return fileFinder.find(containerFqName.asString().replace('.', '/'));
@@ -115,8 +114,8 @@ public class InlineCodegenUtil {
     //TODO: navigate to inner classes
     @Nullable
     public static FqName getContainerFqName(@NotNull DeclarationDescriptor referencedDescriptor) {
-        ClassOrNamespaceDescriptor
-                containerDescriptor = DescriptorUtils.getParentOfType(referencedDescriptor, ClassOrNamespaceDescriptor.class, false);
+        ClassOrPackageFragmentDescriptor
+                containerDescriptor = DescriptorUtils.getParentOfType(referencedDescriptor, ClassOrPackageFragmentDescriptor.class, false);
         if (containerDescriptor instanceof PackageFragmentDescriptor) {
             return PackageClassUtils.getPackageClassFqName(getFqName(containerDescriptor).toSafe());
         }
@@ -145,7 +144,7 @@ public class InlineCodegenUtil {
             }
 
             Type packageFragmentType =
-                    getNamespacePartType(PackageClassUtils.getPackageClassFqName(getFqName(currentDescriptor).toSafe()),
+                    PackageCodegen.getPackagePartType(PackageClassUtils.getPackageClassFqName(getFqName(currentDescriptor).toSafe()),
                                          psiElement.getContainingFile().getVirtualFile());
 
             return packageFragmentType.getInternalName().replace('.', '/');
