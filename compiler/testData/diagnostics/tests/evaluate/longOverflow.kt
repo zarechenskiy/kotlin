@@ -21,3 +21,47 @@ val l14: Long = <!INTEGER_OVERFLOW!>longMinValue * 2<!>
 val l15: Long = <!INTEGER_OVERFLOW!>longMaxValue * -2<!>
 val l16: Long = intMinValue.toLong() * -1
 val l19: Long = <!INTEGER_OVERFLOW!>longMinValue / -1<!>
+
+fun foo() {
+    val l1: Long = <!INTEGER_OVERFLOW!>longMaxValue + 1<!>
+    val l2: Long = <!INTEGER_OVERFLOW!>longMaxValue - 1 + 2<!>
+    val l3: Long = <!INTEGER_OVERFLOW!>longMaxValue - longMinValue<!>
+    val l4: Long = <!INTEGER_OVERFLOW!>-longMinValue<!>
+    val l5: Long = <!INTEGER_OVERFLOW!>longMinValue - 1<!>
+    val l6: Long = <!INTEGER_OVERFLOW!>longMinValue - longMaxValue<!>
+    val l7: Long = longMinValue + longMaxValue
+    val l8: Long = -longMaxValue
+    val l10: Long = -intMinValue.toLong()
+    val l11: Long = -1 + intMinValue.toLong()
+    val l12: Long = <!INTEGER_OVERFLOW!>longMinValue * intMinValue<!>
+    val l13: Long = <!INTEGER_OVERFLOW!>longMinValue * -1<!>
+    val l14: Long = <!INTEGER_OVERFLOW!>longMinValue * 2<!>
+    val l15: Long = <!INTEGER_OVERFLOW!>longMaxValue * -2<!>
+    val l16: Long = intMinValue.toLong() * -1
+    val l19: Long = <!INTEGER_OVERFLOW!>longMinValue / -1<!>
+
+    val <!UNUSED_VARIABLE!>a<!> = "$l1$l2$l3$l4$l5$l6$l7$l8$l10$l11$l12$l13$l14$l14$l15$l16$l19"
+}
+
+class A {
+    fun foo() {
+        val l1: Long = <!INTEGER_OVERFLOW!>longMaxValue + 1<!>
+        val l2: Long = <!INTEGER_OVERFLOW!>longMaxValue - 1 + 2<!>
+        val l3: Long = <!INTEGER_OVERFLOW!>longMaxValue - longMinValue<!>
+        val l4: Long = <!INTEGER_OVERFLOW!>-longMinValue<!>
+        val l5: Long = <!INTEGER_OVERFLOW!>longMinValue - 1<!>
+        val l6: Long = <!INTEGER_OVERFLOW!>longMinValue - longMaxValue<!>
+        val l7: Long = longMinValue + longMaxValue
+        val l8: Long = -longMaxValue
+        val l10: Long = -intMinValue.toLong()
+        val l11: Long = -1 + intMinValue.toLong()
+        val l12: Long = <!INTEGER_OVERFLOW!>longMinValue * intMinValue<!>
+        val l13: Long = <!INTEGER_OVERFLOW!>longMinValue * -1<!>
+        val l14: Long = <!INTEGER_OVERFLOW!>longMinValue * 2<!>
+        val l15: Long = <!INTEGER_OVERFLOW!>longMaxValue * -2<!>
+        val l16: Long = intMinValue.toLong() * -1
+        val l19: Long = <!INTEGER_OVERFLOW!>longMinValue / -1<!>
+
+        val <!UNUSED_VARIABLE!>a<!> = "$l1$l2$l3$l4$l5$l6$l7$l8$l10$l11$l12$l13$l14$l14$l15$l16$l19"
+    }
+}
