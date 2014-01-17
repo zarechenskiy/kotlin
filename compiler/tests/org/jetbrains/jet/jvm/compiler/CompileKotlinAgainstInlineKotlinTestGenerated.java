@@ -101,6 +101,11 @@ public class CompileKotlinAgainstInlineKotlinTestGenerated extends AbstractCompi
         doBoxTest("compiler/testData/codegen/boxInline/params");
     }
     
+    @TestMetadata("rootConstructor")
+    public void testRootConstructor() throws Exception {
+        doBoxTest("compiler/testData/codegen/boxInline/rootConstructor");
+    }
+    
     @TestMetadata("severalClosures")
     public void testSeveralClosures() throws Exception {
         doBoxTest("compiler/testData/codegen/boxInline/severalClosures");
