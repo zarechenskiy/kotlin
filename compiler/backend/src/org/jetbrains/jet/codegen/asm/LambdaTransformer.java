@@ -255,7 +255,7 @@ public class LambdaTransformer {
         }, ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
 
         if (methodNode[0] == null && !findBridge) {
-            throw new RuntimeException("Couldn't find operation method of lambda/sam class " + oldLambdaType.getInternalName());
+            throw new RuntimeException("Couldn't find operation method of lambda/sam class " + oldLambdaType.getInternalName() + ": findConstructor = " + findConstructor);
         }
 
         return methodNode[0];
