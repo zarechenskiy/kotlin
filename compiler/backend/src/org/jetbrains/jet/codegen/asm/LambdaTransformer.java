@@ -173,10 +173,7 @@ public class LambdaTransformer {
     }
 
     private ClassBuilder createClassBuilder() {
-        PsiElement element = BindingContextUtils.descriptorToDeclaration(state.getBindingContext(), info.startFunction);
-        assert element != null : "Couldn't find declaration for " + info.startFunction;
-
-        return state.getFactory().forLambdaInlining(newLambdaType, element.getContainingFile());
+        return state.getFactory().forLambdaInlining(newLambdaType, info.call.getCalleeExpression().getContainingFile());
     }
 
     private MethodVisitor newMethod(ClassBuilder builder, MethodNode original) {
