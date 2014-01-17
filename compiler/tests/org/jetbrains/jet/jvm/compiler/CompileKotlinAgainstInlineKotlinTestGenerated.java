@@ -71,6 +71,11 @@ public class CompileKotlinAgainstInlineKotlinTestGenerated extends AbstractCompi
         doBoxTest("compiler/testData/codegen/boxInline/extension");
     }
     
+    @TestMetadata("forEachLine")
+    public void testForEachLine() throws Exception {
+        doBoxTest("compiler/testData/codegen/boxInline/forEachLine");
+    }
+    
     @TestMetadata("inlineChain")
     public void testInlineChain() throws Exception {
         doBoxTest("compiler/testData/codegen/boxInline/inlineChain");

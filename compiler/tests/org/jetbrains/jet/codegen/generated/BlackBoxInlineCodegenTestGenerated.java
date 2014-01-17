@@ -71,6 +71,11 @@ public class BlackBoxInlineCodegenTestGenerated extends AbstractBlackBoxCodegenT
         doTestMultiFile("compiler/testData/codegen/boxInline/extension");
     }
     
+    @TestMetadata("forEachLine")
+    public void testForEachLine() throws Exception {
+        doTestMultiFile("compiler/testData/codegen/boxInline/forEachLine");
+    }
+    
     @TestMetadata("inlineChain")
     public void testInlineChain() throws Exception {
         doTestMultiFile("compiler/testData/codegen/boxInline/inlineChain");
