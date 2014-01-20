@@ -26,6 +26,8 @@ import org.jetbrains.jet.descriptors.serialization.descriptors.AnnotationDeseria
 import org.jetbrains.jet.lang.descriptors.*;
 import org.jetbrains.jet.lang.descriptors.annotations.AnnotationDescriptor;
 import org.jetbrains.jet.lang.descriptors.annotations.AnnotationDescriptorImpl;
+import org.jetbrains.jet.lang.descriptors.annotations.Annotations;
+import org.jetbrains.jet.lang.descriptors.annotations.AnnotationsImpl;
 import org.jetbrains.jet.lang.resolve.DescriptorUtils;
 import org.jetbrains.jet.lang.resolve.constants.CompileTimeConstant;
 import org.jetbrains.jet.lang.resolve.constants.EnumValue;
@@ -34,12 +36,15 @@ import org.jetbrains.jet.lang.resolve.java.JavaDescriptorResolver;
 import org.jetbrains.jet.lang.resolve.java.JvmAnnotationNames;
 import org.jetbrains.jet.lang.resolve.java.JvmClassName;
 import org.jetbrains.jet.lang.resolve.java.PackageClassUtils;
-import org.jetbrains.jet.lang.resolve.java.resolver.*;
+import org.jetbrains.jet.lang.resolve.java.resolver.DescriptorResolverUtils;
+import org.jetbrains.jet.lang.resolve.java.resolver.ErrorReporter;
+import org.jetbrains.jet.lang.resolve.java.resolver.JavaAnnotationArgumentResolver;
+import org.jetbrains.jet.lang.resolve.java.resolver.JavaAnnotationResolver;
 import org.jetbrains.jet.lang.resolve.name.FqName;
 import org.jetbrains.jet.lang.resolve.name.Name;
 import org.jetbrains.jet.lang.types.ErrorUtils;
-import org.jetbrains.jet.storage.LockBasedStorageManager;
 import org.jetbrains.jet.storage.MemoizedFunctionToNotNull;
+import org.jetbrains.jet.storage.StorageManager;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -56,25 +61,25 @@ public class AnnotationDescriptorDeserializer implements AnnotationDeserializer 
     private KotlinClassFinder kotlinClassFinder;
     private ErrorReporter errorReporter;
 
-    // TODO: a single instance of StorageManager for all computations in resolve-java
-    private final LockBasedStorageManager storageManager = new LockBasedStorageManager();
+    private final MemoizedFunctionToNotNull<KotlinJvmBinaryClass, Map<MemberSignature, List<AnnotationDescriptor>>> memberAnnotations;
 
-    private final MemoizedFunctionToNotNull<KotlinJvmBinaryClass, Map<MemberSignature, List<AnnotationDescriptor>>> memberAnnotations =
-            storageManager.createMemoizedFunction(
-                    new Function1<KotlinJvmBinaryClass, Map<MemberSignature, List<AnnotationDescriptor>>>() {
-                        @NotNull
-                        @Override
-                        public Map<MemberSignature, List<AnnotationDescriptor>> invoke(@NotNull KotlinJvmBinaryClass kotlinClass) {
-                            try {
-                                return loadMemberAnnotationsFromClass(kotlinClass);
-                            }
-                            catch (IOException e) {
-                                errorReporter.reportAnnotationLoadingError(
-                                        "Error loading member annotations from Kotlin class: " + kotlinClass, e);
-                                return Collections.emptyMap();
-                            }
+    public AnnotationDescriptorDeserializer(@NotNull StorageManager storageManager) {
+        this.memberAnnotations = storageManager.createMemoizedFunction(
+                new Function1<KotlinJvmBinaryClass, Map<MemberSignature, List<AnnotationDescriptor>>>() {
+                    @NotNull
+                    @Override
+                    public Map<MemberSignature, List<AnnotationDescriptor>> invoke(@NotNull KotlinJvmBinaryClass kotlinClass) {
+                        try {
+                            return loadMemberAnnotationsFromClass(kotlinClass);
                         }
-                    });
+                        catch (IOException e) {
+                            errorReporter.reportAnnotationLoadingError(
+                                    "Error loading member annotations from Kotlin class: " + kotlinClass, e);
+                            return Collections.emptyMap();
+                        }
+                    }
+                });
+    }
 
     @Inject
     public void setJavaDescriptorResolver(JavaDescriptorResolver javaDescriptorResolver) {
@@ -93,20 +98,20 @@ public class AnnotationDescriptorDeserializer implements AnnotationDeserializer 
 
     @NotNull
     @Override
-    public List<AnnotationDescriptor> loadClassAnnotations(@NotNull ClassDescriptor descriptor, @NotNull ProtoBuf.Class classProto) {
+    public Annotations loadClassAnnotations(@NotNull ClassDescriptor descriptor, @NotNull ProtoBuf.Class classProto) {
         KotlinJvmBinaryClass kotlinClass = findKotlinClassByDescriptor(descriptor);
         if (kotlinClass == null) {
             // This means that the resource we're constructing the descriptor from is no longer present: KotlinClassFinder had found the
             // class earlier, but it can't now
             errorReporter.reportAnnotationLoadingError("Kotlin class for loading class annotations is not found: " + descriptor, null);
-            return Collections.emptyList();
+            return Annotations.EMPTY;
         }
         try {
             return loadClassAnnotationsFromClass(kotlinClass);
         }
         catch (IOException e) {
             errorReporter.reportAnnotationLoadingError("Error loading member annotations from Kotlin class: " + kotlinClass, e);
-            return Collections.emptyList();
+            return Annotations.EMPTY;
         }
     }
 
@@ -125,7 +130,7 @@ public class AnnotationDescriptorDeserializer implements AnnotationDeserializer 
     }
 
     @NotNull
-    private List<AnnotationDescriptor> loadClassAnnotationsFromClass(@NotNull KotlinJvmBinaryClass kotlinClass) throws IOException {
+    private Annotations loadClassAnnotationsFromClass(@NotNull KotlinJvmBinaryClass kotlinClass) throws IOException {
         final List<AnnotationDescriptor> result = new ArrayList<AnnotationDescriptor>();
 
         kotlinClass.loadClassAnnotations(new KotlinJvmBinaryClass.AnnotationVisitor() {
@@ -140,7 +145,7 @@ public class AnnotationDescriptorDeserializer implements AnnotationDeserializer 
             }
         });
 
-        return result;
+        return new AnnotationsImpl(result);
     }
 
     private static boolean ignoreAnnotation(@NotNull JvmClassName className) {
@@ -218,20 +223,20 @@ public class AnnotationDescriptorDeserializer implements AnnotationDeserializer 
 
     @NotNull
     @Override
-    public List<AnnotationDescriptor> loadCallableAnnotations(
+    public Annotations loadCallableAnnotations(
             @NotNull ClassOrPackageFragmentDescriptor container,
             @NotNull ProtoBuf.Callable proto,
             @NotNull NameResolver nameResolver,
             @NotNull AnnotatedCallableKind kind
     ) {
         MemberSignature signature = getCallableSignature(proto, nameResolver, kind);
-        if (signature == null) return Collections.emptyList();
+        if (signature == null) return Annotations.EMPTY;
 
         return findClassAndLoadMemberAnnotations(container, proto, nameResolver, kind, signature);
     }
 
     @NotNull
-    private List<AnnotationDescriptor> findClassAndLoadMemberAnnotations(
+    private Annotations findClassAndLoadMemberAnnotations(
             @NotNull ClassOrPackageFragmentDescriptor container,
             @NotNull ProtoBuf.Callable proto,
             @NotNull NameResolver nameResolver,
@@ -241,11 +246,11 @@ public class AnnotationDescriptorDeserializer implements AnnotationDeserializer 
         KotlinJvmBinaryClass kotlinClass = findClassWithMemberAnnotations(container, proto, nameResolver, kind);
         if (kotlinClass == null) {
             errorReporter.reportAnnotationLoadingError("Kotlin class for loading member annotations is not found: " + container, null);
-            return Collections.emptyList();
+            return Annotations.EMPTY;
         }
 
-        List<AnnotationDescriptor> annotations = memberAnnotations.invoke(kotlinClass).get(signature);
-        return annotations == null ? Collections.<AnnotationDescriptor>emptyList() : annotations;
+        Annotations annotations = new AnnotationsImpl(memberAnnotations.invoke(kotlinClass).get(signature));
+        return annotations == null ? Annotations.EMPTY : annotations;
     }
 
     @Nullable
@@ -497,7 +502,7 @@ public class AnnotationDescriptorDeserializer implements AnnotationDeserializer 
 
     @NotNull
     @Override
-    public List<AnnotationDescriptor> loadValueParameterAnnotations(
+    public Annotations loadValueParameterAnnotations(
             @NotNull ClassOrPackageFragmentDescriptor container,
             @NotNull ProtoBuf.Callable callable,
             @NotNull NameResolver nameResolver,
@@ -513,6 +518,6 @@ public class AnnotationDescriptorDeserializer implements AnnotationDeserializer 
             }
         }
 
-        return Collections.emptyList();
+        return Annotations.EMPTY;
     }
 }
