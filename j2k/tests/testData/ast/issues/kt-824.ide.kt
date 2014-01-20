@@ -23,10 +23,8 @@ class Test() {
         while (One.myContainer.myBoolean)
             System.out.println("Ok")
 
-        do
-        {
+        do {
             System.out.println("Ok")
-        }
-        while (One.myContainer.myBoolean)
+        } while (One.myContainer.myBoolean)
     }
 }
