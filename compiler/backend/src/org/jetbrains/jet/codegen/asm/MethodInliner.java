@@ -340,7 +340,7 @@ public class MethodInliner {
             for (ValueParameterDescriptor parameter : valueParameters) {
                 Type type = typeMapper.mapType(parameter.getType());
                 int paramIndex = index++;
-                result.add(new ParameterInfo(type, false, -1, paramIndex));
+                result.add(new ParameterInfo(type, false, paramIndex, -1));
                 if (type.getSize() == 2) {
                     result.add(ParameterInfo.STUB);
                 }
@@ -348,7 +348,7 @@ public class MethodInliner {
         } else {
             for (Type type : types) {
                 int paramIndex = index++;
-                result.add(new ParameterInfo(type, false, -1, paramIndex));
+                result.add(new ParameterInfo(type, false, paramIndex, -1));
                 if (type.getSize() == 2) {
                     result.add(ParameterInfo.STUB);
                 }

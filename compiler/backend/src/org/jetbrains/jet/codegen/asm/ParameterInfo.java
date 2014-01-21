@@ -23,7 +23,7 @@ class ParameterInfo {
 
     public static final ParameterInfo STUB = new ParameterInfo(AsmTypeConstants.OBJECT_TYPE, true, -1, -1);
 
-    private int index;
+    protected final int index;
 
     public final Type type;
 
@@ -33,7 +33,7 @@ class ParameterInfo {
 
     public LambdaInfo lambda;
 
-    ParameterInfo(Type type, boolean skipped, int remapIndex, int index) {
+    ParameterInfo(Type type, boolean skipped, int index, int remapIndex) {
         this.type = type;
         this.isSkipped = skipped;
         this.remapIndex = remapIndex;
@@ -81,7 +81,4 @@ class ParameterInfo {
         this.remapIndex = remapIndex;
     }
 
-    public void setIndex(int index) {
-        this.index = index;
-    }
 }

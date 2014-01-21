@@ -60,12 +60,7 @@ public class Parameters implements Iterable<ParameterInfo> {
     public static List<CapturedParamInfo> transformList(List<CapturedParamInfo> capturedParams, int realSize) {
         ArrayList result = new ArrayList();
         for (CapturedParamInfo capturedParamInfo : capturedParams) {
-            CapturedParamInfo newInfo =
-                    new CapturedParamInfo(capturedParamInfo.getFieldName(), capturedParamInfo.getType(), capturedParamInfo.isSkipped,
-                                          capturedParamInfo.getIndex(), result.size() + realSize);
-
-            newInfo.setLambda(capturedParamInfo.getLambda());
-            newInfo.setRecapturedFrom(capturedParamInfo.getRecapturedFrom());
+            CapturedParamInfo newInfo = capturedParamInfo.clone(result.size() + realSize, capturedParamInfo.getIndex());
 
             result.add(newInfo);
 
@@ -79,10 +74,7 @@ public class Parameters implements Iterable<ParameterInfo> {
     public static List<CapturedParamInfo> addStubs(List<CapturedParamInfo> capturedParams, int realSize) {
         ArrayList result = new ArrayList();
         for (CapturedParamInfo capturedParamInfo : capturedParams) {
-            CapturedParamInfo newInfo = new CapturedParamInfo(capturedParamInfo.getFieldName(), capturedParamInfo.getType(), capturedParamInfo.isSkipped,
-                                                              capturedParamInfo.getRemapIndex(), result.size() + realSize);
-            newInfo.setLambda(capturedParamInfo.getLambda());
-            newInfo.setRecapturedFrom(capturedParamInfo.getRecapturedFrom());
+            CapturedParamInfo newInfo = capturedParamInfo.newIndex(result.size() + realSize);
             result.add(newInfo);
             if (capturedParamInfo.getType().getSize() == 2) {
                 result.add(CapturedParamInfo.STUB);
