@@ -86,6 +86,11 @@ public class CompileKotlinAgainstInlineKotlinTestGenerated extends AbstractCompi
         doBoxTest("compiler/testData/codegen/boxInline/lambdaClassClash");
     }
     
+    @TestMetadata("lamdaInLambda")
+    public void testLamdaInLambda() throws Exception {
+        doBoxTest("compiler/testData/codegen/boxInline/lamdaInLambda");
+    }
+    
     @TestMetadata("localFunInLambda")
     public void testLocalFunInLambda() throws Exception {
         doBoxTest("compiler/testData/codegen/boxInline/localFunInLambda");
