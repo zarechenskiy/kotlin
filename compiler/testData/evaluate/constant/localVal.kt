@@ -17,6 +17,24 @@ class A() {
             // val prop2: 2.toInt()
             val prop2 = a + 1
         }
+
+        val b = {
+            // val prop3: 1.toInt()
+            val prop3 = a
+
+            // val prop4: 2.toInt()
+            val prop4 = a + 1
+        }
+
+        val c = object: Foo {
+            override fun f() {
+                // val prop9: 1.toInt()
+                val prop9 = a
+
+                // val prop10: 2.toInt()
+                val prop10 = a + 1
+            }
+        }
     }
 }
 
@@ -28,4 +46,8 @@ fun foo() {
 
     // val prop8: 2.toInt()
     val prop8 = a + 1
+}
+
+trait Foo {
+    fun f()
 }

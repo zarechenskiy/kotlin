@@ -1,3 +1,5 @@
+// !DIAGNOSTICS: -UNUSED_VARIABLE
+
 val intMaxValue: Int = 0x7fffffff
 val intMinValue: Int = 1 shl 31
 
@@ -39,8 +41,6 @@ fun foo() {
     val l21: Int = intMinValue - intMinValue
     val l22: Int = <!INTEGER_OVERFLOW!>intMinValue + <!INTEGER_OVERFLOW!>-intMinValue<!><!>
     val l23: Int = intMaxValue + <!INTEGER_OVERFLOW!>-intMinValue<!>
-
-    val <!UNUSED_VARIABLE!>a<!> = "$a3$a4$i2$i3$i4$i5$i6$i7$i8$i10$i11$i12$i13$i15$l20$l21$l22$l23"
 }
 
 class A {
@@ -63,7 +63,5 @@ class A {
         val l21: Int = intMinValue - intMinValue
         val l22: Int = <!INTEGER_OVERFLOW!>intMinValue + <!INTEGER_OVERFLOW!>-intMinValue<!><!>
         val l23: Int = intMaxValue + <!INTEGER_OVERFLOW!>-intMinValue<!>
-
-        val <!UNUSED_VARIABLE!>a<!> = "$a3$a4$i2$i3$i4$i5$i6$i7$i8$i10$i11$i12$i13$i15$l20$l21$l22$l23"
     }
 }

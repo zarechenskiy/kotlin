@@ -1,3 +1,5 @@
+// !DIAGNOSTICS: -UNUSED_VARIABLE
+
 val longMaxValue: Long = 0x7fffffffffffffff
 val longMinValue: Long = -longMaxValue - 1
 val intMaxValue: Int = 0x7fffffff
@@ -39,8 +41,6 @@ fun foo() {
     val l15: Long = <!INTEGER_OVERFLOW!>longMaxValue * -2<!>
     val l16: Long = intMinValue.toLong() * -1
     val l19: Long = <!INTEGER_OVERFLOW!>longMinValue / -1<!>
-
-    val <!UNUSED_VARIABLE!>a<!> = "$l1$l2$l3$l4$l5$l6$l7$l8$l10$l11$l12$l13$l14$l14$l15$l16$l19"
 }
 
 class A {
@@ -61,7 +61,5 @@ class A {
         val l15: Long = <!INTEGER_OVERFLOW!>longMaxValue * -2<!>
         val l16: Long = intMinValue.toLong() * -1
         val l19: Long = <!INTEGER_OVERFLOW!>longMinValue / -1<!>
-
-        val <!UNUSED_VARIABLE!>a<!> = "$l1$l2$l3$l4$l5$l6$l7$l8$l10$l11$l12$l13$l14$l14$l15$l16$l19"
     }
 }

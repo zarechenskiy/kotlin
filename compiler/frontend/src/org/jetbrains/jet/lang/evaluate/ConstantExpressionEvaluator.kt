@@ -203,7 +203,7 @@ public class ConstantExpressionEvaluator private (val trace: BindingTrace) : Jet
                 OperatorConventions.EQUALS -> createCompileTimeConstantForEquals(result, callExpression)
                 else -> {
                     val areArgumentsPure = trace.get(BindingContext.IS_PURE_CONSTANT_EXPRESSION, argumentForReceiver.expression) ?: false &&
-                    trace.get(BindingContext.IS_PURE_CONSTANT_EXPRESSION, argumentForParameter.expression) ?: false
+                                           trace.get(BindingContext.IS_PURE_CONSTANT_EXPRESSION, argumentForParameter.expression) ?: false
                     val canBeUsedInAnnotation = canBeUsedInAnnotation(argumentForReceiver.expression) && canBeUsedInAnnotation(argumentForParameter.expression)
                     createCompileTimeConstant(result, fullExpression, expectedType, areArgumentsPure, canBeUsedInAnnotation)
                 }
@@ -288,17 +288,15 @@ public class ConstantExpressionEvaluator private (val trace: BindingTrace) : Jet
             val callableDescriptor = resolvedCall.getResultingDescriptor()
             if (callableDescriptor is VariableDescriptor) {
                 val compileTimeConstant = trace.getBindingContext().get(COMPILE_TIME_INITIALIZER, callableDescriptor)
+                if (compileTimeConstant == null) return null
 
-                val value: Any? = if (compileTimeConstant is IntegerValueTypeConstant) {
-                    compileTimeConstant.getValue(expectedType ?: TypeUtils.NO_EXPECTED_TYPE)
-                }
-                else {
-                    compileTimeConstant?.getValue()
-                }
-                if (compileTimeConstant != null) {
-                    return createCompileTimeConstant(value, expression, expectedType, false, AnnotationUtils.isPropertyCompileTimeConstant(callableDescriptor))
-                }
-                return null
+                val value: Any? =
+                        if (compileTimeConstant is IntegerValueTypeConstant)
+                            compileTimeConstant.getValue(expectedType ?: TypeUtils.NO_EXPECTED_TYPE)
+                        else
+                            compileTimeConstant.getValue()
+                return createCompileTimeConstant(value, expression, expectedType, false,
+                                                 AnnotationUtils.isPropertyCompileTimeConstant(callableDescriptor))
             }
         }
         return null
@@ -422,14 +420,12 @@ public class ConstantExpressionEvaluator private (val trace: BindingTrace) : Jet
     }
 
     fun createCompileTimeConstant(value: Any?, expression: JetExpression, expectedType: JetType?, isPure: Boolean = true, canBeUsedInAnnotation: Boolean = true): CompileTimeConstant<*>? {
-        val compileTimeConstant: CompileTimeConstant<out Any?>?
-        if (isPure) {
-            compileTimeConstant = createCompileTimeConstant(value, expectedType ?: TypeUtils.NO_EXPECTED_TYPE)
-            trace.record(BindingContext.IS_PURE_CONSTANT_EXPRESSION, expression, true)
-        }
-        else {
-            compileTimeConstant = createCompileTimeConstant(value)
-        }
+        val compileTimeConstant =
+                if (isPure) {
+                    trace.record(BindingContext.IS_PURE_CONSTANT_EXPRESSION, expression, true)
+                    createCompileTimeConstant(value, expectedType ?: TypeUtils.NO_EXPECTED_TYPE)
+                }
+                else createCompileTimeConstant(value)
 
         compileTimeConstant?.setCanBeUsedInAnnotations(canBeUsedInAnnotation)
 
@@ -561,21 +557,16 @@ private fun createStringConstant(value: CompileTimeConstant<*>?): StringValue? {
 }
 
 private fun createCompileTimeConstant(value: Any?, expectedType: JetType? = null): CompileTimeConstant<*>? {
-    return when(value) {
-        is Byte, is Short, is Int, is Long -> {
-            return if (expectedType == null) {
-                when(value) {
-                    is Byte -> ByteValue(value)
-                    is Short -> ShortValue(value)
-                    is Int -> IntValue(value)
-                    is Long -> LongValue(value)
-                    else -> throw IllegalArgumentException("All cases should be catched: $value")
-                }
-            }
-            else {
-                getIntegerValue((value as Number).toLong(), expectedType)
-            }
+    if (expectedType == null) {
+        when(value) {
+            is Byte -> return ByteValue(value)
+            is Short -> return ShortValue(value)
+            is Int -> return IntValue(value)
+            is Long -> return LongValue(value)
         }
+    }
+    return when(value) {
+        is Byte, is Short, is Int, is Long -> getIntegerValue((value as Number).toLong(), expectedType)
         is Char -> CharValue(value)
         is Float -> FloatValue(value)
         is Double -> DoubleValue(value)

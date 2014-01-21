@@ -14,6 +14,24 @@ class A {
 
     // val prop4: null
     val prop4 = a + 1
+
+    val b = {
+        // val prop11: null
+        val prop11 = a
+
+        // val prop12: null
+        val prop12 = a + 1
+    }
+
+    val c = object: Foo {
+        override fun f() {
+            // val prop9: null
+            val prop9 = a
+
+            // val prop10: null
+            val prop10 = a + 1
+        }
+    }
 }
 
 fun foo() {
@@ -22,4 +40,8 @@ fun foo() {
 
     // val prop6: null
     val prop6 = a + 1
+}
+
+trait Foo {
+    fun f()
 }

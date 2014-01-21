@@ -73,12 +73,10 @@ abstract class AbstractEvaluateExpressionTest: AbstractAnnotationDescriptorResol
             val expected = InTextDirectivesUtils.findStringWithPrefixes(fileText, expectedPropertyPrefix)
             assertNotNull(expected, "Failed to find expected directive: $expectedPropertyPrefix")
 
-            var property: VariableDescriptor? = AbstractAnnotationDescriptorResolveTest.getPropertyDescriptor(packageView, propertyName, false)
-            if (property == null) {
-                property = AbstractAnnotationDescriptorResolveTest.getLocalVarDescriptor(context!!, propertyName)
-            }
+            val property = AbstractAnnotationDescriptorResolveTest.getPropertyDescriptor(packageView, propertyName, false)
+                                ?: AbstractAnnotationDescriptorResolveTest.getLocalVarDescriptor(context!!, propertyName)
 
-            val jetProperty = BindingContextUtils.descriptorToDeclaration(context!!, property!!) as JetProperty
+            val jetProperty = BindingContextUtils.descriptorToDeclaration(context!!, property) as JetProperty
 
             val testedObject = getValueToTest(jetProperty, context!!)
             expectedActual.add(expectedPropertyPrefix + expected!! to expectedPropertyPrefix + testedObject)
