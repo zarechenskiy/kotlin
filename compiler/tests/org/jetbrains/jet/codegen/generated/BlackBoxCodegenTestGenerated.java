@@ -4989,6 +4989,11 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
             doTest("compiler/testData/codegen/box/typeInfo/primitiveTypeInfo.kt");
         }
         
+        @TestMetadata("smartCastedThis.kt")
+        public void testSmartCastedThis() throws Exception {
+            doTest("compiler/testData/codegen/box/typeInfo/smartCastedThis.kt");
+        }
+        
     }
     
     @TestMetadata("compiler/testData/codegen/box/typeMapping")
