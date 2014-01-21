@@ -1,6 +1,6 @@
 public class Testing {
     public static void test() {
-        kotlin.enums.KtEnumColor.<caret>
+        mockLib.foo.LibEnum.<caret>
     }
 }
 

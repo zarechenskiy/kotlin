@@ -1,7 +1,7 @@
 public class Testing {
     public static void test() {
-        ClassFr<caret>
+        mockLib.foo.LibObject.<caret>
     }
 }
 
-// EXIST: ClassFromJet
+// EXIST: instance$
