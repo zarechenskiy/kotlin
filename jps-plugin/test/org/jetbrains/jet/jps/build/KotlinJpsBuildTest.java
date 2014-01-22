@@ -24,6 +24,10 @@ import com.intellij.util.containers.ContainerUtil;
 import org.jetbrains.jet.codegen.PackageCodegen;
 import org.jetbrains.jet.lang.resolve.name.FqName;
 import org.jetbrains.jps.builders.BuildResult;
+import org.jetbrains.jps.builders.CompileScopeTestBuilder;
+import org.jetbrains.jps.builders.impl.logging.ProjectBuilderLoggerBase;
+import org.jetbrains.jps.builders.logging.BuildLoggingManager;
+import org.jetbrains.jps.cmdline.ProjectDescriptor;
 import org.jetbrains.jps.model.java.JpsJavaDependencyScope;
 import org.jetbrains.jps.model.java.JpsJavaExtensionService;
 import org.jetbrains.jps.model.module.JpsModule;
@@ -31,6 +35,8 @@ import org.jetbrains.jps.util.JpsPathUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 
 public class KotlinJpsBuildTest extends AbstractKotlinJpsBuildTestCase {
     private static final String PROJECT_NAME = "kotlinProject";
@@ -44,18 +50,16 @@ public class KotlinJpsBuildTest extends AbstractKotlinJpsBuildTestCase {
         super.setUp();
         File sourceFilesRoot = new File(TEST_DATA_PATH + "general/" + getTestName(false));
         workDir = copyTestDataToTmpDir(sourceFilesRoot);
-        getOrCreateProjectDir();
+        System.out.println("workDir = " + workDir);
+        System.out.println("Arrays.asList(workDir.listFiles) = " + Arrays.asList(workDir.listFiles()));
+        System.out.println("getOrCreateProjectDir() = " + getOrCreateProjectDir());
+        System.out.println("Arrays.asList(getOrCreateProjectDir().listFiles()) = " + Arrays.asList(getOrCreateProjectDir().listFiles()));
     }
 
     @Override
     public void tearDown() throws Exception {
         FileUtil.delete(workDir);
         super.tearDown();
-    }
-
-    @Override
-    protected File doGetProjectDir() throws IOException {
-        return workDir;
     }
 
     private void initProject() {
@@ -154,6 +158,65 @@ public class KotlinJpsBuildTest extends AbstractKotlinJpsBuildTestCase {
         checkClassesDeletedFromOutputWhen(Operation.CHANGE, "kotlinProject", "src/Bar.kt", "foo.Bar");
     }
 
+    @Override
+    protected BuildResult doBuild(CompileScopeTestBuilder scope) {
+        ProjectDescriptor descriptor = this.createProjectDescriptor(new BuildLoggingManager(new ProjectBuilderLoggerBase() {
+            @Override
+            public void logCompiledFiles(Collection<File> files, String builderName, String description) throws IOException {
+                super.logCompiledFiles(files, builderName, description);    //TODO
+            }
+
+            public boolean isEnabled() {
+                return true;
+            }
+
+            @Override
+            protected void logLine(String message) {
+                System.out.println(message);
+            }
+        }));
+        try {
+          return this.doBuild(descriptor, scope);
+        }
+        finally {
+          descriptor.release();
+        }
+    }
+
+    public void testUnrelatedClasses() throws InterruptedException {
+        initProject();
+        System.out.println("after init");
+        makeAll().assertSuccessful();
+        System.out.println("after first makeAll");
+        long before = new File(getAbsolutePath(outputPathInModuleByClassFqName("kotlinProject", "test.Bar"))).lastModified();
+        System.out.println("modification stamp before = " + before);
+        Thread.sleep(5000);
+        new File(getAbsolutePath(outputPathInModuleByClassFqName("kotlinProject", "test.Bar"))).setLastModified(1000);
+        System.out.println("modification stamp = " + new File(getAbsolutePath(outputPathInModuleByClassFqName("kotlinProject", "test.Bar"))).lastModified());
+
+        checkClassesDeletedFromOutputWhen(Operation.CHANGE, "kotlinProject", "src/Foo.kt", "test.Foo");
+        long after = new File(getAbsolutePath(outputPathInModuleByClassFqName("kotlinProject", "test.Bar"))).lastModified();
+        System.out.println("modification stamp after = " + after);
+        System.out.println("diff = " + (after - before));
+    }
+
+    public void testSimpleClassDependency() throws InterruptedException {
+        initProject();
+        System.out.println("after init");
+        makeAll().assertSuccessful();
+        System.out.println("after first makeAll");
+        long before = new File(getAbsolutePath(outputPathInModuleByClassFqName("kotlinProject", "test.Bar"))).lastModified();
+        System.out.println("modification stamp before = " + before);
+        Thread.sleep(5000);
+        new File(getAbsolutePath(outputPathInModuleByClassFqName("kotlinProject", "test.Bar"))).setLastModified(1000);
+        System.out.println("modification stamp = " + new File(getAbsolutePath(outputPathInModuleByClassFqName("kotlinProject", "test.Bar"))).lastModified());
+
+        checkClassesDeletedFromOutputWhen(Operation.CHANGE, "kotlinProject", "src/Foo.kt", "test.Foo");
+        long after = new File(getAbsolutePath(outputPathInModuleByClassFqName("kotlinProject", "test.Bar"))).lastModified();
+        System.out.println("modification stamp after = " + after);
+        System.out.println("diff = " + (after - before));
+    }
+
     public void testKotlinProjectTwoFilesInOnePackage() {
         doTest();
 
@@ -246,7 +309,7 @@ public class KotlinJpsBuildTest extends AbstractKotlinJpsBuildTestCase {
         File outputDir = new File(JpsPathUtil.urlToPath(outputUrl));
         for (String path : relativePaths) {
             File outputFile = new File(outputDir, path);
-            assertFalse("Output directory \"" + outputFile.getAbsolutePath() + "\" contains \"" + path  + "\"",
+            assertFalse("Output directory \"" + outputFile.getAbsolutePath() + "\" contains \"" + path + "\"",
                         outputFile.exists());
         }
     }

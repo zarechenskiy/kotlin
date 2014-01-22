@@ -34,7 +34,9 @@ import org.jetbrains.jps.util.JpsPathUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class KotlinSourceFileCollector {
     // For incremental compilation
@@ -56,7 +58,7 @@ public class KotlinSourceFileCollector {
     }
 
     @NotNull
-    public static List<File> getAllKotlinSourceFiles(@NotNull ModuleBuildTarget target) {
+    public static Set<File> getAllKotlinSourceFiles(@NotNull ModuleBuildTarget target) {
         final List<File> moduleExcludes = ContainerUtil.map(target.getModule().getExcludeRootsList().getUrls(), new Function<String, File>() {
             @Override
             public File fun(String url) {
@@ -67,7 +69,7 @@ public class KotlinSourceFileCollector {
         final JpsCompilerExcludes compilerExcludes =
                 JpsJavaExtensionService.getInstance().getOrCreateCompilerConfiguration(target.getModule().getProject()).getCompilerExcludes();
 
-        final List<File> result = ContainerUtil.newArrayList();
+        final Set<File> result = new HashSet<File>();
         for (JpsModuleSourceRoot sourceRoot : getRelevantSourceRoots(target)) {
             FileUtil.processFilesRecursively(
                     sourceRoot.getFile(),
