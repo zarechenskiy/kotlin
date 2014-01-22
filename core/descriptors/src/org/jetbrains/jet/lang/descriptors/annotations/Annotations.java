@@ -17,28 +17,34 @@
 package org.jetbrains.jet.lang.descriptors.annotations;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.ReadOnly;
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.jet.lang.resolve.name.FqName;
 
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 
 public interface Annotations extends Iterable<AnnotationDescriptor> {
     Annotations EMPTY = new Annotations() {
-        @NotNull
         @Override
-        public List<AnnotationDescriptor> getAnnotationDescriptors() {
-            return Collections.emptyList();
+        public boolean isEmpty() {
+            return true;
+        }
+
+        @Nullable
+        @Override
+        public AnnotationDescriptor findAnnotation(@NotNull FqName fqName) {
+            return null;
         }
 
         @NotNull
         @Override
         public Iterator<AnnotationDescriptor> iterator() {
-            return getAnnotationDescriptors().iterator();
+            return Collections.<AnnotationDescriptor>emptyList().iterator();
         }
     };
 
-    @NotNull
-    @ReadOnly
-    List<AnnotationDescriptor> getAnnotationDescriptors();
+    boolean isEmpty();
+
+    @Nullable
+    AnnotationDescriptor findAnnotation(@NotNull FqName fqName);
 }

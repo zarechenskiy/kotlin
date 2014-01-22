@@ -33,18 +33,15 @@ import org.jetbrains.jet.lang.descriptors.impl.MutableClassDescriptor;
 import org.jetbrains.jet.lang.psi.*;
 import org.jetbrains.jet.lang.resolve.*;
 import org.jetbrains.jet.lang.resolve.calls.autocasts.DataFlowInfo;
-import org.jetbrains.jet.lang.resolve.lazy.KotlinCodeAnalyzer;
-import org.jetbrains.jet.lang.resolve.lazy.LazyDescriptor;
-import org.jetbrains.jet.lang.resolve.lazy.ResolveSession;
-import org.jetbrains.jet.lang.resolve.lazy.ScopeProvider;
+import org.jetbrains.jet.lang.resolve.lazy.*;
 import org.jetbrains.jet.lang.resolve.lazy.descriptors.LazyClassDescriptor;
 import org.jetbrains.jet.lang.resolve.lazy.descriptors.LazyPackageDescriptor;
-import org.jetbrains.jet.storage.LazyResolveStorageManager;
 import org.jetbrains.jet.lang.resolve.name.FqName;
 import org.jetbrains.jet.lang.resolve.name.Name;
 import org.jetbrains.jet.lang.resolve.scopes.JetScope;
 import org.jetbrains.jet.lang.resolve.scopes.WritableScope;
 import org.jetbrains.jet.lang.types.TypeConstructor;
+import org.jetbrains.jet.storage.LazyResolveStorageManager;
 import org.jetbrains.jet.storage.MemoizedFunctionToNotNull;
 
 import java.util.Collection;
@@ -205,8 +202,8 @@ public class ResolveElementCache {
 
         TypeConstructor constructor = ((ClassDescriptor) descriptor).getTypeConstructor();
         for (TypeParameterDescriptor parameterDescriptor : constructor.getParameters()) {
-            LazyDescriptor lazyDescriptor = (LazyDescriptor) parameterDescriptor;
-            lazyDescriptor.forceResolveAllContents();
+            LazyEntity lazyEntity = (LazyEntity) parameterDescriptor;
+            lazyEntity.forceResolveAllContents();
         }
     }
 
@@ -215,16 +212,15 @@ public class ResolveElementCache {
         if (declaration != null) {
             Annotated descriptor = analyzer.resolveToDescriptor(declaration);
 
-            // Activate annotation resolving
-            descriptor.getAnnotations().getAnnotationDescriptors();
+            ForceResolveUtil.forceResolveAllContents(descriptor.getAnnotations());
         }
     }
 
     private static void typeParameterAdditionalResolve(KotlinCodeAnalyzer analyzer, JetTypeParameter typeParameter) {
         DeclarationDescriptor descriptor = analyzer.resolveToDescriptor(typeParameter);
-        assert descriptor instanceof LazyDescriptor;
+        assert descriptor instanceof LazyEntity;
 
-        LazyDescriptor parameterDescriptor = (LazyDescriptor) descriptor;
+        LazyEntity parameterDescriptor = (LazyEntity) descriptor;
         parameterDescriptor.forceResolveAllContents();
     }
 

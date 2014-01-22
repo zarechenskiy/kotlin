@@ -17,6 +17,11 @@
 package org.jetbrains.jet.lang.descriptors.annotations;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.jet.lang.descriptors.ClassDescriptor;
+import org.jetbrains.jet.lang.descriptors.ClassifierDescriptor;
+import org.jetbrains.jet.lang.resolve.DescriptorUtils;
+import org.jetbrains.jet.lang.resolve.name.FqName;
 
 import java.util.Iterator;
 import java.util.List;
@@ -29,9 +34,25 @@ public class AnnotationsImpl implements Annotations {
     }
 
     @NotNull
-    @Override
     public List<AnnotationDescriptor> getAnnotationDescriptors() {
         return annotations;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return getAnnotationDescriptors().isEmpty();
+    }
+
+    @Nullable
+    @Override
+    public AnnotationDescriptor findAnnotation(@NotNull FqName fqName) {
+        for (AnnotationDescriptor annotation : annotations) {
+            ClassifierDescriptor descriptor = annotation.getType().getConstructor().getDeclarationDescriptor();
+            if (descriptor instanceof ClassDescriptor && fqName.toUnsafe().equals(DescriptorUtils.getFqName(descriptor))) {
+                return annotation;
+            }
+        }
+        return null;
     }
 
     @NotNull
