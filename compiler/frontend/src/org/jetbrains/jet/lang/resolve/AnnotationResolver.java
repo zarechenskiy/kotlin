@@ -34,7 +34,6 @@ import org.jetbrains.jet.lang.resolve.calls.util.CallMaker;
 import org.jetbrains.jet.lang.resolve.constants.ArrayValue;
 import org.jetbrains.jet.lang.resolve.constants.CompileTimeConstant;
 import org.jetbrains.jet.lang.resolve.constants.IntegerValueTypeConstant;
-import org.jetbrains.jet.lang.resolve.constants.IntegerValueTypeConstructor;
 import org.jetbrains.jet.lang.resolve.scopes.JetScope;
 import org.jetbrains.jet.lang.resolve.scopes.receivers.ReceiverValue;
 import org.jetbrains.jet.lang.types.ErrorUtils;
@@ -43,11 +42,12 @@ import org.jetbrains.jet.lang.types.expressions.ExpressionTypingServices;
 import org.jetbrains.jet.lang.types.lang.KotlinBuiltIns;
 
 import javax.inject.Inject;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import static org.jetbrains.jet.lang.resolve.BindingContext.ANNOTATION_DESCRIPTOR_TO_PSI_ELEMENT;
 import static org.jetbrains.jet.lang.types.TypeUtils.NO_EXPECTED_TYPE;
-import static org.jetbrains.jet.lang.types.TypeUtils.getPrimitiveNumberType;
 
 public class AnnotationResolver {
 
@@ -215,9 +215,12 @@ public class AnnotationResolver {
             ValueParameterDescriptor parameterDescriptor = descriptorToArgument.getKey();
 
             JetType varargElementType = parameterDescriptor.getVarargElementType();
-            List<CompileTimeConstant<?>> constants = resolveValueArguments(descriptorToArgument.getValue(), parameterDescriptor.getType(), trace);
+            boolean argumentsAsVararg = varargElementType != null && !hasSpread(descriptorToArgument.getValue());
+            List<CompileTimeConstant<?>> constants = resolveValueArguments(descriptorToArgument.getValue(),
+                                                                           argumentsAsVararg ? varargElementType : parameterDescriptor.getType(),
+                                                                           trace);
 
-            if (varargElementType != null && !hasSpread(descriptorToArgument.getValue())) {
+            if (argumentsAsVararg) {
                 JetType arrayType = KotlinBuiltIns.getInstance().getPrimitiveArrayJetTypeByPrimitiveJetType(varargElementType);
                 if (arrayType == null) {
                     arrayType = KotlinBuiltIns.getInstance().getArrayType(varargElementType);
@@ -228,6 +231,51 @@ public class AnnotationResolver {
                 for (CompileTimeConstant<?> constant : constants) {
                     annotationDescriptor.setValueArgument(parameterDescriptor, constant);
                 }
+            }
+        }
+    }
+
+    private static void checkCompileTimeConstant(
+            @NotNull JetExpression argumentExpression,
+            @NotNull JetType expectedType,
+            @NotNull BindingTrace trace
+    ) {
+        JetType expressionType = trace.get(BindingContext.EXPRESSION_TYPE, argumentExpression);
+
+        // TYPE_MISMATCH should be reported in this case
+        if (expressionType != null && expressionType.equals(expectedType)) {
+            // array(1, 2, 3) - error should be reported on inner expression
+            if (argumentExpression instanceof JetCallExpression) {
+                ResolvedCall<?> resolvedCall = trace.get(BindingContext.RESOLVED_CALL, ((JetCallExpression) argumentExpression).getCalleeExpression());
+                if (resolvedCall != null && AnnotationUtils.isArrayMethodCall(resolvedCall)) {
+                    for (Map.Entry<ValueParameterDescriptor, ResolvedValueArgument> descriptor : resolvedCall.getValueArguments().entrySet()) {
+                        JetType arrayType = descriptor.getKey().getVarargElementType();
+                        for (ValueArgument valueArgument : descriptor.getValue().getArguments()) {
+                            JetExpression valueArgumentExpression = valueArgument.getArgumentExpression();
+                            if (valueArgumentExpression != null) {
+                                if (arrayType != null) {
+                                    checkCompileTimeConstant(valueArgumentExpression, arrayType, trace);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            CompileTimeConstant<?> constant = trace.get(BindingContext.COMPILE_TIME_VALUE, argumentExpression);
+            if (constant != null && constant.canBeUsedInAnnotations()) {
+                return;
+            }
+
+            ClassifierDescriptor descriptor = expressionType.getConstructor().getDeclarationDescriptor();
+            if (descriptor != null && DescriptorUtils.isEnumClass(descriptor)) {
+                trace.report(Errors.ANNOTATION_PARAMETER_MUST_BE_ENUM_CONST.on(argumentExpression));
+            }
+            else if (descriptor instanceof ClassDescriptor && AnnotationUtils.isJavaLangClass((ClassDescriptor) descriptor)) {
+                trace.report(Errors.ANNOTATION_PARAMETER_MUST_BE_CLASS_LITERAL.on(argumentExpression));
+            }
+            else {
+                trace.report(Errors.ANNOTATION_PARAMETER_MUST_BE_CONST.on(argumentExpression));
             }
         }
     }
@@ -252,24 +300,10 @@ public class AnnotationResolver {
                     JetType defaultType = ((IntegerValueTypeConstant) constant).getType(expectedType);
                     ArgumentTypeResolver.updateNumberType(defaultType, argumentExpression, trace);
                 }
-                if (constant != null && constant.canBeUsedInAnnotations()) {
+                if (constant != null) {
                     constants.add(constant);
                 }
-                else {
-                    JetType expressionType = trace.get(BindingContext.EXPRESSION_TYPE, argumentExpression);
-                    if (expressionType != null && expressionType.equals(expectedType)) {
-                        ClassifierDescriptor descriptor = expressionType.getConstructor().getDeclarationDescriptor();
-                        if (descriptor != null && DescriptorUtils.isEnumClass(descriptor)) {
-                            trace.report(Errors.ANNOTATION_PARAMETER_MUST_BE_ENUM_CONST.on(argumentExpression));
-                        }
-                        else if (descriptor instanceof ClassDescriptor && AnnotationUtils.isJavaLangClass((ClassDescriptor) descriptor)) {
-                            trace.report(Errors.ANNOTATION_PARAMETER_MUST_BE_CLASS_LITERAL.on(argumentExpression));
-                        }
-                        else {
-                            trace.report(Errors.ANNOTATION_PARAMETER_MUST_BE_CONST.on(argumentExpression));
-                        }
-                    }
-                }
+                checkCompileTimeConstant(argumentExpression, expectedType, trace);
             }
         }
         return constants;
