@@ -192,7 +192,7 @@ public class InlineCodegen implements ParentCodegenAware, Inliner {
                                  codegen.getContext(), call);
         MethodInliner inliner = new MethodInliner(node, parameters, info, null, new LambdaFieldRemapper()); //with captured
 
-        VarRemapper.ParamRemapper remapper = new VarRemapper.ParamRemapper(parameters, new VarRemapper.ShiftRemapper(initialFrameSize, null));
+        VarRemapper.ParamRemapper remapper = new VarRemapper.ParamRemapper(parameters, initialFrameSize);
 
         inliner.doTransformAndMerge(codegen.getInstructionAdapter(), remapper);
         generateClosuresBodies();
@@ -247,13 +247,13 @@ public class InlineCodegen implements ParentCodegenAware, Inliner {
         if (!disabled && notSeparateInline && Type.VOID_TYPE != type) {
             //TODO remap only inlinable closure => otherwise we could get a lot of problem
             boolean couldBeRemapped = !shouldPutValue(type, stackValue, codegen.getContext(), valueParameterDescriptor);
-            int remappedIndex = couldBeRemapped ? ((StackValue.Local) stackValue).getIndex() : -1;
+            StackValue remappedIndex = couldBeRemapped ? stackValue : null;
 
             ParameterInfo info = new ParameterInfo(type, false, couldBeRemapped ? -1 : codegen.getFrameMap().enterTemp(type), remappedIndex);
 
             if (index >= 0 && couldBeRemapped) {
                 CapturedParamInfo capturedParamInfo = activeLambda.getCapturedVars().get(index);
-                capturedParamInfo.setRemapIndex(info.getInlinedIndex());
+                capturedParamInfo.setRemapIndex(remappedIndex != null ? remappedIndex : StackValue.local(info.getIndex(), info.getType()));
             }
 
             doWithParameter(info);
@@ -275,7 +275,7 @@ public class InlineCodegen implements ParentCodegenAware, Inliner {
             if (stackValue instanceof StackValue.Field && codegen.getContext().getContextDescriptor() instanceof AnonymousFunctionDescriptor) {
                 if (descriptor != null && !InlineUtil.hasNoinlineAnnotation(descriptor)) {
                     //check type of context
-                    //return false;
+                    return false;
                 }
             }
         }

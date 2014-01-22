@@ -17,6 +17,7 @@
 package org.jetbrains.jet.codegen.asm;
 
 import org.jetbrains.asm4.Type;
+import org.jetbrains.jet.codegen.StackValue;
 import org.jetbrains.jet.lang.resolve.java.AsmTypeConstants;
 
 class ParameterInfo {
@@ -29,31 +30,31 @@ class ParameterInfo {
 
     public final boolean isSkipped;
 
-    private int remapIndex;
+    private StackValue remapIndex;
 
     public LambdaInfo lambda;
 
     ParameterInfo(Type type, boolean skipped, int index, int remapIndex) {
+        this(type, skipped, index, remapIndex == -1 ? null : StackValue.local(remapIndex, type));
+    }
+
+    ParameterInfo(Type type, boolean skipped, int index, StackValue stackValue) {
         this.type = type;
         this.isSkipped = skipped;
-        this.remapIndex = remapIndex;
+        this.remapIndex = stackValue;
         this.index = index;
     }
 
     public boolean isSkippedOrRemapped() {
-        return isSkipped || remapIndex != -1;
+        return isSkipped || remapIndex != null;
     }
 
     public boolean isRemapped() {
-        return remapIndex != -1;
+        return remapIndex != null;
     }
 
-    public int getRemapIndex() {
+    public StackValue getRemapIndex() {
         return remapIndex;
-    }
-
-    public int getInlinedIndex() {
-        return remapIndex != -1 ? getRemapIndex() : getIndex();
     }
 
     public int getIndex() {
@@ -78,7 +79,10 @@ class ParameterInfo {
     }
 
     public void setRemapIndex(int remapIndex) {
-        this.remapIndex = remapIndex;
+        this.remapIndex = StackValue.local(remapIndex, type);
     }
 
+    public void setRemapIndex(StackValue remapIndex) {
+        this.remapIndex = remapIndex;
+    }
 }

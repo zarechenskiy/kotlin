@@ -155,7 +155,7 @@ public class MethodInliner {
                     MethodInliner inliner = new MethodInliner(info.getNode(), params, parent.subInline(parent.nameGenerator.subGenerator("lambda")), info.getLambdaClassType(),
                                                               capturedRemapper);
 
-                    VarRemapper.ParamRemapper remapper = new VarRemapper.ParamRemapper(params, new VarRemapper.ShiftRemapper(valueParamShift, null));
+                    VarRemapper.ParamRemapper remapper = new VarRemapper.ParamRemapper(params, valueParamShift);
                     inliner.doTransformAndMerge(this.mv, remapper); //TODO add skipped this and receiver
 
                     Method bridge = typeMapper.mapSignature(ClosureCodegen.getInvokeFunction(info.getFunctionDescriptor())).getAsmMethod();
