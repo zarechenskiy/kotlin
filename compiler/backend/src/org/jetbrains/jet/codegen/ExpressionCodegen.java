@@ -32,6 +32,7 @@ import org.jetbrains.asm4.MethodVisitor;
 import org.jetbrains.asm4.Type;
 import org.jetbrains.asm4.commons.InstructionAdapter;
 import org.jetbrains.asm4.commons.Method;
+import org.jetbrains.asm4.tree.MethodNode;
 import org.jetbrains.jet.codegen.asm.InlineCodegen;
 import org.jetbrains.jet.codegen.asm.InlineCodegenUtil;
 import org.jetbrains.jet.codegen.asm.Inliner;
@@ -90,7 +91,7 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
 
     private int myLastLineNumber = -1;
 
-    final InstructionAdapter v;
+    InstructionAdapter v;
     final MethodVisitor methodVisitor;
     final FrameMap myFrameMap;
     final JetTypeMapper typeMapper;
@@ -2381,15 +2382,24 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
                     inliner.rememberClosure((JetFunctionLiteralExpression) argumentExpression, parameterType);
                     putInLocal = false;
                 } else {
-                    StackValue value = gen(argumentExpression);
-                    if (inliner.shouldPutValue(parameterType, value, context, valueParameter)) {
-                        value.put(parameterType, v);
-                    } else {
-                        if (value instanceof StackValue.Field) {
-                            v.pop();
+                    InstructionAdapter prev = v;
+                    MethodNode node = new MethodNode();
+                    v = new InstructionAdapter(node);
+                    try {
+                        StackValue value = gen(argumentExpression);
+                        if (inliner.shouldPutValue(parameterType, value, context, valueParameter)) {
+                            value.put(parameterType, v);
+                            node.instructions.accept(prev);
+                        } else {
+                            if (value instanceof StackValue.Field) {
+                                value.put(parameterType, v);
+                                value = new StackValue.Extension(parameterType, node, value);
+                            }
                         }
+                        valueIfPresent = value;
+                    } finally {
+                        v = prev;
                     }
-                    valueIfPresent = value;
                 }
             } else if (resolvedValueArgument instanceof DefaultValueArgument) {
                 pushDefaultValueOnStack(parameterType, v);
