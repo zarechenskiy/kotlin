@@ -171,7 +171,7 @@ public class AnnotationDescriptorDeserializer implements AnnotationDeserializer 
             @Override
             public void visit(@Nullable Name name, @Nullable Object value) {
                 if (name != null) {
-                    CompileTimeConstant<?> argument = JavaAnnotationArgumentResolver.resolveCompileTimeConstantValue(value, null);
+                    CompileTimeConstant<?> argument = JavaAnnotationArgumentResolver.resolveCompileTimeConstantValue(value, true, null);
                     setArgumentValueByName(name, argument != null ? argument : ErrorValue.create("Unsupported annotation argument: " + name));
                 }
             }
@@ -194,7 +194,7 @@ public class AnnotationDescriptorDeserializer implements AnnotationDeserializer 
                 if (enumClass.getKind() == ClassKind.ENUM_CLASS) {
                     ClassifierDescriptor classifier = enumClass.getUnsubstitutedInnerClassesScope().getClassifier(name);
                     if (classifier instanceof ClassDescriptor) {
-                        return new EnumValue((ClassDescriptor) classifier);
+                        return new EnumValue((ClassDescriptor) classifier, true);
                     }
                 }
                 return ErrorValue.create("Unresolved enum entry: " + enumClassName.getInternalName() + "." + name);
