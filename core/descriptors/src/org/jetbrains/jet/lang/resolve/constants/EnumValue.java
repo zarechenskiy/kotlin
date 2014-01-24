@@ -25,7 +25,7 @@ import org.jetbrains.jet.lang.types.lang.KotlinBuiltIns;
 public class EnumValue extends CompileTimeConstant<ClassDescriptor> {
 
     public EnumValue(@NotNull ClassDescriptor value, boolean canBeUsedInAnnotations) {
-        super(value, canBeUsedInAnnotations);
+        super(value, canBeUsedInAnnotations, false);
     }
 
     @NotNull

@@ -24,7 +24,7 @@ import org.jetbrains.jet.lang.types.lang.KotlinBuiltIns;
 public class JavaClassValue extends CompileTimeConstant<JetType> {
 
     public JavaClassValue(@NotNull JetType value, boolean canBeUsedInAnnotations) {
-        super(value, canBeUsedInAnnotations);
+        super(value, canBeUsedInAnnotations, false);
     }
 
     @NotNull
