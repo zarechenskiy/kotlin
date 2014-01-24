@@ -1,5 +1,3 @@
-package kotlin
-
 annotation class Ann(val i: IntArray)
 
 Ann(intArray(<!ANNOTATION_PARAMETER_MUST_BE_CONST!>i<!>))
@@ -14,5 +12,3 @@ val i2 = 1
 val i3 = foo()
 
 fun foo(): Int = 1
-
-fun intArray(vararg content : Int) : IntArray = content
