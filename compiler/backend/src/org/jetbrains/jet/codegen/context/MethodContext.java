@@ -19,20 +19,21 @@ package org.jetbrains.jet.codegen.context;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.asm4.Label;
-import org.jetbrains.jet.codegen.binding.MutableClosure;
-import org.jetbrains.jet.lang.descriptors.SimpleFunctionDescriptor;
-import org.jetbrains.jet.lang.resolve.java.AsmTypeConstants;
 import org.jetbrains.jet.codegen.OwnerKind;
 import org.jetbrains.jet.codegen.StackValue;
+import org.jetbrains.jet.codegen.binding.MutableClosure;
 import org.jetbrains.jet.codegen.state.GenerationState;
-import org.jetbrains.jet.lang.descriptors.CallableDescriptor;
 import org.jetbrains.jet.lang.descriptors.DeclarationDescriptor;
 import org.jetbrains.jet.lang.descriptors.FunctionDescriptor;
 import org.jetbrains.jet.lang.descriptors.PropertyAccessorDescriptor;
+import org.jetbrains.jet.lang.descriptors.SimpleFunctionDescriptor;
+import org.jetbrains.jet.lang.resolve.java.AsmTypeConstants;
 
 public class MethodContext extends CodegenContext {
 
     private Label methodStartLabel;
+
+    private boolean isInlineClosure;
     
     public MethodContext(
             @NotNull FunctionDescriptor contextType,
@@ -61,7 +62,12 @@ public class MethodContext extends CodegenContext {
         }
 
         //noinspection ConstantConditions
-        return getParentContext().lookupInContext(d, result, state, ignoreNoOuter);
+        StackValue stackValue = getParentContext().lookupInContext(d, result, state, ignoreNoOuter);
+        //StackValue specialStackValue = isSpecialStackValue(stackValue);
+        //if (specialStackValue != null) {
+        //    return specialStackValue;
+        //}
+        return stackValue;
     }
 
     @Override
@@ -96,5 +102,23 @@ public class MethodContext extends CodegenContext {
             return ((SimpleFunctionDescriptor) descriptor).isInline();
         }
         return false;
+    }
+
+    public void setInlineClosure(boolean isInlineClosure) {
+        this.isInlineClosure = isInlineClosure;
+    }
+
+    public StackValue isSpecialStackValue(StackValue stackValue) {
+        if (isInlineClosure && stackValue instanceof StackValue.Composed) {
+            StackValue prefix = ((StackValue.Composed) stackValue).prefix;
+            StackValue suffix = ((StackValue.Composed) stackValue).suffix;
+            if (prefix instanceof StackValue.Local && ((StackValue.Local) prefix).index == 0) {
+                if (suffix instanceof StackValue.Field) {
+                    StackValue.Field field = (StackValue.Field) suffix;
+                    return StackValue.field(field.type, field.owner, field.name, true);
+                }
+            }
+        }
+        return null;
     }
 }
