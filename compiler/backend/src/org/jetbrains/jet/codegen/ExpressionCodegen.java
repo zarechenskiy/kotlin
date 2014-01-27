@@ -2382,24 +2382,11 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
                     inliner.rememberClosure((JetFunctionLiteralExpression) argumentExpression, parameterType);
                     putInLocal = false;
                 } else {
-                    InstructionAdapter prev = v;
-                    MethodNode node = new MethodNode();
-                    v = new InstructionAdapter(node);
-                    try {
-                        StackValue value = gen(argumentExpression);
-                        if (inliner.shouldPutValue(parameterType, value, context, valueParameter)) {
-                            value.put(parameterType, v);
-                            node.instructions.accept(prev);
-                        } else {
-                            if (value instanceof StackValue.Field) {
-                                value.put(parameterType, v);
-                                value = new StackValue.Extension(parameterType, node, value);
-                            }
-                        }
-                        valueIfPresent = value;
-                    } finally {
-                        v = prev;
+                    StackValue value = gen(argumentExpression);
+                    if (inliner.shouldPutValue(parameterType, value, context, valueParameter)) {
+                        value.put(parameterType, v);
                     }
+                    valueIfPresent = value;
                 }
             } else if (resolvedValueArgument instanceof DefaultValueArgument) {
                 pushDefaultValueOnStack(parameterType, v);
