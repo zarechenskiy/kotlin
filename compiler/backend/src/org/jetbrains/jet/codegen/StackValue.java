@@ -813,8 +813,8 @@ public abstract class StackValue {
 
 
     public static class Field extends StackValueWithSimpleReceiver {
-        final Type owner;
-        final String name;
+        public final Type owner;
+        public final String name;
 
         public Field(Type type, Type owner, String name, boolean isStatic) {
             super(type, isStatic);
@@ -1248,23 +1248,4 @@ public abstract class StackValue {
             return isStatic ? 0 : 1;
         }
     }
-
-    public static class Extension extends StackValue {
-
-        @NotNull private final MethodNode node;
-        @NotNull private final StackValue suffix;
-
-        protected Extension(@NotNull Type type, @NotNull MethodNode node, @NotNull StackValue suffix) {
-            super(type);
-            this.node = node;
-            this.suffix = suffix;
-        }
-
-        @Override
-        public void put(Type type, InstructionAdapter v) {
-            node.instructions.accept(v);
-            suffix.put(type, v);
-        }
-    }
-
 }
