@@ -400,7 +400,7 @@ public class BodyResolver {
             if (unsubstitutedPrimaryConstructor != null) {
                 WritableScope parameterScope = getPrimaryConstructorParametersScope(classDescriptor.getScopeForSupertypeResolution(), unsubstitutedPrimaryConstructor);
                 expressionTypingServices.resolveValueParameters(klass.getPrimaryConstructorParameters(), unsubstitutedPrimaryConstructor.getValueParameters(),
-                                       parameterScope, context.getOuterDataFlowInfo(), trace);
+                                       parameterScope, context.getOuterDataFlowInfo(), trace, context.completeAnalysisNeeded(klass));
             }
         }
     }
@@ -428,7 +428,6 @@ public class BodyResolver {
         for (Map.Entry<JetClassOrObject, MutableClassDescriptor> entry : context.getClasses().entrySet()) {
             if (!(entry.getKey() instanceof JetClass)) continue;
             JetClass jetClass = (JetClass) entry.getKey();
-            if (!context.completeAnalysisNeeded(jetClass)) continue;
             MutableClassDescriptor classDescriptor = entry.getValue();
 
             for (JetProperty property : jetClass.getProperties()) {
@@ -462,7 +461,6 @@ public class BodyResolver {
         // Top-level properties & properties of objects
         for (Map.Entry<JetProperty, PropertyDescriptor> entry : this.context.getProperties().entrySet()) {
             JetProperty property = entry.getKey();
-            if (!context.completeAnalysisNeeded(property)) continue;
             if (processed.contains(property)) continue;
 
             PropertyDescriptor propertyDescriptor = entry.getValue();
@@ -611,19 +609,24 @@ public class BodyResolver {
             @NotNull BindingTrace trace,
             @NotNull JetDeclarationWithBody function,
             @NotNull FunctionDescriptor functionDescriptor,
-            @NotNull JetScope declaringScope) {
-        if (!context.completeAnalysisNeeded(function)) return;
-
-        JetExpression bodyExpression = function.getBodyExpression();
+            @NotNull JetScope declaringScope
+    ) {
         JetScope functionInnerScope = FunctionDescriptorUtil.getFunctionInnerScope(declaringScope, functionDescriptor, trace);
-        if (bodyExpression != null) {
-            expressionTypingServices.checkFunctionReturnType(functionInnerScope, function, functionDescriptor, context.getOuterDataFlowInfo(), null, trace);
-        }
 
         List<JetParameter> valueParameters = function.getValueParameters();
         List<ValueParameterDescriptor> valueParameterDescriptors = functionDescriptor.getValueParameters();
 
-        expressionTypingServices.resolveValueParameters(valueParameters, valueParameterDescriptors, functionInnerScope, context.getOuterDataFlowInfo(), trace);
+        boolean needCompleteAnalysis = context.completeAnalysisNeeded(function);
+
+        expressionTypingServices.resolveValueParameters(valueParameters, valueParameterDescriptors, functionInnerScope,
+                                                        context.getOuterDataFlowInfo(), trace, needCompleteAnalysis);
+
+        if (!needCompleteAnalysis) return;
+
+        JetExpression bodyExpression = function.getBodyExpression();
+        if (bodyExpression != null) {
+            expressionTypingServices.checkFunctionReturnType(functionInnerScope, function, functionDescriptor, context.getOuterDataFlowInfo(), null, trace);
+        }
 
         assert functionDescriptor.getReturnType() != null;
     }
@@ -641,7 +644,8 @@ public class BodyResolver {
 
         JetScope scope = getPrimaryConstructorParametersScope(declaringScope, constructorDescriptor);
 
-        expressionTypingServices.resolveValueParameters(valueParameters, valueParameterDescriptors, scope, context.getOuterDataFlowInfo(), trace);
+        expressionTypingServices.resolveValueParameters(valueParameters, valueParameterDescriptors, scope,
+                                                        context.getOuterDataFlowInfo(), trace, /* needCompleteAnalysis = */ true);
     }
 
     private void resolveAnnotationArguments(@NotNull JetScope scope, @NotNull JetModifierListOwner owner) {
