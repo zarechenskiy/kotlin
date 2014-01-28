@@ -146,6 +146,11 @@ public class BlackBoxInlineCodegenTestGenerated extends AbstractBlackBoxCodegenT
         doTestMultiFile("compiler/testData/codegen/boxInline/simpleObject");
     }
     
+    @TestMetadata("stackHeightBug")
+    public void testStackHeightBug() throws Exception {
+        doTestMultiFile("compiler/testData/codegen/boxInline/stackHeightBug");
+    }
+    
     @TestMetadata("tryCatchFinally")
     public void testTryCatchFinally() throws Exception {
         doTestMultiFile("compiler/testData/codegen/boxInline/tryCatchFinally");

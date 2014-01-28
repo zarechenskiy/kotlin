@@ -146,6 +146,11 @@ public class CompileKotlinAgainstInlineKotlinTestGenerated extends AbstractCompi
         doBoxTest("compiler/testData/codegen/boxInline/simpleObject");
     }
     
+    @TestMetadata("stackHeightBug")
+    public void testStackHeightBug() throws Exception {
+        doBoxTest("compiler/testData/codegen/boxInline/stackHeightBug");
+    }
+    
     @TestMetadata("tryCatchFinally")
     public void testTryCatchFinally() throws Exception {
         doBoxTest("compiler/testData/codegen/boxInline/tryCatchFinally");
