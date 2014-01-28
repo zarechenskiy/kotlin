@@ -23,6 +23,7 @@ import org.jetbrains.jet.codegen.ClassFileFactory;
 import org.jetbrains.jet.codegen.intrinsics.IntrinsicMethods;
 import org.jetbrains.jet.codegen.state.GenerationState;
 import org.jetbrains.jet.codegen.state.JetTypeMapper;
+import org.jetbrains.jet.descriptors.serialization.descriptors.MemberFilter;
 import org.jetbrains.jet.di.DependencyInjectorGenerator;
 import org.jetbrains.jet.di.GivenExpression;
 import org.jetbrains.jet.di.InjectorForTopDownAnalyzer;
@@ -127,6 +128,9 @@ public class GenerateInjectors {
         DependencyInjectorGenerator generator = new DependencyInjectorGenerator();
         generator.implementInterface(InjectorForTopDownAnalyzer.class);
         generateInjectorForTopDownAnalyzerCommon(generator);
+
+        generator.addParameter(MemberFilter.class);
+
         generator.addPublicField(JavaDescriptorResolver.class);
         generator.addField(false, JavaToKotlinClassMap.class, null, new GivenExpression("org.jetbrains.jet.lang.resolve.java.mapping.JavaToKotlinClassMap.getInstance()"));
         generator.addField(JavaClassFinderImpl.class);
@@ -155,6 +159,8 @@ public class GenerateInjectors {
         // Fields
         generator.addField(true, LockBasedStorageManagerWithExceptionTracking.class, "storageManager", null);
         generator.addPublicField(JavaClassFinderImpl.class);
+        generator.addField(false, MemberFilter.class, "memberFilter",
+                           new GivenExpression("org.jetbrains.jet.descriptors.serialization.descriptors.MemberFilter.ALWAYS_TRUE"));
         generator.addField(TraceBasedExternalSignatureResolver.class);
         generator.addField(TraceBasedJavaResolverCache.class);
         generator.addField(TraceBasedErrorReporter.class);

@@ -28,6 +28,7 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.jet.lang.resolve.TopDownAnalysisParameters;
 import org.jetbrains.jet.lang.resolve.BindingTrace;
 import org.jetbrains.jet.lang.descriptors.ModuleDescriptorImpl;
+import org.jetbrains.jet.descriptors.serialization.descriptors.MemberFilter;
 import org.jetbrains.jet.lang.resolve.java.JavaDescriptorResolver;
 import org.jetbrains.jet.lang.resolve.java.mapping.JavaToKotlinClassMap;
 import org.jetbrains.jet.lang.resolve.java.JavaClassFinderImpl;
@@ -89,6 +90,7 @@ public class InjectorForTopDownAnalyzerForJvm implements InjectorForTopDownAnaly
     private final TopDownAnalysisParameters topDownAnalysisParameters;
     private final BindingTrace bindingTrace;
     private final ModuleDescriptorImpl moduleDescriptor;
+    private final MemberFilter memberFilter;
     private final JavaDescriptorResolver javaDescriptorResolver;
     private final JavaToKotlinClassMap javaToKotlinClassMap;
     private final JavaClassFinderImpl javaClassFinder;
@@ -136,7 +138,8 @@ public class InjectorForTopDownAnalyzerForJvm implements InjectorForTopDownAnaly
         @NotNull Project project,
         @NotNull TopDownAnalysisParameters topDownAnalysisParameters,
         @NotNull BindingTrace bindingTrace,
-        @NotNull ModuleDescriptorImpl moduleDescriptor
+        @NotNull ModuleDescriptorImpl moduleDescriptor,
+        @NotNull MemberFilter memberFilter
     ) {
         this.topDownAnalyzer = new TopDownAnalyzer();
         this.topDownAnalysisContext = new TopDownAnalysisContext();
@@ -150,6 +153,7 @@ public class InjectorForTopDownAnalyzerForJvm implements InjectorForTopDownAnaly
         this.topDownAnalysisParameters = topDownAnalysisParameters;
         this.bindingTrace = bindingTrace;
         this.moduleDescriptor = moduleDescriptor;
+        this.memberFilter = memberFilter;
         this.javaDescriptorResolver = new JavaDescriptorResolver();
         this.javaToKotlinClassMap = org.jetbrains.jet.lang.resolve.java.mapping.JavaToKotlinClassMap.getInstance();
         this.javaClassFinder = new JavaClassFinderImpl();
@@ -357,6 +361,7 @@ public class InjectorForTopDownAnalyzerForJvm implements InjectorForTopDownAnaly
         deserializedDescriptorResolver.setErrorReporter(traceBasedErrorReporter);
         deserializedDescriptorResolver.setJavaDescriptorResolver(javaDescriptorResolver);
         deserializedDescriptorResolver.setJavaPackageFragmentProvider(javaPackageFragmentProvider);
+        deserializedDescriptorResolver.setMemberFilter(memberFilter);
         deserializedDescriptorResolver.setStorageManager(storageManager);
 
         annotationDescriptorDeserializer.setErrorReporter(traceBasedErrorReporter);

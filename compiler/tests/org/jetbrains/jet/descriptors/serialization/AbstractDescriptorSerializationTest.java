@@ -109,7 +109,8 @@ public abstract class AbstractDescriptorSerializationTest extends KotlinTestWith
         PackageData data = PackageData.read(serializedPackage, JavaProtoBufUtil.getExtensionRegistry());
 
         DescriptorDeserializer deserializer = DescriptorDeserializer
-                .create(new LockBasedStorageManager(), packageFragment, data.getNameResolver(), descriptorFinder, UNSUPPORTED);
+                .create(new LockBasedStorageManager(), packageFragment, data.getNameResolver(), descriptorFinder, UNSUPPORTED
+                );
         for (ProtoBuf.Callable proto : data.getPackageProto().getMemberList()) {
             CallableMemberDescriptor descriptor = deserializer.loadCallable(proto);
             if (descriptor instanceof FunctionDescriptor) {

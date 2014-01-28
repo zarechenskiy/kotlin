@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jet.analyzer.AnalyzeExhaust;
 import org.jetbrains.jet.analyzer.AnalyzerFacade;
 import org.jetbrains.jet.analyzer.AnalyzerFacadeForEverything;
+import org.jetbrains.jet.descriptors.serialization.descriptors.MemberFilter;
 import org.jetbrains.jet.di.InjectorForJavaDescriptorResolver;
 import org.jetbrains.jet.di.InjectorForJavaDescriptorResolverUtil;
 import org.jetbrains.jet.di.InjectorForTopDownAnalyzerForJvm;
@@ -187,7 +188,7 @@ public enum AnalyzerFacadeForJVM implements AnalyzerFacade {
             boolean storeContextForBodiesResolve
     ) {
         return analyzeFilesWithJavaIntegration(project, files, trace, scriptParameters, filesToAnalyzeCompletely,
-                                               storeContextForBodiesResolve, createJavaModule("<module>"));
+                                               storeContextForBodiesResolve, createJavaModule("<module>"), MemberFilter.ALWAYS_TRUE);
     }
 
     @NotNull
@@ -198,12 +199,14 @@ public enum AnalyzerFacadeForJVM implements AnalyzerFacade {
             List<AnalyzerScriptParameter> scriptParameters,
             Predicate<PsiFile> filesToAnalyzeCompletely,
             boolean storeContextForBodiesResolve,
-            ModuleDescriptorImpl module
+            ModuleDescriptorImpl module,
+            MemberFilter memberFilter
     ) {
         TopDownAnalysisParameters topDownAnalysisParameters = new TopDownAnalysisParameters(
                 new LockBasedStorageManager(), filesToAnalyzeCompletely, false, false, scriptParameters);
 
-        InjectorForTopDownAnalyzerForJvm injector = new InjectorForTopDownAnalyzerForJvm(project, topDownAnalysisParameters, trace, module);
+        InjectorForTopDownAnalyzerForJvm injector = new InjectorForTopDownAnalyzerForJvm(project, topDownAnalysisParameters, trace, module,
+                                                                                         memberFilter);
         try {
             module.addFragmentProvider(DependencyKind.BINARIES, injector.getJavaDescriptorResolver().getPackageFragmentProvider());
             injector.getTopDownAnalyzer().analyzeFiles(files, scriptParameters);

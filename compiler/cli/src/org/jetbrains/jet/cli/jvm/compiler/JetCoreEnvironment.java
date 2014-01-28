@@ -286,6 +286,7 @@ public class JetCoreEnvironment {
         }
     }
 
+    @NotNull
     public List<JetFile> getSourceFiles() {
         return sourceFiles;
     }

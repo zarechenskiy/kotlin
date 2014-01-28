@@ -20,6 +20,7 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.jet.lang.resolve.BindingTrace;
 import org.jetbrains.jet.storage.LockBasedStorageManagerWithExceptionTracking;
 import org.jetbrains.jet.lang.resolve.java.JavaClassFinderImpl;
+import org.jetbrains.jet.descriptors.serialization.descriptors.MemberFilter;
 import org.jetbrains.jet.lang.resolve.java.resolver.TraceBasedExternalSignatureResolver;
 import org.jetbrains.jet.lang.resolve.java.resolver.TraceBasedJavaResolverCache;
 import org.jetbrains.jet.lang.resolve.java.resolver.TraceBasedErrorReporter;
@@ -54,6 +55,7 @@ public class InjectorForJavaDescriptorResolver {
     private final BindingTrace bindingTrace;
     private final LockBasedStorageManagerWithExceptionTracking storageManager;
     private final JavaClassFinderImpl javaClassFinder;
+    private final MemberFilter memberFilter;
     private final TraceBasedExternalSignatureResolver traceBasedExternalSignatureResolver;
     private final TraceBasedJavaResolverCache traceBasedJavaResolverCache;
     private final TraceBasedErrorReporter traceBasedErrorReporter;
@@ -87,6 +89,7 @@ public class InjectorForJavaDescriptorResolver {
         this.exceptionTracker = new ExceptionTracker();
         this.storageManager = new LockBasedStorageManagerWithExceptionTracking(exceptionTracker);
         this.javaClassFinder = new JavaClassFinderImpl();
+        this.memberFilter = org.jetbrains.jet.descriptors.serialization.descriptors.MemberFilter.ALWAYS_TRUE;
         this.traceBasedExternalSignatureResolver = new TraceBasedExternalSignatureResolver();
         this.traceBasedJavaResolverCache = new TraceBasedJavaResolverCache();
         this.traceBasedErrorReporter = new TraceBasedErrorReporter();
@@ -166,6 +169,7 @@ public class InjectorForJavaDescriptorResolver {
         deserializedDescriptorResolver.setErrorReporter(traceBasedErrorReporter);
         deserializedDescriptorResolver.setJavaDescriptorResolver(javaDescriptorResolver);
         deserializedDescriptorResolver.setJavaPackageFragmentProvider(javaPackageFragmentProvider);
+        deserializedDescriptorResolver.setMemberFilter(memberFilter);
         deserializedDescriptorResolver.setStorageManager(storageManager);
 
         annotationDescriptorDeserializer.setErrorReporter(traceBasedErrorReporter);

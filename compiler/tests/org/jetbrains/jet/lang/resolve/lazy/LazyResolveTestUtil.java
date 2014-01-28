@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jet.JetTestUtils;
 import org.jetbrains.jet.cli.jvm.compiler.CliLightClassGenerationSupport;
 import org.jetbrains.jet.cli.jvm.compiler.JetCoreEnvironment;
+import org.jetbrains.jet.descriptors.serialization.descriptors.MemberFilter;
 import org.jetbrains.jet.di.InjectorForJavaDescriptorResolver;
 import org.jetbrains.jet.di.InjectorForJavaDescriptorResolverUtil;
 import org.jetbrains.jet.di.InjectorForTopDownAnalyzer;
@@ -60,7 +61,7 @@ public class LazyResolveTestUtil {
         ModuleDescriptorImpl sharedModule = support.getModule();
 
         InjectorForTopDownAnalyzerForJvm injector =
-                new InjectorForTopDownAnalyzerForJvm(environment.getProject(), params, sharedTrace, sharedModule);
+                new InjectorForTopDownAnalyzerForJvm(environment.getProject(), params, sharedTrace, sharedModule, MemberFilter.ALWAYS_TRUE);
         sharedModule.addFragmentProvider(DependencyKind.BINARIES, injector.getJavaDescriptorResolver().getPackageFragmentProvider());
         return injector;
     }
