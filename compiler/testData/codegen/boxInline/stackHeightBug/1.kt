@@ -1,6 +1,6 @@
 import test.*
 
 fun box(): String {
-    a{ "".toLowerCase2() }
+    mfun{ "".toLowerCase2() }
     return "OK"
 }
