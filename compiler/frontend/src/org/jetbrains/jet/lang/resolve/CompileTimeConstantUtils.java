@@ -20,7 +20,6 @@ import jet.runtime.Intrinsic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.lang.descriptors.ClassDescriptor;
-import org.jetbrains.jet.lang.descriptors.PropertyDescriptor;
 import org.jetbrains.jet.lang.descriptors.VariableDescriptor;
 import org.jetbrains.jet.lang.descriptors.annotations.Annotated;
 import org.jetbrains.jet.lang.descriptors.annotations.AnnotationDescriptor;
@@ -42,7 +41,7 @@ import static org.jetbrains.jet.lang.diagnostics.Errors.NULLABLE_TYPE_OF_ANNOTAT
 import static org.jetbrains.jet.lang.resolve.BindingContext.VALUE_PARAMETER;
 import static org.jetbrains.jet.lang.resolve.DescriptorUtils.*;
 
-public class AnnotationUtils {
+public class CompileTimeConstantUtils {
 
     public static void checkConstructorParametersType(@NotNull List<JetParameter> parameters, @NotNull BindingTrace trace) {
         for (JetParameter parameter : parameters) {
@@ -116,7 +115,7 @@ public class AnnotationUtils {
         return "kotlin.javaClass.function".equals(getIntrinsicAnnotationArgument(resolvedCall.getResultingDescriptor().getOriginal()));
     }
 
-    public static boolean isPropertyCompileTimeConstant(@NotNull PropertyDescriptor descriptor) {
+    public static boolean isPropertyCompileTimeConstant(@NotNull VariableDescriptor descriptor) {
         if (descriptor.isVar()) {
             return false;
         }
@@ -131,6 +130,6 @@ public class AnnotationUtils {
         return "java.lang.Class".equals(DescriptorUtils.getFqName(descriptor).asString());
     }
 
-    private AnnotationUtils() {
+    private CompileTimeConstantUtils() {
     }
 }

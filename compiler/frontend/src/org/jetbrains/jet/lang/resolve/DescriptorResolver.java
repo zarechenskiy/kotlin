@@ -29,6 +29,7 @@ import org.jetbrains.jet.lang.descriptors.*;
 import org.jetbrains.jet.lang.descriptors.annotations.Annotations;
 import org.jetbrains.jet.lang.descriptors.impl.*;
 import org.jetbrains.jet.lang.diagnostics.DiagnosticFactory1;
+import org.jetbrains.jet.lang.evaluate.EvaluatePackage;
 import org.jetbrains.jet.lang.psi.*;
 import org.jetbrains.jet.lang.resolve.calls.autocasts.DataFlowInfo;
 import org.jetbrains.jet.lang.resolve.name.Name;
@@ -952,6 +953,10 @@ public class DescriptorResolver {
                                                                JetType type =
                                                                        resolveInitializerType(scope, initializer, dataFlowInfo, trace);
 
+                                                               EvaluatePackage.recordCompileTimeValueForInitializerIfNeeded(
+                                                                       variableDescriptor,
+                                                                       initializer, type,
+                                                                       trace);
                                                                return transformAnonymousTypeIfNeeded(variableDescriptor, variable, type,
                                                                                                      trace);
                                                            }
@@ -1164,7 +1169,7 @@ public class DescriptorResolver {
                 resolveVisibilityFromModifiers(modifierList, getDefaultConstructorVisibility(classDescriptor)),
                 DescriptorUtils.isConstructorOfStaticNestedClass(constructorDescriptor));
         if (isAnnotationClass(classDescriptor)) {
-            AnnotationUtils.checkConstructorParametersType(valueParameters, trace);
+            CompileTimeConstantUtils.checkConstructorParametersType(valueParameters, trace);
         }
         return constructor;
     }
