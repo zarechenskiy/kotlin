@@ -76,6 +76,11 @@ public class CompileKotlinAgainstInlineKotlinTestGenerated extends AbstractCompi
         doBoxTest("compiler/testData/codegen/boxInline/forEachLine");
     }
     
+    @TestMetadata("generics")
+    public void testGenerics() throws Exception {
+        doBoxTest("compiler/testData/codegen/boxInline/generics");
+    }
+    
     @TestMetadata("inlineChain")
     public void testInlineChain() throws Exception {
         doBoxTest("compiler/testData/codegen/boxInline/inlineChain");
@@ -139,6 +144,11 @@ public class CompileKotlinAgainstInlineKotlinTestGenerated extends AbstractCompi
     @TestMetadata("simpleDouble")
     public void testSimpleDouble() throws Exception {
         doBoxTest("compiler/testData/codegen/boxInline/simpleDouble");
+    }
+    
+    @TestMetadata("simpleGenerics")
+    public void testSimpleGenerics() throws Exception {
+        doBoxTest("compiler/testData/codegen/boxInline/simpleGenerics");
     }
     
     @TestMetadata("simpleInt")
