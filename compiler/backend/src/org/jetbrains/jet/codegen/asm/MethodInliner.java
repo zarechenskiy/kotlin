@@ -42,6 +42,8 @@ public class MethodInliner {
     private final List<InlinableAccess> inlinableInvocation = new ArrayList<InlinableAccess>();
 
     //keeps order
+    private final List<ConstructorInvocation> constructorInvocationList = new ArrayList<ConstructorInvocation>();
+    //current state
     private final Map<String, ConstructorInvocation> constructorInvocation = new LinkedHashMap<String, ConstructorInvocation>();
 
     /*
@@ -102,7 +104,7 @@ public class MethodInliner {
 
         MethodNode resultNode = new MethodNode(node.access, node.name, node.desc, node.signature, null);
 
-        final Iterator<ConstructorInvocation> iterator = constructorInvocation.values().iterator();
+        final Iterator<ConstructorInvocation> iterator = constructorInvocationList.iterator();
 
         //TODO add reset to counter
         CounterAdapter inliner = new CounterAdapter(resultNode, parameters.totalSize()) {
@@ -112,11 +114,12 @@ public class MethodInliner {
             public void anew(Type type) {
                 if (isLambdaConstructorCall(type.getInternalName(), "<init>")) {
                     invocation = iterator.next();
+
                     if (invocation.isInlinable()) {
                         LambdaTransformer transformer = new LambdaTransformer(invocation.getOwnerInternalName(), parent.subInline(parent.nameGenerator));
                         transformer.doTransform(invocation);
-
                         super.anew(transformer.getNewLambdaType());
+                        constructorInvocation.put(invocation.getOwnerInternalName(), invocation);
                     } else {
                         super.anew(type);
                     }
@@ -310,7 +313,7 @@ public class MethodInliner {
                     }
 
                     ConstructorInvocation invocation = new ConstructorInvocation(owner, infos);
-                    constructorInvocation.put(owner, invocation);
+                    constructorInvocationList.add(invocation);
                 }
             }
             cur = cur.getNext();
