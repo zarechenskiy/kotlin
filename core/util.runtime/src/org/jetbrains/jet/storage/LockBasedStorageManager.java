@@ -59,6 +59,10 @@ public class LockBasedStorageManager implements StorageManager {
         }
     };
 
+    public static LockBasedStorageManager createWithExceptionHandling(@NotNull ExceptionHandlingStrategy exceptionHandlingStrategy) {
+        return new LockBasedStorageManager(exceptionHandlingStrategy);
+    }
+
     protected final Lock lock;
     private final ExceptionHandlingStrategy exceptionHandlingStrategy;
     private final String debugText;
@@ -77,7 +81,7 @@ public class LockBasedStorageManager implements StorageManager {
         this(getPointOfConstruction(), ExceptionHandlingStrategy.THROW, new ReentrantLock());
     }
 
-    public LockBasedStorageManager(@NotNull ExceptionHandlingStrategy exceptionHandlingStrategy) {
+    private LockBasedStorageManager(@NotNull ExceptionHandlingStrategy exceptionHandlingStrategy) {
         this(getPointOfConstruction(), exceptionHandlingStrategy, new ReentrantLock());
     }
 

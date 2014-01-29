@@ -433,7 +433,7 @@ public class StorageManagerTest extends TestCase {
     public void testExceptionHandlingStrategyForLazyValues() throws Exception {
         class RethrownException extends RuntimeException {}
 
-        LockBasedStorageManager m = new LockBasedStorageManager(new LockBasedStorageManager.ExceptionHandlingStrategy() {
+        LockBasedStorageManager m = LockBasedStorageManager.createWithExceptionHandling(new LockBasedStorageManager.ExceptionHandlingStrategy() {
             @NotNull
             @Override
             public RuntimeException handleException(@NotNull Throwable throwable) {
@@ -459,7 +459,7 @@ public class StorageManagerTest extends TestCase {
     public void testExceptionHandlingStrategyForMemoizedFunctions() throws Exception {
         class RethrownException extends RuntimeException {}
 
-        LockBasedStorageManager m = new LockBasedStorageManager(new LockBasedStorageManager.ExceptionHandlingStrategy() {
+        LockBasedStorageManager m = LockBasedStorageManager.createWithExceptionHandling(new LockBasedStorageManager.ExceptionHandlingStrategy() {
             @NotNull
             @Override
             public RuntimeException handleException(@NotNull Throwable throwable) {
