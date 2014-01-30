@@ -37,8 +37,8 @@ import org.jetbrains.jet.lang.resolve.lazy.declarations.FileBasedDeclarationProv
 import org.jetbrains.jet.lang.resolve.name.FqName;
 import org.jetbrains.jet.lang.resolve.name.Name;
 import org.jetbrains.jet.lang.types.lang.KotlinBuiltIns;
-import org.jetbrains.jet.storage.LockBasedLazyResolveStorageManager;
 import org.jetbrains.jet.storage.LockBasedStorageManager;
+import org.jetbrains.jet.storage.LockBasedStorageManagerWithExceptionTracking;
 import org.jetbrains.k2js.config.Config;
 
 import java.util.Collection;
@@ -153,7 +153,7 @@ public final class AnalyzerFacadeForJS {
 
     @NotNull
     public static ResolveSession getLazyResolveSession(Collection<JetFile> files, Config config) {
-        LockBasedLazyResolveStorageManager storageManager = new LockBasedLazyResolveStorageManager(new LockBasedStorageManager());
+        LockBasedStorageManagerWithExceptionTracking storageManager = LockBasedStorageManagerWithExceptionTracking.create();
         FileBasedDeclarationProviderFactory declarationProviderFactory = new FileBasedDeclarationProviderFactory(
                 storageManager, Config.withJsLibAdded(files, config), Predicates.<FqName>alwaysFalse());
         ModuleDescriptorImpl module = createJsModule("<lazy module>");

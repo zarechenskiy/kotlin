@@ -21,7 +21,7 @@ import jet.Function1;
 import jet.Unit;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.jet.utils.ExceptionUtils;
+import org.jetbrains.jet.utils.UtilsPackage;
 import org.jetbrains.jet.utils.WrappedValues;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,7 +31,27 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class LockBasedStorageManager implements StorageManager {
 
-    public static final StorageManager NO_LOCKS = new LockBasedStorageManager("NO_LOCKS", NoLock.INSTANCE) {
+    public interface ExceptionHandlingStrategy {
+        ExceptionHandlingStrategy THROW = new ExceptionHandlingStrategy() {
+            @NotNull
+            @Override
+            public RuntimeException handleException(@NotNull Throwable throwable) {
+                throw UtilsPackage.rethrow(throwable);
+            }
+        };
+
+        /*
+         * The signature of this method is a trick: it is used as
+         *
+         *     throw strategy.handleException(...)
+         *
+         * most implementations of this method throw exceptions themselves, so it does not matter what they return
+         */
+        @NotNull
+        RuntimeException handleException(@NotNull Throwable throwable);
+    }
+
+    public static final StorageManager NO_LOCKS = new LockBasedStorageManager("NO_LOCKS", ExceptionHandlingStrategy.THROW, NoLock.INSTANCE) {
         @NotNull
         @Override
         protected <T> RecursionDetectedResult<T> recursionDetectedDefault() {
@@ -39,11 +59,30 @@ public class LockBasedStorageManager implements StorageManager {
         }
     };
 
+    public static LockBasedStorageManager createWithExceptionHandling(@NotNull ExceptionHandlingStrategy exceptionHandlingStrategy) {
+        return new LockBasedStorageManager(exceptionHandlingStrategy);
+    }
+
     protected final Lock lock;
+    private final ExceptionHandlingStrategy exceptionHandlingStrategy;
     private final String debugText;
 
+    private LockBasedStorageManager(
+            @NotNull String debugText,
+            @NotNull ExceptionHandlingStrategy exceptionHandlingStrategy,
+            @NotNull Lock lock
+    ) {
+        this.lock = lock;
+        this.exceptionHandlingStrategy = exceptionHandlingStrategy;
+        this.debugText = debugText;
+    }
+
     public LockBasedStorageManager() {
-        this(getPointOfConstruction(), new ReentrantLock());
+        this(getPointOfConstruction(), ExceptionHandlingStrategy.THROW, new ReentrantLock());
+    }
+
+    protected LockBasedStorageManager(@NotNull ExceptionHandlingStrategy exceptionHandlingStrategy) {
+        this(getPointOfConstruction(), exceptionHandlingStrategy, new ReentrantLock());
     }
 
     private static String getPointOfConstruction() {
@@ -51,11 +90,6 @@ public class LockBasedStorageManager implements StorageManager {
         // we need to skip frames for getStackTrace(), this method and the constructor that's calling it
         if (trace.length <= 3) return "<unknown creating class>";
         return trace[3].toString();
-    }
-
-    private LockBasedStorageManager(@NotNull String debugText, @NotNull Lock lock) {
-        this.lock = lock;
-        this.debugText = debugText;
     }
 
     @Override
@@ -276,7 +310,7 @@ public class LockBasedStorageManager implements StorageManager {
                         // Store only if it's a genuine result, not something thrown through recursionDetected()
                         value = WrappedValues.escapeThrowable(throwable);
                     }
-                    throw ExceptionUtils.rethrow(throwable);
+                    throw exceptionHandlingStrategy.handleException(throwable);
                 }
             }
             finally {
@@ -352,12 +386,12 @@ public class LockBasedStorageManager implements StorageManager {
                     return typedValue;
                 }
                 catch (Throwable throwable) {
-                    if (throwable == error) throw error;
+                    if (throwable == error) throw exceptionHandlingStrategy.handleException(throwable);
 
                     Object oldValue = cache.put(input, WrappedValues.escapeThrowable(throwable));
                     assert oldValue == NotValue.COMPUTING : "Race condition detected on input " + input + ". Old value is " + oldValue;
 
-                    throw ExceptionUtils.rethrow(throwable);
+                    throw exceptionHandlingStrategy.handleException(throwable);
                 }
             }
             finally {
