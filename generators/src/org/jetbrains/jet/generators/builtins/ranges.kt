@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package org.jetbrains.jet.generators.runtime.ranges
+package org.jetbrains.jet.generators.builtins.ranges
 
-import org.jetbrains.jet.generators.runtime.*
-import org.jetbrains.jet.generators.runtime.ProgressionKind.*
+import org.jetbrains.jet.generators.builtins.*
+import org.jetbrains.jet.generators.builtins.generateBuiltIns.*
+import org.jetbrains.jet.generators.builtins.ProgressionKind.*
 import java.io.PrintWriter
 
-class GenerateRanges(val out: PrintWriter) {
-    fun generate() {
-        generatedBy(out, javaClass.getName())
+class GenerateRanges(out: PrintWriter) : BuiltInsSourceGenerator(out) {
+    override fun generateBody() {
         for (kind in ProgressionKind.values()) {
             val t = kind.capitalized
             val range = "${t}Range"
@@ -77,11 +77,5 @@ class GenerateRanges(val out: PrintWriter) {
 }""")
             out.println()
         }
-    }
-}
-
-fun main(args: Array<String>) {
-    generateBuiltInFile("Ranges.kt") {
-        GenerateRanges(it).generate()
     }
 }

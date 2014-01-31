@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package org.jetbrains.jet.generators.runtime.progressionIterators
+package org.jetbrains.jet.generators.builtins.progressionIterators
 
-import org.jetbrains.jet.generators.runtime.*
-import org.jetbrains.jet.generators.runtime.ProgressionKind.*
+import org.jetbrains.jet.generators.builtins.*
+import org.jetbrains.jet.generators.builtins.generateBuiltIns.*
+import org.jetbrains.jet.generators.builtins.ProgressionKind.*
 import java.io.PrintWriter
 
 fun integerProgressionIterator(kind: ProgressionKind): String {
@@ -66,9 +67,8 @@ fun floatingPointProgressionIterator(kind: ProgressionKind): String {
 }"""
 }
 
-class GenerateProgressionIterators(val out: PrintWriter) {
-    fun generate() {
-        generatedBy(out, javaClass.getName())
+class GenerateProgressionIterators(out: PrintWriter) : BuiltInsSourceGenerator(out) {
+    override fun generateBody() {
         out.println("import jet.runtime.ProgressionUtil")
         out.println()
         for (kind in ProgressionKind.values()) {
@@ -80,11 +80,5 @@ class GenerateProgressionIterators(val out: PrintWriter) {
             }
             out.println()
         }
-    }
-}
-
-fun main(args: Array<String>) {
-    generateBuiltInFile("ProgressionIterators.kt") {
-        GenerateProgressionIterators(it).generate()
     }
 }

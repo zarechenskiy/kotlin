@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.jetbrains.jet.generators.runtime.iterators
+package org.jetbrains.jet.generators.builtins.iterators
 
-import org.jetbrains.jet.generators.runtime.*
+import org.jetbrains.jet.generators.builtins.generateBuiltIns.*
 import java.io.PrintWriter
 
 enum class IteratorKind {
@@ -32,9 +32,8 @@ enum class IteratorKind {
     val capitalized: String get() = name().toLowerCase().capitalize()
 }
 
-class GenerateIterators(val out: PrintWriter) {
-    fun generate() {
-        generatedBy(out, javaClass.getName())
+class GenerateIterators(out: PrintWriter) : BuiltInsSourceGenerator(out) {
+    override fun generateBody() {
         for (kind in IteratorKind.values()) {
             val s = kind.capitalized
             out.println("public abstract class ${s}Iterator : Iterator<$s> {")
@@ -44,11 +43,5 @@ class GenerateIterators(val out: PrintWriter) {
             out.println("}")
             out.println()
         }
-    }
-}
-
-fun main(args: Array<String>) {
-    generateBuiltInFile("Iterators.kt") {
-        GenerateIterators(it).generate()
     }
 }

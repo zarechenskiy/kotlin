@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package org.jetbrains.jet.generators.runtime.progressions
+package org.jetbrains.jet.generators.builtins.progressions
 
-import org.jetbrains.jet.generators.runtime.*
-import org.jetbrains.jet.generators.runtime.ProgressionKind.*
+import org.jetbrains.jet.generators.builtins.*
+import org.jetbrains.jet.generators.builtins.generateBuiltIns.*
+import org.jetbrains.jet.generators.builtins.ProgressionKind.*
 import java.io.PrintWriter
 
-class GenerateProgressions(val out: PrintWriter) {
-    fun generate() {
-        generatedBy(out, javaClass.getName())
+class GenerateProgressions(out: PrintWriter) : BuiltInsSourceGenerator(out) {
+    override fun generateBody() {
         for (kind in ProgressionKind.values()) {
             val t = kind.capitalized
             val progression = "${t}Progression"
@@ -80,11 +80,5 @@ class GenerateProgressions(val out: PrintWriter) {
 }""")
             out.println()
         }
-    }
-}
-
-fun main(args: Array<String>) {
-    generateBuiltInFile("Progressions.kt") {
-        GenerateProgressions(it).generate()
     }
 }
