@@ -40,7 +40,6 @@ import org.jetbrains.jet.lang.types.checker.JetTypeChecker;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import static org.jetbrains.jet.lang.resolve.calls.CallResolverUtil.isOrOverridesSynthesized;
@@ -81,7 +80,7 @@ public class TaskPrioritizer {
     public static <D extends CallableDescriptor, F extends D> List<ResolutionTask<D, F>> computePrioritizedTasks(
             @NotNull BasicCallResolutionContext context,
             @NotNull Name name,
-            @NotNull JetReferenceExpression functionReference,
+            @NotNull TracingStrategy tracing,
             @NotNull List<CallableDescriptorCollector<? extends D>> callableDescriptorCollectors
     ) {
         List<Pair<JetScope, ReceiverValue>> variants = new ArrayList<Pair<JetScope, ReceiverValue>>(2);
@@ -100,7 +99,7 @@ public class TaskPrioritizer {
         }
 
         ResolutionTaskHolder<D, F> result =
-                new ResolutionTaskHolder<D, F>(functionReference, context, new MyPriorityProvider<D>(context), null);
+                new ResolutionTaskHolder<D, F>(context, new MyPriorityProvider<D>(context), tracing);
         for (Pair<JetScope, ReceiverValue> pair : variants) {
             doComputeTasks(pair.second, new TaskPrioritizerContext<D, F>(name, result, context, pair.first, callableDescriptorCollectors));
         }
@@ -334,12 +333,11 @@ public class TaskPrioritizer {
 
     public static <D extends CallableDescriptor, F extends D> List<ResolutionTask<D, F>> computePrioritizedTasksFromCandidates(
             @NotNull BasicCallResolutionContext context,
-            @NotNull JetReferenceExpression functionReference,
             @NotNull Collection<ResolutionCandidate<D>> candidates,
-            @Nullable TracingStrategy tracing
+            @NotNull TracingStrategy tracing
     ) {
         ResolutionTaskHolder<D, F> result = new ResolutionTaskHolder<D, F>(
-                functionReference, context, new MyPriorityProvider<D>(context), tracing);
+                context, new MyPriorityProvider<D>(context), tracing);
         result.addCandidates(candidates);
         return result.getTasks();
     }
