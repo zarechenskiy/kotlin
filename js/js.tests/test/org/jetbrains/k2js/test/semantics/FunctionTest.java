@@ -51,15 +51,15 @@ public class FunctionTest extends AbstractExpressionTest {
     }
 
     public void testClosureWithParameter() throws Exception {
-        checkFooBoxIsOk("closureWithParameter.kt");
+        checkFooBoxIsOk();
     }
 
     public void testClosureWithParameterAndBoxing() throws Exception {
-        checkFooBoxIsOk("closureWithParameterAndBoxing.kt");
+        checkFooBoxIsOk();
     }
 
     public void testEnclosingThis() throws Exception {
-        runFunctionOutputTest("enclosingThis.kt", "foo", "box", "OK");
+        checkFooBoxIsOk();
     }
 
 
@@ -112,4 +112,13 @@ public class FunctionTest extends AbstractExpressionTest {
     public void testCallFunInInit() throws Exception {
         fooBoxTest();
     }
+
+    public void testMangling() throws Exception {
+        checkFooBoxIsOk();
+    }
+
+    public void testOverloadingWithInheritance() throws Exception {
+        checkFooBoxIsOk();
+    }
+
 }

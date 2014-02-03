@@ -14,9 +14,31 @@
  * limitations under the License.
  */
 
-function test() {
-    var a = Kotlin.arrayFromFun(3, function () {
-        return 3
-    });
-    return (a[0] == 3) && (a[2] == 3) && (a[1] == 3);
+package foo
+
+fun run<T>(f: () -> T) = f()
+
+fun box(): String {
+    fun simple(s: String? = null): String {
+        if (s != null) return s
+
+        return run {
+            simple("OK")
+        }
+    }
+
+    if (simple("OK") != "OK") return "failed on simple recursion"
+
+    val ok = "OK"
+    fun withClosure(s: String? = null): String {
+        if (s != null) return s
+
+        return ok + run {
+            withClosure(ok)
+        }
+    }
+
+    if (withClosure() != ok + ok) return "failed when closure something"
+
+    return "OK"
 }
