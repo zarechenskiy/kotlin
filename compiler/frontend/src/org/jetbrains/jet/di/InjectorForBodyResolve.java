@@ -92,7 +92,7 @@ public class InjectorForBodyResolve {
         this.annotationResolver = new AnnotationResolver();
         this.callResolver = new CallResolver();
         this.argumentTypeResolver = new ArgumentTypeResolver();
-        this.expressionTypingServices = new ExpressionTypingServices(storageManager, platformToKotlinClassMap);
+        this.expressionTypingServices = new ExpressionTypingServices(getBodiesResolveContext(), platformToKotlinClassMap);
         this.callExpressionResolver = new CallExpressionResolver();
         this.descriptorResolver = new DescriptorResolver();
         this.delegatedPropertyResolver = new DelegatedPropertyResolver();
@@ -176,10 +176,6 @@ public class InjectorForBodyResolve {
     
     public Project getProject() {
         return this.project;
-    }
-    
-    public TopDownAnalysisParameters getTopDownAnalysisParameters() {
-        return this.topDownAnalysisParameters;
     }
     
     public BindingTrace getBindingTrace() {
