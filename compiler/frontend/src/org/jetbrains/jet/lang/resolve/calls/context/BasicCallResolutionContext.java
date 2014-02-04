@@ -95,4 +95,9 @@ public class BasicCallResolutionContext extends CallResolutionContext<BasicCallR
     protected BasicCallResolutionContext self() {
         return this;
     }
+
+    public BasicCallResolutionContext replaceCall(Call newCall) {
+        return create(trace, scope, newCall, expectedType, dataFlowInfo, contextDependency, checkArguments, resolutionResultsCache,
+                      labelResolver, dataFlowInfoForArguments, callResolverExtension, isAnnotationContext);
+    }
 }

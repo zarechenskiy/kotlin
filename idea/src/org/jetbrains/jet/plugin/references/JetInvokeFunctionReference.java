@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import static org.jetbrains.jet.lang.resolve.BindingContext.CALL;
 import static org.jetbrains.jet.lang.resolve.BindingContext.RESOLVED_CALL;
 
 class JetInvokeFunctionReference extends JetSimpleReference<JetCallExpression> implements MultiRangeReference {
@@ -49,10 +50,15 @@ class JetInvokeFunctionReference extends JetSimpleReference<JetCallExpression> i
     @Override
     @NotNull
     protected Collection<DeclarationDescriptor> getTargetDescriptors(@NotNull BindingContext context) {
-        ResolvedCall<? extends CallableDescriptor> resolvedCall = context.get(RESOLVED_CALL, getExpression().getCalleeExpression());
+        JetExpression calleeExpression = getExpression().getCalleeExpression();
+        ResolvedCall<? extends CallableDescriptor> resolvedCall = context.get(RESOLVED_CALL, calleeExpression);
         if (resolvedCall instanceof VariableAsFunctionResolvedCall) {
             return Collections.<DeclarationDescriptor>singleton(((VariableAsFunctionResolvedCall) resolvedCall).getCandidateDescriptor());
         }
+        Call call = context.get(CALL, calleeExpression);
+        if (call != null && resolvedCall != null && call.getCallType() == Call.CallType.INVOKE_ON_EXPR) {
+            return Collections.<DeclarationDescriptor>singleton(resolvedCall.getCandidateDescriptor());
+        }        
         return Collections.emptyList();
     }
 

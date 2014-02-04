@@ -39,6 +39,7 @@ import org.jetbrains.jet.lang.resolve.calls.results.OverloadResolutionResultsImp
 import org.jetbrains.jet.lang.resolve.calls.tasks.ExplicitReceiverKind;
 import org.jetbrains.jet.lang.resolve.calls.tasks.ResolutionCandidate;
 import org.jetbrains.jet.lang.resolve.calls.tasks.ResolutionTask;
+import org.jetbrains.jet.lang.resolve.calls.tasks.TracingStrategyForInvoke;
 import org.jetbrains.jet.lang.resolve.calls.util.DelegatingCall;
 import org.jetbrains.jet.lang.resolve.scopes.receivers.ExpressionReceiver;
 import org.jetbrains.jet.lang.resolve.scopes.receivers.ReceiverValue;
@@ -197,7 +198,7 @@ public class CallTransformer<D extends CallableDescriptor, F extends D> {
             if (calleeExpression == null) return Collections.emptyList();
 
             ExpressionReceiver variableReceiver = new ExpressionReceiver(calleeExpression, variableResolvedCall.getResultingDescriptor().getType());
-            Call functionCall = new CallForImplicitInvoke(context.receiverForVariableAsFunctionSecondCall, variableReceiver, task.call);
+            Call functionCall = new CallForImplicitInvoke(context.receiverForVariableAsFunctionSecondCall, variableReceiver, task.call, false);
 
             DelegatingBindingTrace variableCallTrace = context.candidateCall.getTrace();
             BasicCallResolutionContext basicCallResolutionContext = BasicCallResolutionContext.create(
@@ -205,8 +206,9 @@ public class CallTransformer<D extends CallableDescriptor, F extends D> {
                     functionCall, context.checkArguments, context.dataFlowInfoForArguments);
 
             // 'invoke' call resolve
+            TracingStrategyForInvoke tracingForInvoke = new TracingStrategyForInvoke(calleeExpression, functionCall);
             OverloadResolutionResults<FunctionDescriptor> results = callResolver.resolveCallForInvoke(
-                    basicCallResolutionContext, context.tracing); //todo context.tracing is incorrect
+                    basicCallResolutionContext, tracingForInvoke);
             Collection<ResolvedCallWithTrace<FunctionDescriptor>> calls = ((OverloadResolutionResultsImpl<FunctionDescriptor>)results).getResultingCalls();
 
             return Collections2.transform(calls, new Function<ResolvedCallWithTrace<FunctionDescriptor>, ResolvedCallWithTrace<FunctionDescriptor>>() {
@@ -219,21 +221,24 @@ public class CallTransformer<D extends CallableDescriptor, F extends D> {
     };
 
     public static class CallForImplicitInvoke extends DelegatingCall {
-        final Call outerCall;
-        final ReceiverValue receiverForVariableAsFunctionSecondCall;
-        final ExpressionReceiver receiverFromVariable;
-        final JetSimpleNameExpression invokeExpression;
+        private final Call outerCall;
+        private final ReceiverValue receiverForVariableAsFunctionSecondCall;
+        private final ExpressionReceiver receiverFromVariable;
+        private final JetSimpleNameExpression invokeExpression;
+        private final boolean invokeOnExpression;
 
-        private CallForImplicitInvoke(
+        public CallForImplicitInvoke(
                 @NotNull ReceiverValue receiverForVariableAsFunctionSecondCall,
                 @NotNull ExpressionReceiver receiverFromVariable,
-                @NotNull Call call
+                @NotNull Call call,
+                boolean invokeOnExpression
         ) {
             super(call);
             this.outerCall = call;
             this.receiverForVariableAsFunctionSecondCall = receiverForVariableAsFunctionSecondCall;
             this.receiverFromVariable = receiverFromVariable;
             this.invokeExpression = (JetSimpleNameExpression) JetPsiFactory.createExpression(call.getCallElement().getProject(), "invoke");
+            this.invokeOnExpression = invokeOnExpression;
         }
 
         @NotNull
@@ -256,20 +261,13 @@ public class CallTransformer<D extends CallableDescriptor, F extends D> {
         @NotNull
         @Override
         public PsiElement getCallElement() {
-            if (outerCall.getCallElement() instanceof JetCallElement) {
-                //to report errors properly
-                JetValueArgumentList list = ((JetCallElement)outerCall.getCallElement()).getValueArgumentList();
-                if (list != null) {
-                    return list;
-                }
-            }
-            return invokeExpression;
+            return outerCall.getCallElement();
         }
 
         @NotNull
         @Override
         public CallType getCallType() {
-            return CallType.INVOKE;
+            return invokeOnExpression ? CallType.INVOKE_ON_EXPR : CallType.INVOKE;
         }
 
         @NotNull
