@@ -270,7 +270,7 @@ import static org.jetbrains.jet.lang.resolve.calls.ValueArgumentsToParametersMap
             }
             if (receiverParameter == null && receiverArgument.exists()) {
                 tracing.noReceiverAllowed(candidateCall.getTrace());
-                if (call.getCalleeExpression() instanceof JetSimpleNameExpression) {
+                if (call.getCalleeExpression() instanceof JetSimpleNameExpression && call.getCallType() != Call.CallType.INVOKE_ON_EXPR) {
                     setStatus(STRONG_ERROR);
                 }
                 else {
