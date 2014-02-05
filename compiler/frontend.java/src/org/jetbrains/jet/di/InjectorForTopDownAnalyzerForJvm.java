@@ -62,6 +62,7 @@ import org.jetbrains.jet.lang.resolve.kotlin.DeserializedDescriptorResolver;
 import org.jetbrains.jet.lang.resolve.kotlin.DescriptorDeserializers;
 import org.jetbrains.jet.lang.resolve.kotlin.AnnotationDescriptorDeserializer;
 import org.jetbrains.jet.lang.resolve.kotlin.DescriptorDeserializersStorage;
+import org.jetbrains.jet.lang.resolve.kotlin.ConstantDescriptorDeserializer;
 import org.jetbrains.annotations.NotNull;
 import javax.annotation.PreDestroy;
 
@@ -115,6 +116,7 @@ public class InjectorForTopDownAnalyzerForJvm implements InjectorForTopDownAnaly
     private final DescriptorDeserializers descriptorDeserializers;
     private final AnnotationDescriptorDeserializer annotationDescriptorDeserializer;
     private final DescriptorDeserializersStorage descriptorDeserializersStorage;
+    private final ConstantDescriptorDeserializer constantDescriptorDeserializer;
     
     public InjectorForTopDownAnalyzerForJvm(
         @NotNull Project project,
@@ -168,6 +170,7 @@ public class InjectorForTopDownAnalyzerForJvm implements InjectorForTopDownAnaly
         this.descriptorDeserializers = new DescriptorDeserializers();
         this.annotationDescriptorDeserializer = new AnnotationDescriptorDeserializer();
         this.descriptorDeserializersStorage = new DescriptorDeserializersStorage(storageManager);
+        this.constantDescriptorDeserializer = new ConstantDescriptorDeserializer();
 
         this.topDownAnalyzer.setBodyResolver(bodyResolver);
         this.topDownAnalyzer.setContext(topDownAnalysisContext);
@@ -294,6 +297,7 @@ public class InjectorForTopDownAnalyzerForJvm implements InjectorForTopDownAnaly
         deserializedDescriptorResolver.setStorageManager(storageManager);
 
         descriptorDeserializers.setAnnotationDescriptorDeserializer(annotationDescriptorDeserializer);
+        descriptorDeserializers.setConstantDescriptorDeserializer(constantDescriptorDeserializer);
 
         annotationDescriptorDeserializer.setErrorReporter(traceBasedErrorReporter);
         annotationDescriptorDeserializer.setJavaDescriptorResolver(javaDescriptorResolver);
@@ -302,6 +306,11 @@ public class InjectorForTopDownAnalyzerForJvm implements InjectorForTopDownAnaly
 
         descriptorDeserializersStorage.setErrorReporter(traceBasedErrorReporter);
         descriptorDeserializersStorage.setJavaDescriptorResolver(javaDescriptorResolver);
+
+        constantDescriptorDeserializer.setErrorReporter(traceBasedErrorReporter);
+        constantDescriptorDeserializer.setJavaDescriptorResolver(javaDescriptorResolver);
+        constantDescriptorDeserializer.setKotlinClassFinder(virtualFileFinder);
+        constantDescriptorDeserializer.setStorage(descriptorDeserializersStorage);
 
         javaClassFinder.initialize();
 
