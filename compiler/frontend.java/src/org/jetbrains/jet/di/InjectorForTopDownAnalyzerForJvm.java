@@ -59,7 +59,9 @@ import org.jetbrains.jet.lang.resolve.TypeHierarchyResolver;
 import org.jetbrains.jet.lang.resolve.java.lazy.LazyJavaPackageFragmentProvider;
 import org.jetbrains.jet.lang.resolve.java.lazy.GlobalJavaResolverContext;
 import org.jetbrains.jet.lang.resolve.kotlin.DeserializedDescriptorResolver;
+import org.jetbrains.jet.lang.resolve.kotlin.DescriptorDeserializers;
 import org.jetbrains.jet.lang.resolve.kotlin.AnnotationDescriptorDeserializer;
+import org.jetbrains.jet.lang.resolve.kotlin.DescriptorDeserializersStorage;
 import org.jetbrains.annotations.NotNull;
 import javax.annotation.PreDestroy;
 
@@ -110,7 +112,9 @@ public class InjectorForTopDownAnalyzerForJvm implements InjectorForTopDownAnaly
     private final LazyJavaPackageFragmentProvider lazyJavaPackageFragmentProvider;
     private final GlobalJavaResolverContext globalJavaResolverContext;
     private final DeserializedDescriptorResolver deserializedDescriptorResolver;
+    private final DescriptorDeserializers descriptorDeserializers;
     private final AnnotationDescriptorDeserializer annotationDescriptorDeserializer;
+    private final DescriptorDeserializersStorage descriptorDeserializersStorage;
     
     public InjectorForTopDownAnalyzerForJvm(
         @NotNull Project project,
@@ -161,7 +165,9 @@ public class InjectorForTopDownAnalyzerForJvm implements InjectorForTopDownAnaly
         this.overloadResolver = new OverloadResolver();
         this.overrideResolver = new OverrideResolver();
         this.typeHierarchyResolver = new TypeHierarchyResolver();
-        this.annotationDescriptorDeserializer = new AnnotationDescriptorDeserializer(storageManager);
+        this.descriptorDeserializers = new DescriptorDeserializers();
+        this.annotationDescriptorDeserializer = new AnnotationDescriptorDeserializer();
+        this.descriptorDeserializersStorage = new DescriptorDeserializersStorage(storageManager);
 
         this.topDownAnalyzer.setBodyResolver(bodyResolver);
         this.topDownAnalyzer.setContext(topDownAnalysisContext);
@@ -281,15 +287,21 @@ public class InjectorForTopDownAnalyzerForJvm implements InjectorForTopDownAnaly
         typeHierarchyResolver.setScriptHeaderResolver(scriptHeaderResolver);
         typeHierarchyResolver.setTrace(bindingTrace);
 
-        deserializedDescriptorResolver.setAnnotationDeserializer(annotationDescriptorDeserializer);
+        deserializedDescriptorResolver.setAnnotationDeserializer(descriptorDeserializers);
         deserializedDescriptorResolver.setErrorReporter(traceBasedErrorReporter);
         deserializedDescriptorResolver.setJavaDescriptorResolver(javaDescriptorResolver);
         deserializedDescriptorResolver.setJavaPackageFragmentProvider(lazyJavaPackageFragmentProvider);
         deserializedDescriptorResolver.setStorageManager(storageManager);
 
+        descriptorDeserializers.setAnnotationDescriptorDeserializer(annotationDescriptorDeserializer);
+
         annotationDescriptorDeserializer.setErrorReporter(traceBasedErrorReporter);
         annotationDescriptorDeserializer.setJavaDescriptorResolver(javaDescriptorResolver);
         annotationDescriptorDeserializer.setKotlinClassFinder(virtualFileFinder);
+        annotationDescriptorDeserializer.setStorage(descriptorDeserializersStorage);
+
+        descriptorDeserializersStorage.setErrorReporter(traceBasedErrorReporter);
+        descriptorDeserializersStorage.setJavaDescriptorResolver(javaDescriptorResolver);
 
         javaClassFinder.initialize();
 
