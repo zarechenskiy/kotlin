@@ -20,11 +20,10 @@ import jet.Function1;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.lang.descriptors.annotations.AnnotationDescriptor;
-import org.jetbrains.jet.lang.resolve.constants.CompileTimeConstant;
+import org.jetbrains.jet.lang.resolve.constants.*;
 import org.jetbrains.jet.lang.resolve.java.JavaDescriptorResolver;
 import org.jetbrains.jet.lang.resolve.java.JvmClassName;
 import org.jetbrains.jet.lang.resolve.java.resolver.ErrorReporter;
-import org.jetbrains.jet.lang.resolve.java.resolver.ResolverPackage;
 import org.jetbrains.jet.lang.resolve.name.Name;
 import org.jetbrains.jet.storage.MemoizedFunctionToNotNull;
 import org.jetbrains.jet.storage.StorageManager;
@@ -86,8 +85,13 @@ public class DescriptorDeserializersStorage {
 
             @Nullable
             @Override
-            public KotlinJvmBinaryClass.AnnotationVisitor visitField(@NotNull Name name, @NotNull String desc) {
-                return new MemberAnnotationVisitor(MemberSignature.fromFieldNameAndDesc(name, desc));
+            public KotlinJvmBinaryClass.AnnotationVisitor visitField(@NotNull Name name, @NotNull String desc, @Nullable Object initializer) {
+                MemberSignature signature = MemberSignature.fromFieldNameAndDesc(name, desc);
+                if (initializer != null) {
+                    propertyConstants.put(signature, ConstantUtils.createCompileTimeConstant(
+                            initializer, /* canBeUsedInAnnotation */ true, /* isPureIntConstant */ true, /* expectedType */ null));
+                }
+                return new MemberAnnotationVisitor(signature);
             }
 
             class AnnotationVisitorForMethod extends MemberAnnotationVisitor implements KotlinJvmBinaryClass.MethodAnnotationVisitor {

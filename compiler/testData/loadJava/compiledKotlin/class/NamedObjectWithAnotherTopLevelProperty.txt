@@ -1,6 +1,6 @@
 package test
 
-internal val x: jet.Int
+internal val x: jet.Int = 5.toInt()
     internal fun <get-x>(): jet.Int
 
 public object Obj {
