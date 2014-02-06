@@ -129,12 +129,12 @@ public class TranslationContext {
     }
 
     @NotNull
-    public TranslationContext innerContextWithThisAliased(@NotNull DeclarationDescriptor correspondingDescriptor, @NotNull JsNameRef alias) {
+    public TranslationContext innerContextWithAliased(@NotNull DeclarationDescriptor correspondingDescriptor, @NotNull JsNameRef alias) {
         return new TranslationContext(this, aliasingContext.inner(correspondingDescriptor, alias));
     }
 
     @NotNull
-    public TranslationContext innerContextWithAliasesForExpressions(@NotNull Map<JetExpression, JsName> aliases) {
+    public TranslationContext innerContextWithAliasesForExpressions(@NotNull Map<JetExpression, JsExpression> aliases) {
         return new TranslationContext(this, aliasingContext.withExpressionsAliased(aliases));
     }
 
@@ -261,9 +261,7 @@ public class TranslationContext {
 
     @Nullable
     public JsExpression getAliasForDescriptor(@NotNull DeclarationDescriptor descriptor) {
-        if (usageTracker != null) {
-            usageTracker.triggerUsed(descriptor);
-        }
+        descriptorUsedInThisContext(descriptor);
         return aliasingContext.getAliasForDescriptor(descriptor);
     }
 
@@ -278,9 +276,7 @@ public class TranslationContext {
             effectiveDescriptor = descriptor;
         }
 
-        if (usageTracker != null) {
-            usageTracker.triggerUsed(effectiveDescriptor);
-        }
+        descriptorUsedInThisContext(effectiveDescriptor);
 
         JsExpression alias = aliasingContext.getAliasForDescriptor(effectiveDescriptor);
         return alias == null ? JsLiteral.THIS : alias;
@@ -296,5 +292,11 @@ public class TranslationContext {
 
     public JsNameRef define(String name, JsExpression expression) {
         return getDefinitionPlace().define(name, expression);
+    }
+
+    private void descriptorUsedInThisContext(DeclarationDescriptor effectiveDescriptor) {
+        if (usageTracker != null) {
+            usageTracker.triggerUsed(effectiveDescriptor);
+        }
     }
 }
