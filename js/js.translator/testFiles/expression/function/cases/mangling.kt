@@ -1,153 +1,195 @@
 package foo
 
-fun internal_foo(): Int = 1
-native fun internal_foo(a: Array<Int>) = "should be ingnored"
-fun internal_foo(i: Int): Int = 2
+public fun public_baz(i: Int) {}
+native public fun public_baz(a: String) {}
 
-fun internal_boo(i: Int): Int = 2
-fun internal_boo(s: String): Int = 3
-fun internal_boo(): Int = 1
-native fun internal_boo(a: Array<Int>) = "should be ingnored"
+fun internal_baz(i: Int) {}
+native fun internal_baz(a: String) {}
 
-val internal_f = { internal_foo() + internal_foo(1) }
-val internal_b = { internal_boo() + internal_boo(1) }
+private fun private_baz(i: Int) {}
+native private fun private_baz(a: String) {}
 
+public class PublicClass {
+    public fun public_baz(i: Int) {}
+    native public fun public_baz(a: String) {}
 
-public fun public_foo(): Int = 1
-native public fun public_foo(a: Array<Int>): String = "should be ingnored"
-public fun public_foo(i: Int): Int = 2
+    fun internal_baz(i: Int) {}
+    native fun internal_baz(a: String) {}
 
-public fun public_boo(i: Int): Int = 2
-public fun public_boo(s: String): Int = 3
-public fun public_boo(): Int = 1
-native public fun public_boo(a: Array<Int>): String = "should be ingnored"
+    private fun private_baz(i: Int) {}
+    native private fun private_baz(a: String) {}
 
-val public_f = { public_foo() + public_foo(1) }
-val public_b = { public_boo() + public_boo(1) }
-
-
-native private fun private_foo(a: Array<Int>): String = "should be ingnored"
-private fun private_foo(): Int = 1
-private fun private_foo(i: Int): Int = 2
-
-native private fun private_boo(a: Array<Int>): String = "should be ingnored"
-private fun private_boo(i: Int): Int = 2
-private fun private_boo(s: String): Int = 3
-private fun private_boo(): Int = 1
-
-val private_f = { private_foo() + private_foo(1) }
-val private_b = { private_boo() + private_boo(1) }
-
-
-public fun mixed_foo(s: String): Int = 3
-fun mixed_foo(): Int = 1
-native fun mixed_foo(a: Array<Int>) = "should be ingnored"
-private fun mixed_foo(s: String, i: Int): Int = 4
-fun mixed_foo(i: Int): Int = 2
-
-fun mixed_boo(i: Int): Int = 2
-private fun mixed_boo(s: String, i: Int): Int = 4
-native fun mixed_boo(a: Array<Int>) = "should be ingnored"
-public fun mixed_boo(s: String): Int = 3
-fun mixed_boo(): Int = 1
-
-val mixed_f = { mixed_foo() + mixed_foo(1) + mixed_foo("str") + mixed_foo("str", 44) }
-val mixed_b = { mixed_boo() + mixed_boo(1) + mixed_boo("str") + mixed_boo("str", 44) }
-
-
-class TestInternal {
-    fun foo(): Int = 1
-    fun foo(i: Int): Int = 2
-
-    fun boo(i: Int): Int = 2
-    fun boo(s: String): Int = 3
-    fun boo(): Int = 1
+    val call_private_baz = { private_baz(0)}
+    val call_private_native_baz = { private_baz("native")}
 }
 
-val internal_in_class_f = { TestInternal().foo() + TestInternal().foo(1) }
-val internal_in_class_b = { TestInternal().boo() + TestInternal().boo(1) }
+class InternalClass {
+    public fun public_baz(i: Int) {}
+    native public fun public_baz(a: String) {}
 
+    fun internal_baz(i: Int) {}
+    native fun internal_baz(a: String) {}
 
-class TestPublic {
-    public fun foo(): Int = 1
-    public fun foo(i: Int): Int = 2
+    private fun private_baz(i: Int) {}
+    native private fun private_baz(a: String) {}
 
-    public fun boo(i: Int): Int = 2
-    public fun boo(s: String): Int = 3
-    public fun boo(): Int = 1
+    val call_private_baz = { private_baz(0)}
+    val call_private_native_baz = { private_baz("native")}
 }
 
-val public_in_class_f = { TestPublic().foo() + TestPublic().foo(1) }
-val public_in_class_b = { TestPublic().boo() + TestPublic().boo(1) }
+private class PrivateClass {
+    public fun public_baz(i: Int) {}
+    native public fun public_baz(a: String) {}
 
+    fun internal_baz(i: Int) {}
+    native fun internal_baz(a: String) {}
 
-class TestPrivate {
-    private fun foo(): Int = 1
-    private fun foo(i: Int): Int = 2
+    private fun private_baz(i: Int) {}
+    native private fun private_baz(a: String) {}
 
-    private fun boo(i: Int): Int = 2
-    private fun boo(s: String): Int = 3
-    private fun boo(): Int = 1
-
-    val f = { foo() + foo(1) }
-    val b = { boo() + boo(1) }
+    val call_private_baz = { private_baz(0)}
+    val call_private_native_baz = { private_baz("native")}
 }
 
-val private_in_class_f = TestPrivate().f
-val private_in_class_b = TestPrivate().b
+open public class OpenPublicClass {
+    public fun public_baz(i: Int) {}
+    native public fun public_baz(a: String) {}
 
+    fun internal_baz(i: Int) {}
+    native fun internal_baz(a: String) {}
 
-class TestMixed {
-    public fun foo(s: String): Int = 3
-    fun foo(): Int = 1
-    private fun foo(s: String, i: Int): Int = 4
-    fun foo(i: Int): Int = 2
+    private fun private_baz(i: Int) {}
+    native private fun private_baz(a: String) {}
 
-    fun boo(i: Int): Int = 2
-    private fun boo(s: String, i: Int): Int = 4
-    public fun boo(s: String): Int = 3
-    fun boo(): Int = 1
-
-    val f = { foo() + foo(1) }
-    val b = { boo() + boo(1) }
+    val call_private_baz = { private_baz(0)}
+    val call_private_native_baz = { private_baz("native")}
 }
 
-val mixed_in_class_f = TestMixed().f
-val mixed_in_class_b = TestMixed().b
+open class OpenInternalClass {
+    public fun public_baz(i: Int) {}
+    native public fun public_baz(a: String) {}
 
+    fun internal_baz(i: Int) {}
+    native fun internal_baz(a: String) {}
+
+    private fun private_baz(i: Int) {}
+    native private fun private_baz(a: String) {}
+
+    val call_private_baz = { private_baz(0)}
+    val call_private_native_baz = { private_baz("native")}
+}
+
+open private class OpenPrivateClass {
+    public fun public_baz(i: Int) {}
+    native public fun public_baz(a: String) {}
+
+    fun internal_baz(i: Int) {}
+    native fun internal_baz(a: String) {}
+
+    private fun private_baz(i: Int) {}
+    native private fun private_baz(a: String) {}
+
+    val call_private_baz = { private_baz(0)}
+    val call_private_native_baz = { private_baz("native")}
+}
+
+// Helpers
 
 native
-fun eval(expr: String): Any? = noImpl
-
-val PACKAGE = "Kotlin.modules.JS_TESTS.foo"
-
-fun funToString(name: String) = eval("$PACKAGE.$name.toString()") as String
+fun String.search(regexp: RegExp): Int = noImpl
 
 native
-fun String.replace(regexp: RegExp, replacement: String): String = noImpl
-
-fun String.replaceAll(regexp: String, replacement: String): String = replace(RegExp(regexp, "g"), replacement)
-
-native
-class RegExp(regexp: String, flags: String)
-
-fun test(prefix: String) {
-    val fs = funToString("${prefix}_f")
-    val bs = funToString("${prefix}_b").replaceAll("boo", "foo")
-
-    if (fs != bs) throw Exception("FAILED on ${prefix}:\n fs = \"$fs\"\n bs = \"$bs\"")
+class RegExp(regexp: String, flags: String = "") {
+    fun exec(s: String): Array<String>? = noImpl
 }
+
+val CALEE_NAME = RegExp("""\b\w*(baz[^(]*)""")
+
+fun Function0<Unit>.extractNames(): Array<String> {
+    val names = CALEE_NAME.exec(this.toString())
+
+    if (names == null || names.size != 2) {
+        throw Exception("Cannot extract function name, $names for actual = \"$this\"")
+    }
+
+    return names
+}
+
+// Testing
+
+var testGroup = ""
+
+fun test(expected: String, f: ()->Unit){
+    val actual = f.extractNames()
+
+    if (expected != actual[1]) {
+        throw Exception("Failed on '$testGroup' group: expected = \"$expected\", actual[1] = \"${actual[1]}\"\n actual = $actual")
+    }
+}
+
+public fun stable_mangled_baz(i: Int) {}
+
+val SIMPLE = "baz"
+val SIMPLE1 = "${SIMPLE}_1"
+val NATIVE = SIMPLE
+val STABLE = { stable_mangled_baz(0) }.extractNames()[1]
 
 fun box(): String {
-    test("internal")
-    test("public")
-    test("private")
-    test("mixed")
+    testGroup = "Top Level"
+    test(STABLE)  { public_baz(0) }
+    test(NATIVE)  { public_baz("native") }
+    test(SIMPLE1) { internal_baz(0) }
+    test(NATIVE)  { internal_baz("native") }
+    test(SIMPLE1) { private_baz(0) }
+    test(NATIVE)  { private_baz("native") }
 
-    test("internal_in_class")
-    test("public_in_class")
-    test("private_in_class")
-    test("mixed_in_class")
+    testGroup = "Public Class"
+    test(STABLE) { PublicClass().public_baz(0) }
+    test(NATIVE) { PublicClass().public_baz("native") }
+    test(SIMPLE1) { PublicClass().internal_baz(0) }
+    test(NATIVE) { PublicClass().internal_baz("native") }
+    test(SIMPLE1, PublicClass().call_private_baz)
+    test(NATIVE, PublicClass().call_private_native_baz)
+
+    testGroup = "Internal Class"
+    test(SIMPLE1) { InternalClass().public_baz(0) }
+    test(NATIVE) { InternalClass().public_baz("native") }
+    test(SIMPLE1) { InternalClass().internal_baz(0) }
+    test(NATIVE) { InternalClass().internal_baz("native") }
+    test(SIMPLE1, InternalClass().call_private_baz)
+    test(NATIVE, InternalClass().call_private_native_baz)
+
+    testGroup = "Private Class"
+    test(SIMPLE1) { PrivateClass().public_baz(0) }
+    test(NATIVE) { PrivateClass().public_baz("native") }
+    test(SIMPLE1) { PrivateClass().internal_baz(0) }
+    test(NATIVE) { PrivateClass().internal_baz("native") }
+    test(SIMPLE1, PrivateClass().call_private_baz)
+    test(NATIVE, PrivateClass().call_private_native_baz)
+
+    testGroup = "Open Public Class"
+    test(STABLE) { OpenPublicClass().public_baz(0) }
+    test(NATIVE) { OpenPublicClass().public_baz("native") }
+    test(STABLE) { OpenPublicClass().internal_baz(0) }
+    test(NATIVE) { OpenPublicClass().internal_baz("native") }
+    test(STABLE, OpenPublicClass().call_private_baz)
+    test(NATIVE, OpenPublicClass().call_private_native_baz)
+
+    testGroup = "Open Internal Class"
+    test(STABLE) { OpenInternalClass().public_baz(0) }
+    test(NATIVE) { OpenInternalClass().public_baz("native") }
+    test(STABLE) { OpenInternalClass().internal_baz(0) }
+    test(NATIVE) { OpenInternalClass().internal_baz("native") }
+    test(STABLE, OpenInternalClass().call_private_baz)
+    test(NATIVE, OpenInternalClass().call_private_native_baz)
+
+    testGroup = "Open Private Class"
+    test(STABLE) { OpenPrivateClass().public_baz(0) }
+    test(NATIVE) { OpenPrivateClass().public_baz("native") }
+    test(STABLE) { OpenPrivateClass().internal_baz(0) }
+    test(NATIVE) { OpenPrivateClass().internal_baz("native") }
+    test(STABLE, OpenPrivateClass().call_private_baz)
+    test(NATIVE, OpenPrivateClass().call_private_native_baz)
 
     return "OK"
 }

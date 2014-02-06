@@ -117,8 +117,15 @@ public class FunctionTest extends AbstractExpressionTest {
         checkFooBoxIsOk();
     }
 
+    public void testManglingStability() throws Exception {
+        checkFooBoxIsOk();
+    }
+
     public void testOverloadingWithInheritance() throws Exception {
         checkFooBoxIsOk();
     }
 
+    public void testManglingAnyMethods() throws Exception {
+        checkFooBoxIsOk();
+    }
 }
