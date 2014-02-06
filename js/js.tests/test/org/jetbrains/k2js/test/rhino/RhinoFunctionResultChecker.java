@@ -16,6 +16,7 @@
 
 package org.jetbrains.k2js.test.rhino;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.k2js.config.Config;
 import org.jetbrains.k2js.translate.context.Namer;
@@ -32,11 +33,11 @@ public class RhinoFunctionResultChecker implements RhinoResultChecker {
     private final String functionName;
     private final Object expectedResult;
 
-    public RhinoFunctionResultChecker(@Nullable String packageName, String functionName, Object expectedResult) {
+    public RhinoFunctionResultChecker(@Nullable String packageName, @NotNull String functionName, @NotNull Object expectedResult) {
         this(Config.REWRITABLE_MODULE_NAME, packageName, functionName, expectedResult);
     }
 
-    public RhinoFunctionResultChecker(@Nullable String moduleId, @Nullable String packageName, String functionName, Object expectedResult) {
+    public RhinoFunctionResultChecker(@NotNull String moduleId, @Nullable String packageName, @NotNull String functionName, @NotNull Object expectedResult) {
         this.moduleId = moduleId;
         this.packageName = packageName;
         this.functionName = functionName;
