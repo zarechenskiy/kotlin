@@ -737,14 +737,13 @@ public fun <T, R> Stream<T>.fold(initial: R, operation: (R, T) -> R) : R {
 
 /**
  * Applies binary operation to all elements of iterable, going from right to left.
- * Similar to foldRight function, but uses the last element as initial value
  */
-public fun <T, R> Array<T>.foldRight(initial: R, operation: (R, T) -> R) : R {
+public fun <T, R> Array<T>.foldRight(initial: R, operation: (T, R) -> R) : R {
     var index = size - 1
     if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
     var answer = initial
     while (index >= 0) {
-        answer = operation(answer, get(index--))
+        answer = operation(get(index--), answer)
     }
     return answer
     
@@ -752,14 +751,13 @@ public fun <T, R> Array<T>.foldRight(initial: R, operation: (R, T) -> R) : R {
 
 /**
  * Applies binary operation to all elements of iterable, going from right to left.
- * Similar to foldRight function, but uses the last element as initial value
  */
-public fun <R> BooleanArray.foldRight(initial: R, operation: (R, Boolean) -> R) : R {
+public fun <R> BooleanArray.foldRight(initial: R, operation: (Boolean, R) -> R) : R {
     var index = size - 1
     if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
     var answer = initial
     while (index >= 0) {
-        answer = operation(answer, get(index--))
+        answer = operation(get(index--), answer)
     }
     return answer
     
@@ -767,14 +765,13 @@ public fun <R> BooleanArray.foldRight(initial: R, operation: (R, Boolean) -> R) 
 
 /**
  * Applies binary operation to all elements of iterable, going from right to left.
- * Similar to foldRight function, but uses the last element as initial value
  */
-public fun <R> ByteArray.foldRight(initial: R, operation: (R, Byte) -> R) : R {
+public fun <R> ByteArray.foldRight(initial: R, operation: (Byte, R) -> R) : R {
     var index = size - 1
     if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
     var answer = initial
     while (index >= 0) {
-        answer = operation(answer, get(index--))
+        answer = operation(get(index--), answer)
     }
     return answer
     
@@ -782,14 +779,13 @@ public fun <R> ByteArray.foldRight(initial: R, operation: (R, Byte) -> R) : R {
 
 /**
  * Applies binary operation to all elements of iterable, going from right to left.
- * Similar to foldRight function, but uses the last element as initial value
  */
-public fun <R> CharArray.foldRight(initial: R, operation: (R, Char) -> R) : R {
+public fun <R> CharArray.foldRight(initial: R, operation: (Char, R) -> R) : R {
     var index = size - 1
     if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
     var answer = initial
     while (index >= 0) {
-        answer = operation(answer, get(index--))
+        answer = operation(get(index--), answer)
     }
     return answer
     
@@ -797,14 +793,13 @@ public fun <R> CharArray.foldRight(initial: R, operation: (R, Char) -> R) : R {
 
 /**
  * Applies binary operation to all elements of iterable, going from right to left.
- * Similar to foldRight function, but uses the last element as initial value
  */
-public fun <R> DoubleArray.foldRight(initial: R, operation: (R, Double) -> R) : R {
+public fun <R> DoubleArray.foldRight(initial: R, operation: (Double, R) -> R) : R {
     var index = size - 1
     if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
     var answer = initial
     while (index >= 0) {
-        answer = operation(answer, get(index--))
+        answer = operation(get(index--), answer)
     }
     return answer
     
@@ -812,14 +807,13 @@ public fun <R> DoubleArray.foldRight(initial: R, operation: (R, Double) -> R) : 
 
 /**
  * Applies binary operation to all elements of iterable, going from right to left.
- * Similar to foldRight function, but uses the last element as initial value
  */
-public fun <R> FloatArray.foldRight(initial: R, operation: (R, Float) -> R) : R {
+public fun <R> FloatArray.foldRight(initial: R, operation: (Float, R) -> R) : R {
     var index = size - 1
     if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
     var answer = initial
     while (index >= 0) {
-        answer = operation(answer, get(index--))
+        answer = operation(get(index--), answer)
     }
     return answer
     
@@ -827,14 +821,13 @@ public fun <R> FloatArray.foldRight(initial: R, operation: (R, Float) -> R) : R 
 
 /**
  * Applies binary operation to all elements of iterable, going from right to left.
- * Similar to foldRight function, but uses the last element as initial value
  */
-public fun <R> IntArray.foldRight(initial: R, operation: (R, Int) -> R) : R {
+public fun <R> IntArray.foldRight(initial: R, operation: (Int, R) -> R) : R {
     var index = size - 1
     if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
     var answer = initial
     while (index >= 0) {
-        answer = operation(answer, get(index--))
+        answer = operation(get(index--), answer)
     }
     return answer
     
@@ -842,14 +835,13 @@ public fun <R> IntArray.foldRight(initial: R, operation: (R, Int) -> R) : R {
 
 /**
  * Applies binary operation to all elements of iterable, going from right to left.
- * Similar to foldRight function, but uses the last element as initial value
  */
-public fun <R> LongArray.foldRight(initial: R, operation: (R, Long) -> R) : R {
+public fun <R> LongArray.foldRight(initial: R, operation: (Long, R) -> R) : R {
     var index = size - 1
     if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
     var answer = initial
     while (index >= 0) {
-        answer = operation(answer, get(index--))
+        answer = operation(get(index--), answer)
     }
     return answer
     
@@ -857,14 +849,13 @@ public fun <R> LongArray.foldRight(initial: R, operation: (R, Long) -> R) : R {
 
 /**
  * Applies binary operation to all elements of iterable, going from right to left.
- * Similar to foldRight function, but uses the last element as initial value
  */
-public fun <R> ShortArray.foldRight(initial: R, operation: (R, Short) -> R) : R {
+public fun <R> ShortArray.foldRight(initial: R, operation: (Short, R) -> R) : R {
     var index = size - 1
     if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
     var answer = initial
     while (index >= 0) {
-        answer = operation(answer, get(index--))
+        answer = operation(get(index--), answer)
     }
     return answer
     
@@ -872,14 +863,13 @@ public fun <R> ShortArray.foldRight(initial: R, operation: (R, Short) -> R) : R 
 
 /**
  * Applies binary operation to all elements of iterable, going from right to left.
- * Similar to foldRight function, but uses the last element as initial value
  */
-public fun <T, R> List<T>.foldRight(initial: R, operation: (R, T) -> R) : R {
+public fun <T, R> List<T>.foldRight(initial: R, operation: (T, R) -> R) : R {
     var index = size - 1
     if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
     var answer = initial
     while (index >= 0) {
-        answer = operation(answer, get(index--))
+        answer = operation(get(index--), answer)
     }
     return answer
     

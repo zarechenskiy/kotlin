@@ -230,12 +230,11 @@ fun aggregates(): List<GenericFunction> {
         }
     }
 
-    templates add f("foldRight(initial: R, operation: (R, T) -> R)") {
+    templates add f("foldRight(initial: R, operation: (T, R) -> R)") {
         only(Lists, ArraysOfObjects, ArraysOfPrimitives)
         doc {
             """
             Applies binary operation to all elements of iterable, going from right to left.
-            Similar to foldRight function, but uses the last element as initial value
             """
         }
         typeParam("R")
@@ -246,7 +245,7 @@ fun aggregates(): List<GenericFunction> {
             if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
             var answer = initial
             while (index >= 0) {
-                answer = operation(answer, get(index--))
+                answer = operation(get(index--), answer)
             }
             return answer
             """
