@@ -57,8 +57,7 @@ fun mapping(): List<GenericFunction> {
         typeParam("R")
         returns("Stream<R>")
         body {
-            // TODO: Implement lazy flatMap
-            "return flatMapTo(ArrayList<R>(), transform).stream()"
+            "return FlatteningStream(this, transform)"
         }
     }
 
@@ -80,23 +79,6 @@ fun mapping(): List<GenericFunction> {
     }
 
     templates add f("flatMapTo(result: C, transform: (T) -> Stream<R>)") {
-        only(Streams)
-        doc { "Returns the result of transforming each element to one or more values which are concatenated together into a single stream" }
-        typeParam("R")
-        typeParam("C: MutableCollection<in R>")
-        returns("C")
-        body {
-            """
-                for (element in this) {
-                    val list = transform(element)
-                    result.addAll(list)
-                }
-                return result
-            """
-        }
-    }
-
-    templates add f("flatMapTo(result: C, transform: (T) -> Iterable<R>)") {
         only(Streams)
         doc { "Returns the result of transforming each element to one or more values which are concatenated together into a single stream" }
         typeParam("R")

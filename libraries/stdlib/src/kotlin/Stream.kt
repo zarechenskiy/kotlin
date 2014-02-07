@@ -41,6 +41,35 @@ class TransformingStream<T, R>(val stream: Stream<T>, val transformer: (T) -> R)
     }
 }
 
+class FlatteningStream<T, R>(val stream: Stream<T>, val transformer: (T) -> Stream<R>) : Stream<R> {
+    override fun iterator(): Iterator<R> = object : AbstractIterator<R>() {
+        val iterator = stream.iterator()
+        var itemIterator: Iterator<R>? = null
+        override fun computeNext() {
+            while (itemIterator == null) {
+                if (!iterator.hasNext()) {
+                    done()
+                    break;
+                } else {
+                    val element = iterator.next()
+                    val nextItemIterator = transformer(element).iterator()
+                    if (nextItemIterator.hasNext())
+                        itemIterator = nextItemIterator
+                }
+            }
+
+            val currentItemIterator = itemIterator
+            if (currentItemIterator == null) {
+                done()
+            } else {
+                setNext(currentItemIterator.next())
+                if (!currentItemIterator.hasNext())
+                    itemIterator = null
+            }
+        }
+    }
+}
+
 class LimitedStream<T>(val stream: Stream<T>, val stopWhen: Boolean = true, val predicate: (T) -> Boolean) : Stream<T> {
     override fun iterator(): Iterator<T> = object : AbstractIterator<T>() {
         val iterator = stream.iterator()
@@ -76,7 +105,7 @@ class FunctionStream<T : Any>(val producer: () -> T?) : Stream<T> {
 /**
  * Returns a stream which invokes the function to calculate the next value on each iteration until the function returns *null*
  */
-public fun <T:Any> stream(nextFunction: () -> T?) : Stream<T> {
+public fun <T : Any> stream(nextFunction: () -> T?): Stream<T> {
     return FunctionStream(nextFunction)
 }
 
@@ -84,6 +113,6 @@ public fun <T:Any> stream(nextFunction: () -> T?) : Stream<T> {
  * Returns a stream which invokes the function to calculate the next value based on the previous one on each iteration
  * until the function returns *null*
  */
-public /*inline*/ fun <T: Any> stream(initialValue: T, nextFunction: (T) -> T?): Stream<T> =
+public /*inline*/ fun <T : Any> stream(initialValue: T, nextFunction: (T) -> T?): Stream<T> =
         stream(nextFunction.toGenerator(initialValue))
 
