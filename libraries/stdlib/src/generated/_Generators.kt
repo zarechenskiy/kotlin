@@ -397,10 +397,10 @@ public fun <T> Iterable<T>.plus(element: T) : List<T> {
 /**
  * Creates an [[Iterator]] which iterates over this iterator then the given element at the end
  */
-public fun <T> Stream<T>.plus(element: T) : List<T> {
+public fun <T> Stream<T>.plus(element: T) : Stream<T> {
     val answer = toArrayList()
     answer.add(element)
-    return answer
+    return answer.stream()
     
 }
 
