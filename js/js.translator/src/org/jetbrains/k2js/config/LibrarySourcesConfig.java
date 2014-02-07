@@ -28,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jet.lang.psi.JetFile;
 import org.jetbrains.jet.lang.psi.JetPsiFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -36,6 +37,8 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+
+import static org.jetbrains.jet.utils.LibraryUtils.isJsRuntimeLibrary;
 
 public class LibrarySourcesConfig extends Config {
     @NotNull
@@ -77,8 +80,10 @@ public class LibrarySourcesConfig extends Config {
                 moduleName = path.substring(1);
             }
             else if (path.endsWith(".jar") || path.endsWith(".zip")) {
+                String actualModuleName = isJsRuntimeLibrary(new File(path)) ? "kotlin_lib_compiled" : moduleName;
+
                 try {
-                    jetFiles.addAll(readZip(path));
+                    jetFiles.addAll(readZip(path, actualModuleName));
                 }
                 catch (IOException e) {
                     LOG.error(e);
@@ -102,10 +107,10 @@ public class LibrarySourcesConfig extends Config {
         return jetFiles;
     }
 
-    private List<JetFile> readZip(String file) throws IOException {
+    private List<JetFile> readZip(String file, String moduleName) throws IOException {
         ZipFile zipFile = new ZipFile(file);
         try {
-            return traverseArchive(zipFile);
+            return traverseArchive(zipFile, moduleName);
         }
         finally {
             zipFile.close();
@@ -113,16 +118,16 @@ public class LibrarySourcesConfig extends Config {
     }
 
     @NotNull
-    private List<JetFile> traverseArchive(@NotNull ZipFile file) throws IOException {
+    private List<JetFile> traverseArchive(@NotNull ZipFile zipFile, String moduleName) throws IOException {
         List<JetFile> result = Lists.newArrayList();
-        Enumeration<? extends ZipEntry> zipEntries = file.entries();
+        Enumeration<? extends ZipEntry> zipEntries = zipFile.entries();
         while (zipEntries.hasMoreElements()) {
             ZipEntry entry = zipEntries.nextElement();
             if (!entry.isDirectory() && entry.getName().endsWith(".kt")) {
-                InputStream stream = file.getInputStream(entry);
+                InputStream stream = zipFile.getInputStream(entry);
                 String text = FileUtil.loadTextAndClose(stream);
                 JetFile jetFile = JetPsiFactory.createFile(getProject(), entry.getName(), text);
-                jetFile.putUserData(EXTERNAL_MODULE_NAME, UNKNOWN_EXTERNAL_MODULE_NAME);
+                jetFile.putUserData(EXTERNAL_MODULE_NAME, moduleName);
                 result.add(jetFile);
             }
         }
