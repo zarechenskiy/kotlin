@@ -54,7 +54,7 @@ class StreamsTest {
         var ml = arrayListOf("a").stream()
         ml += a.stream()
         ml += "beer"
-        ml += b
+        ml += b.stream()
         ml += "z"
         assertEquals(arrayListOf("a", "foo", "bar", "beer", "cheese", "wine", "z"), ml.toList())
     }
