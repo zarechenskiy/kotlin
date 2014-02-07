@@ -2,7 +2,7 @@ package templates
 
 import templates.Family.*
 
-fun subsequences(): List<GenericFunction> {
+fun filtering(): List<GenericFunction> {
     val templates = arrayListOf<GenericFunction>()
 
     templates add f("drop(n: Int)") {
@@ -139,7 +139,7 @@ fun subsequences(): List<GenericFunction> {
         returns(Streams) { "Stream<T>" }
         body(Streams) {
             """
-            return LimitedStream(this, true, predicate)
+            return LimitedStream(this, false, predicate)
             """
         }
     }
