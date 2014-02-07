@@ -17,12 +17,23 @@ fun guards(): List<GenericFunction> {
         body {
             val THIS = "\$this"
             """
-                for (element in this) {
-                    if (element == null) {
-                        throw IllegalArgumentException("null element found in $THIS")
-                    }
+            for (element in this) {
+                if (element == null) {
+                    throw IllegalArgumentException("null element found in $THIS")
                 }
-                return this as SELF
+            }
+            return this as SELF
+            """
+        }
+        body(Streams) {
+            val THIS = "\$this"
+            """
+            return FilteringStream(this) {
+                if (it == null) {
+                    throw IllegalArgumentException("null element found in $this")
+                }
+                true
+            } as Stream<T>
             """
         }
     }

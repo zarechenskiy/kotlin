@@ -50,12 +50,12 @@ public fun <T:Any> List<T?>.requireNoNulls() : List<T> {
  * Returns an original Iterable containing all the non-*null* elements, throwing an [[IllegalArgumentException]] if there are any null elements
  */
 public fun <T:Any> Stream<T?>.requireNoNulls() : Stream<T> {
-    for (element in this) {
-        if (element == null) {
-            throw IllegalArgumentException("null element found in $this")
+    return FilteringStream(this) {
+        if (it == null) {
+            throw IllegalArgumentException("null element found in templates.GenericFunction@f377405")
         }
-    }
-    return this as Stream<T>
+        true
+    } as Stream<T>
     
 }
 
