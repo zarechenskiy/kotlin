@@ -8,110 +8,172 @@ import java.io.StringReader
 import java.util.StringTokenizer
 
 enum class Family {
-    Iterators
+    Streams
     Iterables
     Collections
-    Arrays
-    PrimitiveArrays
+    Lists
+    ArraysOfObjects
+    ArraysOfPrimitives
 }
 
-class GenericFunction(val signature : String): Comparable<GenericFunction> {
-    var doc : String = ""
-    var toNullableT : Boolean = false
-    var isInline : Boolean = true;
+class GenericFunction(val signature: String) : Comparable<GenericFunction> {
+    val defaultFamilies = array(Iterables, Streams, ArraysOfObjects, ArraysOfPrimitives)
+
+    var toNullableT: Boolean = false
+    var makeInline: Boolean = false;
     private val customReceivers = HashMap<Family, String>()
-    val blockedFor = HashSet<Family>()
-    private val blockedForPrimitive = HashSet<PrimitiveType>()
+
+    val buildFamilies = HashSet<Family>(defaultFamilies.toList())
+    private val buildPrimitives = HashSet<PrimitiveType>(PrimitiveType.values().toList())
+
+    var doc: String = ""
+    val docs = HashMap<Family, String>()
+
+    var defaultBody: String = ""
     val bodies = HashMap<Family, String>()
+
+    var defaultReturnType = ""
     val returnTypes = HashMap<Family, String>()
+
     val typeParams = ArrayList<String>()
 
-    fun body(b : () -> String) {
-        for (f in Family.values()) {
-            if (bodies[f] == null) f.body(b)
+    fun body(vararg families: Family, b: () -> String) {
+        if (families.isEmpty())
+            defaultBody = b()
+        else {
+            for (f in families) {
+                include(f)
+                bodies[f] = b()
+            }
         }
     }
 
-    fun Family.body(b : () -> String) {
-        bodies[this] = b()
-    }
-
-    fun returns(r : String) {
-        for (f in Family.values()) {
-            if (returnTypes[f] == null) f.returns(r)
+    fun doc(vararg families: Family, b: () -> String) {
+        if (families.isEmpty())
+            doc = b()
+        else {
+            for (f in families) {
+                docs[f] = b()
+            }
         }
     }
 
-    fun Family.returns(r:String) {
-        returnTypes[this] = r
+    fun returns(vararg families: Family, b: () -> String) {
+        if (families.isEmpty())
+            defaultReturnType = b()
+        else {
+            for (f in families) {
+                returnTypes[f] = b()
+            }
+        }
+    }
+
+    fun returns(r: String) {
+        defaultReturnType = r
     }
 
     fun Family.customReceiver(r: String) {
         customReceivers[this] = r
     }
 
-    fun typeParam(t:String) {
+    fun typeParam(t: String) {
         typeParams.add(t)
     }
 
-    fun absentFor(vararg f : Family) {
-        blockedFor.addAll(f.toList())
+    fun exclude(vararg families: Family) {
+        buildFamilies.removeAll(families.toList())
     }
 
-    fun absentFor(vararg p: PrimitiveType) {
-        blockedForPrimitive.addAll(p.toList())
+    fun only(vararg families: Family) {
+        buildFamilies.clear()
+        buildFamilies.addAll(families.toList())
     }
 
-    private fun effectiveTypeParams(f : Family) : List<String> {
-        val types = ArrayList(typeParams)
-        if (typeParams.find { it.startsWith("T") } == null && !customReceivers.containsKey(f)) {
-            types.add(0, "T")
+    fun include(vararg families: Family) {
+        buildFamilies.addAll(families.toList())
+    }
+
+    fun exclude(vararg p: PrimitiveType) {
+        buildPrimitives.removeAll(p.toList())
+    }
+
+    fun include(vararg p: PrimitiveType) {
+        buildPrimitives.addAll(p.toList())
+    }
+
+
+    fun build(vararg families: Family = Family.values()): String {
+        val builder = StringBuilder()
+        for (family in families) {
+            if (buildFamilies.contains(family))
+                build(builder, family)
         }
-
-        if (f == PrimitiveArrays) {
-            types.remove(types.find { it.startsWith("T") })
-        }
-
-        return types
+        return builder.toString()
     }
 
+    fun build(builder: StringBuilder, f: Family) {
+        if (f == ArraysOfPrimitives) {
+            for (primitive in buildPrimitives)
+                build(builder, f, primitive)
+        } else {
+            build(builder, f, null)
+        }
+    }
 
+    fun build(builder: StringBuilder, f: Family, primitive: PrimitiveType?) {
+        val returnType = returnTypes[f] ?: defaultReturnType
+        if (returnType.isEmpty())
+            throw RuntimeException("No return type specified for $signature")
 
-    fun buildFor(f: Family, primitiveType: PrimitiveType?) : String {
-        if (blockedFor.contains(f)) return ""
-        if (primitiveType != null && blockedForPrimitive.contains(primitiveType)) return ""
-
-        if (returnTypes[f] == null) throw RuntimeException("No return type specified for $signature")
-        val retType = returnTypes[f]!!
-
-        val selftype = when (f) {
+        val receiver = when (f) {
             Iterables -> "Iterable<T>"
             Collections -> "Collection<T>"
-            Iterators -> "Iterator<T>"
-            Arrays -> "Array<out T>"
-            PrimitiveArrays -> "${primitiveType!!.name}Array"
+            Lists -> "List<T>"
+            Streams -> "Stream<T>"
+            ArraysOfObjects -> "Array<T>"
+            ArraysOfPrimitives -> primitive?.let { it.name() + "Array" } ?: throw IllegalArgumentException("Primitive array should specify primitive type")
+            else -> throw IllegalStateException("Invalid family")
         }
 
-        fun String.renderType() : String {
+        fun String.renderType(): String {
             val t = StringTokenizer(this, " \t\n,:()<>?.", true)
             val answer = StringBuilder()
 
             while (t.hasMoreTokens()) {
                 val token = t.nextToken()
                 answer.append(when (token) {
-                    "SELF" -> selftype
-                    "T" -> if (f == Family.PrimitiveArrays) primitiveType!!.name else token
-                    else -> token
-                })
+                                  "SELF" -> receiver
+                                  "PRIMITIVE" -> primitive?.name() ?: token
+                                  "ZERO" -> when (primitive) {
+                                      PrimitiveType.Double -> "0.0"
+                                      PrimitiveType.Float -> "0.0f"
+                                      else -> "0"
+                                  }
+                                  "T" -> primitive?.name() ?: token
+                                  else -> token
+                              })
             }
 
             return answer.toString()
         }
 
-        val builder = StringBuilder()
-        if (doc != "") {
+        fun effectiveTypeParams(): List<String> {
+            val types = ArrayList(typeParams)
+            if (primitive == null) {
+                if (typeParams.all { !it.startsWith("T") } && !customReceivers.containsKey(f)) {
+                    types.add(0, "T")
+                }
+                return types
+            } else {
+                // primitive type arrays should drop constraints
+                return typeParams.filter { !it.startsWith("T") }
+            }
+        }
+
+        val methodDoc = docs[f] ?: doc
+        if (methodDoc != "") {
             builder.append("/**\n")
-            StringReader(doc).forEachLine {
+            StringReader(methodDoc).forEachLine {
                 val line = it.trim()
                 if (!line.isEmpty()) {
                     builder.append(" * ").append(line).append("\n")
@@ -121,56 +183,49 @@ class GenericFunction(val signature : String): Comparable<GenericFunction> {
         }
 
         builder.append("public ")
-        if (isInline) builder.append("inline ")
+        if (makeInline)
+            builder.append("inline ")
 
         builder.append("fun ")
 
-        val types = effectiveTypeParams(f)
-
+        val types = effectiveTypeParams()
         if (!types.isEmpty()) {
             builder.append(types.makeString(separator = ", ", prefix = "<", postfix = "> ").renderType())
         }
 
-        builder.append((customReceivers[f] ?:
+        val receiverType = (customReceivers[f] ?:
         if (toNullableT) {
-            selftype.replace("T>", "T?>")
-        }
-        else {
-            selftype
-        }).renderType())
+            receiver.replace("T>", "T?>")
+        } else {
+            receiver
+        }).renderType()
 
-        builder.append(".${signature.renderType()} : ${retType.renderType()} {")
+        builder.append(receiverType)
+        builder.append(".${signature.renderType()} : ${returnType.renderType()} {")
 
-        val body = bodies[f]!!.trim("\n")
-        val prefix : Int = body.takeWhile { it == ' ' }.length
+        val body = (bodies[f] ?: defaultBody).trim("\n")
+        val prefix: Int = body.takeWhile { it == ' ' }.length
 
         StringReader(body).forEachLine {
             builder.append('\n')
             var count = prefix
-            builder.append("    ").append(it.dropWhile {count-- > 0 && it == ' '} .renderType())
+            builder.append("    ").append(it.dropWhile { count-- > 0 && it == ' ' } .renderType())
         }
 
-        return builder.toString().trimTrailingSpaces() + "\n}\n\n"
+        builder.append("\n}\n\n")
     }
 
-    public override fun compareTo(other : GenericFunction) : Int = this.signature.compareTo(other.signature)
+    public override fun compareTo(other: GenericFunction): Int = this.signature.compareTo(other.signature)
 }
 
-fun String.trimTrailingSpaces() : String {
+fun String.trimTrailingSpaces(): String {
     var answer = this;
     while (answer.endsWith(' ') || answer.endsWith('\n')) answer = answer.substring(0, answer.length() - 1)
     return answer
 }
 
-fun f(signature : String, init : GenericFunction.() -> Unit): GenericFunction {
+fun f(signature: String, init: GenericFunction.() -> Unit): GenericFunction {
     val gf = GenericFunction(signature)
     gf.init()
     return gf
-}
-
-fun main(args : Array<String>) {
-    val templates = collections()
-    for (t in templates) {
-        print(t.buildFor(PrimitiveArrays, PrimitiveType.Byte))
-    }
 }

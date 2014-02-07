@@ -20,7 +20,7 @@ private fun PrimitiveType.zero() = when (this) {
     PrimitiveType.Long -> "0.toLong()"
     PrimitiveType.Double -> "0.0"
     PrimitiveType.Float -> "0.toFloat()"
-    else -> null
+    else -> throw IllegalArgumentException("Primitive type $this doesn't have default value")
 }
 
 private fun returnTypeForSum(primitive: PrimitiveType) = when (primitive) {
@@ -29,19 +29,18 @@ private fun returnTypeForSum(primitive: PrimitiveType) = when (primitive) {
     else -> primitive
 }
 
-fun sumFunction(primitive: PrimitiveType) = primitive.zero()?.let { zero ->
-    f("sum()") {
-        doc = "Sums up the elements"
-        isInline = false
-        if (returnTypeForSum(primitive) != primitive) {
-            //this is required to avoid clash of erasured method signatures (Iterables.sum(): Int)
-            absentFor(Iterables)
+fun sumFunction(primitive: PrimitiveType) =
+        f("sum()") {
+            doc = "Sums up the elements"
+            makeInline = false
+            if (returnTypeForSum(primitive) != primitive) {
+                //this is required to avoid clash of erasured method signatures (Iterables.sum(): Int)
+                //absentFor(Iterables)
+            }
+            Iterables.customReceiver("Iterable<${primitive.name}>")
+            ArraysOfObjects.customReceiver("Array<${primitive.name}>")
+            returns(returnTypeForSum(primitive).name)
+            body {
+                "return fold(${primitive.zero()}, {a,b -> a+b})"
+            }
         }
-        Iterables.customReceiver("Iterable<${primitive.name}>")
-        Arrays.customReceiver("Array<${primitive.name}>")
-        returns(returnTypeForSum(primitive).name)
-        body {
-            "return fold($zero, {a,b -> a+b})"
-        }
-    }
-}

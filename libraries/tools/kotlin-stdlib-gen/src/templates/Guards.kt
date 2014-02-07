@@ -3,18 +3,17 @@ package templates
 import java.util.ArrayList
 import templates.Family.*
 
-fun collections(): List<GenericFunction> {
+fun guards(): List<GenericFunction> {
 
     val templates = ArrayList<GenericFunction>()
 
     templates add f("requireNoNulls()") {
-        isInline = false
-        absentFor(PrimitiveArrays) // Those are inherently non-nulls
-        doc = "Returns a original Iterable containing all the non-*null* elements, throwing an [[IllegalArgumentException]] if there are any null elements"
+        include(Lists)
+        exclude(ArraysOfPrimitives)
+        doc { "Returns an original Iterable containing all the non-*null* elements, throwing an [[IllegalArgumentException]] if there are any null elements" }
         typeParam("T:Any")
         toNullableT = true
         returns("SELF")
-
         body {
             val THIS = "\$this"
             """
@@ -26,8 +25,7 @@ fun collections(): List<GenericFunction> {
                 return this as SELF
             """
         }
-
     }
 
-    return templates.sort()
+    return templates
 }
