@@ -53,13 +53,7 @@ public fun sortedSet<T>(comparator: Comparator<T>, vararg values: T) : TreeSet<T
  */
 public fun <K,V> hashMapOf(vararg values: Pair<K,V>): HashMap<K,V> {
     val answer = HashMap<K,V>(values.size)
-    /**
-        TODO replace by this simpler call when we can pass vararg values into other methods
-        answer.putAll(values)
-    */
-    for (v in values) {
-        answer.put(v.first, v.second)
-    }
+    answer.putAll(*values)
     return answer
 }
 

@@ -29,17 +29,6 @@ public fun <T,U: Collection<in T>> Iterator<T>.toCollection(container: U) : U {
 */
 
 /**
-Add iterated elements to java.util.ArrayList
-*/
-public fun <T> Iterator<T>.toArrayList() : ArrayList<T> = toCollection(ArrayList<T>())
-
-/**
-Add iterated elements to java.util.HashSet
-*/
-public fun <T> Iterator<T>.toHashSet() : HashSet<T> = toCollection(HashSet<T>())
-
-
-/**
  * Creates a tuple of type [[Pair<A,B>]] from this and *that* which can be useful for creating [[Map]] literals
  * with less noise, for example
 

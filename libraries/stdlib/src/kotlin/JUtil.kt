@@ -26,13 +26,6 @@ val Collection<*>.notEmpty : Boolean
 /** Returns the Collection if its not null otherwise it returns the empty list */
 public fun <T> Collection<T>?.orEmpty() : Collection<T> = this ?: Collections.emptyList<T>()
 
-
-/** TODO these functions don't work when they generate the Array<T> versions when they are in JLIterables */
-public fun <T: Comparable<T>> Iterable<T>.toSortedList() : List<T> = toCollection(ArrayList<T>()).sort()
-
-public fun <T: Comparable<T>> Iterable<T>.toSortedList(comparator: java.util.Comparator<T>) : List<T> = toList().sort(comparator)
-
-
 // List APIs
 
 /** Returns the List if its not null otherwise returns the empty list */

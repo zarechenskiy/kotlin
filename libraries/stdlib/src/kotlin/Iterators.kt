@@ -4,103 +4,9 @@ import kotlin.support.*
 import java.util.Collections
 import kotlin.test.assertTrue
 
-/**
- * Returns an iterator which invokes the function to calculate the next value on each iteration until the function returns *null*
- */
-public fun <T:Any> iterate(nextFunction: () -> T?) : Iterator<T> {
-    return FunctionIterator(nextFunction)
-}
-
-/**
- * Returns an iterator which invokes the function to calculate the next value based on the previous one on each iteration
- * until the function returns *null*
- */
-public /*inline*/ fun <T: Any> iterate(initialValue: T, nextFunction: (T) -> T?): Iterator<T> =
-        iterate(nextFunction.toGenerator(initialValue))
-
-/**
- * Returns an iterator whose values are pairs composed of values produced by given pair of iterators
- */
-public fun <T, S> Iterator<T>.zip(iterator: Iterator<S>): Iterator<Pair<T, S>> = PairIterator(this, iterator)
-
-/**
- * Returns an iterator shifted to right by the given number of elements
- */
-public fun <T> Iterator<T>.skip(n: Int): Iterator<T> = SkippingIterator(this, n)
-
-class FilterIterator<T>(val iterator : Iterator<T>, val predicate: (T)-> Boolean) : AbstractIterator<T>() {
-    override protected fun computeNext(): Unit {
-        while (iterator.hasNext()) {
-            val next = iterator.next()
-            if ((predicate)(next)) {
-                setNext(next)
-                return
-            }
-        }
-        done()
-    }
-}
-
-class FilterNotNullIterator<T:Any>(val iterator : Iterator<T?>?) : AbstractIterator<T>() {
-    override protected fun computeNext(): Unit {
-        if (iterator != null) {
-            while (iterator.hasNext()) {
-                val next = iterator.next()
-                if (next != null) {
-                    setNext(next)
-                    return
-                }
-            }
-        }
-        done()
-    }
-}
-
-class MapIterator<T, R>(val iterator : Iterator<T>, val transform: (T) -> R) : AbstractIterator<R>() {
-    override protected fun computeNext() : Unit {
-        if (iterator.hasNext()) {
-            setNext((transform)(iterator.next()))
-        } else {
-            done()
-        }
-    }
-}
-
-class FlatMapIterator<T, R>(val iterator : Iterator<T>, val transform: (T) -> Iterator<R>) : AbstractIterator<R>() {
-    var transformed: Iterator<R> = iterate<R> { null }
-
-    override protected fun computeNext() : Unit {
-        while (true) {
-            if (transformed.hasNext()) {
-                setNext(transformed.next())
-                return
-            }
-            if (iterator.hasNext()) {
-                transformed = (transform)(iterator.next())
-            } else {
-                done()
-                return
-            }
-        }
-    }
-}
-
-class TakeWhileIterator<T>(val iterator: Iterator<T>, val predicate: (T) -> Boolean) : AbstractIterator<T>() {
-    override protected fun computeNext() : Unit {
-        if (iterator.hasNext()) {
-            val item = iterator.next()
-            if ((predicate)(item)) {
-                setNext(item)
-                return
-            }
-        }
-        done()
-    }
-}
 
 /** An [[Iterator]] which invokes a function to calculate the next value in the iteration until the function returns *null* */
 class FunctionIterator<T:Any>(val nextFunction: () -> T?): AbstractIterator<T>() {
-
     override protected fun computeNext(): Unit {
         val next = (nextFunction)()
         if (next == null) {
@@ -204,12 +110,3 @@ class SkippingIterator<T>(val iterator: Iterator<T>, val n: Int): Iterator<T> {
     }
 }
 
-public fun <T: Any> Function1<T, T?>.toGenerator(initialValue: T): Function0<T?> {
-    var nextValue: T? = initialValue
-    return {
-        nextValue?.let { result ->
-            nextValue = this@toGenerator(result)
-            result
-        }
-    }
-}

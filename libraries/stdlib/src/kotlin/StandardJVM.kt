@@ -12,17 +12,6 @@ import java.io.PrintStream
 import java.util.concurrent.Callable
 
 /**
- * Add iterated elements to a [[LinkedHashSet]] to preserve insertion order
- */
-public fun <T> Iterator<T>.toLinkedSet() : LinkedHashSet<T> = toCollection(LinkedHashSet<T>())
-
-/**
- * Add iterated elements to [[SortedSet]] with the given *comparator* to ensure iteration is in the order of the given comparator
- */
-public fun <T> Iterator<T>.toSortedSet(comparator: Comparator<T>) : SortedSet<T> = toCollection(TreeSet<T>(comparator))
-
-
-/**
  * Allows a stack trace to be printed from Kotlin's [[Throwable]]
  */
 public fun Throwable.printStackTrace(writer: PrintWriter): Unit {
