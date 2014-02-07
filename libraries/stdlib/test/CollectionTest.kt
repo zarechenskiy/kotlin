@@ -155,7 +155,7 @@ class CollectionTest {
     }
 
     test fun foldRight() {
-        expect("4321") {
+        expect("1234") {
             val numbers = arrayListOf(1, 2, 3, 4)
             numbers.map { it.toString() }.foldRight("") { a, b -> a + b }
         }
