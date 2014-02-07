@@ -1,11 +1,5 @@
 package kotlin
 
-/** Returns true if the array is not empty */
-public fun <T> Array<out T>.isNotEmpty() : Boolean = !this.isEmpty()
-
-/** Returns true if the array is empty */
-public fun <T> Array<out T>.isEmpty() : Boolean = this.size == 0
-
 public val          BooleanArray.lastIndex : Int
     get() = this.size - 1
 
