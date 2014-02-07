@@ -84,7 +84,7 @@ public fun   FloatArray.copyOf(newLength: Int = this.size) : FloatArray   = Arra
 public fun  DoubleArray.copyOf(newLength: Int = this.size) : DoubleArray  = Arrays.copyOf(this, newLength)
 public fun    CharArray.copyOf(newLength: Int = this.size) : CharArray    = Arrays.copyOf(this, newLength)
 
-// TODO: resuling array may contain nulls even if T is non-nullable
+// TODO: resulting array may contain nulls even if T is non-nullable
 public fun  <T> Array<T>.copyOf(newLength: Int = this.size) : Array<T> = Arrays.copyOf(this, newLength) as Array<T>
 
 public fun BooleanArray.copyOfRange(from: Int, to: Int) : BooleanArray = Arrays.copyOfRange(this, from, to)
@@ -96,7 +96,7 @@ public fun   FloatArray.copyOfRange(from: Int, to: Int) : FloatArray   = Arrays.
 public fun  DoubleArray.copyOfRange(from: Int, to: Int) : DoubleArray  = Arrays.copyOfRange(this, from, to)
 public fun    CharArray.copyOfRange(from: Int, to: Int) : CharArray    = Arrays.copyOfRange(this, from, to)
 
-// TODO: resuling array may contain nulls even if T is non-nullable
+// TODO: resulting array may contain nulls even if T is non-nullable
 public fun  <T> Array<T>.copyOfRange(from: Int, to: Int) : Array<T> = Arrays.copyOfRange(this, from, to) as Array<T>
 
 public val ByteArray.inputStream : ByteArrayInputStream
