@@ -10,25 +10,16 @@ import java.util.*
 /**
  * Returns *true* if all elements match the given *predicate*
  */
-public fun <T> Stream<T>.all(predicate: (T) -> Boolean) : Boolean {
-    for (element in this) if (!predicate(element)) return false
-    return true
-    
-}
-
-/**
- * Returns *true* if all elements match the given *predicate*
- */
-public fun <T> Iterable<T>.all(predicate: (T) -> Boolean) : Boolean {
-    for (element in this) if (!predicate(element)) return false
-    return true
-    
-}
-
-/**
- * Returns *true* if all elements match the given *predicate*
- */
 public fun <T> Array<T>.all(predicate: (T) -> Boolean) : Boolean {
+    for (element in this) if (!predicate(element)) return false
+    return true
+    
+}
+
+/**
+ * Returns *true* if all elements match the given *predicate*
+ */
+public fun BooleanArray.all(predicate: (Boolean) -> Boolean) : Boolean {
     for (element in this) if (!predicate(element)) return false
     return true
     
@@ -64,7 +55,7 @@ public fun DoubleArray.all(predicate: (Double) -> Boolean) : Boolean {
 /**
  * Returns *true* if all elements match the given *predicate*
  */
-public fun LongArray.all(predicate: (Long) -> Boolean) : Boolean {
+public fun FloatArray.all(predicate: (Float) -> Boolean) : Boolean {
     for (element in this) if (!predicate(element)) return false
     return true
     
@@ -82,6 +73,15 @@ public fun IntArray.all(predicate: (Int) -> Boolean) : Boolean {
 /**
  * Returns *true* if all elements match the given *predicate*
  */
+public fun LongArray.all(predicate: (Long) -> Boolean) : Boolean {
+    for (element in this) if (!predicate(element)) return false
+    return true
+    
+}
+
+/**
+ * Returns *true* if all elements match the given *predicate*
+ */
 public fun ShortArray.all(predicate: (Short) -> Boolean) : Boolean {
     for (element in this) if (!predicate(element)) return false
     return true
@@ -91,7 +91,7 @@ public fun ShortArray.all(predicate: (Short) -> Boolean) : Boolean {
 /**
  * Returns *true* if all elements match the given *predicate*
  */
-public fun BooleanArray.all(predicate: (Boolean) -> Boolean) : Boolean {
+public fun <T> Iterable<T>.all(predicate: (T) -> Boolean) : Boolean {
     for (element in this) if (!predicate(element)) return false
     return true
     
@@ -100,7 +100,7 @@ public fun BooleanArray.all(predicate: (Boolean) -> Boolean) : Boolean {
 /**
  * Returns *true* if all elements match the given *predicate*
  */
-public fun FloatArray.all(predicate: (Float) -> Boolean) : Boolean {
+public fun <T> Stream<T>.all(predicate: (T) -> Boolean) : Boolean {
     for (element in this) if (!predicate(element)) return false
     return true
     
@@ -109,25 +109,16 @@ public fun FloatArray.all(predicate: (Float) -> Boolean) : Boolean {
 /**
  * Returns *true* if any elements match the given *predicate*
  */
-public fun <T> Stream<T>.any(predicate: (T) -> Boolean) : Boolean {
-    for (element in this) if (predicate(element)) return true
-    return false
-    
-}
-
-/**
- * Returns *true* if any elements match the given *predicate*
- */
-public fun <T> Iterable<T>.any(predicate: (T) -> Boolean) : Boolean {
-    for (element in this) if (predicate(element)) return true
-    return false
-    
-}
-
-/**
- * Returns *true* if any elements match the given *predicate*
- */
 public fun <T> Array<T>.any(predicate: (T) -> Boolean) : Boolean {
+    for (element in this) if (predicate(element)) return true
+    return false
+    
+}
+
+/**
+ * Returns *true* if any elements match the given *predicate*
+ */
+public fun BooleanArray.any(predicate: (Boolean) -> Boolean) : Boolean {
     for (element in this) if (predicate(element)) return true
     return false
     
@@ -163,7 +154,7 @@ public fun DoubleArray.any(predicate: (Double) -> Boolean) : Boolean {
 /**
  * Returns *true* if any elements match the given *predicate*
  */
-public fun LongArray.any(predicate: (Long) -> Boolean) : Boolean {
+public fun FloatArray.any(predicate: (Float) -> Boolean) : Boolean {
     for (element in this) if (predicate(element)) return true
     return false
     
@@ -181,6 +172,15 @@ public fun IntArray.any(predicate: (Int) -> Boolean) : Boolean {
 /**
  * Returns *true* if any elements match the given *predicate*
  */
+public fun LongArray.any(predicate: (Long) -> Boolean) : Boolean {
+    for (element in this) if (predicate(element)) return true
+    return false
+    
+}
+
+/**
+ * Returns *true* if any elements match the given *predicate*
+ */
 public fun ShortArray.any(predicate: (Short) -> Boolean) : Boolean {
     for (element in this) if (predicate(element)) return true
     return false
@@ -190,7 +190,7 @@ public fun ShortArray.any(predicate: (Short) -> Boolean) : Boolean {
 /**
  * Returns *true* if any elements match the given *predicate*
  */
-public fun BooleanArray.any(predicate: (Boolean) -> Boolean) : Boolean {
+public fun <T> Iterable<T>.any(predicate: (T) -> Boolean) : Boolean {
     for (element in this) if (predicate(element)) return true
     return false
     
@@ -199,49 +199,9 @@ public fun BooleanArray.any(predicate: (Boolean) -> Boolean) : Boolean {
 /**
  * Returns *true* if any elements match the given *predicate*
  */
-public fun FloatArray.any(predicate: (Float) -> Boolean) : Boolean {
+public fun <T> Stream<T>.any(predicate: (T) -> Boolean) : Boolean {
     for (element in this) if (predicate(element)) return true
     return false
-    
-}
-
-/**
- * Appends the string from all the elements separated using the *separator* and using the given *prefix* and *postfix* if supplied
- * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
- * a special *truncated* separator (which defaults to "..."
- */
-public fun <T> Stream<T>.appendString(buffer: Appendable, separator: String = ", ", prefix: String ="", postfix: String = "", limit: Int = -1, truncated: String = "...") : Unit {
-    buffer.append(prefix)
-    var count = 0
-    for (element in this) {
-        if (++count > 1) buffer.append(separator)
-        if (limit < 0 || count <= limit) {
-            val text = if (element == null) "null" else element.toString()
-            buffer.append(text)
-        } else break
-    }
-    if (limit >= 0 && count > limit) buffer.append(truncated)
-    buffer.append(postfix)
-    
-}
-
-/**
- * Appends the string from all the elements separated using the *separator* and using the given *prefix* and *postfix* if supplied
- * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
- * a special *truncated* separator (which defaults to "..."
- */
-public fun <T> Iterable<T>.appendString(buffer: Appendable, separator: String = ", ", prefix: String ="", postfix: String = "", limit: Int = -1, truncated: String = "...") : Unit {
-    buffer.append(prefix)
-    var count = 0
-    for (element in this) {
-        if (++count > 1) buffer.append(separator)
-        if (limit < 0 || count <= limit) {
-            val text = if (element == null) "null" else element.toString()
-            buffer.append(text)
-        } else break
-    }
-    if (limit >= 0 && count > limit) buffer.append(truncated)
-    buffer.append(postfix)
     
 }
 
@@ -251,6 +211,26 @@ public fun <T> Iterable<T>.appendString(buffer: Appendable, separator: String = 
  * a special *truncated* separator (which defaults to "..."
  */
 public fun <T> Array<T>.appendString(buffer: Appendable, separator: String = ", ", prefix: String ="", postfix: String = "", limit: Int = -1, truncated: String = "...") : Unit {
+    buffer.append(prefix)
+    var count = 0
+    for (element in this) {
+        if (++count > 1) buffer.append(separator)
+        if (limit < 0 || count <= limit) {
+            val text = if (element == null) "null" else element.toString()
+            buffer.append(text)
+        } else break
+    }
+    if (limit >= 0 && count > limit) buffer.append(truncated)
+    buffer.append(postfix)
+    
+}
+
+/**
+ * Appends the string from all the elements separated using the *separator* and using the given *prefix* and *postfix* if supplied
+ * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
+ * a special *truncated* separator (which defaults to "..."
+ */
+public fun BooleanArray.appendString(buffer: Appendable, separator: String = ", ", prefix: String ="", postfix: String = "", limit: Int = -1, truncated: String = "...") : Unit {
     buffer.append(prefix)
     var count = 0
     for (element in this) {
@@ -330,7 +310,7 @@ public fun DoubleArray.appendString(buffer: Appendable, separator: String = ", "
  * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
  * a special *truncated* separator (which defaults to "..."
  */
-public fun LongArray.appendString(buffer: Appendable, separator: String = ", ", prefix: String ="", postfix: String = "", limit: Int = -1, truncated: String = "...") : Unit {
+public fun FloatArray.appendString(buffer: Appendable, separator: String = ", ", prefix: String ="", postfix: String = "", limit: Int = -1, truncated: String = "...") : Unit {
     buffer.append(prefix)
     var count = 0
     for (element in this) {
@@ -370,6 +350,26 @@ public fun IntArray.appendString(buffer: Appendable, separator: String = ", ", p
  * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
  * a special *truncated* separator (which defaults to "..."
  */
+public fun LongArray.appendString(buffer: Appendable, separator: String = ", ", prefix: String ="", postfix: String = "", limit: Int = -1, truncated: String = "...") : Unit {
+    buffer.append(prefix)
+    var count = 0
+    for (element in this) {
+        if (++count > 1) buffer.append(separator)
+        if (limit < 0 || count <= limit) {
+            val text = if (element == null) "null" else element.toString()
+            buffer.append(text)
+        } else break
+    }
+    if (limit >= 0 && count > limit) buffer.append(truncated)
+    buffer.append(postfix)
+    
+}
+
+/**
+ * Appends the string from all the elements separated using the *separator* and using the given *prefix* and *postfix* if supplied
+ * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
+ * a special *truncated* separator (which defaults to "..."
+ */
 public fun ShortArray.appendString(buffer: Appendable, separator: String = ", ", prefix: String ="", postfix: String = "", limit: Int = -1, truncated: String = "...") : Unit {
     buffer.append(prefix)
     var count = 0
@@ -390,7 +390,7 @@ public fun ShortArray.appendString(buffer: Appendable, separator: String = ", ",
  * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
  * a special *truncated* separator (which defaults to "..."
  */
-public fun BooleanArray.appendString(buffer: Appendable, separator: String = ", ", prefix: String ="", postfix: String = "", limit: Int = -1, truncated: String = "...") : Unit {
+public fun <T> Iterable<T>.appendString(buffer: Appendable, separator: String = ", ", prefix: String ="", postfix: String = "", limit: Int = -1, truncated: String = "...") : Unit {
     buffer.append(prefix)
     var count = 0
     for (element in this) {
@@ -410,7 +410,7 @@ public fun BooleanArray.appendString(buffer: Appendable, separator: String = ", 
  * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
  * a special *truncated* separator (which defaults to "..."
  */
-public fun FloatArray.appendString(buffer: Appendable, separator: String = ", ", prefix: String ="", postfix: String = "", limit: Int = -1, truncated: String = "...") : Unit {
+public fun <T> Stream<T>.appendString(buffer: Appendable, separator: String = ", ", prefix: String ="", postfix: String = "", limit: Int = -1, truncated: String = "...") : Unit {
     buffer.append(prefix)
     var count = 0
     for (element in this) {
@@ -428,34 +428,14 @@ public fun FloatArray.appendString(buffer: Appendable, separator: String = ", ",
 /**
  * Returns the number of elements
  */
-public fun <T> Stream<T>.count() : Int {
-    var count = 0
-    for (element in this) count++
-    return count
-    
-}
-
-/**
- * Returns the number of elements
- */
-public fun <T> Iterable<T>.count() : Int {
-    var count = 0
-    for (element in this) count++
-    return count
-    
-}
-
-/**
- * Returns the number of elements
- */
-public fun <T> Collection<T>.count() : Int {
+public fun <T> Array<T>.count() : Int {
     return size
 }
 
 /**
  * Returns the number of elements
  */
-public fun <T> Array<T>.count() : Int {
+public fun BooleanArray.count() : Int {
     return size
 }
 
@@ -483,7 +463,7 @@ public fun DoubleArray.count() : Int {
 /**
  * Returns the number of elements
  */
-public fun LongArray.count() : Int {
+public fun FloatArray.count() : Int {
     return size
 }
 
@@ -497,6 +477,13 @@ public fun IntArray.count() : Int {
 /**
  * Returns the number of elements
  */
+public fun LongArray.count() : Int {
+    return size
+}
+
+/**
+ * Returns the number of elements
+ */
 public fun ShortArray.count() : Int {
     return size
 }
@@ -504,33 +491,26 @@ public fun ShortArray.count() : Int {
 /**
  * Returns the number of elements
  */
-public fun BooleanArray.count() : Int {
+public fun <T> Collection<T>.count() : Int {
     return size
 }
 
 /**
  * Returns the number of elements
  */
-public fun FloatArray.count() : Int {
-    return size
-}
-
-/**
- * Returns the number of elements matching the given *predicate*
- */
-public fun <T> Stream<T>.count(predicate: (T) -> Boolean) : Int {
+public fun <T> Iterable<T>.count() : Int {
     var count = 0
-    for (element in this) if (predicate(element)) count++
+    for (element in this) count++
     return count
     
 }
 
 /**
- * Returns the number of elements matching the given *predicate*
+ * Returns the number of elements
  */
-public fun <T> Iterable<T>.count(predicate: (T) -> Boolean) : Int {
+public fun <T> Stream<T>.count() : Int {
     var count = 0
-    for (element in this) if (predicate(element)) count++
+    for (element in this) count++
     return count
     
 }
@@ -539,6 +519,16 @@ public fun <T> Iterable<T>.count(predicate: (T) -> Boolean) : Int {
  * Returns the number of elements matching the given *predicate*
  */
 public fun <T> Array<T>.count(predicate: (T) -> Boolean) : Int {
+    var count = 0
+    for (element in this) if (predicate(element)) count++
+    return count
+    
+}
+
+/**
+ * Returns the number of elements matching the given *predicate*
+ */
+public fun BooleanArray.count(predicate: (Boolean) -> Boolean) : Int {
     var count = 0
     for (element in this) if (predicate(element)) count++
     return count
@@ -578,7 +568,7 @@ public fun DoubleArray.count(predicate: (Double) -> Boolean) : Int {
 /**
  * Returns the number of elements matching the given *predicate*
  */
-public fun LongArray.count(predicate: (Long) -> Boolean) : Int {
+public fun FloatArray.count(predicate: (Float) -> Boolean) : Int {
     var count = 0
     for (element in this) if (predicate(element)) count++
     return count
@@ -598,6 +588,16 @@ public fun IntArray.count(predicate: (Int) -> Boolean) : Int {
 /**
  * Returns the number of elements matching the given *predicate*
  */
+public fun LongArray.count(predicate: (Long) -> Boolean) : Int {
+    var count = 0
+    for (element in this) if (predicate(element)) count++
+    return count
+    
+}
+
+/**
+ * Returns the number of elements matching the given *predicate*
+ */
 public fun ShortArray.count(predicate: (Short) -> Boolean) : Int {
     var count = 0
     for (element in this) if (predicate(element)) count++
@@ -608,7 +608,7 @@ public fun ShortArray.count(predicate: (Short) -> Boolean) : Int {
 /**
  * Returns the number of elements matching the given *predicate*
  */
-public fun BooleanArray.count(predicate: (Boolean) -> Boolean) : Int {
+public fun <T> Iterable<T>.count(predicate: (T) -> Boolean) : Int {
     var count = 0
     for (element in this) if (predicate(element)) count++
     return count
@@ -618,7 +618,7 @@ public fun BooleanArray.count(predicate: (Boolean) -> Boolean) : Int {
 /**
  * Returns the number of elements matching the given *predicate*
  */
-public fun FloatArray.count(predicate: (Float) -> Boolean) : Int {
+public fun <T> Stream<T>.count(predicate: (T) -> Boolean) : Int {
     var count = 0
     for (element in this) if (predicate(element)) count++
     return count
@@ -628,27 +628,17 @@ public fun FloatArray.count(predicate: (Float) -> Boolean) : Int {
 /**
  * Folds all elements from from left to right with the *initial* value to perform the operation on sequential pairs of elements
  */
-public fun <T, R> Stream<T>.fold(initial: R, operation: (R, T) -> R) : R {
-    var answer = initial
-    for (element in this) answer = operation(answer, element)
-    return answer
-    
-}
-
-/**
- * Folds all elements from from left to right with the *initial* value to perform the operation on sequential pairs of elements
- */
-public fun <T, R> Iterable<T>.fold(initial: R, operation: (R, T) -> R) : R {
-    var answer = initial
-    for (element in this) answer = operation(answer, element)
-    return answer
-    
-}
-
-/**
- * Folds all elements from from left to right with the *initial* value to perform the operation on sequential pairs of elements
- */
 public fun <T, R> Array<T>.fold(initial: R, operation: (R, T) -> R) : R {
+    var answer = initial
+    for (element in this) answer = operation(answer, element)
+    return answer
+    
+}
+
+/**
+ * Folds all elements from from left to right with the *initial* value to perform the operation on sequential pairs of elements
+ */
+public fun <R> BooleanArray.fold(initial: R, operation: (R, Boolean) -> R) : R {
     var answer = initial
     for (element in this) answer = operation(answer, element)
     return answer
@@ -688,7 +678,7 @@ public fun <R> DoubleArray.fold(initial: R, operation: (R, Double) -> R) : R {
 /**
  * Folds all elements from from left to right with the *initial* value to perform the operation on sequential pairs of elements
  */
-public fun <R> LongArray.fold(initial: R, operation: (R, Long) -> R) : R {
+public fun <R> FloatArray.fold(initial: R, operation: (R, Float) -> R) : R {
     var answer = initial
     for (element in this) answer = operation(answer, element)
     return answer
@@ -708,6 +698,16 @@ public fun <R> IntArray.fold(initial: R, operation: (R, Int) -> R) : R {
 /**
  * Folds all elements from from left to right with the *initial* value to perform the operation on sequential pairs of elements
  */
+public fun <R> LongArray.fold(initial: R, operation: (R, Long) -> R) : R {
+    var answer = initial
+    for (element in this) answer = operation(answer, element)
+    return answer
+    
+}
+
+/**
+ * Folds all elements from from left to right with the *initial* value to perform the operation on sequential pairs of elements
+ */
 public fun <R> ShortArray.fold(initial: R, operation: (R, Short) -> R) : R {
     var answer = initial
     for (element in this) answer = operation(answer, element)
@@ -718,7 +718,7 @@ public fun <R> ShortArray.fold(initial: R, operation: (R, Short) -> R) : R {
 /**
  * Folds all elements from from left to right with the *initial* value to perform the operation on sequential pairs of elements
  */
-public fun <R> BooleanArray.fold(initial: R, operation: (R, Boolean) -> R) : R {
+public fun <T, R> Iterable<T>.fold(initial: R, operation: (R, T) -> R) : R {
     var answer = initial
     for (element in this) answer = operation(answer, element)
     return answer
@@ -728,7 +728,7 @@ public fun <R> BooleanArray.fold(initial: R, operation: (R, Boolean) -> R) : R {
 /**
  * Folds all elements from from left to right with the *initial* value to perform the operation on sequential pairs of elements
  */
-public fun <R> FloatArray.fold(initial: R, operation: (R, Float) -> R) : R {
+public fun <T, R> Stream<T>.fold(initial: R, operation: (R, T) -> R) : R {
     var answer = initial
     for (element in this) answer = operation(answer, element)
     return answer
@@ -739,7 +739,7 @@ public fun <R> FloatArray.fold(initial: R, operation: (R, Float) -> R) : R {
  * Applies binary operation to all elements of iterable, going from right to left.
  * Similar to foldRight function, but uses the last element as initial value
  */
-public fun <T, R> List<T>.foldRight(initial: R, operation: (R, T) -> R) : R {
+public fun <T, R> Array<T>.foldRight(initial: R, operation: (R, T) -> R) : R {
     var index = size - 1
     if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
     var answer = initial
@@ -754,7 +754,7 @@ public fun <T, R> List<T>.foldRight(initial: R, operation: (R, T) -> R) : R {
  * Applies binary operation to all elements of iterable, going from right to left.
  * Similar to foldRight function, but uses the last element as initial value
  */
-public fun <T, R> Array<T>.foldRight(initial: R, operation: (R, T) -> R) : R {
+public fun <R> BooleanArray.foldRight(initial: R, operation: (R, Boolean) -> R) : R {
     var index = size - 1
     if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
     var answer = initial
@@ -814,7 +814,7 @@ public fun <R> DoubleArray.foldRight(initial: R, operation: (R, Double) -> R) : 
  * Applies binary operation to all elements of iterable, going from right to left.
  * Similar to foldRight function, but uses the last element as initial value
  */
-public fun <R> LongArray.foldRight(initial: R, operation: (R, Long) -> R) : R {
+public fun <R> FloatArray.foldRight(initial: R, operation: (R, Float) -> R) : R {
     var index = size - 1
     if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
     var answer = initial
@@ -844,6 +844,21 @@ public fun <R> IntArray.foldRight(initial: R, operation: (R, Int) -> R) : R {
  * Applies binary operation to all elements of iterable, going from right to left.
  * Similar to foldRight function, but uses the last element as initial value
  */
+public fun <R> LongArray.foldRight(initial: R, operation: (R, Long) -> R) : R {
+    var index = size - 1
+    if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
+    var answer = initial
+    while (index >= 0) {
+        answer = operation(answer, get(index--))
+    }
+    return answer
+    
+}
+
+/**
+ * Applies binary operation to all elements of iterable, going from right to left.
+ * Similar to foldRight function, but uses the last element as initial value
+ */
 public fun <R> ShortArray.foldRight(initial: R, operation: (R, Short) -> R) : R {
     var index = size - 1
     if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
@@ -859,7 +874,7 @@ public fun <R> ShortArray.foldRight(initial: R, operation: (R, Short) -> R) : R 
  * Applies binary operation to all elements of iterable, going from right to left.
  * Similar to foldRight function, but uses the last element as initial value
  */
-public fun <R> BooleanArray.foldRight(initial: R, operation: (R, Boolean) -> R) : R {
+public fun <T, R> List<T>.foldRight(initial: R, operation: (R, T) -> R) : R {
     var index = size - 1
     if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
     var answer = initial
@@ -867,37 +882,6 @@ public fun <R> BooleanArray.foldRight(initial: R, operation: (R, Boolean) -> R) 
         answer = operation(answer, get(index--))
     }
     return answer
-    
-}
-
-/**
- * Applies binary operation to all elements of iterable, going from right to left.
- * Similar to foldRight function, but uses the last element as initial value
- */
-public fun <R> FloatArray.foldRight(initial: R, operation: (R, Float) -> R) : R {
-    var index = size - 1
-    if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
-    var answer = initial
-    while (index >= 0) {
-        answer = operation(answer, get(index--))
-    }
-    return answer
-    
-}
-
-/**
- * Performs the given *operation* on each element
- */
-public fun <T> Stream<T>.forEach(operation: (T) -> Unit) : Unit {
-    for (element in this) operation(element)
-    
-}
-
-/**
- * Performs the given *operation* on each element
- */
-public fun <T> Iterable<T>.forEach(operation: (T) -> Unit) : Unit {
-    for (element in this) operation(element)
     
 }
 
@@ -905,6 +889,14 @@ public fun <T> Iterable<T>.forEach(operation: (T) -> Unit) : Unit {
  * Performs the given *operation* on each element
  */
 public fun <T> Array<T>.forEach(operation: (T) -> Unit) : Unit {
+    for (element in this) operation(element)
+    
+}
+
+/**
+ * Performs the given *operation* on each element
+ */
+public fun BooleanArray.forEach(operation: (Boolean) -> Unit) : Unit {
     for (element in this) operation(element)
     
 }
@@ -936,7 +928,7 @@ public fun DoubleArray.forEach(operation: (Double) -> Unit) : Unit {
 /**
  * Performs the given *operation* on each element
  */
-public fun LongArray.forEach(operation: (Long) -> Unit) : Unit {
+public fun FloatArray.forEach(operation: (Float) -> Unit) : Unit {
     for (element in this) operation(element)
     
 }
@@ -952,6 +944,14 @@ public fun IntArray.forEach(operation: (Int) -> Unit) : Unit {
 /**
  * Performs the given *operation* on each element
  */
+public fun LongArray.forEach(operation: (Long) -> Unit) : Unit {
+    for (element in this) operation(element)
+    
+}
+
+/**
+ * Performs the given *operation* on each element
+ */
 public fun ShortArray.forEach(operation: (Short) -> Unit) : Unit {
     for (element in this) operation(element)
     
@@ -960,7 +960,7 @@ public fun ShortArray.forEach(operation: (Short) -> Unit) : Unit {
 /**
  * Performs the given *operation* on each element
  */
-public fun BooleanArray.forEach(operation: (Boolean) -> Unit) : Unit {
+public fun <T> Iterable<T>.forEach(operation: (T) -> Unit) : Unit {
     for (element in this) operation(element)
     
 }
@@ -968,32 +968,8 @@ public fun BooleanArray.forEach(operation: (Boolean) -> Unit) : Unit {
 /**
  * Performs the given *operation* on each element
  */
-public fun FloatArray.forEach(operation: (Float) -> Unit) : Unit {
+public fun <T> Stream<T>.forEach(operation: (T) -> Unit) : Unit {
     for (element in this) operation(element)
-    
-}
-
-/**
- * Creates a string from all the elements separated using the *separator* and using the given *prefix* and *postfix* if supplied.
- * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
- * a special *truncated* separator (which defaults to "..."
- */
-public fun <T> Stream<T>.makeString(separator: String = ", ", prefix: String = "", postfix: String = "", limit: Int = -1, truncated: String = "...") : String {
-    val buffer = StringBuilder()
-    appendString(buffer, separator, prefix, postfix, limit, truncated)
-    return buffer.toString()
-    
-}
-
-/**
- * Creates a string from all the elements separated using the *separator* and using the given *prefix* and *postfix* if supplied.
- * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
- * a special *truncated* separator (which defaults to "..."
- */
-public fun <T> Iterable<T>.makeString(separator: String = ", ", prefix: String = "", postfix: String = "", limit: Int = -1, truncated: String = "...") : String {
-    val buffer = StringBuilder()
-    appendString(buffer, separator, prefix, postfix, limit, truncated)
-    return buffer.toString()
     
 }
 
@@ -1003,6 +979,18 @@ public fun <T> Iterable<T>.makeString(separator: String = ", ", prefix: String =
  * a special *truncated* separator (which defaults to "..."
  */
 public fun <T> Array<T>.makeString(separator: String = ", ", prefix: String = "", postfix: String = "", limit: Int = -1, truncated: String = "...") : String {
+    val buffer = StringBuilder()
+    appendString(buffer, separator, prefix, postfix, limit, truncated)
+    return buffer.toString()
+    
+}
+
+/**
+ * Creates a string from all the elements separated using the *separator* and using the given *prefix* and *postfix* if supplied.
+ * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
+ * a special *truncated* separator (which defaults to "..."
+ */
+public fun BooleanArray.makeString(separator: String = ", ", prefix: String = "", postfix: String = "", limit: Int = -1, truncated: String = "...") : String {
     val buffer = StringBuilder()
     appendString(buffer, separator, prefix, postfix, limit, truncated)
     return buffer.toString()
@@ -1050,7 +1038,7 @@ public fun DoubleArray.makeString(separator: String = ", ", prefix: String = "",
  * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
  * a special *truncated* separator (which defaults to "..."
  */
-public fun LongArray.makeString(separator: String = ", ", prefix: String = "", postfix: String = "", limit: Int = -1, truncated: String = "...") : String {
+public fun FloatArray.makeString(separator: String = ", ", prefix: String = "", postfix: String = "", limit: Int = -1, truncated: String = "...") : String {
     val buffer = StringBuilder()
     appendString(buffer, separator, prefix, postfix, limit, truncated)
     return buffer.toString()
@@ -1074,6 +1062,18 @@ public fun IntArray.makeString(separator: String = ", ", prefix: String = "", po
  * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
  * a special *truncated* separator (which defaults to "..."
  */
+public fun LongArray.makeString(separator: String = ", ", prefix: String = "", postfix: String = "", limit: Int = -1, truncated: String = "...") : String {
+    val buffer = StringBuilder()
+    appendString(buffer, separator, prefix, postfix, limit, truncated)
+    return buffer.toString()
+    
+}
+
+/**
+ * Creates a string from all the elements separated using the *separator* and using the given *prefix* and *postfix* if supplied.
+ * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
+ * a special *truncated* separator (which defaults to "..."
+ */
 public fun ShortArray.makeString(separator: String = ", ", prefix: String = "", postfix: String = "", limit: Int = -1, truncated: String = "...") : String {
     val buffer = StringBuilder()
     appendString(buffer, separator, prefix, postfix, limit, truncated)
@@ -1086,7 +1086,7 @@ public fun ShortArray.makeString(separator: String = ", ", prefix: String = "", 
  * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
  * a special *truncated* separator (which defaults to "..."
  */
-public fun BooleanArray.makeString(separator: String = ", ", prefix: String = "", postfix: String = "", limit: Int = -1, truncated: String = "...") : String {
+public fun <T> Iterable<T>.makeString(separator: String = ", ", prefix: String = "", postfix: String = "", limit: Int = -1, truncated: String = "...") : String {
     val buffer = StringBuilder()
     appendString(buffer, separator, prefix, postfix, limit, truncated)
     return buffer.toString()
@@ -1098,42 +1098,10 @@ public fun BooleanArray.makeString(separator: String = ", ", prefix: String = ""
  * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
  * a special *truncated* separator (which defaults to "..."
  */
-public fun FloatArray.makeString(separator: String = ", ", prefix: String = "", postfix: String = "", limit: Int = -1, truncated: String = "...") : String {
+public fun <T> Stream<T>.makeString(separator: String = ", ", prefix: String = "", postfix: String = "", limit: Int = -1, truncated: String = "...") : String {
     val buffer = StringBuilder()
     appendString(buffer, separator, prefix, postfix, limit, truncated)
     return buffer.toString()
-    
-}
-
-/**
- * Returns the largest element or null if there are no elements
- */
-public fun <T: Comparable<T>> Stream<T>.max() : T? {
-    val iterator = iterator()
-    if (!iterator.hasNext()) return null
-    
-    var max = iterator.next()
-    while (iterator.hasNext()) {
-        val e = iterator.next()
-        if (max < e) max = e
-    }
-    return max
-    
-}
-
-/**
- * Returns the largest element or null if there are no elements
- */
-public fun <T: Comparable<T>> Iterable<T>.max() : T? {
-    val iterator = iterator()
-    if (!iterator.hasNext()) return null
-    
-    var max = iterator.next()
-    while (iterator.hasNext()) {
-        val e = iterator.next()
-        if (max < e) max = e
-    }
-    return max
     
 }
 
@@ -1200,7 +1168,7 @@ public fun DoubleArray.max() : Double? {
 /**
  * Returns the largest element or null if there are no elements
  */
-public fun LongArray.max() : Long? {
+public fun FloatArray.max() : Float? {
     if (isEmpty()) return null
     
     var max = this[0]
@@ -1230,6 +1198,21 @@ public fun IntArray.max() : Int? {
 /**
  * Returns the largest element or null if there are no elements
  */
+public fun LongArray.max() : Long? {
+    if (isEmpty()) return null
+    
+    var max = this[0]
+    for (i in 1..lastIndex) {
+        val e = this[i]
+        if (max < e) max = e
+    }
+    return max
+    
+}
+
+/**
+ * Returns the largest element or null if there are no elements
+ */
 public fun ShortArray.max() : Short? {
     if (isEmpty()) return null
     
@@ -1245,12 +1228,29 @@ public fun ShortArray.max() : Short? {
 /**
  * Returns the largest element or null if there are no elements
  */
-public fun FloatArray.max() : Float? {
-    if (isEmpty()) return null
+public fun <T: Comparable<T>> Iterable<T>.max() : T? {
+    val iterator = iterator()
+    if (!iterator.hasNext()) return null
     
-    var max = this[0]
-    for (i in 1..lastIndex) {
-        val e = this[i]
+    var max = iterator.next()
+    while (iterator.hasNext()) {
+        val e = iterator.next()
+        if (max < e) max = e
+    }
+    return max
+    
+}
+
+/**
+ * Returns the largest element or null if there are no elements
+ */
+public fun <T: Comparable<T>> Stream<T>.max() : T? {
+    val iterator = iterator()
+    if (!iterator.hasNext()) return null
+    
+    var max = iterator.next()
+    while (iterator.hasNext()) {
+        val e = iterator.next()
         if (max < e) max = e
     }
     return max
@@ -1260,49 +1260,27 @@ public fun FloatArray.max() : Float? {
 /**
  * Returns the first element yielding the largest value of the given function or null if there are no elements
  */
-public fun <R: Comparable<R>, T: Any> Stream<T>.maxBy(f: (T) -> R) : T? {
-    val iterator = iterator()
-    if (!iterator.hasNext()) return null
-    
-    var maxElem = iterator.next()
-    var maxValue = f(maxElem)
-    while (iterator.hasNext()) {
-        val e = iterator.next()
-        val v = f(e)
-        if (maxValue < v) {
-           maxElem = e
-           maxValue = v
-        }
-    }
-    return maxElem
-    
-}
-
-/**
- * Returns the first element yielding the largest value of the given function or null if there are no elements
- */
-public fun <R: Comparable<R>, T: Any> Iterable<T>.maxBy(f: (T) -> R) : T? {
-    val iterator = iterator()
-    if (!iterator.hasNext()) return null
-    
-    var maxElem = iterator.next()
-    var maxValue = f(maxElem)
-    while (iterator.hasNext()) {
-        val e = iterator.next()
-        val v = f(e)
-        if (maxValue < v) {
-           maxElem = e
-           maxValue = v
-        }
-    }
-    return maxElem
-    
-}
-
-/**
- * Returns the first element yielding the largest value of the given function or null if there are no elements
- */
 public fun <R: Comparable<R>, T: Any> Array<T>.maxBy(f: (T) -> R) : T? {
+    if (isEmpty()) return null
+    
+    var maxElem = this[0]
+    var maxValue = f(maxElem)
+    for (i in 1..lastIndex) {
+        val e = this[i]
+        val v = f(e)
+        if (maxValue < v) {
+           maxElem = e
+           maxValue = v
+        }
+    }
+    return maxElem
+    
+}
+
+/**
+ * Returns the first element yielding the largest value of the given function or null if there are no elements
+ */
+public fun <R: Comparable<R>> BooleanArray.maxBy(f: (Boolean) -> R) : Boolean? {
     if (isEmpty()) return null
     
     var maxElem = this[0]
@@ -1382,7 +1360,7 @@ public fun <R: Comparable<R>> DoubleArray.maxBy(f: (Double) -> R) : Double? {
 /**
  * Returns the first element yielding the largest value of the given function or null if there are no elements
  */
-public fun <R: Comparable<R>> LongArray.maxBy(f: (Long) -> R) : Long? {
+public fun <R: Comparable<R>> FloatArray.maxBy(f: (Float) -> R) : Float? {
     if (isEmpty()) return null
     
     var maxElem = this[0]
@@ -1422,6 +1400,26 @@ public fun <R: Comparable<R>> IntArray.maxBy(f: (Int) -> R) : Int? {
 /**
  * Returns the first element yielding the largest value of the given function or null if there are no elements
  */
+public fun <R: Comparable<R>> LongArray.maxBy(f: (Long) -> R) : Long? {
+    if (isEmpty()) return null
+    
+    var maxElem = this[0]
+    var maxValue = f(maxElem)
+    for (i in 1..lastIndex) {
+        val e = this[i]
+        val v = f(e)
+        if (maxValue < v) {
+           maxElem = e
+           maxValue = v
+        }
+    }
+    return maxElem
+    
+}
+
+/**
+ * Returns the first element yielding the largest value of the given function or null if there are no elements
+ */
 public fun <R: Comparable<R>> ShortArray.maxBy(f: (Short) -> R) : Short? {
     if (isEmpty()) return null
     
@@ -1442,13 +1440,14 @@ public fun <R: Comparable<R>> ShortArray.maxBy(f: (Short) -> R) : Short? {
 /**
  * Returns the first element yielding the largest value of the given function or null if there are no elements
  */
-public fun <R: Comparable<R>> BooleanArray.maxBy(f: (Boolean) -> R) : Boolean? {
-    if (isEmpty()) return null
+public fun <R: Comparable<R>, T: Any> Iterable<T>.maxBy(f: (T) -> R) : T? {
+    val iterator = iterator()
+    if (!iterator.hasNext()) return null
     
-    var maxElem = this[0]
+    var maxElem = iterator.next()
     var maxValue = f(maxElem)
-    for (i in 1..lastIndex) {
-        val e = this[i]
+    while (iterator.hasNext()) {
+        val e = iterator.next()
         val v = f(e)
         if (maxValue < v) {
            maxElem = e
@@ -1462,13 +1461,14 @@ public fun <R: Comparable<R>> BooleanArray.maxBy(f: (Boolean) -> R) : Boolean? {
 /**
  * Returns the first element yielding the largest value of the given function or null if there are no elements
  */
-public fun <R: Comparable<R>> FloatArray.maxBy(f: (Float) -> R) : Float? {
-    if (isEmpty()) return null
+public fun <R: Comparable<R>, T: Any> Stream<T>.maxBy(f: (T) -> R) : T? {
+    val iterator = iterator()
+    if (!iterator.hasNext()) return null
     
-    var maxElem = this[0]
+    var maxElem = iterator.next()
     var maxValue = f(maxElem)
-    for (i in 1..lastIndex) {
-        val e = this[i]
+    while (iterator.hasNext()) {
+        val e = iterator.next()
         val v = f(e)
         if (maxValue < v) {
            maxElem = e
@@ -1476,38 +1476,6 @@ public fun <R: Comparable<R>> FloatArray.maxBy(f: (Float) -> R) : Float? {
         }
     }
     return maxElem
-    
-}
-
-/**
- * Returns the smallest element or null if there are no elements
- */
-public fun <T: Comparable<T>> Stream<T>.min() : T? {
-    val iterator = iterator()
-    if (!iterator.hasNext()) return null
-    
-    var min = iterator.next()
-    while (iterator.hasNext()) {
-        val e = iterator.next()
-        if (min > e) min = e
-    }
-    return min
-    
-}
-
-/**
- * Returns the smallest element or null if there are no elements
- */
-public fun <T: Comparable<T>> Iterable<T>.min() : T? {
-    val iterator = iterator()
-    if (!iterator.hasNext()) return null
-    
-    var min = iterator.next()
-    while (iterator.hasNext()) {
-        val e = iterator.next()
-        if (min > e) min = e
-    }
-    return min
     
 }
 
@@ -1570,7 +1538,7 @@ public fun DoubleArray.min() : Double? {
 /**
  * Returns the smallest element or null if there are no elements
  */
-public fun LongArray.min() : Long? {
+public fun FloatArray.min() : Float? {
     if (isEmpty()) return null
     var min = this[0]
     for (i in 1..lastIndex) {
@@ -1598,6 +1566,20 @@ public fun IntArray.min() : Int? {
 /**
  * Returns the smallest element or null if there are no elements
  */
+public fun LongArray.min() : Long? {
+    if (isEmpty()) return null
+    var min = this[0]
+    for (i in 1..lastIndex) {
+        val e = this[i]
+        if (min > e) min = e
+    }
+    return min
+    
+}
+
+/**
+ * Returns the smallest element or null if there are no elements
+ */
 public fun ShortArray.min() : Short? {
     if (isEmpty()) return null
     var min = this[0]
@@ -1612,11 +1594,29 @@ public fun ShortArray.min() : Short? {
 /**
  * Returns the smallest element or null if there are no elements
  */
-public fun FloatArray.min() : Float? {
-    if (isEmpty()) return null
-    var min = this[0]
-    for (i in 1..lastIndex) {
-        val e = this[i]
+public fun <T: Comparable<T>> Iterable<T>.min() : T? {
+    val iterator = iterator()
+    if (!iterator.hasNext()) return null
+    
+    var min = iterator.next()
+    while (iterator.hasNext()) {
+        val e = iterator.next()
+        if (min > e) min = e
+    }
+    return min
+    
+}
+
+/**
+ * Returns the smallest element or null if there are no elements
+ */
+public fun <T: Comparable<T>> Stream<T>.min() : T? {
+    val iterator = iterator()
+    if (!iterator.hasNext()) return null
+    
+    var min = iterator.next()
+    while (iterator.hasNext()) {
+        val e = iterator.next()
         if (min > e) min = e
     }
     return min
@@ -1626,49 +1626,27 @@ public fun FloatArray.min() : Float? {
 /**
  * Returns the first element yielding the smallest value of the given function or null if there are no elements
  */
-public fun <R: Comparable<R>, T: Any> Stream<T>.minBy(f: (T) -> R) : T? {
-    val iterator = iterator()
-    if (!iterator.hasNext()) return null
-    
-    var minElem = iterator.next()
-    var minValue = f(minElem)
-    while (iterator.hasNext()) {
-        val e = iterator.next()
-        val v = f(e)
-        if (minValue > v) {
-           minElem = e
-           minValue = v
-        }
-    }
-    return minElem
-    
-}
-
-/**
- * Returns the first element yielding the smallest value of the given function or null if there are no elements
- */
-public fun <R: Comparable<R>, T: Any> Iterable<T>.minBy(f: (T) -> R) : T? {
-    val iterator = iterator()
-    if (!iterator.hasNext()) return null
-    
-    var minElem = iterator.next()
-    var minValue = f(minElem)
-    while (iterator.hasNext()) {
-        val e = iterator.next()
-        val v = f(e)
-        if (minValue > v) {
-           minElem = e
-           minValue = v
-        }
-    }
-    return minElem
-    
-}
-
-/**
- * Returns the first element yielding the smallest value of the given function or null if there are no elements
- */
 public fun <R: Comparable<R>, T: Any> Array<T>.minBy(f: (T) -> R) : T? {
+    if (size == 0) return null
+    
+    var minElem = this[0]
+    var minValue = f(minElem)
+    for (i in 1..lastIndex) {
+        val e = this[i]
+        val v = f(e)
+        if (minValue > v) {
+           minElem = e
+           minValue = v
+        }
+    }
+    return minElem
+    
+}
+
+/**
+ * Returns the first element yielding the smallest value of the given function or null if there are no elements
+ */
+public fun <R: Comparable<R>> BooleanArray.minBy(f: (Boolean) -> R) : Boolean? {
     if (size == 0) return null
     
     var minElem = this[0]
@@ -1748,7 +1726,7 @@ public fun <R: Comparable<R>> DoubleArray.minBy(f: (Double) -> R) : Double? {
 /**
  * Returns the first element yielding the smallest value of the given function or null if there are no elements
  */
-public fun <R: Comparable<R>> LongArray.minBy(f: (Long) -> R) : Long? {
+public fun <R: Comparable<R>> FloatArray.minBy(f: (Float) -> R) : Float? {
     if (size == 0) return null
     
     var minElem = this[0]
@@ -1788,6 +1766,26 @@ public fun <R: Comparable<R>> IntArray.minBy(f: (Int) -> R) : Int? {
 /**
  * Returns the first element yielding the smallest value of the given function or null if there are no elements
  */
+public fun <R: Comparable<R>> LongArray.minBy(f: (Long) -> R) : Long? {
+    if (size == 0) return null
+    
+    var minElem = this[0]
+    var minValue = f(minElem)
+    for (i in 1..lastIndex) {
+        val e = this[i]
+        val v = f(e)
+        if (minValue > v) {
+           minElem = e
+           minValue = v
+        }
+    }
+    return minElem
+    
+}
+
+/**
+ * Returns the first element yielding the smallest value of the given function or null if there are no elements
+ */
 public fun <R: Comparable<R>> ShortArray.minBy(f: (Short) -> R) : Short? {
     if (size == 0) return null
     
@@ -1808,13 +1806,14 @@ public fun <R: Comparable<R>> ShortArray.minBy(f: (Short) -> R) : Short? {
 /**
  * Returns the first element yielding the smallest value of the given function or null if there are no elements
  */
-public fun <R: Comparable<R>> BooleanArray.minBy(f: (Boolean) -> R) : Boolean? {
-    if (size == 0) return null
+public fun <R: Comparable<R>, T: Any> Iterable<T>.minBy(f: (T) -> R) : T? {
+    val iterator = iterator()
+    if (!iterator.hasNext()) return null
     
-    var minElem = this[0]
+    var minElem = iterator.next()
     var minValue = f(minElem)
-    for (i in 1..lastIndex) {
-        val e = this[i]
+    while (iterator.hasNext()) {
+        val e = iterator.next()
         val v = f(e)
         if (minValue > v) {
            minElem = e
@@ -1828,13 +1827,14 @@ public fun <R: Comparable<R>> BooleanArray.minBy(f: (Boolean) -> R) : Boolean? {
 /**
  * Returns the first element yielding the smallest value of the given function or null if there are no elements
  */
-public fun <R: Comparable<R>> FloatArray.minBy(f: (Float) -> R) : Float? {
-    if (size == 0) return null
+public fun <R: Comparable<R>, T: Any> Stream<T>.minBy(f: (T) -> R) : T? {
+    val iterator = iterator()
+    if (!iterator.hasNext()) return null
     
-    var minElem = this[0]
+    var minElem = iterator.next()
     var minValue = f(minElem)
-    for (i in 1..lastIndex) {
-        val e = this[i]
+    while (iterator.hasNext()) {
+        val e = iterator.next()
         val v = f(e)
         if (minValue > v) {
            minElem = e
@@ -1848,25 +1848,16 @@ public fun <R: Comparable<R>> FloatArray.minBy(f: (Float) -> R) : Float? {
 /**
  * Returns *true* if no elements match the given *predicate*
  */
-public fun <T> Stream<T>.none(predicate: (T) -> Boolean) : Boolean {
-    for (element in this) if (predicate(element)) return false
-    return true
-    
-}
-
-/**
- * Returns *true* if no elements match the given *predicate*
- */
-public fun <T> Iterable<T>.none(predicate: (T) -> Boolean) : Boolean {
-    for (element in this) if (predicate(element)) return false
-    return true
-    
-}
-
-/**
- * Returns *true* if no elements match the given *predicate*
- */
 public fun <T> Array<T>.none(predicate: (T) -> Boolean) : Boolean {
+    for (element in this) if (predicate(element)) return false
+    return true
+    
+}
+
+/**
+ * Returns *true* if no elements match the given *predicate*
+ */
+public fun BooleanArray.none(predicate: (Boolean) -> Boolean) : Boolean {
     for (element in this) if (predicate(element)) return false
     return true
     
@@ -1902,7 +1893,7 @@ public fun DoubleArray.none(predicate: (Double) -> Boolean) : Boolean {
 /**
  * Returns *true* if no elements match the given *predicate*
  */
-public fun LongArray.none(predicate: (Long) -> Boolean) : Boolean {
+public fun FloatArray.none(predicate: (Float) -> Boolean) : Boolean {
     for (element in this) if (predicate(element)) return false
     return true
     
@@ -1920,6 +1911,15 @@ public fun IntArray.none(predicate: (Int) -> Boolean) : Boolean {
 /**
  * Returns *true* if no elements match the given *predicate*
  */
+public fun LongArray.none(predicate: (Long) -> Boolean) : Boolean {
+    for (element in this) if (predicate(element)) return false
+    return true
+    
+}
+
+/**
+ * Returns *true* if no elements match the given *predicate*
+ */
 public fun ShortArray.none(predicate: (Short) -> Boolean) : Boolean {
     for (element in this) if (predicate(element)) return false
     return true
@@ -1929,7 +1929,7 @@ public fun ShortArray.none(predicate: (Short) -> Boolean) : Boolean {
 /**
  * Returns *true* if no elements match the given *predicate*
  */
-public fun BooleanArray.none(predicate: (Boolean) -> Boolean) : Boolean {
+public fun <T> Iterable<T>.none(predicate: (T) -> Boolean) : Boolean {
     for (element in this) if (predicate(element)) return false
     return true
     
@@ -1938,45 +1938,9 @@ public fun BooleanArray.none(predicate: (Boolean) -> Boolean) : Boolean {
 /**
  * Returns *true* if no elements match the given *predicate*
  */
-public fun FloatArray.none(predicate: (Float) -> Boolean) : Boolean {
+public fun <T> Stream<T>.none(predicate: (T) -> Boolean) : Boolean {
     for (element in this) if (predicate(element)) return false
     return true
-    
-}
-
-/**
- * Applies binary operation to all elements of iterable, going from left to right.
- * Similar to fold function, but uses the first element as initial value
- */
-public fun <T> Stream<T>.reduce(operation: (T, T) -> T) : T {
-    val iterator = this.iterator()
-    if (!iterator.hasNext()) {
-        throw UnsupportedOperationException("Empty iterable can't be reduced")
-    }
-    
-    var result: T = iterator.next() //compiler doesn't understand that result will initialized anyway
-    while (iterator.hasNext()) {
-        result = operation(result, iterator.next())
-    }
-    return result
-    
-}
-
-/**
- * Applies binary operation to all elements of iterable, going from left to right.
- * Similar to fold function, but uses the first element as initial value
- */
-public fun <T> Iterable<T>.reduce(operation: (T, T) -> T) : T {
-    val iterator = this.iterator()
-    if (!iterator.hasNext()) {
-        throw UnsupportedOperationException("Empty iterable can't be reduced")
-    }
-    
-    var result: T = iterator.next() //compiler doesn't understand that result will initialized anyway
-    while (iterator.hasNext()) {
-        result = operation(result, iterator.next())
-    }
-    return result
     
 }
 
@@ -1991,6 +1955,24 @@ public fun <T> Array<T>.reduce(operation: (T, T) -> T) : T {
     }
     
     var result: T = iterator.next() //compiler doesn't understand that result will initialized anyway
+    while (iterator.hasNext()) {
+        result = operation(result, iterator.next())
+    }
+    return result
+    
+}
+
+/**
+ * Applies binary operation to all elements of iterable, going from left to right.
+ * Similar to fold function, but uses the first element as initial value
+ */
+public fun BooleanArray.reduce(operation: (Boolean, Boolean) -> Boolean) : Boolean {
+    val iterator = this.iterator()
+    if (!iterator.hasNext()) {
+        throw UnsupportedOperationException("Empty iterable can't be reduced")
+    }
+    
+    var result: Boolean = iterator.next() //compiler doesn't understand that result will initialized anyway
     while (iterator.hasNext()) {
         result = operation(result, iterator.next())
     }
@@ -2056,13 +2038,13 @@ public fun DoubleArray.reduce(operation: (Double, Double) -> Double) : Double {
  * Applies binary operation to all elements of iterable, going from left to right.
  * Similar to fold function, but uses the first element as initial value
  */
-public fun LongArray.reduce(operation: (Long, Long) -> Long) : Long {
+public fun FloatArray.reduce(operation: (Float, Float) -> Float) : Float {
     val iterator = this.iterator()
     if (!iterator.hasNext()) {
         throw UnsupportedOperationException("Empty iterable can't be reduced")
     }
     
-    var result: Long = iterator.next() //compiler doesn't understand that result will initialized anyway
+    var result: Float = iterator.next() //compiler doesn't understand that result will initialized anyway
     while (iterator.hasNext()) {
         result = operation(result, iterator.next())
     }
@@ -2092,6 +2074,24 @@ public fun IntArray.reduce(operation: (Int, Int) -> Int) : Int {
  * Applies binary operation to all elements of iterable, going from left to right.
  * Similar to fold function, but uses the first element as initial value
  */
+public fun LongArray.reduce(operation: (Long, Long) -> Long) : Long {
+    val iterator = this.iterator()
+    if (!iterator.hasNext()) {
+        throw UnsupportedOperationException("Empty iterable can't be reduced")
+    }
+    
+    var result: Long = iterator.next() //compiler doesn't understand that result will initialized anyway
+    while (iterator.hasNext()) {
+        result = operation(result, iterator.next())
+    }
+    return result
+    
+}
+
+/**
+ * Applies binary operation to all elements of iterable, going from left to right.
+ * Similar to fold function, but uses the first element as initial value
+ */
 public fun ShortArray.reduce(operation: (Short, Short) -> Short) : Short {
     val iterator = this.iterator()
     if (!iterator.hasNext()) {
@@ -2110,13 +2110,13 @@ public fun ShortArray.reduce(operation: (Short, Short) -> Short) : Short {
  * Applies binary operation to all elements of iterable, going from left to right.
  * Similar to fold function, but uses the first element as initial value
  */
-public fun BooleanArray.reduce(operation: (Boolean, Boolean) -> Boolean) : Boolean {
+public fun <T> Iterable<T>.reduce(operation: (T, T) -> T) : T {
     val iterator = this.iterator()
     if (!iterator.hasNext()) {
         throw UnsupportedOperationException("Empty iterable can't be reduced")
     }
     
-    var result: Boolean = iterator.next() //compiler doesn't understand that result will initialized anyway
+    var result: T = iterator.next() //compiler doesn't understand that result will initialized anyway
     while (iterator.hasNext()) {
         result = operation(result, iterator.next())
     }
@@ -2128,13 +2128,13 @@ public fun BooleanArray.reduce(operation: (Boolean, Boolean) -> Boolean) : Boole
  * Applies binary operation to all elements of iterable, going from left to right.
  * Similar to fold function, but uses the first element as initial value
  */
-public fun FloatArray.reduce(operation: (Float, Float) -> Float) : Float {
+public fun <T> Stream<T>.reduce(operation: (T, T) -> T) : T {
     val iterator = this.iterator()
     if (!iterator.hasNext()) {
         throw UnsupportedOperationException("Empty iterable can't be reduced")
     }
     
-    var result: Float = iterator.next() //compiler doesn't understand that result will initialized anyway
+    var result: T = iterator.next() //compiler doesn't understand that result will initialized anyway
     while (iterator.hasNext()) {
         result = operation(result, iterator.next())
     }
@@ -2146,7 +2146,7 @@ public fun FloatArray.reduce(operation: (Float, Float) -> Float) : Float {
  * Applies binary operation to all elements of iterable, going from right to left.
  * Similar to foldRight function, but uses the last element as initial value
  */
-public fun <T> List<T>.reduceRight(operation: (T, T) -> T) : T {
+public fun <T> Array<T>.reduceRight(operation: (T, T) -> T) : T {
     var index = size - 1
     if (index < 0) {
         throw UnsupportedOperationException("Empty iterable can't be reduced")
@@ -2165,7 +2165,7 @@ public fun <T> List<T>.reduceRight(operation: (T, T) -> T) : T {
  * Applies binary operation to all elements of iterable, going from right to left.
  * Similar to foldRight function, but uses the last element as initial value
  */
-public fun <T> Array<T>.reduceRight(operation: (T, T) -> T) : T {
+public fun BooleanArray.reduceRight(operation: (Boolean, Boolean) -> Boolean) : Boolean {
     var index = size - 1
     if (index < 0) {
         throw UnsupportedOperationException("Empty iterable can't be reduced")
@@ -2241,7 +2241,7 @@ public fun DoubleArray.reduceRight(operation: (Double, Double) -> Double) : Doub
  * Applies binary operation to all elements of iterable, going from right to left.
  * Similar to foldRight function, but uses the last element as initial value
  */
-public fun LongArray.reduceRight(operation: (Long, Long) -> Long) : Long {
+public fun FloatArray.reduceRight(operation: (Float, Float) -> Float) : Float {
     var index = size - 1
     if (index < 0) {
         throw UnsupportedOperationException("Empty iterable can't be reduced")
@@ -2279,6 +2279,25 @@ public fun IntArray.reduceRight(operation: (Int, Int) -> Int) : Int {
  * Applies binary operation to all elements of iterable, going from right to left.
  * Similar to foldRight function, but uses the last element as initial value
  */
+public fun LongArray.reduceRight(operation: (Long, Long) -> Long) : Long {
+    var index = size - 1
+    if (index < 0) {
+        throw UnsupportedOperationException("Empty iterable can't be reduced")
+    }
+    
+    var r = get(index--)
+    while (index >= 0) {
+        r = operation(get(index--), r)
+    }
+    
+    return r
+    
+}
+
+/**
+ * Applies binary operation to all elements of iterable, going from right to left.
+ * Similar to foldRight function, but uses the last element as initial value
+ */
 public fun ShortArray.reduceRight(operation: (Short, Short) -> Short) : Short {
     var index = size - 1
     if (index < 0) {
@@ -2298,26 +2317,7 @@ public fun ShortArray.reduceRight(operation: (Short, Short) -> Short) : Short {
  * Applies binary operation to all elements of iterable, going from right to left.
  * Similar to foldRight function, but uses the last element as initial value
  */
-public fun BooleanArray.reduceRight(operation: (Boolean, Boolean) -> Boolean) : Boolean {
-    var index = size - 1
-    if (index < 0) {
-        throw UnsupportedOperationException("Empty iterable can't be reduced")
-    }
-    
-    var r = get(index--)
-    while (index >= 0) {
-        r = operation(get(index--), r)
-    }
-    
-    return r
-    
-}
-
-/**
- * Applies binary operation to all elements of iterable, going from right to left.
- * Similar to foldRight function, but uses the last element as initial value
- */
-public fun FloatArray.reduceRight(operation: (Float, Float) -> Float) : Float {
+public fun <T> List<T>.reduceRight(operation: (T, T) -> T) : T {
     var index = size - 1
     if (index < 0) {
         throw UnsupportedOperationException("Empty iterable can't be reduced")

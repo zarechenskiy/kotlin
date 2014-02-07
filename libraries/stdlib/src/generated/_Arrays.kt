@@ -17,6 +17,13 @@ public fun <T> Array<T>.isEmpty() : Boolean {
 /**
  * Returns true if the array is empty
  */
+public fun BooleanArray.isEmpty() : Boolean {
+    return size == 0
+}
+
+/**
+ * Returns true if the array is empty
+ */
 public fun ByteArray.isEmpty() : Boolean {
     return size == 0
 }
@@ -38,7 +45,7 @@ public fun DoubleArray.isEmpty() : Boolean {
 /**
  * Returns true if the array is empty
  */
-public fun LongArray.isEmpty() : Boolean {
+public fun FloatArray.isEmpty() : Boolean {
     return size == 0
 }
 
@@ -52,6 +59,13 @@ public fun IntArray.isEmpty() : Boolean {
 /**
  * Returns true if the array is empty
  */
+public fun LongArray.isEmpty() : Boolean {
+    return size == 0
+}
+
+/**
+ * Returns true if the array is empty
+ */
 public fun ShortArray.isEmpty() : Boolean {
     return size == 0
 }
@@ -59,21 +73,14 @@ public fun ShortArray.isEmpty() : Boolean {
 /**
  * Returns true if the array is empty
  */
-public fun BooleanArray.isEmpty() : Boolean {
-    return size == 0
-}
-
-/**
- * Returns true if the array is empty
- */
-public fun FloatArray.isEmpty() : Boolean {
-    return size == 0
-}
-
-/**
- * Returns true if the array is empty
- */
 public fun <T> Array<T>.isNotEmpty() : Boolean {
+    return !isEmpty()
+}
+
+/**
+ * Returns true if the array is empty
+ */
+public fun BooleanArray.isNotEmpty() : Boolean {
     return !isEmpty()
 }
 
@@ -101,7 +108,7 @@ public fun DoubleArray.isNotEmpty() : Boolean {
 /**
  * Returns true if the array is empty
  */
-public fun LongArray.isNotEmpty() : Boolean {
+public fun FloatArray.isNotEmpty() : Boolean {
     return !isEmpty()
 }
 
@@ -115,21 +122,14 @@ public fun IntArray.isNotEmpty() : Boolean {
 /**
  * Returns true if the array is empty
  */
+public fun LongArray.isNotEmpty() : Boolean {
+    return !isEmpty()
+}
+
+/**
+ * Returns true if the array is empty
+ */
 public fun ShortArray.isNotEmpty() : Boolean {
-    return !isEmpty()
-}
-
-/**
- * Returns true if the array is empty
- */
-public fun BooleanArray.isNotEmpty() : Boolean {
-    return !isEmpty()
-}
-
-/**
- * Returns true if the array is empty
- */
-public fun FloatArray.isNotEmpty() : Boolean {
     return !isEmpty()
 }
 

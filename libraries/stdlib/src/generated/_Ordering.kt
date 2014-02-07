@@ -10,7 +10,7 @@ import java.util.*
 /**
  * Returns a list with elements in reversed order
  */
-public fun <T> Iterable<T>.reverse() : List<T> {
+public fun <T> Array<T>.reverse() : List<T> {
     val list = toArrayList()
     Collections.reverse(list)
     return list
@@ -20,7 +20,7 @@ public fun <T> Iterable<T>.reverse() : List<T> {
 /**
  * Returns a list with elements in reversed order
  */
-public fun <T> Array<T>.reverse() : List<T> {
+public fun BooleanArray.reverse() : List<Boolean> {
     val list = toArrayList()
     Collections.reverse(list)
     return list
@@ -60,7 +60,7 @@ public fun DoubleArray.reverse() : List<Double> {
 /**
  * Returns a list with elements in reversed order
  */
-public fun LongArray.reverse() : List<Long> {
+public fun FloatArray.reverse() : List<Float> {
     val list = toArrayList()
     Collections.reverse(list)
     return list
@@ -80,6 +80,16 @@ public fun IntArray.reverse() : List<Int> {
 /**
  * Returns a list with elements in reversed order
  */
+public fun LongArray.reverse() : List<Long> {
+    val list = toArrayList()
+    Collections.reverse(list)
+    return list
+    
+}
+
+/**
+ * Returns a list with elements in reversed order
+ */
 public fun ShortArray.reverse() : List<Short> {
     val list = toArrayList()
     Collections.reverse(list)
@@ -90,17 +100,7 @@ public fun ShortArray.reverse() : List<Short> {
 /**
  * Returns a list with elements in reversed order
  */
-public fun BooleanArray.reverse() : List<Boolean> {
-    val list = toArrayList()
-    Collections.reverse(list)
-    return list
-    
-}
-
-/**
- * Returns a list with elements in reversed order
- */
-public fun FloatArray.reverse() : List<Float> {
+public fun <T> Iterable<T>.reverse() : List<T> {
     val list = toArrayList()
     Collections.reverse(list)
     return list
@@ -121,7 +121,7 @@ public fun <T: Comparable<T>> Iterable<T>.sort() : List<T> {
 /**
  * Copies all elements into a [[List]] and sorts it using provided comparator
  */
-public fun <T> Iterable<T>.sortBy(comparator : Comparator<T>) : List<T> {
+public fun <T> Array<T>.sortBy(comparator : Comparator<T>) : List<T> {
     val sortedList = toArrayList()
     java.util.Collections.sort(sortedList, comparator)
     return sortedList
@@ -131,7 +131,7 @@ public fun <T> Iterable<T>.sortBy(comparator : Comparator<T>) : List<T> {
 /**
  * Copies all elements into a [[List]] and sorts it using provided comparator
  */
-public fun <T> Array<T>.sortBy(comparator : Comparator<T>) : List<T> {
+public fun <T> Iterable<T>.sortBy(comparator : Comparator<T>) : List<T> {
     val sortedList = toArrayList()
     java.util.Collections.sort(sortedList, comparator)
     return sortedList
@@ -141,7 +141,7 @@ public fun <T> Array<T>.sortBy(comparator : Comparator<T>) : List<T> {
 /**
  * Copies all elements into a [[List]] and sorts it by value of f(element)
  */
-public fun <T, R: Comparable<R>> Iterable<T>.sortBy(f: (T) -> R) : List<T> {
+public fun <T, R: Comparable<R>> Array<T>.sortBy(f: (T) -> R) : List<T> {
     val sortedList = toArrayList()
     val sortBy: Comparator<T> = comparator<T> {(x: T, y: T) -> f(x).compareTo(f(y))}
     java.util.Collections.sort(sortedList, sortBy)
@@ -152,7 +152,7 @@ public fun <T, R: Comparable<R>> Iterable<T>.sortBy(f: (T) -> R) : List<T> {
 /**
  * Copies all elements into a [[List]] and sorts it by value of f(element)
  */
-public fun <T, R: Comparable<R>> Array<T>.sortBy(f: (T) -> R) : List<T> {
+public fun <T, R: Comparable<R>> Iterable<T>.sortBy(f: (T) -> R) : List<T> {
     val sortedList = toArrayList()
     val sortBy: Comparator<T> = comparator<T> {(x: T, y: T) -> f(x).compareTo(f(y))}
     java.util.Collections.sort(sortedList, sortBy)

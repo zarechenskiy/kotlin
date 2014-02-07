@@ -10,13 +10,13 @@ import java.util.*
 /**
  * Returns an original Iterable containing all the non-*null* elements, throwing an [[IllegalArgumentException]] if there are any null elements
  */
-public fun <T:Any> Stream<T?>.requireNoNulls() : Stream<T> {
+public fun <T:Any> Array<T?>.requireNoNulls() : Array<T> {
     for (element in this) {
         if (element == null) {
             throw IllegalArgumentException("null element found in $this")
         }
     }
-    return this as Stream<T>
+    return this as Array<T>
     
 }
 
@@ -49,13 +49,13 @@ public fun <T:Any> List<T?>.requireNoNulls() : List<T> {
 /**
  * Returns an original Iterable containing all the non-*null* elements, throwing an [[IllegalArgumentException]] if there are any null elements
  */
-public fun <T:Any> Array<T?>.requireNoNulls() : Array<T> {
+public fun <T:Any> Stream<T?>.requireNoNulls() : Stream<T> {
     for (element in this) {
         if (element == null) {
             throw IllegalArgumentException("null element found in $this")
         }
     }
-    return this as Array<T>
+    return this as Stream<T>
     
 }
 

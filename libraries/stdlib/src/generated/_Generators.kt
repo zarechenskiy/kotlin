@@ -10,43 +10,26 @@ import java.util.*
 /**
  * Partitions this collection into a pair of collections
  */
-public fun <T> Stream<T>.partition(predicate: (T) -> Boolean) : Pair<List<T>, List<T>> {
-    val first = ArrayList<T>()
-    val second = ArrayList<T>()
-    for (element in this) {
-        if (predicate(element)) {
-            first.add(element)
-        } else {
-            second.add(element)
-        }
-    }
-    return Pair(first, second)
-    
-}
-
-/**
- * Partitions this collection into a pair of collections
- */
-public fun <T> Iterable<T>.partition(predicate: (T) -> Boolean) : Pair<List<T>, List<T>> {
-    val first = ArrayList<T>()
-    val second = ArrayList<T>()
-    for (element in this) {
-        if (predicate(element)) {
-            first.add(element)
-        } else {
-            second.add(element)
-        }
-    }
-    return Pair(first, second)
-    
-}
-
-/**
- * Partitions this collection into a pair of collections
- */
 public fun <T> Array<T>.partition(predicate: (T) -> Boolean) : Pair<List<T>, List<T>> {
     val first = ArrayList<T>()
     val second = ArrayList<T>()
+    for (element in this) {
+        if (predicate(element)) {
+            first.add(element)
+        } else {
+            second.add(element)
+        }
+    }
+    return Pair(first, second)
+    
+}
+
+/**
+ * Partitions this collection into a pair of collections
+ */
+public fun BooleanArray.partition(predicate: (Boolean) -> Boolean) : Pair<List<Boolean>, List<Boolean>> {
+    val first = ArrayList<Boolean>()
+    val second = ArrayList<Boolean>()
     for (element in this) {
         if (predicate(element)) {
             first.add(element)
@@ -112,9 +95,9 @@ public fun DoubleArray.partition(predicate: (Double) -> Boolean) : Pair<List<Dou
 /**
  * Partitions this collection into a pair of collections
  */
-public fun LongArray.partition(predicate: (Long) -> Boolean) : Pair<List<Long>, List<Long>> {
-    val first = ArrayList<Long>()
-    val second = ArrayList<Long>()
+public fun FloatArray.partition(predicate: (Float) -> Boolean) : Pair<List<Float>, List<Float>> {
+    val first = ArrayList<Float>()
+    val second = ArrayList<Float>()
     for (element in this) {
         if (predicate(element)) {
             first.add(element)
@@ -146,6 +129,23 @@ public fun IntArray.partition(predicate: (Int) -> Boolean) : Pair<List<Int>, Lis
 /**
  * Partitions this collection into a pair of collections
  */
+public fun LongArray.partition(predicate: (Long) -> Boolean) : Pair<List<Long>, List<Long>> {
+    val first = ArrayList<Long>()
+    val second = ArrayList<Long>()
+    for (element in this) {
+        if (predicate(element)) {
+            first.add(element)
+        } else {
+            second.add(element)
+        }
+    }
+    return Pair(first, second)
+    
+}
+
+/**
+ * Partitions this collection into a pair of collections
+ */
 public fun ShortArray.partition(predicate: (Short) -> Boolean) : Pair<List<Short>, List<Short>> {
     val first = ArrayList<Short>()
     val second = ArrayList<Short>()
@@ -163,9 +163,9 @@ public fun ShortArray.partition(predicate: (Short) -> Boolean) : Pair<List<Short
 /**
  * Partitions this collection into a pair of collections
  */
-public fun BooleanArray.partition(predicate: (Boolean) -> Boolean) : Pair<List<Boolean>, List<Boolean>> {
-    val first = ArrayList<Boolean>()
-    val second = ArrayList<Boolean>()
+public fun <T> Iterable<T>.partition(predicate: (T) -> Boolean) : Pair<List<T>, List<T>> {
+    val first = ArrayList<T>()
+    val second = ArrayList<T>()
     for (element in this) {
         if (predicate(element)) {
             first.add(element)
@@ -180,9 +180,9 @@ public fun BooleanArray.partition(predicate: (Boolean) -> Boolean) : Pair<List<B
 /**
  * Partitions this collection into a pair of collections
  */
-public fun FloatArray.partition(predicate: (Float) -> Boolean) : Pair<List<Float>, List<Float>> {
-    val first = ArrayList<Float>()
-    val second = ArrayList<Float>()
+public fun <T> Stream<T>.partition(predicate: (T) -> Boolean) : Pair<List<T>, List<T>> {
+    val first = ArrayList<T>()
+    val second = ArrayList<T>()
     for (element in this) {
         if (predicate(element)) {
             first.add(element)
@@ -197,7 +197,7 @@ public fun FloatArray.partition(predicate: (Float) -> Boolean) : Pair<List<Float
 /**
  * Creates an [[Iterator]] which iterates over this iterator then the following collection
  */
-public fun <T> Iterable<T>.plus(collection: Iterable<T>) : List<T> {
+public fun <T> Array<T>.plus(collection: Iterable<T>) : List<T> {
     val answer = toArrayList()
     answer.addAll(collection)
     return answer
@@ -207,7 +207,7 @@ public fun <T> Iterable<T>.plus(collection: Iterable<T>) : List<T> {
 /**
  * Creates an [[Iterator]] which iterates over this iterator then the following collection
  */
-public fun <T> Array<T>.plus(collection: Iterable<T>) : List<T> {
+public fun BooleanArray.plus(collection: Iterable<Boolean>) : List<Boolean> {
     val answer = toArrayList()
     answer.addAll(collection)
     return answer
@@ -247,7 +247,7 @@ public fun DoubleArray.plus(collection: Iterable<Double>) : List<Double> {
 /**
  * Creates an [[Iterator]] which iterates over this iterator then the following collection
  */
-public fun LongArray.plus(collection: Iterable<Long>) : List<Long> {
+public fun FloatArray.plus(collection: Iterable<Float>) : List<Float> {
     val answer = toArrayList()
     answer.addAll(collection)
     return answer
@@ -267,6 +267,16 @@ public fun IntArray.plus(collection: Iterable<Int>) : List<Int> {
 /**
  * Creates an [[Iterator]] which iterates over this iterator then the following collection
  */
+public fun LongArray.plus(collection: Iterable<Long>) : List<Long> {
+    val answer = toArrayList()
+    answer.addAll(collection)
+    return answer
+    
+}
+
+/**
+ * Creates an [[Iterator]] which iterates over this iterator then the following collection
+ */
 public fun ShortArray.plus(collection: Iterable<Short>) : List<Short> {
     val answer = toArrayList()
     answer.addAll(collection)
@@ -277,39 +287,9 @@ public fun ShortArray.plus(collection: Iterable<Short>) : List<Short> {
 /**
  * Creates an [[Iterator]] which iterates over this iterator then the following collection
  */
-public fun BooleanArray.plus(collection: Iterable<Boolean>) : List<Boolean> {
+public fun <T> Iterable<T>.plus(collection: Iterable<T>) : List<T> {
     val answer = toArrayList()
     answer.addAll(collection)
-    return answer
-    
-}
-
-/**
- * Creates an [[Iterator]] which iterates over this iterator then the following collection
- */
-public fun FloatArray.plus(collection: Iterable<Float>) : List<Float> {
-    val answer = toArrayList()
-    answer.addAll(collection)
-    return answer
-    
-}
-
-/**
- * Creates an [[Iterator]] which iterates over this iterator then the given element at the end
- */
-public fun <T> Stream<T>.plus(element: T) : List<T> {
-    val answer = toArrayList()
-    answer.add(element)
-    return answer
-    
-}
-
-/**
- * Creates an [[Iterator]] which iterates over this iterator then the given element at the end
- */
-public fun <T> Iterable<T>.plus(element: T) : List<T> {
-    val answer = toArrayList()
-    answer.add(element)
     return answer
     
 }
@@ -318,6 +298,16 @@ public fun <T> Iterable<T>.plus(element: T) : List<T> {
  * Creates an [[Iterator]] which iterates over this iterator then the given element at the end
  */
 public fun <T> Array<T>.plus(element: T) : List<T> {
+    val answer = toArrayList()
+    answer.add(element)
+    return answer
+    
+}
+
+/**
+ * Creates an [[Iterator]] which iterates over this iterator then the given element at the end
+ */
+public fun BooleanArray.plus(element: Boolean) : List<Boolean> {
     val answer = toArrayList()
     answer.add(element)
     return answer
@@ -357,7 +347,7 @@ public fun DoubleArray.plus(element: Double) : List<Double> {
 /**
  * Creates an [[Iterator]] which iterates over this iterator then the given element at the end
  */
-public fun LongArray.plus(element: Long) : List<Long> {
+public fun FloatArray.plus(element: Float) : List<Float> {
     val answer = toArrayList()
     answer.add(element)
     return answer
@@ -377,6 +367,16 @@ public fun IntArray.plus(element: Int) : List<Int> {
 /**
  * Creates an [[Iterator]] which iterates over this iterator then the given element at the end
  */
+public fun LongArray.plus(element: Long) : List<Long> {
+    val answer = toArrayList()
+    answer.add(element)
+    return answer
+    
+}
+
+/**
+ * Creates an [[Iterator]] which iterates over this iterator then the given element at the end
+ */
 public fun ShortArray.plus(element: Short) : List<Short> {
     val answer = toArrayList()
     answer.add(element)
@@ -387,7 +387,7 @@ public fun ShortArray.plus(element: Short) : List<Short> {
 /**
  * Creates an [[Iterator]] which iterates over this iterator then the given element at the end
  */
-public fun BooleanArray.plus(element: Boolean) : List<Boolean> {
+public fun <T> Iterable<T>.plus(element: T) : List<T> {
     val answer = toArrayList()
     answer.add(element)
     return answer
@@ -397,7 +397,7 @@ public fun BooleanArray.plus(element: Boolean) : List<Boolean> {
 /**
  * Creates an [[Iterator]] which iterates over this iterator then the given element at the end
  */
-public fun FloatArray.plus(element: Float) : List<Float> {
+public fun <T> Stream<T>.plus(element: T) : List<T> {
     val answer = toArrayList()
     answer.add(element)
     return answer
