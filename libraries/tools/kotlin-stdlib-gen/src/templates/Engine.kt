@@ -144,6 +144,12 @@ class GenericFunction(val signature: String) : Comparable<GenericFunction> {
                 answer.append(when (token) {
                                   "SELF" -> receiver
                                   "PRIMITIVE" -> primitive?.name() ?: token
+                                  "SUM" -> {
+                                      when (primitive) {
+                                          PrimitiveType.Byte, PrimitiveType.Short -> "Int"
+                                          else -> primitive
+                                      }
+                                  }
                                   "ZERO" -> when (primitive) {
                                       PrimitiveType.Double -> "0.0"
                                       PrimitiveType.Float -> "0.0f"

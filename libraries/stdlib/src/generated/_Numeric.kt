@@ -23,6 +23,45 @@ public fun Iterable<Int>.sum() : Int {
 /**
  * Returns the largest element or null if there are no elements
  */
+public fun Iterable<Long>.sum() : Long {
+    val iterator = iterator()
+    var sum : Long = 0
+    while (iterator.hasNext()) {
+        sum += iterator.next()
+    }
+    return sum
+    
+}
+
+/**
+ * Returns the largest element or null if there are no elements
+ */
+public fun Iterable<Double>.sum() : Double {
+    val iterator = iterator()
+    var sum : Double = 0.0
+    while (iterator.hasNext()) {
+        sum += iterator.next()
+    }
+    return sum
+    
+}
+
+/**
+ * Returns the largest element or null if there are no elements
+ */
+public fun Iterable<Float>.sum() : Float {
+    val iterator = iterator()
+    var sum : Float = 0.0f
+    while (iterator.hasNext()) {
+        sum += iterator.next()
+    }
+    return sum
+    
+}
+
+/**
+ * Returns the largest element or null if there are no elements
+ */
 public fun Array<Int>.sum() : Int {
     val iterator = iterator()
     var sum : Int = 0
@@ -39,19 +78,6 @@ public fun Array<Int>.sum() : Int {
 public fun IntArray.sum() : Int {
     val iterator = iterator()
     var sum : Int = 0
-    while (iterator.hasNext()) {
-        sum += iterator.next()
-    }
-    return sum
-    
-}
-
-/**
- * Returns the largest element or null if there are no elements
- */
-public fun Iterable<Long>.sum() : Long {
-    val iterator = iterator()
-    var sum : Long = 0
     while (iterator.hasNext()) {
         sum += iterator.next()
     }
@@ -88,9 +114,9 @@ public fun LongArray.sum() : Long {
 /**
  * Returns the largest element or null if there are no elements
  */
-public fun Iterable<Byte>.sum() : Byte {
+public fun Array<Byte>.sum() : Int {
     val iterator = iterator()
-    var sum : Byte = 0
+    var sum : Int = 0
     while (iterator.hasNext()) {
         sum += iterator.next()
     }
@@ -101,9 +127,9 @@ public fun Iterable<Byte>.sum() : Byte {
 /**
  * Returns the largest element or null if there are no elements
  */
-public fun Array<Byte>.sum() : Byte {
+public fun ByteArray.sum() : Int {
     val iterator = iterator()
-    var sum : Byte = 0
+    var sum : Int = 0
     while (iterator.hasNext()) {
         sum += iterator.next()
     }
@@ -114,9 +140,9 @@ public fun Array<Byte>.sum() : Byte {
 /**
  * Returns the largest element or null if there are no elements
  */
-public fun ByteArray.sum() : Byte {
+public fun Array<Short>.sum() : Int {
     val iterator = iterator()
-    var sum : Byte = 0
+    var sum : Int = 0
     while (iterator.hasNext()) {
         sum += iterator.next()
     }
@@ -127,48 +153,9 @@ public fun ByteArray.sum() : Byte {
 /**
  * Returns the largest element or null if there are no elements
  */
-public fun Iterable<Short>.sum() : Short {
+public fun ShortArray.sum() : Int {
     val iterator = iterator()
-    var sum : Short = 0
-    while (iterator.hasNext()) {
-        sum += iterator.next()
-    }
-    return sum
-    
-}
-
-/**
- * Returns the largest element or null if there are no elements
- */
-public fun Array<Short>.sum() : Short {
-    val iterator = iterator()
-    var sum : Short = 0
-    while (iterator.hasNext()) {
-        sum += iterator.next()
-    }
-    return sum
-    
-}
-
-/**
- * Returns the largest element or null if there are no elements
- */
-public fun ShortArray.sum() : Short {
-    val iterator = iterator()
-    var sum : Short = 0
-    while (iterator.hasNext()) {
-        sum += iterator.next()
-    }
-    return sum
-    
-}
-
-/**
- * Returns the largest element or null if there are no elements
- */
-public fun Iterable<Double>.sum() : Double {
-    val iterator = iterator()
-    var sum : Double = 0.0
+    var sum : Int = 0
     while (iterator.hasNext()) {
         sum += iterator.next()
     }
@@ -195,19 +182,6 @@ public fun Array<Double>.sum() : Double {
 public fun DoubleArray.sum() : Double {
     val iterator = iterator()
     var sum : Double = 0.0
-    while (iterator.hasNext()) {
-        sum += iterator.next()
-    }
-    return sum
-    
-}
-
-/**
- * Returns the largest element or null if there are no elements
- */
-public fun Iterable<Float>.sum() : Float {
-    val iterator = iterator()
-    var sum : Float = 0.0f
     while (iterator.hasNext()) {
         sum += iterator.next()
     }

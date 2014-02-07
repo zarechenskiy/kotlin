@@ -7,11 +7,11 @@ fun numeric(): List<GenericFunction> {
 
     templates add f("sum()") {
         doc { "Returns the largest element or null if there are no elements" }
-        returns("T")
+        returns("SUM")
         body {
             """
                 val iterator = iterator()
-                var sum : PRIMITIVE = ZERO
+                var sum : SUM = ZERO
                 while (iterator.hasNext()) {
                     sum += iterator.next()
                 }

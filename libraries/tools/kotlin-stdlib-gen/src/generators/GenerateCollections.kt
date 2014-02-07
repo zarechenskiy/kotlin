@@ -18,9 +18,12 @@ fun generateCollectionsAPI(outDir : File) {
 
     numeric().writeTo(File(outDir, "_Numeric.kt")) {
         val builder = StringBuilder()
-        val numerics = listOf(Int, Long, Byte, Short, Double, Float)
-        for(numeric in numerics) {
+        // TODO: decide if sum for byte and short is needed and how to make it work
+        for(numeric in listOf(Int, Long, /*Byte, Short, */ Double, Float)) {
             build(builder, Iterables, numeric)
+        }
+
+        for(numeric in listOf(Int, Long, Byte, Short,  Double, Float)) {
             build(builder, ArraysOfObjects, numeric)
             build(builder, ArraysOfPrimitives, numeric)
         }
