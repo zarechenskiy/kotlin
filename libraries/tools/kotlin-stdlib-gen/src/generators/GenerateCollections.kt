@@ -7,7 +7,7 @@ import templates.PrimitiveType.*
 
 fun generateCollectionsAPI(outDir : File) {
     elements().writeTo(File(outDir, "_Elements.kt")) { build() }
-    subsequences().writeTo(File(outDir, "_Subsequences.kt")) { build() }
+    filtering().writeTo(File(outDir, "_Filtering.kt")) { build() }
     ordering().writeTo(File(outDir, "_Ordering.kt")) { build() }
     arrays().writeTo(File(outDir, "_Arrays.kt")) { build() }
     conversions().writeTo(File(outDir, "_Conversions.kt"))  { build() }
