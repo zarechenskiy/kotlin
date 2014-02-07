@@ -153,8 +153,7 @@ class ArraysTest {
         expect(3.0) { array(1.0, 2.0).sum() }
         expect(200) { array<Byte>(100, 100).sum() }
         expect(50000) { array<Short>(20000, 30000).sum() }
-        //TODO: uncomment when toLong() will be supported
-        //expect(3000000000000) { array<Long>(1000000000000, 2000000000000).sum() }
+        expect(3000000000000) { array<Long>(1000000000000, 2000000000000).sum() }
         expect(3.0.toFloat()) { array<Float>(1.0.toFloat(), 2.0.toFloat()).sum() }
     }
 

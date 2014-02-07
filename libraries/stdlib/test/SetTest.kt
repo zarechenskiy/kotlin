@@ -41,10 +41,10 @@ class SetTest {
     }
 
     Test fun find() {
-        val x = data.find{it.startsWith("x")}
+        val x = data.first{it.startsWith("x")}
         assertNull(x)
 
-        val f = data.find{it.startsWith("f")}
+        val f = data.first{it.startsWith("f")}
         assertEquals("foo", f)
     }
 

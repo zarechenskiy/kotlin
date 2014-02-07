@@ -9,8 +9,8 @@ import org.junit.Test as test
 class CollectionJVMTest {
 
     test fun flatMap() {
-        val data = arrayList("", "foo", "bar", "x", "")
-        val characters = data.flatMap<String,Char>{ it.toCharList() }
+        val data = arrayListOf("", "foo", "bar", "x", "")
+        val characters = data.flatMap { it.toCharList() }
         println("Got list of characters ${characters}")
         assertEquals(7, characters.size())
         val text = characters.makeString("")
@@ -18,16 +18,30 @@ class CollectionJVMTest {
     }
 
 
-        // TODO would be nice to avoid the <String>
-    test fun filterIntoLinkedList() {
-        val data = arrayList("foo", "bar")
-        val foo = data.filterTo(linkedList<String>()){it.startsWith("f")}
+    test fun filterIntolinkedListOf() {
+        val data = arrayListOf("foo", "bar")
+        val foo = data.filterTo(linkedListOf<String>()) { it.startsWith("f") }
 
         assertTrue {
-            foo.all{it.startsWith("f")}
+            foo.all { it.startsWith("f") }
         }
         assertEquals(1, foo.size)
-        assertEquals(linkedList("foo"), foo)
+        assertEquals(linkedListOf("foo"), foo)
+
+        assertTrue {
+            foo is LinkedList<String>
+        }
+    }
+
+    test fun filterNotIntolinkedListOf() {
+        val data = arrayListOf("foo", "bar")
+        val foo = data.filterNotTo(linkedListOf<String>()) { it.startsWith("f") }
+
+        assertTrue {
+            foo.all { !it.startsWith("f") }
+        }
+        assertEquals(1, foo.size)
+        assertEquals(linkedListOf("bar"), foo)
 
         assertTrue {
             foo is LinkedList<String>
@@ -35,28 +49,12 @@ class CollectionJVMTest {
     }
 
     // TODO would be nice to avoid the <String>
-    test fun filterNotIntoLinkedList() {
-        val data = arrayList("foo", "bar")
-        val foo = data.filterNotTo(linkedList<String>()){it.startsWith("f")}
-
-        assertTrue {
-            foo.all{!it.startsWith("f")}
-        }
-        assertEquals(1, foo.size)
-        assertEquals(linkedList("bar"), foo)
-
-        assertTrue {
-            foo is LinkedList<String>
-        }
-    }
-
-    // TODO would be nice to avoid the <String>
-    test fun filterNotNullIntoLinkedList() {
-        val data = arrayList(null, "foo", null, "bar")
-        val foo = data.filterNotNullTo(linkedList<String>())
+    test fun filterNotNullIntolinkedListOf() {
+        val data = arrayListOf(null, "foo", null, "bar")
+        val foo = data.filterNotNullTo(linkedListOf<String>())
 
         assertEquals(2, foo.size)
-        assertEquals(linkedList("foo", "bar"), foo)
+        assertEquals(linkedListOf("foo", "bar"), foo)
 
         assertTrue {
             foo is LinkedList<String>
@@ -66,59 +64,53 @@ class CollectionJVMTest {
 
     // TODO would be nice to avoid the <String>
     test fun filterIntoSortedSet() {
-        val data = arrayList("foo", "bar")
-        val sorted = data.filterTo(sortedSet<String>()){it.length == 3}
+        val data = arrayListOf("foo", "bar")
+        val sorted = data.filterTo(sortedSetOf<String>()) { it.length == 3 }
         assertEquals(2, sorted.size)
-        assertEquals(sortedSet("bar", "foo"), sorted)
+        assertEquals(sortedSetOf("bar", "foo"), sorted)
         assertTrue {
             sorted is TreeSet<String>
         }
     }
 
-        //todo after KT-1873 the name might be returned to 'last'
+    //todo after KT-1873 the name might be returned to 'last'
     test fun lastElement() {
-        val data = arrayList("foo", "bar")
+        val data = arrayListOf("foo", "bar")
         assertEquals("bar", data.last())
-        assertEquals(25, arrayList(15, 19, 20, 25).last())
-        assertEquals('a', linkedList('a').last())
+        assertEquals(25, arrayListOf(15, 19, 20, 25).last())
+        assertEquals('a', linkedListOf('a').last())
     }
 
     test fun lastException() {
-        fails { linkedList<String>().last() }
+        fails { linkedListOf<String>().last() }
     }
 
     test fun contains() {
-        assertTrue(linkedList(15, 19, 20).contains(15))
+        assertTrue(linkedListOf(15, 19, 20).contains(15))
     }
 
     test fun sortBy() {
-        expect(arrayList("two" to 2, "three" to 3)) {
-            arrayList("three" to 3, "two" to 2).sortBy { it.second }
+        expect(arrayListOf("two" to 2, "three" to 3)) {
+            arrayListOf("three" to 3, "two" to 2).sortBy { it.second }
         }
-        expect(arrayList("three" to 3, "two" to 2)) {
-            arrayList("three" to 3, "two" to 2).sortBy { it.first }
+        expect(arrayListOf("three" to 3, "two" to 2)) {
+            arrayListOf("three" to 3, "two" to 2).sortBy { it.first }
         }
-        expect(arrayList("two" to 2, "three" to 3)) {
-            arrayList("three" to 3, "two" to 2).sortBy { it.first.length }
+        expect(arrayListOf("two" to 2, "three" to 3)) {
+            arrayListOf("three" to 3, "two" to 2).sortBy { it.first.length }
         }
     }
 
 
     test fun sortFunctionShouldReturnSortedCopyForList() {
-        // TODO fixme Some sort of in/out variance thing - or an issue with Java interop?
-        todo {
-//            val list : List<Int> = arrayList<Int>(2, 3, 1)
-//            expect(arrayList(1, 2, 3)) { list.sort() }
-//            expect(arrayList(2, 3, 1)) { list }
-        }
+        val list: List<Int> = arrayListOf(2, 3, 1)
+        expect(arrayListOf(1, 2, 3)) { list.sort() }
+        expect(arrayListOf(2, 3, 1)) { list }
     }
 
     test fun sortFunctionShouldReturnSortedCopyForIterable() {
-        // TODO fixme Some sort of in/out variance thing - or an issue with Java interop?
-        todo {
-//        val list : Iterable<Int> = arrayList(2, 3, 1)
-//        expect(arrayList(1, 2, 3)) { list.sort() }
-//        expect(arrayList(2, 3, 1)) { list }
-        }
+        val list: Iterable<Int> = arrayListOf(2, 3, 1)
+        expect(arrayListOf(1, 2, 3)) { list.sort() }
+        expect(arrayListOf(2, 3, 1)) { list }
     }
 }
