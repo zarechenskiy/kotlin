@@ -101,7 +101,7 @@ class CollectionTest {
 
     test fun find() {
         val data = arrayListOf("foo", "bar")
-        val x = data.first { it.startsWith("x") }
+        val x = data.firstOrNull { it.startsWith("x") }
         assertNull(x)
 
         val f = data.first { it.startsWith("f") }
@@ -155,7 +155,7 @@ class CollectionTest {
     }
 
     test fun foldRight() {
-        expect("1234") {
+        expect("4321") {
             val numbers = arrayListOf(1, 2, 3, 4)
             numbers.map { it.toString() }.foldRight("") { a, b -> a + b }
         }
