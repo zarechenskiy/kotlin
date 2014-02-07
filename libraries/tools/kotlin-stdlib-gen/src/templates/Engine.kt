@@ -104,7 +104,7 @@ class GenericFunction(val signature: String) : Comparable<GenericFunction> {
 
     fun build(vararg families: Family = Family.values()): String {
         val builder = StringBuilder()
-        for (family in families) {
+        for (family in families.sortBy { it.name() }) {
             if (buildFamilies.contains(family))
                 build(builder, family)
         }
@@ -113,7 +113,7 @@ class GenericFunction(val signature: String) : Comparable<GenericFunction> {
 
     fun build(builder: StringBuilder, f: Family) {
         if (f == ArraysOfPrimitives) {
-            for (primitive in buildPrimitives)
+            for (primitive in buildPrimitives.sortBy { it.name() })
                 build(builder, f, primitive)
         } else {
             build(builder, f, null)
