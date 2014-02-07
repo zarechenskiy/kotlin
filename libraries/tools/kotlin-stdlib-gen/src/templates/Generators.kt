@@ -15,6 +15,17 @@ fun generators(): List<GenericFunction> {
                 return answer
             """
         }
+
+        doc(Streams) { "Creates an [[Iterator]] which iterates over this iterator then the given element at the end" }
+        returns(Streams) { "Stream<T>" }
+        // TODO: Implement lazy behavior
+        body(Streams) {
+            """
+                val answer = toArrayList()
+                answer.add(element)
+                return answer.stream()
+            """
+        }
     }
 
     templates add f("plus(collection: Iterable<T>)") {
