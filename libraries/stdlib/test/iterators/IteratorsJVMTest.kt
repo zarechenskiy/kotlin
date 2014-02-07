@@ -11,7 +11,7 @@ class IteratorsJVMTest {
         fun intToBinaryDigits() = { (i: Int) ->
             val binary = Integer.toBinaryString(i)!!
             var index = 0
-            iterate<Char> { if (index < binary.length()) binary.get(index++) else null }
+            stream<Char> { if (index < binary.length()) binary.get(index++) else null }
         }
 
         val expected = arrayListOf(
@@ -26,8 +26,8 @@ class IteratorsJVMTest {
         assertEquals(expected, fibonacci().flatMap<Int, Char>(intToBinaryDigits()).take(10).toList())
     }
 
-    test fun flatMapOnIterator() {
-        val result = listOf(1, 2).iterator().flatMap { i -> (0..i).iterator()}
+    test fun flatMapOnStream() {
+        val result = listOf(1, 2).stream().flatMap<Int, Int> { (0..it).stream() }
         assertEquals(listOf(0, 1, 0, 1, 2), result.toList())
     }
 }
