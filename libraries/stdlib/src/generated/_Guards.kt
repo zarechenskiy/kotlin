@@ -52,7 +52,7 @@ public fun <T:Any> List<T?>.requireNoNulls() : List<T> {
 public fun <T:Any> Stream<T?>.requireNoNulls() : Stream<T> {
     return FilteringStream(this) {
         if (it == null) {
-            throw IllegalArgumentException("null element found in templates.GenericFunction@f377405")
+            throw IllegalArgumentException("null element found in $this")
         }
         true
     } as Stream<T>

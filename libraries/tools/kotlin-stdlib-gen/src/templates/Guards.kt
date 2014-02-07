@@ -4,6 +4,7 @@ import java.util.ArrayList
 import templates.Family.*
 
 fun guards(): List<GenericFunction> {
+    val THIS = "\$this"
 
     val templates = ArrayList<GenericFunction>()
 
@@ -15,7 +16,6 @@ fun guards(): List<GenericFunction> {
         toNullableT = true
         returns("SELF")
         body {
-            val THIS = "\$this"
             """
             for (element in this) {
                 if (element == null) {
@@ -26,11 +26,10 @@ fun guards(): List<GenericFunction> {
             """
         }
         body(Streams) {
-            val THIS = "\$this"
             """
             return FilteringStream(this) {
                 if (it == null) {
-                    throw IllegalArgumentException("null element found in $this")
+                    throw IllegalArgumentException("null element found in $THIS")
                 }
                 true
             } as Stream<T>
