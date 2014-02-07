@@ -5038,6 +5038,11 @@ public class JetDiagnosticsTestGenerated extends AbstractJetDiagnosticsTest {
                 doTest("compiler/testData/diagnostics/tests/operatorsOverloading/kt1028.kt");
             }
             
+            @TestMetadata("kt3450.kt")
+            public void testKt3450() throws Exception {
+                doTest("compiler/testData/diagnostics/tests/operatorsOverloading/kt3450.kt");
+            }
+            
         }
         
         @TestMetadata("compiler/testData/diagnostics/tests/overload")
