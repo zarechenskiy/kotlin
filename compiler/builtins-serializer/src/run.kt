@@ -36,7 +36,7 @@ found top-level declarations to <destination dir> (files such as
 
     val destDir = File(args[0])
 
-    val srcDirs = args.iterator().skip(1).map({ File(it) }).toList()
+    val srcDirs = args.drop(1).map({ File(it) }).toList()
     assert(srcDirs all { it.exists() }) { "Some of the built-ins source directories don't exist: $srcDirs" }
 
     BuiltInsSerializer(System.out).serialize(destDir, srcDirs)
