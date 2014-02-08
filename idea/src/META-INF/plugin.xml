@@ -488,6 +488,15 @@
       <category>Kotlin</category>
     </intentionAction>
 
+    <!--<inspectionToolProvider implementation="org.jetbrains.jet.plugin.inspections.KotlinInspectionToolProvider"/>-->
+
+    <localInspection implementationClass="org.jetbrains.jet.plugin.inspections.MySimpleInspection"
+        displayName="simple"
+        groupName="simple"
+        enabledByDefault="true"
+        level="WEAK WARNING"
+        />
+
     <project.converterProvider implementation="org.jetbrains.jet.plugin.converters.JetRunConfigurationSettingsFormatConverterProvider"/>
 
   </extensions>
