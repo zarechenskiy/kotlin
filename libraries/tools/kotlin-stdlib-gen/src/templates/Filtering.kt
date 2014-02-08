@@ -145,7 +145,7 @@ fun filtering(): List<GenericFunction> {
     }
 
     templates add f("filter(predicate: (T)->Boolean)") {
-        doc { "Returns a list containing all elements except first elements that satisfy the given *predicate*" }
+        doc { "Returns a list containing all elements matching the given *predicate*" }
         returns("List<T>")
         body {
             """
@@ -153,7 +153,7 @@ fun filtering(): List<GenericFunction> {
             """
         }
 
-        doc(Streams) { "Returns a stream containing all elements except first elements that satisfy the given *predicate*" }
+        doc(Streams) { "Returns a stream containing all elements matching the given *predicate*" }
         returns(Streams) { "Stream<T>" }
         body(Streams) {
             """
@@ -162,47 +162,21 @@ fun filtering(): List<GenericFunction> {
         }
     }
 
-    templates add f("filterTo(result: C, predicate: (T) -> Boolean)") {
-        doc { "Filters all elements which match the given predicate into the given list" }
+    templates add f("filterTo(collection: C, predicate: (T) -> Boolean)") {
+        doc { "Appends all elements matching the given *predicate* into the given *collection*" }
         typeParam("C: MutableCollection<in T>")
         returns("C")
 
         body {
             """
-            for (element in this) if (predicate(element)) result.add(element)
-            return result
+            for (element in this) if (predicate(element)) collection.add(element)
+            return collection
             """
         }
     }
-
-    templates add f("filterIsInstanceTo(result: C, klass: Class<R>)") {
-        doc { "Filters all elements which match the given predicate into the given list" }
-        typeParam("C: MutableCollection<in R>")
-        typeParam("R: T")
-        returns("C")
-
-        body {
-            """
-            for (element in this) if (klass.isInstance(element)) result.add(element as R)
-            return result
-            """
-        }
-    }
-
-    templates add f("filterIsInstance(klass: Class<R>)") {
-        doc { "Filters all elements which match the given predicate into the given list" }
-        typeParam("R: T")
-        returns("List<R>")
-        body {
-            """
-            return filterIsInstanceTo(ArrayList<R>(), klass)
-            """
-        }
-    }
-
 
     templates add f("filterNot(predicate: (T)->Boolean)") {
-        doc { "Returns a list containing all elements except first elements that does not satisfy the given *predicate*" }
+        doc { "Returns a list containing all elements not matching the given *predicate*" }
         returns("List<T>")
         body {
             """
@@ -210,7 +184,7 @@ fun filtering(): List<GenericFunction> {
             """
         }
 
-        doc(Streams) { "Returns a stream containing all elements except first elements that does not satisfy the given *predicate*" }
+        doc(Streams) { "Returns a stream containing all elements not matching the given *predicate*" }
         returns(Streams) { "Stream<T>" }
         body(Streams) {
             """
@@ -219,22 +193,22 @@ fun filtering(): List<GenericFunction> {
         }
     }
 
-    templates add f("filterNotTo(result: C, predicate: (T) -> Boolean)") {
-        doc { "Returns a list containing all elements which do not match the given *predicate*" }
+    templates add f("filterNotTo(collection: C, predicate: (T) -> Boolean)") {
+        doc { "Appends all elements not matching the given *predicate* to the given *collection*" }
         typeParam("C: MutableCollection<in T>")
         returns("C")
 
         body {
             """
-            for (element in this) if (!predicate(element)) result.add(element)
-            return result
+            for (element in this) if (!predicate(element)) collection.add(element)
+            return collection
             """
         }
     }
 
     templates add f("filterNotNull()") {
         exclude(ArraysOfPrimitives)
-        doc { "Returns a list containing all elements except first elements that does not satisfy the given *predicate*" }
+        doc { "Returns a list containing all elements that are not null" }
         typeParam("T: Any")
         returns("List<T>")
         toNullableT = true
@@ -244,7 +218,7 @@ fun filtering(): List<GenericFunction> {
             """
         }
 
-        doc(Streams) { "Returns a stream containing all elements except first elements that does not satisfy the given *predicate*" }
+        doc(Streams) { "Returns a stream containing all elements that are not null" }
         returns(Streams) { "Stream<T>" }
         body(Streams) {
             """
@@ -253,17 +227,17 @@ fun filtering(): List<GenericFunction> {
         }
     }
 
-    templates add f("filterNotNullTo(result: C)") {
+    templates add f("filterNotNullTo(collection: C)") {
         exclude(ArraysOfPrimitives)
-        doc { "Returns a list containing all elements which do not match the given *predicate*" }
+        doc { "Appends all elements that are not null to the given *collection*" }
         typeParam("C: MutableCollection<in T>")
         typeParam("T: Any")
         returns("C")
         toNullableT = true
         body {
             """
-            for (element in this) if (element != null) result.add(element)
-            return result
+            for (element in this) if (element != null) collection.add(element)
+            return collection
             """
         }
     }

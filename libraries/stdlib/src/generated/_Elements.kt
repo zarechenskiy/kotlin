@@ -8,7 +8,7 @@ package kotlin
 import java.util.*
 
 /**
- * Returns element at index
+ * Returns element at given *index*
  */
 public fun <T> Array<T>.elementAt(index : Int) : T {
     return get(index)
@@ -16,7 +16,7 @@ public fun <T> Array<T>.elementAt(index : Int) : T {
 }
 
 /**
- * Returns element at index
+ * Returns element at given *index*
  */
 public fun BooleanArray.elementAt(index : Int) : Boolean {
     return get(index)
@@ -24,7 +24,7 @@ public fun BooleanArray.elementAt(index : Int) : Boolean {
 }
 
 /**
- * Returns element at index
+ * Returns element at given *index*
  */
 public fun ByteArray.elementAt(index : Int) : Byte {
     return get(index)
@@ -32,7 +32,7 @@ public fun ByteArray.elementAt(index : Int) : Byte {
 }
 
 /**
- * Returns element at index
+ * Returns element at given *index*
  */
 public fun CharArray.elementAt(index : Int) : Char {
     return get(index)
@@ -40,7 +40,7 @@ public fun CharArray.elementAt(index : Int) : Char {
 }
 
 /**
- * Returns element at index
+ * Returns element at given *index*
  */
 public fun DoubleArray.elementAt(index : Int) : Double {
     return get(index)
@@ -48,7 +48,7 @@ public fun DoubleArray.elementAt(index : Int) : Double {
 }
 
 /**
- * Returns element at index
+ * Returns element at given *index*
  */
 public fun FloatArray.elementAt(index : Int) : Float {
     return get(index)
@@ -56,7 +56,7 @@ public fun FloatArray.elementAt(index : Int) : Float {
 }
 
 /**
- * Returns element at index
+ * Returns element at given *index*
  */
 public fun IntArray.elementAt(index : Int) : Int {
     return get(index)
@@ -64,7 +64,7 @@ public fun IntArray.elementAt(index : Int) : Int {
 }
 
 /**
- * Returns element at index
+ * Returns element at given *index*
  */
 public fun LongArray.elementAt(index : Int) : Long {
     return get(index)
@@ -72,7 +72,7 @@ public fun LongArray.elementAt(index : Int) : Long {
 }
 
 /**
- * Returns element at index
+ * Returns element at given *index*
  */
 public fun ShortArray.elementAt(index : Int) : Short {
     return get(index)
@@ -80,7 +80,7 @@ public fun ShortArray.elementAt(index : Int) : Short {
 }
 
 /**
- * Returns element at index
+ * Returns element at given *index*
  */
 public fun <T> Iterable<T>.elementAt(index : Int) : T {
     if (this is List<*>)
@@ -92,13 +92,12 @@ public fun <T> Iterable<T>.elementAt(index : Int) : T {
         if (index == count++)
             return element
     }
-    throw IndexOutOfBoundsException("Collection doesn't contain element at index ")
-    
+    throw IndexOutOfBoundsException("Collection doesn't contain element at index")
     
 }
 
 /**
- * Returns element at index
+ * Returns element at given *index*
  */
 public fun <T> List<T>.elementAt(index : Int) : T {
     return get(index)
@@ -106,7 +105,7 @@ public fun <T> List<T>.elementAt(index : Int) : T {
 }
 
 /**
- * Returns element at index
+ * Returns element at given *index*
  */
 public fun <T> Stream<T>.elementAt(index : Int) : T {
     val iterator = iterator()
@@ -116,8 +115,7 @@ public fun <T> Stream<T>.elementAt(index : Int) : T {
         if (index == count++)
             return element
     }
-    throw IndexOutOfBoundsException("Collection doesn't contain element at index ")
-    
+    throw IndexOutOfBoundsException("Collection doesn't contain element at index")
     
 }
 
@@ -422,19 +420,19 @@ public fun <T> Stream<T>.firstOrNull(predicate: (T) -> Boolean) : T? {
 }
 
 /**
- * Returns first index of item, or -1 if the array does not contain item
+ * Returns first index of *element*, or -1 if the collection does not contain element
  */
-public fun <T> Array<T>.indexOf(item: T) : Int {
-    if (item == null) {
-        for (i in indices) {
-            if (this[i] == null) {
-                return i
+public fun <T> Array<T>.indexOf(element: T) : Int {
+    if (element == null) {
+        for (index in indices) {
+            if (this[index] == null) {
+                return index
             }
         }
     } else {
-        for (i in indices) {
-            if (item == this[i]) {
-                return i
+        for (index in indices) {
+            if (element == this[index]) {
+                return index
             }
         }
     }
@@ -443,12 +441,12 @@ public fun <T> Array<T>.indexOf(item: T) : Int {
 }
 
 /**
- * Returns first index of item, or -1 if the array does not contain item
+ * Returns first index of *element*, or -1 if the collection does not contain element
  */
-public fun BooleanArray.indexOf(item: Boolean) : Int {
-    for (i in indices) {
-        if (item == this[i]) {
-            return i
+public fun BooleanArray.indexOf(element: Boolean) : Int {
+    for (index in indices) {
+        if (element == this[index]) {
+            return index
         }
     }
     return -1
@@ -456,12 +454,12 @@ public fun BooleanArray.indexOf(item: Boolean) : Int {
 }
 
 /**
- * Returns first index of item, or -1 if the array does not contain item
+ * Returns first index of *element*, or -1 if the collection does not contain element
  */
-public fun ByteArray.indexOf(item: Byte) : Int {
-    for (i in indices) {
-        if (item == this[i]) {
-            return i
+public fun ByteArray.indexOf(element: Byte) : Int {
+    for (index in indices) {
+        if (element == this[index]) {
+            return index
         }
     }
     return -1
@@ -469,12 +467,12 @@ public fun ByteArray.indexOf(item: Byte) : Int {
 }
 
 /**
- * Returns first index of item, or -1 if the array does not contain item
+ * Returns first index of *element*, or -1 if the collection does not contain element
  */
-public fun CharArray.indexOf(item: Char) : Int {
-    for (i in indices) {
-        if (item == this[i]) {
-            return i
+public fun CharArray.indexOf(element: Char) : Int {
+    for (index in indices) {
+        if (element == this[index]) {
+            return index
         }
     }
     return -1
@@ -482,12 +480,12 @@ public fun CharArray.indexOf(item: Char) : Int {
 }
 
 /**
- * Returns first index of item, or -1 if the array does not contain item
+ * Returns first index of *element*, or -1 if the collection does not contain element
  */
-public fun DoubleArray.indexOf(item: Double) : Int {
-    for (i in indices) {
-        if (item == this[i]) {
-            return i
+public fun DoubleArray.indexOf(element: Double) : Int {
+    for (index in indices) {
+        if (element == this[index]) {
+            return index
         }
     }
     return -1
@@ -495,12 +493,12 @@ public fun DoubleArray.indexOf(item: Double) : Int {
 }
 
 /**
- * Returns first index of item, or -1 if the array does not contain item
+ * Returns first index of *element*, or -1 if the collection does not contain element
  */
-public fun FloatArray.indexOf(item: Float) : Int {
-    for (i in indices) {
-        if (item == this[i]) {
-            return i
+public fun FloatArray.indexOf(element: Float) : Int {
+    for (index in indices) {
+        if (element == this[index]) {
+            return index
         }
     }
     return -1
@@ -508,12 +506,12 @@ public fun FloatArray.indexOf(item: Float) : Int {
 }
 
 /**
- * Returns first index of item, or -1 if the array does not contain item
+ * Returns first index of *element*, or -1 if the collection does not contain element
  */
-public fun IntArray.indexOf(item: Int) : Int {
-    for (i in indices) {
-        if (item == this[i]) {
-            return i
+public fun IntArray.indexOf(element: Int) : Int {
+    for (index in indices) {
+        if (element == this[index]) {
+            return index
         }
     }
     return -1
@@ -521,12 +519,12 @@ public fun IntArray.indexOf(item: Int) : Int {
 }
 
 /**
- * Returns first index of item, or -1 if the array does not contain item
+ * Returns first index of *element*, or -1 if the collection does not contain element
  */
-public fun LongArray.indexOf(item: Long) : Int {
-    for (i in indices) {
-        if (item == this[i]) {
-            return i
+public fun LongArray.indexOf(element: Long) : Int {
+    for (index in indices) {
+        if (element == this[index]) {
+            return index
         }
     }
     return -1
@@ -534,12 +532,12 @@ public fun LongArray.indexOf(item: Long) : Int {
 }
 
 /**
- * Returns first index of item, or -1 if the array does not contain item
+ * Returns first index of *element*, or -1 if the collection does not contain element
  */
-public fun ShortArray.indexOf(item: Short) : Int {
-    for (i in indices) {
-        if (item == this[i]) {
-            return i
+public fun ShortArray.indexOf(element: Short) : Int {
+    for (index in indices) {
+        if (element == this[index]) {
+            return index
         }
     }
     return -1
@@ -547,11 +545,11 @@ public fun ShortArray.indexOf(item: Short) : Int {
 }
 
 /**
- * Returns first index of item, or -1 if the array does not contain item
+ * Returns first index of *element*, or -1 if the collection does not contain element
  */
-public fun <T> Iterable<T>.indexOf(item: T) : Int {
+public fun <T> Iterable<T>.indexOf(element: T) : Int {
     var index = 0
-    for (element in this) {
+    for (item in this) {
         if (element == item)
             return index
         index++
@@ -561,11 +559,11 @@ public fun <T> Iterable<T>.indexOf(item: T) : Int {
 }
 
 /**
- * Returns first index of item, or -1 if the array does not contain item
+ * Returns first index of *element*, or -1 if the collection does not contain element
  */
-public fun <T> Stream<T>.indexOf(item: T) : Int {
+public fun <T> Stream<T>.indexOf(element: T) : Int {
     var index = 0
-    for (element in this) {
+    for (item in this) {
         if (element == item)
             return index
         index++
@@ -718,7 +716,7 @@ public fun <T> Stream<T>.last() : T {
 public fun <T> Array<T>.last(predicate: (T) -> Boolean) : T {
     fun Iterator<T>.first() : T {
         for (element in this) if (predicate(element)) return element
-        throw IllegalArgumentException("Collection doesn't have matching element")
+        throw IllegalArgumentException("Collection doesn't contain any element matching predicate")
     }
     val iterator = iterator()
     var last = iterator.first()
@@ -737,7 +735,7 @@ public fun <T> Array<T>.last(predicate: (T) -> Boolean) : T {
 public fun BooleanArray.last(predicate: (Boolean) -> Boolean) : Boolean {
     fun Iterator<Boolean>.first() : Boolean {
         for (element in this) if (predicate(element)) return element
-        throw IllegalArgumentException("Collection doesn't have matching element")
+        throw IllegalArgumentException("Collection doesn't contain any element matching predicate")
     }
     val iterator = iterator()
     var last = iterator.first()
@@ -756,7 +754,7 @@ public fun BooleanArray.last(predicate: (Boolean) -> Boolean) : Boolean {
 public fun ByteArray.last(predicate: (Byte) -> Boolean) : Byte {
     fun Iterator<Byte>.first() : Byte {
         for (element in this) if (predicate(element)) return element
-        throw IllegalArgumentException("Collection doesn't have matching element")
+        throw IllegalArgumentException("Collection doesn't contain any element matching predicate")
     }
     val iterator = iterator()
     var last = iterator.first()
@@ -775,7 +773,7 @@ public fun ByteArray.last(predicate: (Byte) -> Boolean) : Byte {
 public fun CharArray.last(predicate: (Char) -> Boolean) : Char {
     fun Iterator<Char>.first() : Char {
         for (element in this) if (predicate(element)) return element
-        throw IllegalArgumentException("Collection doesn't have matching element")
+        throw IllegalArgumentException("Collection doesn't contain any element matching predicate")
     }
     val iterator = iterator()
     var last = iterator.first()
@@ -794,7 +792,7 @@ public fun CharArray.last(predicate: (Char) -> Boolean) : Char {
 public fun DoubleArray.last(predicate: (Double) -> Boolean) : Double {
     fun Iterator<Double>.first() : Double {
         for (element in this) if (predicate(element)) return element
-        throw IllegalArgumentException("Collection doesn't have matching element")
+        throw IllegalArgumentException("Collection doesn't contain any element matching predicate")
     }
     val iterator = iterator()
     var last = iterator.first()
@@ -813,7 +811,7 @@ public fun DoubleArray.last(predicate: (Double) -> Boolean) : Double {
 public fun FloatArray.last(predicate: (Float) -> Boolean) : Float {
     fun Iterator<Float>.first() : Float {
         for (element in this) if (predicate(element)) return element
-        throw IllegalArgumentException("Collection doesn't have matching element")
+        throw IllegalArgumentException("Collection doesn't contain any element matching predicate")
     }
     val iterator = iterator()
     var last = iterator.first()
@@ -832,7 +830,7 @@ public fun FloatArray.last(predicate: (Float) -> Boolean) : Float {
 public fun IntArray.last(predicate: (Int) -> Boolean) : Int {
     fun Iterator<Int>.first() : Int {
         for (element in this) if (predicate(element)) return element
-        throw IllegalArgumentException("Collection doesn't have matching element")
+        throw IllegalArgumentException("Collection doesn't contain any element matching predicate")
     }
     val iterator = iterator()
     var last = iterator.first()
@@ -851,7 +849,7 @@ public fun IntArray.last(predicate: (Int) -> Boolean) : Int {
 public fun LongArray.last(predicate: (Long) -> Boolean) : Long {
     fun Iterator<Long>.first() : Long {
         for (element in this) if (predicate(element)) return element
-        throw IllegalArgumentException("Collection doesn't have matching element")
+        throw IllegalArgumentException("Collection doesn't contain any element matching predicate")
     }
     val iterator = iterator()
     var last = iterator.first()
@@ -870,7 +868,7 @@ public fun LongArray.last(predicate: (Long) -> Boolean) : Long {
 public fun ShortArray.last(predicate: (Short) -> Boolean) : Short {
     fun Iterator<Short>.first() : Short {
         for (element in this) if (predicate(element)) return element
-        throw IllegalArgumentException("Collection doesn't have matching element")
+        throw IllegalArgumentException("Collection doesn't contain any element matching predicate")
     }
     val iterator = iterator()
     var last = iterator.first()
@@ -889,7 +887,7 @@ public fun ShortArray.last(predicate: (Short) -> Boolean) : Short {
 public fun <T> Iterable<T>.last(predicate: (T) -> Boolean) : T {
     fun Iterator<T>.first() : T {
         for (element in this) if (predicate(element)) return element
-        throw IllegalArgumentException("Collection doesn't have matching element")
+        throw IllegalArgumentException("Collection doesn't contain any element matching predicate")
     }
     val iterator = iterator()
     var last = iterator.first()
@@ -908,7 +906,7 @@ public fun <T> Iterable<T>.last(predicate: (T) -> Boolean) : T {
 public fun <T> Stream<T>.last(predicate: (T) -> Boolean) : T {
     fun Iterator<T>.first() : T {
         for (element in this) if (predicate(element)) return element
-        throw IllegalArgumentException("Collection doesn't have matching element")
+        throw IllegalArgumentException("Collection doesn't contain any element matching predicate")
     }
     val iterator = iterator()
     var last = iterator.first()
@@ -1153,7 +1151,7 @@ public fun <T> Stream<T>.lastOrNull(predicate: (T) -> Boolean) : T? {
 }
 
 /**
- * Returns single element
+ * Returns single element, or throws exception if there is no or more than one element
  */
 public fun <T> Array<T>.single() : T {
     if (size != 1)
@@ -1163,7 +1161,7 @@ public fun <T> Array<T>.single() : T {
 }
 
 /**
- * Returns single element
+ * Returns single element, or throws exception if there is no or more than one element
  */
 public fun BooleanArray.single() : Boolean {
     if (size != 1)
@@ -1173,7 +1171,7 @@ public fun BooleanArray.single() : Boolean {
 }
 
 /**
- * Returns single element
+ * Returns single element, or throws exception if there is no or more than one element
  */
 public fun ByteArray.single() : Byte {
     if (size != 1)
@@ -1183,7 +1181,7 @@ public fun ByteArray.single() : Byte {
 }
 
 /**
- * Returns single element
+ * Returns single element, or throws exception if there is no or more than one element
  */
 public fun CharArray.single() : Char {
     if (size != 1)
@@ -1193,7 +1191,7 @@ public fun CharArray.single() : Char {
 }
 
 /**
- * Returns single element
+ * Returns single element, or throws exception if there is no or more than one element
  */
 public fun DoubleArray.single() : Double {
     if (size != 1)
@@ -1203,7 +1201,7 @@ public fun DoubleArray.single() : Double {
 }
 
 /**
- * Returns single element
+ * Returns single element, or throws exception if there is no or more than one element
  */
 public fun FloatArray.single() : Float {
     if (size != 1)
@@ -1213,7 +1211,7 @@ public fun FloatArray.single() : Float {
 }
 
 /**
- * Returns single element
+ * Returns single element, or throws exception if there is no or more than one element
  */
 public fun IntArray.single() : Int {
     if (size != 1)
@@ -1223,7 +1221,7 @@ public fun IntArray.single() : Int {
 }
 
 /**
- * Returns single element
+ * Returns single element, or throws exception if there is no or more than one element
  */
 public fun LongArray.single() : Long {
     if (size != 1)
@@ -1233,7 +1231,7 @@ public fun LongArray.single() : Long {
 }
 
 /**
- * Returns single element
+ * Returns single element, or throws exception if there is no or more than one element
  */
 public fun ShortArray.single() : Short {
     if (size != 1)
@@ -1243,7 +1241,7 @@ public fun ShortArray.single() : Short {
 }
 
 /**
- * Returns single element
+ * Returns single element, or throws exception if there is no or more than one element
  */
 public fun <T> Iterable<T>.single() : T {
     when (this) {
@@ -1262,7 +1260,7 @@ public fun <T> Iterable<T>.single() : T {
 }
 
 /**
- * Returns single element
+ * Returns single element, or throws exception if there is no or more than one element
  */
 public fun <T> Stream<T>.single() : T {
     when (this) {
@@ -1281,7 +1279,7 @@ public fun <T> Stream<T>.single() : T {
 }
 
 /**
- * Returns single element matching the given *predicate*
+ * Returns single element matching the given *predicate*, or throws exception if there is no or more than one element
  */
 public fun <T> Array<T>.single(predicate: (T) -> Boolean) : T {
     fun Iterator<T>.first() : T {
@@ -1300,7 +1298,7 @@ public fun <T> Array<T>.single(predicate: (T) -> Boolean) : T {
 }
 
 /**
- * Returns single element matching the given *predicate*
+ * Returns single element matching the given *predicate*, or throws exception if there is no or more than one element
  */
 public fun BooleanArray.single(predicate: (Boolean) -> Boolean) : Boolean {
     fun Iterator<Boolean>.first() : Boolean {
@@ -1319,7 +1317,7 @@ public fun BooleanArray.single(predicate: (Boolean) -> Boolean) : Boolean {
 }
 
 /**
- * Returns single element matching the given *predicate*
+ * Returns single element matching the given *predicate*, or throws exception if there is no or more than one element
  */
 public fun ByteArray.single(predicate: (Byte) -> Boolean) : Byte {
     fun Iterator<Byte>.first() : Byte {
@@ -1338,7 +1336,7 @@ public fun ByteArray.single(predicate: (Byte) -> Boolean) : Byte {
 }
 
 /**
- * Returns single element matching the given *predicate*
+ * Returns single element matching the given *predicate*, or throws exception if there is no or more than one element
  */
 public fun CharArray.single(predicate: (Char) -> Boolean) : Char {
     fun Iterator<Char>.first() : Char {
@@ -1357,7 +1355,7 @@ public fun CharArray.single(predicate: (Char) -> Boolean) : Char {
 }
 
 /**
- * Returns single element matching the given *predicate*
+ * Returns single element matching the given *predicate*, or throws exception if there is no or more than one element
  */
 public fun DoubleArray.single(predicate: (Double) -> Boolean) : Double {
     fun Iterator<Double>.first() : Double {
@@ -1376,7 +1374,7 @@ public fun DoubleArray.single(predicate: (Double) -> Boolean) : Double {
 }
 
 /**
- * Returns single element matching the given *predicate*
+ * Returns single element matching the given *predicate*, or throws exception if there is no or more than one element
  */
 public fun FloatArray.single(predicate: (Float) -> Boolean) : Float {
     fun Iterator<Float>.first() : Float {
@@ -1395,7 +1393,7 @@ public fun FloatArray.single(predicate: (Float) -> Boolean) : Float {
 }
 
 /**
- * Returns single element matching the given *predicate*
+ * Returns single element matching the given *predicate*, or throws exception if there is no or more than one element
  */
 public fun IntArray.single(predicate: (Int) -> Boolean) : Int {
     fun Iterator<Int>.first() : Int {
@@ -1414,7 +1412,7 @@ public fun IntArray.single(predicate: (Int) -> Boolean) : Int {
 }
 
 /**
- * Returns single element matching the given *predicate*
+ * Returns single element matching the given *predicate*, or throws exception if there is no or more than one element
  */
 public fun LongArray.single(predicate: (Long) -> Boolean) : Long {
     fun Iterator<Long>.first() : Long {
@@ -1433,7 +1431,7 @@ public fun LongArray.single(predicate: (Long) -> Boolean) : Long {
 }
 
 /**
- * Returns single element matching the given *predicate*
+ * Returns single element matching the given *predicate*, or throws exception if there is no or more than one element
  */
 public fun ShortArray.single(predicate: (Short) -> Boolean) : Short {
     fun Iterator<Short>.first() : Short {
@@ -1452,7 +1450,7 @@ public fun ShortArray.single(predicate: (Short) -> Boolean) : Short {
 }
 
 /**
- * Returns single element matching the given *predicate*
+ * Returns single element matching the given *predicate*, or throws exception if there is no or more than one element
  */
 public fun <T> Iterable<T>.single(predicate: (T) -> Boolean) : T {
     fun Iterator<T>.first() : T {
@@ -1471,7 +1469,7 @@ public fun <T> Iterable<T>.single(predicate: (T) -> Boolean) : T {
 }
 
 /**
- * Returns single element matching the given *predicate*
+ * Returns single element matching the given *predicate*, or throws exception if there is no or more than one element
  */
 public fun <T> Stream<T>.single(predicate: (T) -> Boolean) : T {
     fun Iterator<T>.first() : T {
@@ -1490,7 +1488,7 @@ public fun <T> Stream<T>.single(predicate: (T) -> Boolean) : T {
 }
 
 /**
- * Returns single element matching the given *predicate*, or null if element was not found
+ * Returns single element matching the given *predicate*, or null if element was not found or more than one elements were found
  */
 public fun <T> Array<T>.singleOrNull(predicate: (T) -> Boolean) : T? {
     fun Iterator<T>.first() : T? {
@@ -1511,7 +1509,7 @@ public fun <T> Array<T>.singleOrNull(predicate: (T) -> Boolean) : T? {
 }
 
 /**
- * Returns single element matching the given *predicate*, or null if element was not found
+ * Returns single element matching the given *predicate*, or null if element was not found or more than one elements were found
  */
 public fun BooleanArray.singleOrNull(predicate: (Boolean) -> Boolean) : Boolean? {
     fun Iterator<Boolean>.first() : Boolean? {
@@ -1532,7 +1530,7 @@ public fun BooleanArray.singleOrNull(predicate: (Boolean) -> Boolean) : Boolean?
 }
 
 /**
- * Returns single element matching the given *predicate*, or null if element was not found
+ * Returns single element matching the given *predicate*, or null if element was not found or more than one elements were found
  */
 public fun ByteArray.singleOrNull(predicate: (Byte) -> Boolean) : Byte? {
     fun Iterator<Byte>.first() : Byte? {
@@ -1553,7 +1551,7 @@ public fun ByteArray.singleOrNull(predicate: (Byte) -> Boolean) : Byte? {
 }
 
 /**
- * Returns single element matching the given *predicate*, or null if element was not found
+ * Returns single element matching the given *predicate*, or null if element was not found or more than one elements were found
  */
 public fun CharArray.singleOrNull(predicate: (Char) -> Boolean) : Char? {
     fun Iterator<Char>.first() : Char? {
@@ -1574,7 +1572,7 @@ public fun CharArray.singleOrNull(predicate: (Char) -> Boolean) : Char? {
 }
 
 /**
- * Returns single element matching the given *predicate*, or null if element was not found
+ * Returns single element matching the given *predicate*, or null if element was not found or more than one elements were found
  */
 public fun DoubleArray.singleOrNull(predicate: (Double) -> Boolean) : Double? {
     fun Iterator<Double>.first() : Double? {
@@ -1595,7 +1593,7 @@ public fun DoubleArray.singleOrNull(predicate: (Double) -> Boolean) : Double? {
 }
 
 /**
- * Returns single element matching the given *predicate*, or null if element was not found
+ * Returns single element matching the given *predicate*, or null if element was not found or more than one elements were found
  */
 public fun FloatArray.singleOrNull(predicate: (Float) -> Boolean) : Float? {
     fun Iterator<Float>.first() : Float? {
@@ -1616,7 +1614,7 @@ public fun FloatArray.singleOrNull(predicate: (Float) -> Boolean) : Float? {
 }
 
 /**
- * Returns single element matching the given *predicate*, or null if element was not found
+ * Returns single element matching the given *predicate*, or null if element was not found or more than one elements were found
  */
 public fun IntArray.singleOrNull(predicate: (Int) -> Boolean) : Int? {
     fun Iterator<Int>.first() : Int? {
@@ -1637,7 +1635,7 @@ public fun IntArray.singleOrNull(predicate: (Int) -> Boolean) : Int? {
 }
 
 /**
- * Returns single element matching the given *predicate*, or null if element was not found
+ * Returns single element matching the given *predicate*, or null if element was not found or more than one elements were found
  */
 public fun LongArray.singleOrNull(predicate: (Long) -> Boolean) : Long? {
     fun Iterator<Long>.first() : Long? {
@@ -1658,7 +1656,7 @@ public fun LongArray.singleOrNull(predicate: (Long) -> Boolean) : Long? {
 }
 
 /**
- * Returns single element matching the given *predicate*, or null if element was not found
+ * Returns single element matching the given *predicate*, or null if element was not found or more than one elements were found
  */
 public fun ShortArray.singleOrNull(predicate: (Short) -> Boolean) : Short? {
     fun Iterator<Short>.first() : Short? {
@@ -1679,7 +1677,7 @@ public fun ShortArray.singleOrNull(predicate: (Short) -> Boolean) : Short? {
 }
 
 /**
- * Returns single element matching the given *predicate*, or null if element was not found
+ * Returns single element matching the given *predicate*, or null if element was not found or more than one elements were found
  */
 public fun <T> Iterable<T>.singleOrNull(predicate: (T) -> Boolean) : T? {
     fun Iterator<T>.first() : T? {
@@ -1700,7 +1698,7 @@ public fun <T> Iterable<T>.singleOrNull(predicate: (T) -> Boolean) : T? {
 }
 
 /**
- * Returns single element matching the given *predicate*, or null if element was not found
+ * Returns single element matching the given *predicate*, or null if element was not found or more than one elements were found
  */
 public fun <T> Stream<T>.singleOrNull(predicate: (T) -> Boolean) : T? {
     fun Iterator<T>.first() : T? {

@@ -10,9 +10,9 @@ fun ordering(): List<GenericFunction> {
         returns { "List<T>" }
         body {
             """
-                val list = toArrayList()
-                Collections.reverse(list)
-                return list
+            val list = toArrayList()
+            Collections.reverse(list)
+            return list
             """
         }
 
@@ -22,17 +22,17 @@ fun ordering(): List<GenericFunction> {
     templates add f("sort()") {
         doc {
             """
-            Copies all elements into a [[List]] and sorts it
+            Returns a sorted list of all elements
             """
         }
         returns("List<T>")
         typeParam("T: Comparable<T>")
         body {
             """
-                val sortedList = toArrayList()
-                val sortBy: Comparator<T> = comparator<T> {(x: T, y: T) -> x.compareTo(y)}
-                java.util.Collections.sort(sortedList, sortBy)
-                return sortedList
+            val sortedList = toArrayList()
+            val sortBy: Comparator<T> = comparator<T> {(x: T, y: T) -> x.compareTo(y)}
+            java.util.Collections.sort(sortedList, sortBy)
+            return sortedList
             """
         }
 
@@ -41,20 +41,20 @@ fun ordering(): List<GenericFunction> {
         exclude(ArraysOfObjects)
     }
 
-    templates add f("sortBy(f: (T) -> R)") {
+    templates add f("sortBy(order: (T) -> R)") {
         doc {
             """
-            Copies all elements into a [[List]] and sorts it by value of f(element)
+            Returns a list of all elements, sorted by results of specified *order* function.
             """
         }
         returns("List<T>")
         typeParam("R: Comparable<R>")
         body {
             """
-                val sortedList = toArrayList()
-                val sortBy: Comparator<T> = comparator<T> {(x: T, y: T) -> f(x).compareTo(f(y))}
-                java.util.Collections.sort(sortedList, sortBy)
-                return sortedList
+            val sortedList = toArrayList()
+            val sortBy: Comparator<T> = comparator<T> {(x: T, y: T) -> order(x).compareTo(order(y))}
+            java.util.Collections.sort(sortedList, sortBy)
+            return sortedList
             """
         }
 
@@ -65,15 +65,15 @@ fun ordering(): List<GenericFunction> {
     templates add f("sortBy(comparator : Comparator<T>)") {
         doc {
             """
-            Copies all elements into a [[List]] and sorts it using provided comparator
+            Returns a list of all elements, sorted by the specified *comparator*
             """
         }
         returns("List<T>")
         body {
             """
-                val sortedList = toArrayList()
-                java.util.Collections.sort(sortedList, comparator)
-                return sortedList
+            val sortedList = toArrayList()
+            java.util.Collections.sort(sortedList, comparator)
+            return sortedList
             """
         }
 

@@ -8,7 +8,7 @@ package kotlin
 import java.util.*
 
 /**
- * Adds all elements to a new ArrayList
+ * Returns an ArrayList of all elements
  */
 public fun <T> Array<T>.toArrayList() : ArrayList<T> {
     val list = ArrayList<T>(size)
@@ -18,7 +18,7 @@ public fun <T> Array<T>.toArrayList() : ArrayList<T> {
 }
 
 /**
- * Adds all elements to a new ArrayList
+ * Returns an ArrayList of all elements
  */
 public fun BooleanArray.toArrayList() : ArrayList<Boolean> {
     val list = ArrayList<Boolean>(size)
@@ -28,7 +28,7 @@ public fun BooleanArray.toArrayList() : ArrayList<Boolean> {
 }
 
 /**
- * Adds all elements to a new ArrayList
+ * Returns an ArrayList of all elements
  */
 public fun ByteArray.toArrayList() : ArrayList<Byte> {
     val list = ArrayList<Byte>(size)
@@ -38,7 +38,7 @@ public fun ByteArray.toArrayList() : ArrayList<Byte> {
 }
 
 /**
- * Adds all elements to a new ArrayList
+ * Returns an ArrayList of all elements
  */
 public fun CharArray.toArrayList() : ArrayList<Char> {
     val list = ArrayList<Char>(size)
@@ -48,7 +48,7 @@ public fun CharArray.toArrayList() : ArrayList<Char> {
 }
 
 /**
- * Adds all elements to a new ArrayList
+ * Returns an ArrayList of all elements
  */
 public fun DoubleArray.toArrayList() : ArrayList<Double> {
     val list = ArrayList<Double>(size)
@@ -58,7 +58,7 @@ public fun DoubleArray.toArrayList() : ArrayList<Double> {
 }
 
 /**
- * Adds all elements to a new ArrayList
+ * Returns an ArrayList of all elements
  */
 public fun FloatArray.toArrayList() : ArrayList<Float> {
     val list = ArrayList<Float>(size)
@@ -68,7 +68,7 @@ public fun FloatArray.toArrayList() : ArrayList<Float> {
 }
 
 /**
- * Adds all elements to a new ArrayList
+ * Returns an ArrayList of all elements
  */
 public fun IntArray.toArrayList() : ArrayList<Int> {
     val list = ArrayList<Int>(size)
@@ -78,7 +78,7 @@ public fun IntArray.toArrayList() : ArrayList<Int> {
 }
 
 /**
- * Adds all elements to a new ArrayList
+ * Returns an ArrayList of all elements
  */
 public fun LongArray.toArrayList() : ArrayList<Long> {
     val list = ArrayList<Long>(size)
@@ -88,7 +88,7 @@ public fun LongArray.toArrayList() : ArrayList<Long> {
 }
 
 /**
- * Adds all elements to a new ArrayList
+ * Returns an ArrayList of all elements
  */
 public fun ShortArray.toArrayList() : ArrayList<Short> {
     val list = ArrayList<Short>(size)
@@ -98,29 +98,21 @@ public fun ShortArray.toArrayList() : ArrayList<Short> {
 }
 
 /**
- * Adds all elements to a new ArrayList
- */
-public fun <T> Collection<T>.toArrayList() : ArrayList<T> {
-    return ArrayList<T>(this)
-    
-}
-
-/**
- * Adds all elements to a new ArrayList
+ * Returns an ArrayList of all elements
  */
 public fun <T> Iterable<T>.toArrayList() : ArrayList<T> {
     return toCollection(ArrayList<T>())
 }
 
 /**
- * Adds all elements to a new ArrayList
+ * Returns an ArrayList of all elements
  */
 public fun <T> Stream<T>.toArrayList() : ArrayList<T> {
     return toCollection(ArrayList<T>())
 }
 
 /**
- * Adds all elements to a new ArrayList
+ * Appends all elements to the given *collection*
  */
 public fun <T, C : MutableCollection<in T>> Array<T>.toCollection(collection : C) : C {
     for (item in this) {
@@ -131,7 +123,7 @@ public fun <T, C : MutableCollection<in T>> Array<T>.toCollection(collection : C
 }
 
 /**
- * Adds all elements to a new ArrayList
+ * Appends all elements to the given *collection*
  */
 public fun <C : MutableCollection<in Boolean>> BooleanArray.toCollection(collection : C) : C {
     for (item in this) {
@@ -142,7 +134,7 @@ public fun <C : MutableCollection<in Boolean>> BooleanArray.toCollection(collect
 }
 
 /**
- * Adds all elements to a new ArrayList
+ * Appends all elements to the given *collection*
  */
 public fun <C : MutableCollection<in Byte>> ByteArray.toCollection(collection : C) : C {
     for (item in this) {
@@ -153,7 +145,7 @@ public fun <C : MutableCollection<in Byte>> ByteArray.toCollection(collection : 
 }
 
 /**
- * Adds all elements to a new ArrayList
+ * Appends all elements to the given *collection*
  */
 public fun <C : MutableCollection<in Char>> CharArray.toCollection(collection : C) : C {
     for (item in this) {
@@ -164,7 +156,7 @@ public fun <C : MutableCollection<in Char>> CharArray.toCollection(collection : 
 }
 
 /**
- * Adds all elements to a new ArrayList
+ * Appends all elements to the given *collection*
  */
 public fun <C : MutableCollection<in Double>> DoubleArray.toCollection(collection : C) : C {
     for (item in this) {
@@ -175,7 +167,7 @@ public fun <C : MutableCollection<in Double>> DoubleArray.toCollection(collectio
 }
 
 /**
- * Adds all elements to a new ArrayList
+ * Appends all elements to the given *collection*
  */
 public fun <C : MutableCollection<in Float>> FloatArray.toCollection(collection : C) : C {
     for (item in this) {
@@ -186,7 +178,7 @@ public fun <C : MutableCollection<in Float>> FloatArray.toCollection(collection 
 }
 
 /**
- * Adds all elements to a new ArrayList
+ * Appends all elements to the given *collection*
  */
 public fun <C : MutableCollection<in Int>> IntArray.toCollection(collection : C) : C {
     for (item in this) {
@@ -197,7 +189,7 @@ public fun <C : MutableCollection<in Int>> IntArray.toCollection(collection : C)
 }
 
 /**
- * Adds all elements to a new ArrayList
+ * Appends all elements to the given *collection*
  */
 public fun <C : MutableCollection<in Long>> LongArray.toCollection(collection : C) : C {
     for (item in this) {
@@ -208,7 +200,7 @@ public fun <C : MutableCollection<in Long>> LongArray.toCollection(collection : 
 }
 
 /**
- * Adds all elements to a new ArrayList
+ * Appends all elements to the given *collection*
  */
 public fun <C : MutableCollection<in Short>> ShortArray.toCollection(collection : C) : C {
     for (item in this) {
@@ -219,7 +211,7 @@ public fun <C : MutableCollection<in Short>> ShortArray.toCollection(collection 
 }
 
 /**
- * Adds all elements to a new ArrayList
+ * Appends all elements to the given *collection*
  */
 public fun <T, C : MutableCollection<in T>> Iterable<T>.toCollection(collection : C) : C {
     for (item in this) {
@@ -230,7 +222,7 @@ public fun <T, C : MutableCollection<in T>> Iterable<T>.toCollection(collection 
 }
 
 /**
- * Adds all elements to a new ArrayList
+ * Appends all elements to the given *collection*
  */
 public fun <T, C : MutableCollection<in T>> Stream<T>.toCollection(collection : C) : C {
     for (item in this) {
@@ -241,92 +233,91 @@ public fun <T, C : MutableCollection<in T>> Stream<T>.toCollection(collection : 
 }
 
 /**
- * Copies all elements into a [[LinkedList]]
+ * Returns a LinkedList containing all elements
  */
 public fun <T> Array<T>.toLinkedList() : LinkedList<T> {
     return toCollection(LinkedList<T>())
 }
 
 /**
- * Copies all elements into a [[LinkedList]]
+ * Returns a LinkedList containing all elements
  */
 public fun BooleanArray.toLinkedList() : LinkedList<Boolean> {
     return toCollection(LinkedList<Boolean>())
 }
 
 /**
- * Copies all elements into a [[LinkedList]]
+ * Returns a LinkedList containing all elements
  */
 public fun ByteArray.toLinkedList() : LinkedList<Byte> {
     return toCollection(LinkedList<Byte>())
 }
 
 /**
- * Copies all elements into a [[LinkedList]]
+ * Returns a LinkedList containing all elements
  */
 public fun CharArray.toLinkedList() : LinkedList<Char> {
     return toCollection(LinkedList<Char>())
 }
 
 /**
- * Copies all elements into a [[LinkedList]]
+ * Returns a LinkedList containing all elements
  */
 public fun DoubleArray.toLinkedList() : LinkedList<Double> {
     return toCollection(LinkedList<Double>())
 }
 
 /**
- * Copies all elements into a [[LinkedList]]
+ * Returns a LinkedList containing all elements
  */
 public fun FloatArray.toLinkedList() : LinkedList<Float> {
     return toCollection(LinkedList<Float>())
 }
 
 /**
- * Copies all elements into a [[LinkedList]]
+ * Returns a LinkedList containing all elements
  */
 public fun IntArray.toLinkedList() : LinkedList<Int> {
     return toCollection(LinkedList<Int>())
 }
 
 /**
- * Copies all elements into a [[LinkedList]]
+ * Returns a LinkedList containing all elements
  */
 public fun LongArray.toLinkedList() : LinkedList<Long> {
     return toCollection(LinkedList<Long>())
 }
 
 /**
- * Copies all elements into a [[LinkedList]]
+ * Returns a LinkedList containing all elements
  */
 public fun ShortArray.toLinkedList() : LinkedList<Short> {
     return toCollection(LinkedList<Short>())
 }
 
 /**
- * Copies all elements into a [[LinkedList]]
+ * Returns a LinkedList containing all elements
  */
 public fun <T> Iterable<T>.toLinkedList() : LinkedList<T> {
     return toCollection(LinkedList<T>())
 }
 
 /**
- * Copies all elements into a [[LinkedList]]
+ * Returns a LinkedList containing all elements
  */
 public fun <T> Stream<T>.toLinkedList() : LinkedList<T> {
     return toCollection(LinkedList<T>())
 }
 
 /**
- * Returns new List<T> containing all elements
+ * Returns a List containing all elements
  */
 public fun <T> Array<T>.toList() : List<T> {
-    return ArrayList<T>(Arrays.asList(*this))
-    
+    return toCollection(ArrayList<T>())
 }
 
 /**
- * Returns new List<T> containing all elements
+ * Returns a List containing all elements
  */
 public fun BooleanArray.toList() : List<Boolean> {
     val list = ArrayList<Boolean>(size)
@@ -336,7 +327,7 @@ public fun BooleanArray.toList() : List<Boolean> {
 }
 
 /**
- * Returns new List<T> containing all elements
+ * Returns a List containing all elements
  */
 public fun ByteArray.toList() : List<Byte> {
     val list = ArrayList<Byte>(size)
@@ -346,7 +337,7 @@ public fun ByteArray.toList() : List<Byte> {
 }
 
 /**
- * Returns new List<T> containing all elements
+ * Returns a List containing all elements
  */
 public fun CharArray.toList() : List<Char> {
     val list = ArrayList<Char>(size)
@@ -356,7 +347,7 @@ public fun CharArray.toList() : List<Char> {
 }
 
 /**
- * Returns new List<T> containing all elements
+ * Returns a List containing all elements
  */
 public fun DoubleArray.toList() : List<Double> {
     val list = ArrayList<Double>(size)
@@ -366,7 +357,7 @@ public fun DoubleArray.toList() : List<Double> {
 }
 
 /**
- * Returns new List<T> containing all elements
+ * Returns a List containing all elements
  */
 public fun FloatArray.toList() : List<Float> {
     val list = ArrayList<Float>(size)
@@ -376,7 +367,7 @@ public fun FloatArray.toList() : List<Float> {
 }
 
 /**
- * Returns new List<T> containing all elements
+ * Returns a List containing all elements
  */
 public fun IntArray.toList() : List<Int> {
     val list = ArrayList<Int>(size)
@@ -386,7 +377,7 @@ public fun IntArray.toList() : List<Int> {
 }
 
 /**
- * Returns new List<T> containing all elements
+ * Returns a List containing all elements
  */
 public fun LongArray.toList() : List<Long> {
     val list = ArrayList<Long>(size)
@@ -396,7 +387,7 @@ public fun LongArray.toList() : List<Long> {
 }
 
 /**
- * Returns new List<T> containing all elements
+ * Returns a List containing all elements
  */
 public fun ShortArray.toList() : List<Short> {
     val list = ArrayList<Short>(size)
@@ -406,253 +397,245 @@ public fun ShortArray.toList() : List<Short> {
 }
 
 /**
- * Returns new List<T> containing all elements
- */
-public fun <T> Collection<T>.toList() : List<T> {
-    return ArrayList<T>(this)
-    
-}
-
-/**
- * Returns new List<T> containing all elements
+ * Returns a List containing all elements
  */
 public fun <T> Iterable<T>.toList() : List<T> {
     return toCollection(ArrayList<T>())
 }
 
 /**
- * Returns new List<T> containing all elements
+ * Returns a List containing all elements
  */
 public fun <T> Stream<T>.toList() : List<T> {
     return toCollection(ArrayList<T>())
 }
 
 /**
- * Copies all elements into a [[Set]]
+ * Returns a Set of all elements
  */
 public fun <T> Array<T>.toSet() : Set<T> {
     return toCollection(LinkedHashSet<T>())
 }
 
 /**
- * Copies all elements into a [[Set]]
+ * Returns a Set of all elements
  */
 public fun BooleanArray.toSet() : Set<Boolean> {
     return toCollection(LinkedHashSet<Boolean>())
 }
 
 /**
- * Copies all elements into a [[Set]]
+ * Returns a Set of all elements
  */
 public fun ByteArray.toSet() : Set<Byte> {
     return toCollection(LinkedHashSet<Byte>())
 }
 
 /**
- * Copies all elements into a [[Set]]
+ * Returns a Set of all elements
  */
 public fun CharArray.toSet() : Set<Char> {
     return toCollection(LinkedHashSet<Char>())
 }
 
 /**
- * Copies all elements into a [[Set]]
+ * Returns a Set of all elements
  */
 public fun DoubleArray.toSet() : Set<Double> {
     return toCollection(LinkedHashSet<Double>())
 }
 
 /**
- * Copies all elements into a [[Set]]
+ * Returns a Set of all elements
  */
 public fun FloatArray.toSet() : Set<Float> {
     return toCollection(LinkedHashSet<Float>())
 }
 
 /**
- * Copies all elements into a [[Set]]
+ * Returns a Set of all elements
  */
 public fun IntArray.toSet() : Set<Int> {
     return toCollection(LinkedHashSet<Int>())
 }
 
 /**
- * Copies all elements into a [[Set]]
+ * Returns a Set of all elements
  */
 public fun LongArray.toSet() : Set<Long> {
     return toCollection(LinkedHashSet<Long>())
 }
 
 /**
- * Copies all elements into a [[Set]]
+ * Returns a Set of all elements
  */
 public fun ShortArray.toSet() : Set<Short> {
     return toCollection(LinkedHashSet<Short>())
 }
 
 /**
- * Copies all elements into a [[Set]]
+ * Returns a Set of all elements
  */
 public fun <T> Iterable<T>.toSet() : Set<T> {
     return toCollection(LinkedHashSet<T>())
 }
 
 /**
- * Copies all elements into a [[Set]]
+ * Returns a Set of all elements
  */
 public fun <T> Stream<T>.toSet() : Set<T> {
     return toCollection(LinkedHashSet<T>())
 }
 
 /**
- * Copies all elements into a [[List]] and sorts them
+ * Returns a sorted list of all elements
  */
 public fun <T: Comparable<T>> Array<T>.toSortedList() : List<T> {
     return toArrayList().sort()
 }
 
 /**
- * Copies all elements into a [[List]] and sorts them
+ * Returns a sorted list of all elements
  */
 public fun BooleanArray.toSortedList() : List<Boolean> {
     return toArrayList().sort()
 }
 
 /**
- * Copies all elements into a [[List]] and sorts them
+ * Returns a sorted list of all elements
  */
 public fun ByteArray.toSortedList() : List<Byte> {
     return toArrayList().sort()
 }
 
 /**
- * Copies all elements into a [[List]] and sorts them
+ * Returns a sorted list of all elements
  */
 public fun CharArray.toSortedList() : List<Char> {
     return toArrayList().sort()
 }
 
 /**
- * Copies all elements into a [[List]] and sorts them
+ * Returns a sorted list of all elements
  */
 public fun DoubleArray.toSortedList() : List<Double> {
     return toArrayList().sort()
 }
 
 /**
- * Copies all elements into a [[List]] and sorts them
+ * Returns a sorted list of all elements
  */
 public fun FloatArray.toSortedList() : List<Float> {
     return toArrayList().sort()
 }
 
 /**
- * Copies all elements into a [[List]] and sorts them
+ * Returns a sorted list of all elements
  */
 public fun IntArray.toSortedList() : List<Int> {
     return toArrayList().sort()
 }
 
 /**
- * Copies all elements into a [[List]] and sorts them
+ * Returns a sorted list of all elements
  */
 public fun LongArray.toSortedList() : List<Long> {
     return toArrayList().sort()
 }
 
 /**
- * Copies all elements into a [[List]] and sorts them
+ * Returns a sorted list of all elements
  */
 public fun ShortArray.toSortedList() : List<Short> {
     return toArrayList().sort()
 }
 
 /**
- * Copies all elements into a [[List]] and sorts them
+ * Returns a sorted list of all elements
  */
 public fun <T: Comparable<T>> Iterable<T>.toSortedList() : List<T> {
-    return toArrayList().sort()
+    return sort()
 }
 
 /**
- * Copies all elements into a [[List]] and sorts them
+ * Returns a sorted list of all elements
  */
 public fun <T: Comparable<T>> Stream<T>.toSortedList() : List<T> {
     return toArrayList().sort()
 }
 
 /**
- * Copies all elements into a [[SortedSet]]
+ * Returns a SortedSet of all elements
  */
 public fun <T> Array<T>.toSortedSet() : SortedSet<T> {
     return toCollection(TreeSet<T>())
 }
 
 /**
- * Copies all elements into a [[SortedSet]]
+ * Returns a SortedSet of all elements
  */
 public fun BooleanArray.toSortedSet() : SortedSet<Boolean> {
     return toCollection(TreeSet<Boolean>())
 }
 
 /**
- * Copies all elements into a [[SortedSet]]
+ * Returns a SortedSet of all elements
  */
 public fun ByteArray.toSortedSet() : SortedSet<Byte> {
     return toCollection(TreeSet<Byte>())
 }
 
 /**
- * Copies all elements into a [[SortedSet]]
+ * Returns a SortedSet of all elements
  */
 public fun CharArray.toSortedSet() : SortedSet<Char> {
     return toCollection(TreeSet<Char>())
 }
 
 /**
- * Copies all elements into a [[SortedSet]]
+ * Returns a SortedSet of all elements
  */
 public fun DoubleArray.toSortedSet() : SortedSet<Double> {
     return toCollection(TreeSet<Double>())
 }
 
 /**
- * Copies all elements into a [[SortedSet]]
+ * Returns a SortedSet of all elements
  */
 public fun FloatArray.toSortedSet() : SortedSet<Float> {
     return toCollection(TreeSet<Float>())
 }
 
 /**
- * Copies all elements into a [[SortedSet]]
+ * Returns a SortedSet of all elements
  */
 public fun IntArray.toSortedSet() : SortedSet<Int> {
     return toCollection(TreeSet<Int>())
 }
 
 /**
- * Copies all elements into a [[SortedSet]]
+ * Returns a SortedSet of all elements
  */
 public fun LongArray.toSortedSet() : SortedSet<Long> {
     return toCollection(TreeSet<Long>())
 }
 
 /**
- * Copies all elements into a [[SortedSet]]
+ * Returns a SortedSet of all elements
  */
 public fun ShortArray.toSortedSet() : SortedSet<Short> {
     return toCollection(TreeSet<Short>())
 }
 
 /**
- * Copies all elements into a [[SortedSet]]
+ * Returns a SortedSet of all elements
  */
 public fun <T> Iterable<T>.toSortedSet() : SortedSet<T> {
     return toCollection(TreeSet<T>())
 }
 
 /**
- * Copies all elements into a [[SortedSet]]
+ * Returns a SortedSet of all elements
  */
 public fun <T> Stream<T>.toSortedSet() : SortedSet<T> {
     return toCollection(TreeSet<T>())

@@ -16,13 +16,12 @@ fun arrays(): List<GenericFunction> {
 
     templates add f("isNotEmpty()") {
         only(ArraysOfObjects, ArraysOfPrimitives)
-        doc { "Returns true if the array is empty" }
+        doc { "Returns true if the array is not empty" }
         returns("Boolean")
         body {
             "return !isEmpty()"
         }
     }
-
 
     return templates
 }

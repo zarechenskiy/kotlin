@@ -8,7 +8,7 @@ package kotlin
 import java.util.*
 
 /**
- * Returns the largest element or null if there are no elements
+ * Returns the sum of all elements in the collection
  */
 public fun Iterable<Int>.sum() : Int {
     val iterator = iterator()
@@ -21,7 +21,7 @@ public fun Iterable<Int>.sum() : Int {
 }
 
 /**
- * Returns the largest element or null if there are no elements
+ * Returns the sum of all elements in the collection
  */
 public fun Iterable<Long>.sum() : Long {
     val iterator = iterator()
@@ -34,7 +34,7 @@ public fun Iterable<Long>.sum() : Long {
 }
 
 /**
- * Returns the largest element or null if there are no elements
+ * Returns the sum of all elements in the collection
  */
 public fun Iterable<Double>.sum() : Double {
     val iterator = iterator()
@@ -47,7 +47,7 @@ public fun Iterable<Double>.sum() : Double {
 }
 
 /**
- * Returns the largest element or null if there are no elements
+ * Returns the sum of all elements in the collection
  */
 public fun Iterable<Float>.sum() : Float {
     val iterator = iterator()
@@ -60,7 +60,7 @@ public fun Iterable<Float>.sum() : Float {
 }
 
 /**
- * Returns the largest element or null if there are no elements
+ * Returns the sum of all elements in the collection
  */
 public fun Array<Int>.sum() : Int {
     val iterator = iterator()
@@ -73,7 +73,7 @@ public fun Array<Int>.sum() : Int {
 }
 
 /**
- * Returns the largest element or null if there are no elements
+ * Returns the sum of all elements in the collection
  */
 public fun IntArray.sum() : Int {
     val iterator = iterator()
@@ -86,7 +86,7 @@ public fun IntArray.sum() : Int {
 }
 
 /**
- * Returns the largest element or null if there are no elements
+ * Returns the sum of all elements in the collection
  */
 public fun Array<Long>.sum() : Long {
     val iterator = iterator()
@@ -99,7 +99,7 @@ public fun Array<Long>.sum() : Long {
 }
 
 /**
- * Returns the largest element or null if there are no elements
+ * Returns the sum of all elements in the collection
  */
 public fun LongArray.sum() : Long {
     val iterator = iterator()
@@ -112,7 +112,7 @@ public fun LongArray.sum() : Long {
 }
 
 /**
- * Returns the largest element or null if there are no elements
+ * Returns the sum of all elements in the collection
  */
 public fun Array<Byte>.sum() : Int {
     val iterator = iterator()
@@ -125,7 +125,7 @@ public fun Array<Byte>.sum() : Int {
 }
 
 /**
- * Returns the largest element or null if there are no elements
+ * Returns the sum of all elements in the collection
  */
 public fun ByteArray.sum() : Int {
     val iterator = iterator()
@@ -138,7 +138,7 @@ public fun ByteArray.sum() : Int {
 }
 
 /**
- * Returns the largest element or null if there are no elements
+ * Returns the sum of all elements in the collection
  */
 public fun Array<Short>.sum() : Int {
     val iterator = iterator()
@@ -151,7 +151,7 @@ public fun Array<Short>.sum() : Int {
 }
 
 /**
- * Returns the largest element or null if there are no elements
+ * Returns the sum of all elements in the collection
  */
 public fun ShortArray.sum() : Int {
     val iterator = iterator()
@@ -164,7 +164,7 @@ public fun ShortArray.sum() : Int {
 }
 
 /**
- * Returns the largest element or null if there are no elements
+ * Returns the sum of all elements in the collection
  */
 public fun Array<Double>.sum() : Double {
     val iterator = iterator()
@@ -177,7 +177,7 @@ public fun Array<Double>.sum() : Double {
 }
 
 /**
- * Returns the largest element or null if there are no elements
+ * Returns the sum of all elements in the collection
  */
 public fun DoubleArray.sum() : Double {
     val iterator = iterator()
@@ -190,7 +190,7 @@ public fun DoubleArray.sum() : Double {
 }
 
 /**
- * Returns the largest element or null if there are no elements
+ * Returns the sum of all elements in the collection
  */
 public fun Array<Float>.sum() : Float {
     val iterator = iterator()
@@ -203,7 +203,7 @@ public fun Array<Float>.sum() : Float {
 }
 
 /**
- * Returns the largest element or null if there are no elements
+ * Returns the sum of all elements in the collection
  */
 public fun FloatArray.sum() : Float {
     val iterator = iterator()

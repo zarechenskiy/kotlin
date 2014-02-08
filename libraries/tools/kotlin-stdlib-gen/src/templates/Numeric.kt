@@ -6,7 +6,7 @@ fun numeric(): List<GenericFunction> {
     val templates = arrayListOf<GenericFunction>()
 
     templates add f("sum()") {
-        doc { "Returns the largest element or null if there are no elements" }
+        doc { "Returns the sum of all elements in the collection" }
         returns("SUM")
         body {
             """

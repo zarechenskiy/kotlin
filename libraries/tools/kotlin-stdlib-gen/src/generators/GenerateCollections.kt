@@ -10,11 +10,13 @@ fun generateCollectionsAPI(outDir : File) {
     filtering().writeTo(File(outDir, "_Filtering.kt")) { build() }
     ordering().writeTo(File(outDir, "_Ordering.kt")) { build() }
     arrays().writeTo(File(outDir, "_Arrays.kt")) { build() }
-    conversions().writeTo(File(outDir, "_Conversions.kt"))  { build() }
+    snapshots().writeTo(File(outDir, "_Snapshots.kt"))  { build() }
     mapping().writeTo(File(outDir, "_Mapping.kt")) { build() }
     aggregates().writeTo(File(outDir, "_Aggregates.kt")) { build() }
     guards().writeTo(File(outDir, "_Guards.kt")) { build() }
     generators().writeTo(File(outDir, "_Generators.kt")) { build() }
+    strings().writeTo(File(outDir, "_Strings.kt")) { build() }
+    specialJVM().writeTo(File(outDir, "_SpecialJVM.kt")) { build() }
 
     numeric().writeTo(File(outDir, "_Numeric.kt")) {
         val builder = StringBuilder()

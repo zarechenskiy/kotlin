@@ -6,7 +6,7 @@ fun generators(): List<GenericFunction> {
     val templates = arrayListOf<GenericFunction>()
 
     templates add f("plus(element: T)") {
-        doc { "Creates an [[Iterator]] which iterates over this iterator then the given element at the end" }
+        doc { "Returns a list containing all elements of original collection and then the given element" }
         returns("List<T>")
         body {
             """
@@ -16,7 +16,7 @@ fun generators(): List<GenericFunction> {
             """
         }
 
-        doc(Streams) { "Creates an [[Iterator]] which iterates over this iterator then the given element at the end" }
+        doc(Streams) { "Returns a stream containing all elements of original stream and then the given element" }
         returns(Streams) { "Stream<T>" }
         // TODO: Implement lazy behavior
         body(Streams) {
@@ -30,7 +30,7 @@ fun generators(): List<GenericFunction> {
 
     templates add f("plus(collection: Iterable<T>)") {
         exclude(Streams)
-        doc { "Creates an [[Iterator]] which iterates over this iterator then the following collection" }
+        doc { "Returns a list containing all elements of original collection and then all elements of the given *collection*" }
         returns("List<T>")
 
         body {
@@ -44,9 +44,8 @@ fun generators(): List<GenericFunction> {
 
     templates add f("plus(stream: Stream<T>)") {
         only(Streams)
-        doc { "Creates an [[Iterator]] which iterates over this iterator then the following collection" }
+        doc { "Returns a stream containing all elements of original stream and then all elements of the given *stream*" }
         returns("Stream<T>")
-
         body {
             // TODO: Implement lazy behavior
             """
@@ -58,7 +57,14 @@ fun generators(): List<GenericFunction> {
     }
 
     templates add f("partition(predicate: (T) -> Boolean)") {
-        doc { "Partitions this collection into a pair of collections" }
+        doc {
+            """
+            Splits original collection into pair of collections,
+            where *first* collection contains elements for which predicate yielded *true*,
+            while *second* collection contains elements for which predicate yielded *false*
+            """
+        }
+        // TODO: Stream variant
         returns("Pair<List<T>, List<T>>")
         body {
             """

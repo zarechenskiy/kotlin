@@ -107,7 +107,7 @@ public fun <T> Stream<T>.all(predicate: (T) -> Boolean) : Boolean {
 }
 
 /**
- * Returns *true* if any elements match the given *predicate*
+ * Returns *true* if any element matches the given *predicate*
  */
 public fun <T> Array<T>.any(predicate: (T) -> Boolean) : Boolean {
     for (element in this) if (predicate(element)) return true
@@ -116,7 +116,7 @@ public fun <T> Array<T>.any(predicate: (T) -> Boolean) : Boolean {
 }
 
 /**
- * Returns *true* if any elements match the given *predicate*
+ * Returns *true* if any element matches the given *predicate*
  */
 public fun BooleanArray.any(predicate: (Boolean) -> Boolean) : Boolean {
     for (element in this) if (predicate(element)) return true
@@ -125,7 +125,7 @@ public fun BooleanArray.any(predicate: (Boolean) -> Boolean) : Boolean {
 }
 
 /**
- * Returns *true* if any elements match the given *predicate*
+ * Returns *true* if any element matches the given *predicate*
  */
 public fun ByteArray.any(predicate: (Byte) -> Boolean) : Boolean {
     for (element in this) if (predicate(element)) return true
@@ -134,7 +134,7 @@ public fun ByteArray.any(predicate: (Byte) -> Boolean) : Boolean {
 }
 
 /**
- * Returns *true* if any elements match the given *predicate*
+ * Returns *true* if any element matches the given *predicate*
  */
 public fun CharArray.any(predicate: (Char) -> Boolean) : Boolean {
     for (element in this) if (predicate(element)) return true
@@ -143,7 +143,7 @@ public fun CharArray.any(predicate: (Char) -> Boolean) : Boolean {
 }
 
 /**
- * Returns *true* if any elements match the given *predicate*
+ * Returns *true* if any element matches the given *predicate*
  */
 public fun DoubleArray.any(predicate: (Double) -> Boolean) : Boolean {
     for (element in this) if (predicate(element)) return true
@@ -152,7 +152,7 @@ public fun DoubleArray.any(predicate: (Double) -> Boolean) : Boolean {
 }
 
 /**
- * Returns *true* if any elements match the given *predicate*
+ * Returns *true* if any element matches the given *predicate*
  */
 public fun FloatArray.any(predicate: (Float) -> Boolean) : Boolean {
     for (element in this) if (predicate(element)) return true
@@ -161,7 +161,7 @@ public fun FloatArray.any(predicate: (Float) -> Boolean) : Boolean {
 }
 
 /**
- * Returns *true* if any elements match the given *predicate*
+ * Returns *true* if any element matches the given *predicate*
  */
 public fun IntArray.any(predicate: (Int) -> Boolean) : Boolean {
     for (element in this) if (predicate(element)) return true
@@ -170,7 +170,7 @@ public fun IntArray.any(predicate: (Int) -> Boolean) : Boolean {
 }
 
 /**
- * Returns *true* if any elements match the given *predicate*
+ * Returns *true* if any element matches the given *predicate*
  */
 public fun LongArray.any(predicate: (Long) -> Boolean) : Boolean {
     for (element in this) if (predicate(element)) return true
@@ -179,7 +179,7 @@ public fun LongArray.any(predicate: (Long) -> Boolean) : Boolean {
 }
 
 /**
- * Returns *true* if any elements match the given *predicate*
+ * Returns *true* if any element matches the given *predicate*
  */
 public fun ShortArray.any(predicate: (Short) -> Boolean) : Boolean {
     for (element in this) if (predicate(element)) return true
@@ -188,7 +188,7 @@ public fun ShortArray.any(predicate: (Short) -> Boolean) : Boolean {
 }
 
 /**
- * Returns *true* if any elements match the given *predicate*
+ * Returns *true* if any element matches the given *predicate*
  */
 public fun <T> Iterable<T>.any(predicate: (T) -> Boolean) : Boolean {
     for (element in this) if (predicate(element)) return true
@@ -197,231 +197,11 @@ public fun <T> Iterable<T>.any(predicate: (T) -> Boolean) : Boolean {
 }
 
 /**
- * Returns *true* if any elements match the given *predicate*
+ * Returns *true* if any element matches the given *predicate*
  */
 public fun <T> Stream<T>.any(predicate: (T) -> Boolean) : Boolean {
     for (element in this) if (predicate(element)) return true
     return false
-    
-}
-
-/**
- * Appends the string from all the elements separated using the *separator* and using the given *prefix* and *postfix* if supplied
- * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
- * a special *truncated* separator (which defaults to "..."
- */
-public fun <T> Array<T>.appendString(buffer: Appendable, separator: String = ", ", prefix: String ="", postfix: String = "", limit: Int = -1, truncated: String = "...") : Unit {
-    buffer.append(prefix)
-    var count = 0
-    for (element in this) {
-        if (++count > 1) buffer.append(separator)
-        if (limit < 0 || count <= limit) {
-            val text = if (element == null) "null" else element.toString()
-            buffer.append(text)
-        } else break
-    }
-    if (limit >= 0 && count > limit) buffer.append(truncated)
-    buffer.append(postfix)
-    
-}
-
-/**
- * Appends the string from all the elements separated using the *separator* and using the given *prefix* and *postfix* if supplied
- * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
- * a special *truncated* separator (which defaults to "..."
- */
-public fun BooleanArray.appendString(buffer: Appendable, separator: String = ", ", prefix: String ="", postfix: String = "", limit: Int = -1, truncated: String = "...") : Unit {
-    buffer.append(prefix)
-    var count = 0
-    for (element in this) {
-        if (++count > 1) buffer.append(separator)
-        if (limit < 0 || count <= limit) {
-            val text = if (element == null) "null" else element.toString()
-            buffer.append(text)
-        } else break
-    }
-    if (limit >= 0 && count > limit) buffer.append(truncated)
-    buffer.append(postfix)
-    
-}
-
-/**
- * Appends the string from all the elements separated using the *separator* and using the given *prefix* and *postfix* if supplied
- * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
- * a special *truncated* separator (which defaults to "..."
- */
-public fun ByteArray.appendString(buffer: Appendable, separator: String = ", ", prefix: String ="", postfix: String = "", limit: Int = -1, truncated: String = "...") : Unit {
-    buffer.append(prefix)
-    var count = 0
-    for (element in this) {
-        if (++count > 1) buffer.append(separator)
-        if (limit < 0 || count <= limit) {
-            val text = if (element == null) "null" else element.toString()
-            buffer.append(text)
-        } else break
-    }
-    if (limit >= 0 && count > limit) buffer.append(truncated)
-    buffer.append(postfix)
-    
-}
-
-/**
- * Appends the string from all the elements separated using the *separator* and using the given *prefix* and *postfix* if supplied
- * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
- * a special *truncated* separator (which defaults to "..."
- */
-public fun CharArray.appendString(buffer: Appendable, separator: String = ", ", prefix: String ="", postfix: String = "", limit: Int = -1, truncated: String = "...") : Unit {
-    buffer.append(prefix)
-    var count = 0
-    for (element in this) {
-        if (++count > 1) buffer.append(separator)
-        if (limit < 0 || count <= limit) {
-            val text = if (element == null) "null" else element.toString()
-            buffer.append(text)
-        } else break
-    }
-    if (limit >= 0 && count > limit) buffer.append(truncated)
-    buffer.append(postfix)
-    
-}
-
-/**
- * Appends the string from all the elements separated using the *separator* and using the given *prefix* and *postfix* if supplied
- * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
- * a special *truncated* separator (which defaults to "..."
- */
-public fun DoubleArray.appendString(buffer: Appendable, separator: String = ", ", prefix: String ="", postfix: String = "", limit: Int = -1, truncated: String = "...") : Unit {
-    buffer.append(prefix)
-    var count = 0
-    for (element in this) {
-        if (++count > 1) buffer.append(separator)
-        if (limit < 0 || count <= limit) {
-            val text = if (element == null) "null" else element.toString()
-            buffer.append(text)
-        } else break
-    }
-    if (limit >= 0 && count > limit) buffer.append(truncated)
-    buffer.append(postfix)
-    
-}
-
-/**
- * Appends the string from all the elements separated using the *separator* and using the given *prefix* and *postfix* if supplied
- * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
- * a special *truncated* separator (which defaults to "..."
- */
-public fun FloatArray.appendString(buffer: Appendable, separator: String = ", ", prefix: String ="", postfix: String = "", limit: Int = -1, truncated: String = "...") : Unit {
-    buffer.append(prefix)
-    var count = 0
-    for (element in this) {
-        if (++count > 1) buffer.append(separator)
-        if (limit < 0 || count <= limit) {
-            val text = if (element == null) "null" else element.toString()
-            buffer.append(text)
-        } else break
-    }
-    if (limit >= 0 && count > limit) buffer.append(truncated)
-    buffer.append(postfix)
-    
-}
-
-/**
- * Appends the string from all the elements separated using the *separator* and using the given *prefix* and *postfix* if supplied
- * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
- * a special *truncated* separator (which defaults to "..."
- */
-public fun IntArray.appendString(buffer: Appendable, separator: String = ", ", prefix: String ="", postfix: String = "", limit: Int = -1, truncated: String = "...") : Unit {
-    buffer.append(prefix)
-    var count = 0
-    for (element in this) {
-        if (++count > 1) buffer.append(separator)
-        if (limit < 0 || count <= limit) {
-            val text = if (element == null) "null" else element.toString()
-            buffer.append(text)
-        } else break
-    }
-    if (limit >= 0 && count > limit) buffer.append(truncated)
-    buffer.append(postfix)
-    
-}
-
-/**
- * Appends the string from all the elements separated using the *separator* and using the given *prefix* and *postfix* if supplied
- * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
- * a special *truncated* separator (which defaults to "..."
- */
-public fun LongArray.appendString(buffer: Appendable, separator: String = ", ", prefix: String ="", postfix: String = "", limit: Int = -1, truncated: String = "...") : Unit {
-    buffer.append(prefix)
-    var count = 0
-    for (element in this) {
-        if (++count > 1) buffer.append(separator)
-        if (limit < 0 || count <= limit) {
-            val text = if (element == null) "null" else element.toString()
-            buffer.append(text)
-        } else break
-    }
-    if (limit >= 0 && count > limit) buffer.append(truncated)
-    buffer.append(postfix)
-    
-}
-
-/**
- * Appends the string from all the elements separated using the *separator* and using the given *prefix* and *postfix* if supplied
- * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
- * a special *truncated* separator (which defaults to "..."
- */
-public fun ShortArray.appendString(buffer: Appendable, separator: String = ", ", prefix: String ="", postfix: String = "", limit: Int = -1, truncated: String = "...") : Unit {
-    buffer.append(prefix)
-    var count = 0
-    for (element in this) {
-        if (++count > 1) buffer.append(separator)
-        if (limit < 0 || count <= limit) {
-            val text = if (element == null) "null" else element.toString()
-            buffer.append(text)
-        } else break
-    }
-    if (limit >= 0 && count > limit) buffer.append(truncated)
-    buffer.append(postfix)
-    
-}
-
-/**
- * Appends the string from all the elements separated using the *separator* and using the given *prefix* and *postfix* if supplied
- * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
- * a special *truncated* separator (which defaults to "..."
- */
-public fun <T> Iterable<T>.appendString(buffer: Appendable, separator: String = ", ", prefix: String ="", postfix: String = "", limit: Int = -1, truncated: String = "...") : Unit {
-    buffer.append(prefix)
-    var count = 0
-    for (element in this) {
-        if (++count > 1) buffer.append(separator)
-        if (limit < 0 || count <= limit) {
-            val text = if (element == null) "null" else element.toString()
-            buffer.append(text)
-        } else break
-    }
-    if (limit >= 0 && count > limit) buffer.append(truncated)
-    buffer.append(postfix)
-    
-}
-
-/**
- * Appends the string from all the elements separated using the *separator* and using the given *prefix* and *postfix* if supplied
- * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
- * a special *truncated* separator (which defaults to "..."
- */
-public fun <T> Stream<T>.appendString(buffer: Appendable, separator: String = ", ", prefix: String ="", postfix: String = "", limit: Int = -1, truncated: String = "...") : Unit {
-    buffer.append(prefix)
-    var count = 0
-    for (element in this) {
-        if (++count > 1) buffer.append(separator)
-        if (limit < 0 || count <= limit) {
-            val text = if (element == null) "null" else element.toString()
-            buffer.append(text)
-        } else break
-    }
-    if (limit >= 0 && count > limit) buffer.append(truncated)
-    buffer.append(postfix)
     
 }
 
@@ -626,252 +406,242 @@ public fun <T> Stream<T>.count(predicate: (T) -> Boolean) : Int {
 }
 
 /**
- * Folds all elements from from left to right with the *initial* value to perform the operation on sequential pairs of elements
+ * Accumulates value starting with *initial* value and applying *operation* from left to right to current accumulator value and each element
  */
 public fun <T, R> Array<T>.fold(initial: R, operation: (R, T) -> R) : R {
-    var answer = initial
-    for (element in this) answer = operation(answer, element)
-    return answer
+    var accumulator = initial
+    for (element in this) accumulator = operation(accumulator, element)
+    return accumulator
     
 }
 
 /**
- * Folds all elements from from left to right with the *initial* value to perform the operation on sequential pairs of elements
+ * Accumulates value starting with *initial* value and applying *operation* from left to right to current accumulator value and each element
  */
 public fun <R> BooleanArray.fold(initial: R, operation: (R, Boolean) -> R) : R {
-    var answer = initial
-    for (element in this) answer = operation(answer, element)
-    return answer
+    var accumulator = initial
+    for (element in this) accumulator = operation(accumulator, element)
+    return accumulator
     
 }
 
 /**
- * Folds all elements from from left to right with the *initial* value to perform the operation on sequential pairs of elements
+ * Accumulates value starting with *initial* value and applying *operation* from left to right to current accumulator value and each element
  */
 public fun <R> ByteArray.fold(initial: R, operation: (R, Byte) -> R) : R {
-    var answer = initial
-    for (element in this) answer = operation(answer, element)
-    return answer
+    var accumulator = initial
+    for (element in this) accumulator = operation(accumulator, element)
+    return accumulator
     
 }
 
 /**
- * Folds all elements from from left to right with the *initial* value to perform the operation on sequential pairs of elements
+ * Accumulates value starting with *initial* value and applying *operation* from left to right to current accumulator value and each element
  */
 public fun <R> CharArray.fold(initial: R, operation: (R, Char) -> R) : R {
-    var answer = initial
-    for (element in this) answer = operation(answer, element)
-    return answer
+    var accumulator = initial
+    for (element in this) accumulator = operation(accumulator, element)
+    return accumulator
     
 }
 
 /**
- * Folds all elements from from left to right with the *initial* value to perform the operation on sequential pairs of elements
+ * Accumulates value starting with *initial* value and applying *operation* from left to right to current accumulator value and each element
  */
 public fun <R> DoubleArray.fold(initial: R, operation: (R, Double) -> R) : R {
-    var answer = initial
-    for (element in this) answer = operation(answer, element)
-    return answer
+    var accumulator = initial
+    for (element in this) accumulator = operation(accumulator, element)
+    return accumulator
     
 }
 
 /**
- * Folds all elements from from left to right with the *initial* value to perform the operation on sequential pairs of elements
+ * Accumulates value starting with *initial* value and applying *operation* from left to right to current accumulator value and each element
  */
 public fun <R> FloatArray.fold(initial: R, operation: (R, Float) -> R) : R {
-    var answer = initial
-    for (element in this) answer = operation(answer, element)
-    return answer
+    var accumulator = initial
+    for (element in this) accumulator = operation(accumulator, element)
+    return accumulator
     
 }
 
 /**
- * Folds all elements from from left to right with the *initial* value to perform the operation on sequential pairs of elements
+ * Accumulates value starting with *initial* value and applying *operation* from left to right to current accumulator value and each element
  */
 public fun <R> IntArray.fold(initial: R, operation: (R, Int) -> R) : R {
-    var answer = initial
-    for (element in this) answer = operation(answer, element)
-    return answer
+    var accumulator = initial
+    for (element in this) accumulator = operation(accumulator, element)
+    return accumulator
     
 }
 
 /**
- * Folds all elements from from left to right with the *initial* value to perform the operation on sequential pairs of elements
+ * Accumulates value starting with *initial* value and applying *operation* from left to right to current accumulator value and each element
  */
 public fun <R> LongArray.fold(initial: R, operation: (R, Long) -> R) : R {
-    var answer = initial
-    for (element in this) answer = operation(answer, element)
-    return answer
+    var accumulator = initial
+    for (element in this) accumulator = operation(accumulator, element)
+    return accumulator
     
 }
 
 /**
- * Folds all elements from from left to right with the *initial* value to perform the operation on sequential pairs of elements
+ * Accumulates value starting with *initial* value and applying *operation* from left to right to current accumulator value and each element
  */
 public fun <R> ShortArray.fold(initial: R, operation: (R, Short) -> R) : R {
-    var answer = initial
-    for (element in this) answer = operation(answer, element)
-    return answer
+    var accumulator = initial
+    for (element in this) accumulator = operation(accumulator, element)
+    return accumulator
     
 }
 
 /**
- * Folds all elements from from left to right with the *initial* value to perform the operation on sequential pairs of elements
+ * Accumulates value starting with *initial* value and applying *operation* from left to right to current accumulator value and each element
  */
 public fun <T, R> Iterable<T>.fold(initial: R, operation: (R, T) -> R) : R {
-    var answer = initial
-    for (element in this) answer = operation(answer, element)
-    return answer
+    var accumulator = initial
+    for (element in this) accumulator = operation(accumulator, element)
+    return accumulator
     
 }
 
 /**
- * Folds all elements from from left to right with the *initial* value to perform the operation on sequential pairs of elements
+ * Accumulates value starting with *initial* value and applying *operation* from left to right to current accumulator value and each element
  */
 public fun <T, R> Stream<T>.fold(initial: R, operation: (R, T) -> R) : R {
-    var answer = initial
-    for (element in this) answer = operation(answer, element)
-    return answer
+    var accumulator = initial
+    for (element in this) accumulator = operation(accumulator, element)
+    return accumulator
     
 }
 
 /**
- * Applies binary operation to all elements of iterable, going from right to left.
+ * Accumulates value starting with *initial* value and applying *operation* from right to left to each element and current accumulator value
  */
 public fun <T, R> Array<T>.foldRight(initial: R, operation: (T, R) -> R) : R {
     var index = size - 1
-    if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
-    var answer = initial
+    var accumulator = initial
     while (index >= 0) {
-        answer = operation(get(index--), answer)
+        accumulator = operation(get(index--), accumulator)
     }
-    return answer
+    return accumulator
     
 }
 
 /**
- * Applies binary operation to all elements of iterable, going from right to left.
+ * Accumulates value starting with *initial* value and applying *operation* from right to left to each element and current accumulator value
  */
 public fun <R> BooleanArray.foldRight(initial: R, operation: (Boolean, R) -> R) : R {
     var index = size - 1
-    if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
-    var answer = initial
+    var accumulator = initial
     while (index >= 0) {
-        answer = operation(get(index--), answer)
+        accumulator = operation(get(index--), accumulator)
     }
-    return answer
+    return accumulator
     
 }
 
 /**
- * Applies binary operation to all elements of iterable, going from right to left.
+ * Accumulates value starting with *initial* value and applying *operation* from right to left to each element and current accumulator value
  */
 public fun <R> ByteArray.foldRight(initial: R, operation: (Byte, R) -> R) : R {
     var index = size - 1
-    if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
-    var answer = initial
+    var accumulator = initial
     while (index >= 0) {
-        answer = operation(get(index--), answer)
+        accumulator = operation(get(index--), accumulator)
     }
-    return answer
+    return accumulator
     
 }
 
 /**
- * Applies binary operation to all elements of iterable, going from right to left.
+ * Accumulates value starting with *initial* value and applying *operation* from right to left to each element and current accumulator value
  */
 public fun <R> CharArray.foldRight(initial: R, operation: (Char, R) -> R) : R {
     var index = size - 1
-    if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
-    var answer = initial
+    var accumulator = initial
     while (index >= 0) {
-        answer = operation(get(index--), answer)
+        accumulator = operation(get(index--), accumulator)
     }
-    return answer
+    return accumulator
     
 }
 
 /**
- * Applies binary operation to all elements of iterable, going from right to left.
+ * Accumulates value starting with *initial* value and applying *operation* from right to left to each element and current accumulator value
  */
 public fun <R> DoubleArray.foldRight(initial: R, operation: (Double, R) -> R) : R {
     var index = size - 1
-    if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
-    var answer = initial
+    var accumulator = initial
     while (index >= 0) {
-        answer = operation(get(index--), answer)
+        accumulator = operation(get(index--), accumulator)
     }
-    return answer
+    return accumulator
     
 }
 
 /**
- * Applies binary operation to all elements of iterable, going from right to left.
+ * Accumulates value starting with *initial* value and applying *operation* from right to left to each element and current accumulator value
  */
 public fun <R> FloatArray.foldRight(initial: R, operation: (Float, R) -> R) : R {
     var index = size - 1
-    if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
-    var answer = initial
+    var accumulator = initial
     while (index >= 0) {
-        answer = operation(get(index--), answer)
+        accumulator = operation(get(index--), accumulator)
     }
-    return answer
+    return accumulator
     
 }
 
 /**
- * Applies binary operation to all elements of iterable, going from right to left.
+ * Accumulates value starting with *initial* value and applying *operation* from right to left to each element and current accumulator value
  */
 public fun <R> IntArray.foldRight(initial: R, operation: (Int, R) -> R) : R {
     var index = size - 1
-    if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
-    var answer = initial
+    var accumulator = initial
     while (index >= 0) {
-        answer = operation(get(index--), answer)
+        accumulator = operation(get(index--), accumulator)
     }
-    return answer
+    return accumulator
     
 }
 
 /**
- * Applies binary operation to all elements of iterable, going from right to left.
+ * Accumulates value starting with *initial* value and applying *operation* from right to left to each element and current accumulator value
  */
 public fun <R> LongArray.foldRight(initial: R, operation: (Long, R) -> R) : R {
     var index = size - 1
-    if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
-    var answer = initial
+    var accumulator = initial
     while (index >= 0) {
-        answer = operation(get(index--), answer)
+        accumulator = operation(get(index--), accumulator)
     }
-    return answer
+    return accumulator
     
 }
 
 /**
- * Applies binary operation to all elements of iterable, going from right to left.
+ * Accumulates value starting with *initial* value and applying *operation* from right to left to each element and current accumulator value
  */
 public fun <R> ShortArray.foldRight(initial: R, operation: (Short, R) -> R) : R {
     var index = size - 1
-    if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
-    var answer = initial
+    var accumulator = initial
     while (index >= 0) {
-        answer = operation(get(index--), answer)
+        accumulator = operation(get(index--), accumulator)
     }
-    return answer
+    return accumulator
     
 }
 
 /**
- * Applies binary operation to all elements of iterable, going from right to left.
+ * Accumulates value starting with *initial* value and applying *operation* from right to left to each element and current accumulator value
  */
 public fun <T, R> List<T>.foldRight(initial: R, operation: (T, R) -> R) : R {
     var index = size - 1
-    if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
-    var answer = initial
+    var accumulator = initial
     while (index >= 0) {
-        answer = operation(get(index--), answer)
+        accumulator = operation(get(index--), accumulator)
     }
-    return answer
+    return accumulator
     
 }
 
@@ -960,138 +730,6 @@ public fun <T> Iterable<T>.forEach(operation: (T) -> Unit) : Unit {
  */
 public fun <T> Stream<T>.forEach(operation: (T) -> Unit) : Unit {
     for (element in this) operation(element)
-    
-}
-
-/**
- * Creates a string from all the elements separated using the *separator* and using the given *prefix* and *postfix* if supplied.
- * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
- * a special *truncated* separator (which defaults to "..."
- */
-public fun <T> Array<T>.makeString(separator: String = ", ", prefix: String = "", postfix: String = "", limit: Int = -1, truncated: String = "...") : String {
-    val buffer = StringBuilder()
-    appendString(buffer, separator, prefix, postfix, limit, truncated)
-    return buffer.toString()
-    
-}
-
-/**
- * Creates a string from all the elements separated using the *separator* and using the given *prefix* and *postfix* if supplied.
- * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
- * a special *truncated* separator (which defaults to "..."
- */
-public fun BooleanArray.makeString(separator: String = ", ", prefix: String = "", postfix: String = "", limit: Int = -1, truncated: String = "...") : String {
-    val buffer = StringBuilder()
-    appendString(buffer, separator, prefix, postfix, limit, truncated)
-    return buffer.toString()
-    
-}
-
-/**
- * Creates a string from all the elements separated using the *separator* and using the given *prefix* and *postfix* if supplied.
- * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
- * a special *truncated* separator (which defaults to "..."
- */
-public fun ByteArray.makeString(separator: String = ", ", prefix: String = "", postfix: String = "", limit: Int = -1, truncated: String = "...") : String {
-    val buffer = StringBuilder()
-    appendString(buffer, separator, prefix, postfix, limit, truncated)
-    return buffer.toString()
-    
-}
-
-/**
- * Creates a string from all the elements separated using the *separator* and using the given *prefix* and *postfix* if supplied.
- * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
- * a special *truncated* separator (which defaults to "..."
- */
-public fun CharArray.makeString(separator: String = ", ", prefix: String = "", postfix: String = "", limit: Int = -1, truncated: String = "...") : String {
-    val buffer = StringBuilder()
-    appendString(buffer, separator, prefix, postfix, limit, truncated)
-    return buffer.toString()
-    
-}
-
-/**
- * Creates a string from all the elements separated using the *separator* and using the given *prefix* and *postfix* if supplied.
- * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
- * a special *truncated* separator (which defaults to "..."
- */
-public fun DoubleArray.makeString(separator: String = ", ", prefix: String = "", postfix: String = "", limit: Int = -1, truncated: String = "...") : String {
-    val buffer = StringBuilder()
-    appendString(buffer, separator, prefix, postfix, limit, truncated)
-    return buffer.toString()
-    
-}
-
-/**
- * Creates a string from all the elements separated using the *separator* and using the given *prefix* and *postfix* if supplied.
- * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
- * a special *truncated* separator (which defaults to "..."
- */
-public fun FloatArray.makeString(separator: String = ", ", prefix: String = "", postfix: String = "", limit: Int = -1, truncated: String = "...") : String {
-    val buffer = StringBuilder()
-    appendString(buffer, separator, prefix, postfix, limit, truncated)
-    return buffer.toString()
-    
-}
-
-/**
- * Creates a string from all the elements separated using the *separator* and using the given *prefix* and *postfix* if supplied.
- * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
- * a special *truncated* separator (which defaults to "..."
- */
-public fun IntArray.makeString(separator: String = ", ", prefix: String = "", postfix: String = "", limit: Int = -1, truncated: String = "...") : String {
-    val buffer = StringBuilder()
-    appendString(buffer, separator, prefix, postfix, limit, truncated)
-    return buffer.toString()
-    
-}
-
-/**
- * Creates a string from all the elements separated using the *separator* and using the given *prefix* and *postfix* if supplied.
- * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
- * a special *truncated* separator (which defaults to "..."
- */
-public fun LongArray.makeString(separator: String = ", ", prefix: String = "", postfix: String = "", limit: Int = -1, truncated: String = "...") : String {
-    val buffer = StringBuilder()
-    appendString(buffer, separator, prefix, postfix, limit, truncated)
-    return buffer.toString()
-    
-}
-
-/**
- * Creates a string from all the elements separated using the *separator* and using the given *prefix* and *postfix* if supplied.
- * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
- * a special *truncated* separator (which defaults to "..."
- */
-public fun ShortArray.makeString(separator: String = ", ", prefix: String = "", postfix: String = "", limit: Int = -1, truncated: String = "...") : String {
-    val buffer = StringBuilder()
-    appendString(buffer, separator, prefix, postfix, limit, truncated)
-    return buffer.toString()
-    
-}
-
-/**
- * Creates a string from all the elements separated using the *separator* and using the given *prefix* and *postfix* if supplied.
- * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
- * a special *truncated* separator (which defaults to "..."
- */
-public fun <T> Iterable<T>.makeString(separator: String = ", ", prefix: String = "", postfix: String = "", limit: Int = -1, truncated: String = "...") : String {
-    val buffer = StringBuilder()
-    appendString(buffer, separator, prefix, postfix, limit, truncated)
-    return buffer.toString()
-    
-}
-
-/**
- * Creates a string from all the elements separated using the *separator* and using the given *prefix* and *postfix* if supplied.
- * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
- * a special *truncated* separator (which defaults to "..."
- */
-public fun <T> Stream<T>.makeString(separator: String = ", ", prefix: String = "", postfix: String = "", limit: Int = -1, truncated: String = "...") : String {
-    val buffer = StringBuilder()
-    appendString(buffer, separator, prefix, postfix, limit, truncated)
-    return buffer.toString()
     
 }
 
@@ -1935,390 +1573,327 @@ public fun <T> Stream<T>.none(predicate: (T) -> Boolean) : Boolean {
 }
 
 /**
- * Applies binary operation to all elements of iterable, going from left to right.
- * Similar to fold function, but uses the first element as initial value
+ * Accumulates value starting with the first element and applying *operation* from left to right to current accumulator value and each element
  */
 public fun <T> Array<T>.reduce(operation: (T, T) -> T) : T {
     val iterator = this.iterator()
-    if (!iterator.hasNext()) {
-        throw UnsupportedOperationException("Empty iterable can't be reduced")
-    }
+    if (!iterator.hasNext()) throw UnsupportedOperationException("Empty iterable can't be reduced")
     
-    var result: T = iterator.next() //compiler doesn't understand that result will initialized anyway
+    var accumulator = iterator.next()
     while (iterator.hasNext()) {
-        result = operation(result, iterator.next())
+        accumulator = operation(accumulator, iterator.next())
     }
-    return result
+    return accumulator
     
 }
 
 /**
- * Applies binary operation to all elements of iterable, going from left to right.
- * Similar to fold function, but uses the first element as initial value
+ * Accumulates value starting with the first element and applying *operation* from left to right to current accumulator value and each element
  */
 public fun BooleanArray.reduce(operation: (Boolean, Boolean) -> Boolean) : Boolean {
     val iterator = this.iterator()
-    if (!iterator.hasNext()) {
-        throw UnsupportedOperationException("Empty iterable can't be reduced")
-    }
+    if (!iterator.hasNext()) throw UnsupportedOperationException("Empty iterable can't be reduced")
     
-    var result: Boolean = iterator.next() //compiler doesn't understand that result will initialized anyway
+    var accumulator = iterator.next()
     while (iterator.hasNext()) {
-        result = operation(result, iterator.next())
+        accumulator = operation(accumulator, iterator.next())
     }
-    return result
+    return accumulator
     
 }
 
 /**
- * Applies binary operation to all elements of iterable, going from left to right.
- * Similar to fold function, but uses the first element as initial value
+ * Accumulates value starting with the first element and applying *operation* from left to right to current accumulator value and each element
  */
 public fun ByteArray.reduce(operation: (Byte, Byte) -> Byte) : Byte {
     val iterator = this.iterator()
-    if (!iterator.hasNext()) {
-        throw UnsupportedOperationException("Empty iterable can't be reduced")
-    }
+    if (!iterator.hasNext()) throw UnsupportedOperationException("Empty iterable can't be reduced")
     
-    var result: Byte = iterator.next() //compiler doesn't understand that result will initialized anyway
+    var accumulator = iterator.next()
     while (iterator.hasNext()) {
-        result = operation(result, iterator.next())
+        accumulator = operation(accumulator, iterator.next())
     }
-    return result
+    return accumulator
     
 }
 
 /**
- * Applies binary operation to all elements of iterable, going from left to right.
- * Similar to fold function, but uses the first element as initial value
+ * Accumulates value starting with the first element and applying *operation* from left to right to current accumulator value and each element
  */
 public fun CharArray.reduce(operation: (Char, Char) -> Char) : Char {
     val iterator = this.iterator()
-    if (!iterator.hasNext()) {
-        throw UnsupportedOperationException("Empty iterable can't be reduced")
-    }
+    if (!iterator.hasNext()) throw UnsupportedOperationException("Empty iterable can't be reduced")
     
-    var result: Char = iterator.next() //compiler doesn't understand that result will initialized anyway
+    var accumulator = iterator.next()
     while (iterator.hasNext()) {
-        result = operation(result, iterator.next())
+        accumulator = operation(accumulator, iterator.next())
     }
-    return result
+    return accumulator
     
 }
 
 /**
- * Applies binary operation to all elements of iterable, going from left to right.
- * Similar to fold function, but uses the first element as initial value
+ * Accumulates value starting with the first element and applying *operation* from left to right to current accumulator value and each element
  */
 public fun DoubleArray.reduce(operation: (Double, Double) -> Double) : Double {
     val iterator = this.iterator()
-    if (!iterator.hasNext()) {
-        throw UnsupportedOperationException("Empty iterable can't be reduced")
-    }
+    if (!iterator.hasNext()) throw UnsupportedOperationException("Empty iterable can't be reduced")
     
-    var result: Double = iterator.next() //compiler doesn't understand that result will initialized anyway
+    var accumulator = iterator.next()
     while (iterator.hasNext()) {
-        result = operation(result, iterator.next())
+        accumulator = operation(accumulator, iterator.next())
     }
-    return result
+    return accumulator
     
 }
 
 /**
- * Applies binary operation to all elements of iterable, going from left to right.
- * Similar to fold function, but uses the first element as initial value
+ * Accumulates value starting with the first element and applying *operation* from left to right to current accumulator value and each element
  */
 public fun FloatArray.reduce(operation: (Float, Float) -> Float) : Float {
     val iterator = this.iterator()
-    if (!iterator.hasNext()) {
-        throw UnsupportedOperationException("Empty iterable can't be reduced")
-    }
+    if (!iterator.hasNext()) throw UnsupportedOperationException("Empty iterable can't be reduced")
     
-    var result: Float = iterator.next() //compiler doesn't understand that result will initialized anyway
+    var accumulator = iterator.next()
     while (iterator.hasNext()) {
-        result = operation(result, iterator.next())
+        accumulator = operation(accumulator, iterator.next())
     }
-    return result
+    return accumulator
     
 }
 
 /**
- * Applies binary operation to all elements of iterable, going from left to right.
- * Similar to fold function, but uses the first element as initial value
+ * Accumulates value starting with the first element and applying *operation* from left to right to current accumulator value and each element
  */
 public fun IntArray.reduce(operation: (Int, Int) -> Int) : Int {
     val iterator = this.iterator()
-    if (!iterator.hasNext()) {
-        throw UnsupportedOperationException("Empty iterable can't be reduced")
-    }
+    if (!iterator.hasNext()) throw UnsupportedOperationException("Empty iterable can't be reduced")
     
-    var result: Int = iterator.next() //compiler doesn't understand that result will initialized anyway
+    var accumulator = iterator.next()
     while (iterator.hasNext()) {
-        result = operation(result, iterator.next())
+        accumulator = operation(accumulator, iterator.next())
     }
-    return result
+    return accumulator
     
 }
 
 /**
- * Applies binary operation to all elements of iterable, going from left to right.
- * Similar to fold function, but uses the first element as initial value
+ * Accumulates value starting with the first element and applying *operation* from left to right to current accumulator value and each element
  */
 public fun LongArray.reduce(operation: (Long, Long) -> Long) : Long {
     val iterator = this.iterator()
-    if (!iterator.hasNext()) {
-        throw UnsupportedOperationException("Empty iterable can't be reduced")
-    }
+    if (!iterator.hasNext()) throw UnsupportedOperationException("Empty iterable can't be reduced")
     
-    var result: Long = iterator.next() //compiler doesn't understand that result will initialized anyway
+    var accumulator = iterator.next()
     while (iterator.hasNext()) {
-        result = operation(result, iterator.next())
+        accumulator = operation(accumulator, iterator.next())
     }
-    return result
+    return accumulator
     
 }
 
 /**
- * Applies binary operation to all elements of iterable, going from left to right.
- * Similar to fold function, but uses the first element as initial value
+ * Accumulates value starting with the first element and applying *operation* from left to right to current accumulator value and each element
  */
 public fun ShortArray.reduce(operation: (Short, Short) -> Short) : Short {
     val iterator = this.iterator()
-    if (!iterator.hasNext()) {
-        throw UnsupportedOperationException("Empty iterable can't be reduced")
-    }
+    if (!iterator.hasNext()) throw UnsupportedOperationException("Empty iterable can't be reduced")
     
-    var result: Short = iterator.next() //compiler doesn't understand that result will initialized anyway
+    var accumulator = iterator.next()
     while (iterator.hasNext()) {
-        result = operation(result, iterator.next())
+        accumulator = operation(accumulator, iterator.next())
     }
-    return result
+    return accumulator
     
 }
 
 /**
- * Applies binary operation to all elements of iterable, going from left to right.
- * Similar to fold function, but uses the first element as initial value
+ * Accumulates value starting with the first element and applying *operation* from left to right to current accumulator value and each element
  */
 public fun <T> Iterable<T>.reduce(operation: (T, T) -> T) : T {
     val iterator = this.iterator()
-    if (!iterator.hasNext()) {
-        throw UnsupportedOperationException("Empty iterable can't be reduced")
-    }
+    if (!iterator.hasNext()) throw UnsupportedOperationException("Empty iterable can't be reduced")
     
-    var result: T = iterator.next() //compiler doesn't understand that result will initialized anyway
+    var accumulator = iterator.next()
     while (iterator.hasNext()) {
-        result = operation(result, iterator.next())
+        accumulator = operation(accumulator, iterator.next())
     }
-    return result
+    return accumulator
     
 }
 
 /**
- * Applies binary operation to all elements of iterable, going from left to right.
- * Similar to fold function, but uses the first element as initial value
+ * Accumulates value starting with the first element and applying *operation* from left to right to current accumulator value and each element
  */
 public fun <T> Stream<T>.reduce(operation: (T, T) -> T) : T {
     val iterator = this.iterator()
-    if (!iterator.hasNext()) {
-        throw UnsupportedOperationException("Empty iterable can't be reduced")
-    }
+    if (!iterator.hasNext()) throw UnsupportedOperationException("Empty iterable can't be reduced")
     
-    var result: T = iterator.next() //compiler doesn't understand that result will initialized anyway
+    var accumulator = iterator.next()
     while (iterator.hasNext()) {
-        result = operation(result, iterator.next())
+        accumulator = operation(accumulator, iterator.next())
     }
-    return result
+    return accumulator
     
 }
 
 /**
- * Applies binary operation to all elements of iterable, going from right to left.
- * Similar to foldRight function, but uses the last element as initial value
+ * Accumulates value starting with last element and applying *operation* from right to left to each element and current accumulator value
  */
 public fun <T> Array<T>.reduceRight(operation: (T, T) -> T) : T {
     var index = size - 1
-    if (index < 0) {
-        throw UnsupportedOperationException("Empty iterable can't be reduced")
-    }
+    if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
     
-    var r = get(index--)
+    var accumulator = get(index--)
     while (index >= 0) {
-        r = operation(get(index--), r)
+        accumulator = operation(get(index--), accumulator)
     }
     
-    return r
+    return accumulator
     
 }
 
 /**
- * Applies binary operation to all elements of iterable, going from right to left.
- * Similar to foldRight function, but uses the last element as initial value
+ * Accumulates value starting with last element and applying *operation* from right to left to each element and current accumulator value
  */
 public fun BooleanArray.reduceRight(operation: (Boolean, Boolean) -> Boolean) : Boolean {
     var index = size - 1
-    if (index < 0) {
-        throw UnsupportedOperationException("Empty iterable can't be reduced")
-    }
+    if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
     
-    var r = get(index--)
+    var accumulator = get(index--)
     while (index >= 0) {
-        r = operation(get(index--), r)
+        accumulator = operation(get(index--), accumulator)
     }
     
-    return r
+    return accumulator
     
 }
 
 /**
- * Applies binary operation to all elements of iterable, going from right to left.
- * Similar to foldRight function, but uses the last element as initial value
+ * Accumulates value starting with last element and applying *operation* from right to left to each element and current accumulator value
  */
 public fun ByteArray.reduceRight(operation: (Byte, Byte) -> Byte) : Byte {
     var index = size - 1
-    if (index < 0) {
-        throw UnsupportedOperationException("Empty iterable can't be reduced")
-    }
+    if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
     
-    var r = get(index--)
+    var accumulator = get(index--)
     while (index >= 0) {
-        r = operation(get(index--), r)
+        accumulator = operation(get(index--), accumulator)
     }
     
-    return r
+    return accumulator
     
 }
 
 /**
- * Applies binary operation to all elements of iterable, going from right to left.
- * Similar to foldRight function, but uses the last element as initial value
+ * Accumulates value starting with last element and applying *operation* from right to left to each element and current accumulator value
  */
 public fun CharArray.reduceRight(operation: (Char, Char) -> Char) : Char {
     var index = size - 1
-    if (index < 0) {
-        throw UnsupportedOperationException("Empty iterable can't be reduced")
-    }
+    if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
     
-    var r = get(index--)
+    var accumulator = get(index--)
     while (index >= 0) {
-        r = operation(get(index--), r)
+        accumulator = operation(get(index--), accumulator)
     }
     
-    return r
+    return accumulator
     
 }
 
 /**
- * Applies binary operation to all elements of iterable, going from right to left.
- * Similar to foldRight function, but uses the last element as initial value
+ * Accumulates value starting with last element and applying *operation* from right to left to each element and current accumulator value
  */
 public fun DoubleArray.reduceRight(operation: (Double, Double) -> Double) : Double {
     var index = size - 1
-    if (index < 0) {
-        throw UnsupportedOperationException("Empty iterable can't be reduced")
-    }
+    if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
     
-    var r = get(index--)
+    var accumulator = get(index--)
     while (index >= 0) {
-        r = operation(get(index--), r)
+        accumulator = operation(get(index--), accumulator)
     }
     
-    return r
+    return accumulator
     
 }
 
 /**
- * Applies binary operation to all elements of iterable, going from right to left.
- * Similar to foldRight function, but uses the last element as initial value
+ * Accumulates value starting with last element and applying *operation* from right to left to each element and current accumulator value
  */
 public fun FloatArray.reduceRight(operation: (Float, Float) -> Float) : Float {
     var index = size - 1
-    if (index < 0) {
-        throw UnsupportedOperationException("Empty iterable can't be reduced")
-    }
+    if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
     
-    var r = get(index--)
+    var accumulator = get(index--)
     while (index >= 0) {
-        r = operation(get(index--), r)
+        accumulator = operation(get(index--), accumulator)
     }
     
-    return r
+    return accumulator
     
 }
 
 /**
- * Applies binary operation to all elements of iterable, going from right to left.
- * Similar to foldRight function, but uses the last element as initial value
+ * Accumulates value starting with last element and applying *operation* from right to left to each element and current accumulator value
  */
 public fun IntArray.reduceRight(operation: (Int, Int) -> Int) : Int {
     var index = size - 1
-    if (index < 0) {
-        throw UnsupportedOperationException("Empty iterable can't be reduced")
-    }
+    if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
     
-    var r = get(index--)
+    var accumulator = get(index--)
     while (index >= 0) {
-        r = operation(get(index--), r)
+        accumulator = operation(get(index--), accumulator)
     }
     
-    return r
+    return accumulator
     
 }
 
 /**
- * Applies binary operation to all elements of iterable, going from right to left.
- * Similar to foldRight function, but uses the last element as initial value
+ * Accumulates value starting with last element and applying *operation* from right to left to each element and current accumulator value
  */
 public fun LongArray.reduceRight(operation: (Long, Long) -> Long) : Long {
     var index = size - 1
-    if (index < 0) {
-        throw UnsupportedOperationException("Empty iterable can't be reduced")
-    }
+    if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
     
-    var r = get(index--)
+    var accumulator = get(index--)
     while (index >= 0) {
-        r = operation(get(index--), r)
+        accumulator = operation(get(index--), accumulator)
     }
     
-    return r
+    return accumulator
     
 }
 
 /**
- * Applies binary operation to all elements of iterable, going from right to left.
- * Similar to foldRight function, but uses the last element as initial value
+ * Accumulates value starting with last element and applying *operation* from right to left to each element and current accumulator value
  */
 public fun ShortArray.reduceRight(operation: (Short, Short) -> Short) : Short {
     var index = size - 1
-    if (index < 0) {
-        throw UnsupportedOperationException("Empty iterable can't be reduced")
-    }
+    if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
     
-    var r = get(index--)
+    var accumulator = get(index--)
     while (index >= 0) {
-        r = operation(get(index--), r)
+        accumulator = operation(get(index--), accumulator)
     }
     
-    return r
+    return accumulator
     
 }
 
 /**
- * Applies binary operation to all elements of iterable, going from right to left.
- * Similar to foldRight function, but uses the last element as initial value
+ * Accumulates value starting with last element and applying *operation* from right to left to each element and current accumulator value
  */
 public fun <T> List<T>.reduceRight(operation: (T, T) -> T) : T {
     var index = size - 1
-    if (index < 0) {
-        throw UnsupportedOperationException("Empty iterable can't be reduced")
-    }
+    if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
     
-    var r = get(index--)
+    var accumulator = get(index--)
     while (index >= 0) {
-        r = operation(get(index--), r)
+        accumulator = operation(get(index--), accumulator)
     }
     
-    return r
+    return accumulator
     
 }
 

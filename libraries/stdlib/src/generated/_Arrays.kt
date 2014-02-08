@@ -71,63 +71,63 @@ public fun ShortArray.isEmpty() : Boolean {
 }
 
 /**
- * Returns true if the array is empty
+ * Returns true if the array is not empty
  */
 public fun <T> Array<T>.isNotEmpty() : Boolean {
     return !isEmpty()
 }
 
 /**
- * Returns true if the array is empty
+ * Returns true if the array is not empty
  */
 public fun BooleanArray.isNotEmpty() : Boolean {
     return !isEmpty()
 }
 
 /**
- * Returns true if the array is empty
+ * Returns true if the array is not empty
  */
 public fun ByteArray.isNotEmpty() : Boolean {
     return !isEmpty()
 }
 
 /**
- * Returns true if the array is empty
+ * Returns true if the array is not empty
  */
 public fun CharArray.isNotEmpty() : Boolean {
     return !isEmpty()
 }
 
 /**
- * Returns true if the array is empty
+ * Returns true if the array is not empty
  */
 public fun DoubleArray.isNotEmpty() : Boolean {
     return !isEmpty()
 }
 
 /**
- * Returns true if the array is empty
+ * Returns true if the array is not empty
  */
 public fun FloatArray.isNotEmpty() : Boolean {
     return !isEmpty()
 }
 
 /**
- * Returns true if the array is empty
+ * Returns true if the array is not empty
  */
 public fun IntArray.isNotEmpty() : Boolean {
     return !isEmpty()
 }
 
 /**
- * Returns true if the array is empty
+ * Returns true if the array is not empty
  */
 public fun LongArray.isNotEmpty() : Boolean {
     return !isEmpty()
 }
 
 /**
- * Returns true if the array is empty
+ * Returns true if the array is not empty
  */
 public fun ShortArray.isNotEmpty() : Boolean {
     return !isEmpty()

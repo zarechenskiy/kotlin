@@ -10,8 +10,8 @@ fun aggregates(): List<GenericFunction> {
         returns("Boolean")
         body {
             """
-                for (element in this) if (!predicate(element)) return false
-                return true
+            for (element in this) if (!predicate(element)) return false
+            return true
             """
         }
     }
@@ -21,19 +21,19 @@ fun aggregates(): List<GenericFunction> {
         returns("Boolean")
         body {
             """
-                for (element in this) if (predicate(element)) return false
-                return true
+            for (element in this) if (predicate(element)) return false
+            return true
             """
         }
     }
 
     templates add f("any(predicate: (T) -> Boolean)") {
-        doc { "Returns *true* if any elements match the given *predicate*" }
+        doc { "Returns *true* if any element matches the given *predicate*" }
         returns("Boolean")
         body {
             """
-                for (element in this) if (predicate(element)) return true
-                return false
+            for (element in this) if (predicate(element)) return true
+            return false
             """
         }
     }
@@ -43,10 +43,10 @@ fun aggregates(): List<GenericFunction> {
         returns("Int")
         body {
             """
-               var count = 0
-               for (element in this) if (predicate(element)) count++
-               return count
-           """
+            var count = 0
+            for (element in this) if (predicate(element)) count++
+            return count
+            """
         }
     }
 
@@ -55,12 +55,11 @@ fun aggregates(): List<GenericFunction> {
         returns("Int")
         body {
             """
-               var count = 0
-               for (element in this) count++
-               return count
-           """
+            var count = 0
+            for (element in this) count++
+            return count
+            """
         }
-        include(Collections)
         body(Collections, ArraysOfObjects, ArraysOfPrimitives) {
             "return size"
         }
@@ -73,26 +72,26 @@ fun aggregates(): List<GenericFunction> {
         typeParam("T: Comparable<T>")
         body {
             """
-                val iterator = iterator()
-                if (!iterator.hasNext()) return null
+            val iterator = iterator()
+            if (!iterator.hasNext()) return null
 
-                var min = iterator.next()
-                while (iterator.hasNext()) {
-                    val e = iterator.next()
-                    if (min > e) min = e
-                }
-                return min
+            var min = iterator.next()
+            while (iterator.hasNext()) {
+                val e = iterator.next()
+                if (min > e) min = e
+            }
+            return min
             """
         }
         body(ArraysOfObjects, ArraysOfPrimitives) {
             """
-                if (isEmpty()) return null
-                var min = this[0]
-                for (i in 1..lastIndex) {
-                    val e = this[i]
-                    if (min > e) min = e
-                }
-                return min
+            if (isEmpty()) return null
+            var min = this[0]
+            for (i in 1..lastIndex) {
+                val e = this[i]
+                if (min > e) min = e
+            }
+            return min
             """
         }
     }
@@ -104,39 +103,38 @@ fun aggregates(): List<GenericFunction> {
         returns("T?")
         body {
             """
-                val iterator = iterator()
-                if (!iterator.hasNext()) return null
+            val iterator = iterator()
+            if (!iterator.hasNext()) return null
 
-                var minElem = iterator.next()
-                var minValue = f(minElem)
-                while (iterator.hasNext()) {
-                    val e = iterator.next()
-                    val v = f(e)
-                    if (minValue > v) {
-                       minElem = e
-                       minValue = v
-                    }
+            var minElem = iterator.next()
+            var minValue = f(minElem)
+            while (iterator.hasNext()) {
+                val e = iterator.next()
+                val v = f(e)
+                if (minValue > v) {
+                   minElem = e
+                   minValue = v
                 }
-                return minElem
+            }
+            return minElem
             """
         }
         body(ArraysOfObjects, ArraysOfPrimitives) {
             """
-                    if (size == 0) return null
+            if (size == 0) return null
 
-                    var minElem = this[0]
-                    var minValue = f(minElem)
-                    for (i in 1..lastIndex) {
-                        val e = this[i]
-                        val v = f(e)
-                        if (minValue > v) {
-                           minElem = e
-                           minValue = v
-                        }
-                    }
-                    return minElem
-                """
-
+            var minElem = this[0]
+            var minValue = f(minElem)
+            for (i in 1..lastIndex) {
+                val e = this[i]
+                val v = f(e)
+                if (minValue > v) {
+                   minElem = e
+                   minValue = v
+                }
+            }
+            return minElem
+            """
         }
     }
 
@@ -147,28 +145,28 @@ fun aggregates(): List<GenericFunction> {
         typeParam("T: Comparable<T>")
         body {
             """
-                val iterator = iterator()
-                if (!iterator.hasNext()) return null
+            val iterator = iterator()
+            if (!iterator.hasNext()) return null
 
-                var max = iterator.next()
-                while (iterator.hasNext()) {
-                    val e = iterator.next()
-                    if (max < e) max = e
-                }
-                return max
+            var max = iterator.next()
+            while (iterator.hasNext()) {
+                val e = iterator.next()
+                if (max < e) max = e
+            }
+            return max
             """
         }
 
         body(ArraysOfObjects, ArraysOfPrimitives) {
             """
-                if (isEmpty()) return null
+            if (isEmpty()) return null
 
-                var max = this[0]
-                for (i in 1..lastIndex) {
-                    val e = this[i]
-                    if (max < e) max = e
-                }
-                return max
+            var max = this[0]
+            for (i in 1..lastIndex) {
+                val e = this[i]
+                if (max < e) max = e
+            }
+            return max
             """
         }
     }
@@ -180,37 +178,37 @@ fun aggregates(): List<GenericFunction> {
         returns("T?")
         body {
             """
-                val iterator = iterator()
-                if (!iterator.hasNext()) return null
+            val iterator = iterator()
+            if (!iterator.hasNext()) return null
 
-                var maxElem = iterator.next()
-                var maxValue = f(maxElem)
-                while (iterator.hasNext()) {
-                    val e = iterator.next()
-                    val v = f(e)
-                    if (maxValue < v) {
-                       maxElem = e
-                       maxValue = v
-                    }
+            var maxElem = iterator.next()
+            var maxValue = f(maxElem)
+            while (iterator.hasNext()) {
+                val e = iterator.next()
+                val v = f(e)
+                if (maxValue < v) {
+                   maxElem = e
+                   maxValue = v
                 }
-                return maxElem
+            }
+            return maxElem
             """
         }
         body(ArraysOfObjects, ArraysOfPrimitives) {
             """
-                if (isEmpty()) return null
+            if (isEmpty()) return null
 
-                var maxElem = this[0]
-                var maxValue = f(maxElem)
-                for (i in 1..lastIndex) {
-                    val e = this[i]
-                    val v = f(e)
-                    if (maxValue < v) {
-                       maxElem = e
-                       maxValue = v
-                    }
+            var maxElem = this[0]
+            var maxValue = f(maxElem)
+            for (i in 1..lastIndex) {
+                val e = this[i]
+                val v = f(e)
+                if (maxValue < v) {
+                   maxElem = e
+                   maxValue = v
                 }
-                return maxElem
+            }
+            return maxElem
             """
         }
     }
@@ -218,88 +216,68 @@ fun aggregates(): List<GenericFunction> {
 
 
     templates add f("fold(initial: R, operation: (R, T) -> R)") {
-        doc { "Folds all elements from from left to right with the *initial* value to perform the operation on sequential pairs of elements" }
+        doc { "Accumulates value starting with *initial* value and applying *operation* from left to right to current accumulator value and each element" }
         typeParam("R")
         returns("R")
         body {
             """
-            var answer = initial
-            for (element in this) answer = operation(answer, element)
-            return answer
+            var accumulator = initial
+            for (element in this) accumulator = operation(accumulator, element)
+            return accumulator
             """
         }
     }
 
     templates add f("foldRight(initial: R, operation: (T, R) -> R)") {
         only(Lists, ArraysOfObjects, ArraysOfPrimitives)
-        doc {
-            """
-            Applies binary operation to all elements of iterable, going from right to left.
-            """
-        }
+        doc { "Accumulates value starting with *initial* value and applying *operation* from right to left to each element and current accumulator value" }
         typeParam("R")
         returns("R")
         body {
             """
             var index = size - 1
-            if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
-            var answer = initial
+            var accumulator = initial
             while (index >= 0) {
-                answer = operation(get(index--), answer)
+                accumulator = operation(get(index--), accumulator)
             }
-            return answer
+            return accumulator
             """
         }
     }
 
 
     templates add f("reduce(operation: (T, T) -> T)") {
-        doc {
-            """
-            Applies binary operation to all elements of iterable, going from left to right.
-            Similar to fold function, but uses the first element as initial value
-            """
-        }
+        doc { "Accumulates value starting with the first element and applying *operation* from left to right to current accumulator value and each element" }
         returns("T")
-
         body {
             """
             val iterator = this.iterator()
-            if (!iterator.hasNext()) {
-                throw UnsupportedOperationException("Empty iterable can't be reduced")
-            }
+            if (!iterator.hasNext()) throw UnsupportedOperationException("Empty iterable can't be reduced")
 
-            var result: T = iterator.next() //compiler doesn't understand that result will initialized anyway
+            var accumulator = iterator.next()
             while (iterator.hasNext()) {
-                result = operation(result, iterator.next())
+                accumulator = operation(accumulator, iterator.next())
             }
-            return result
+            return accumulator
             """
         }
     }
 
     templates add f("reduceRight(operation: (T, T) -> T)") {
         only(Lists, ArraysOfObjects, ArraysOfPrimitives)
-        doc {
-            """
-            Applies binary operation to all elements of iterable, going from right to left.
-            Similar to foldRight function, but uses the last element as initial value
-            """
-        }
+        doc { "Accumulates value starting with last element and applying *operation* from right to left to each element and current accumulator value" }
         returns("T")
         body {
             """
             var index = size - 1
-            if (index < 0) {
-                throw UnsupportedOperationException("Empty iterable can't be reduced")
-            }
+            if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
 
-            var r = get(index--)
+            var accumulator = get(index--)
             while (index >= 0) {
-                r = operation(get(index--), r)
+                accumulator = operation(get(index--), accumulator)
             }
 
-            return r
+            return accumulator
             """
         }
     }
@@ -311,53 +289,6 @@ fun aggregates(): List<GenericFunction> {
         body {
             """
             for (element in this) operation(element)
-            """
-        }
-    }
-
-    templates add f("appendString(buffer: Appendable, separator: String = \", \", prefix: String =\"\", postfix: String = \"\", limit: Int = -1, truncated: String = \"...\")") {
-        doc {
-            """
-            Appends the string from all the elements separated using the *separator* and using the given *prefix* and *postfix* if supplied
-
-            If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
-            a special *truncated* separator (which defaults to "..."
-            """
-        }
-        returns { "Unit" }
-        body {
-            """
-            buffer.append(prefix)
-            var count = 0
-            for (element in this) {
-                if (++count > 1) buffer.append(separator)
-                if (limit < 0 || count <= limit) {
-                    val text = if (element == null) "null" else element.toString()
-                    buffer.append(text)
-                } else break
-            }
-            if (limit >= 0 && count > limit) buffer.append(truncated)
-            buffer.append(postfix)
-            """
-        }
-    }
-
-    templates add f("makeString(separator: String = \", \", prefix: String = \"\", postfix: String = \"\", limit: Int = -1, truncated: String = \"...\")") {
-        doc {
-            """
-            Creates a string from all the elements separated using the *separator* and using the given *prefix* and *postfix* if supplied.
-
-            If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
-            a special *truncated* separator (which defaults to "..."
-            """
-        }
-
-        returns("String")
-        body {
-            """
-            val buffer = StringBuilder()
-            appendString(buffer, separator, prefix, postfix, limit, truncated)
-            return buffer.toString()
             """
         }
     }

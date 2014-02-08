@@ -16,6 +16,18 @@ enum class Family {
     ArraysOfPrimitives
 }
 
+enum class PrimitiveType(val name: String) {
+    Boolean: PrimitiveType("Boolean")
+    Byte: PrimitiveType("Byte")
+    Char: PrimitiveType("Char")
+    Short: PrimitiveType("Short")
+    Int: PrimitiveType("Int")
+    Long: PrimitiveType("Long")
+    Float: PrimitiveType("Float")
+    Double: PrimitiveType("Double")
+}
+
+
 class GenericFunction(val signature: String) : Comparable<GenericFunction> {
     val defaultFamilies = array(Iterables, Streams, ArraysOfObjects, ArraysOfPrimitives)
 

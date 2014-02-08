@@ -108,7 +108,7 @@ public fun <T> Iterable<T>.reverse() : List<T> {
 }
 
 /**
- * Copies all elements into a [[List]] and sorts it
+ * Returns a sorted list of all elements
  */
 public fun <T: Comparable<T>> Iterable<T>.sort() : List<T> {
     val sortedList = toArrayList()
@@ -119,7 +119,7 @@ public fun <T: Comparable<T>> Iterable<T>.sort() : List<T> {
 }
 
 /**
- * Copies all elements into a [[List]] and sorts it using provided comparator
+ * Returns a list of all elements, sorted by the specified *comparator*
  */
 public fun <T> Array<T>.sortBy(comparator : Comparator<T>) : List<T> {
     val sortedList = toArrayList()
@@ -129,7 +129,7 @@ public fun <T> Array<T>.sortBy(comparator : Comparator<T>) : List<T> {
 }
 
 /**
- * Copies all elements into a [[List]] and sorts it using provided comparator
+ * Returns a list of all elements, sorted by the specified *comparator*
  */
 public fun <T> Iterable<T>.sortBy(comparator : Comparator<T>) : List<T> {
     val sortedList = toArrayList()
@@ -139,22 +139,22 @@ public fun <T> Iterable<T>.sortBy(comparator : Comparator<T>) : List<T> {
 }
 
 /**
- * Copies all elements into a [[List]] and sorts it by value of f(element)
+ * Returns a list of all elements, sorted by results of specified *order* function.
  */
-public fun <T, R: Comparable<R>> Array<T>.sortBy(f: (T) -> R) : List<T> {
+public fun <T, R: Comparable<R>> Array<T>.sortBy(order: (T) -> R) : List<T> {
     val sortedList = toArrayList()
-    val sortBy: Comparator<T> = comparator<T> {(x: T, y: T) -> f(x).compareTo(f(y))}
+    val sortBy: Comparator<T> = comparator<T> {(x: T, y: T) -> order(x).compareTo(order(y))}
     java.util.Collections.sort(sortedList, sortBy)
     return sortedList
     
 }
 
 /**
- * Copies all elements into a [[List]] and sorts it by value of f(element)
+ * Returns a list of all elements, sorted by results of specified *order* function.
  */
-public fun <T, R: Comparable<R>> Iterable<T>.sortBy(f: (T) -> R) : List<T> {
+public fun <T, R: Comparable<R>> Iterable<T>.sortBy(order: (T) -> R) : List<T> {
     val sortedList = toArrayList()
-    val sortBy: Comparator<T> = comparator<T> {(x: T, y: T) -> f(x).compareTo(f(y))}
+    val sortBy: Comparator<T> = comparator<T> {(x: T, y: T) -> order(x).compareTo(order(y))}
     java.util.Collections.sort(sortedList, sortBy)
     return sortedList
     

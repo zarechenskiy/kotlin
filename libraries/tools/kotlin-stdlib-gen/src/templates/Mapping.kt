@@ -6,7 +6,7 @@ fun mapping(): List<GenericFunction> {
     val templates = arrayListOf<GenericFunction>()
 
     templates add f("map(transform : (T) -> R)") {
-        doc { "Returns a new List containing the results of applying the given *transform* function to each element in this collection" }
+        doc { "Returns a list containing the results of applying the given *transform* function to each element of the original collection" }
         typeParam("R")
         returns("List<R>")
         body {
@@ -14,20 +14,20 @@ fun mapping(): List<GenericFunction> {
         }
 
         returns(Streams) { "Stream<R>" }
+        doc(Streams) { "Returns a stream containing the results of applying the given *transform* function to each element of the original stream" }
         body(Streams) {
             "return TransformingStream(this, transform) "
         }
 
     }
 
-    templates add f("mapTo(result: C, transform : (T) -> R)") {
+    templates add f("mapTo(collection: C, transform : (T) -> R)") {
         doc {
             """
-            Transforms each element of this collection with the given *transform* function and
-            adds each return value to the given *results* collection
+            Appends transformed elements of original collection using the given *transform* function
+            to the given *collection*
             """
         }
-
         typeParam("R")
         typeParam("C: MutableCollection<in R>")
         returns("C")
@@ -35,15 +35,15 @@ fun mapping(): List<GenericFunction> {
         body {
             """
                 for (item in this)
-                    result.add(transform(item))
-                return result
+                    collection.add(transform(item))
+                return collection
             """
         }
     }
 
     templates add f("flatMap(transform: (T)-> Iterable<R>)") {
         exclude(Streams)
-        doc { "Returns the result of transforming each element to one or more values which are concatenated together into a single list" }
+        doc { "Returns a single list of all elements yielded from results of *transform* function being invoked on each element of original collection" }
         typeParam("R")
         returns("List<R>")
         body {
@@ -53,7 +53,7 @@ fun mapping(): List<GenericFunction> {
 
     templates add f("flatMap(transform: (T)-> Stream<R>)") {
         only(Streams)
-        doc { "Returns the result of transforming each element to one or more values which are concatenated together into a single list" }
+        doc { "Returns a single stream of all elements streamed from results of *transform* function being invoked on each element of original stream" }
         typeParam("R")
         returns("Stream<R>")
         body {
@@ -61,9 +61,9 @@ fun mapping(): List<GenericFunction> {
         }
     }
 
-    templates add f("flatMapTo(result: C, transform: (T) -> Iterable<R>)") {
+    templates add f("flatMapTo(collection: C, transform: (T) -> Iterable<R>)") {
         exclude(Streams)
-        doc { "Returns the result of transforming each element to one or more values which are concatenated together into a single collection" }
+        doc { "Appends all elements yielded from results of *transform* function being invoked on each element of original collection, to the given *collection*" }
         typeParam("R")
         typeParam("C: MutableCollection<in R>")
         returns("C")
@@ -71,16 +71,16 @@ fun mapping(): List<GenericFunction> {
             """
                 for (element in this) {
                     val list = transform(element)
-                    result.addAll(list)
+                    collection.addAll(list)
                 }
-                return result
+                return collection
             """
         }
     }
 
-    templates add f("flatMapTo(result: C, transform: (T) -> Stream<R>)") {
+    templates add f("flatMapTo(collection: C, transform: (T) -> Stream<R>)") {
         only(Streams)
-        doc { "Returns the result of transforming each element to one or more values which are concatenated together into a single stream" }
+        doc { "Appends all elements yielded from results of *transform* function being invoked on each element of original stream, to the given *collection*" }
         typeParam("R")
         typeParam("C: MutableCollection<in R>")
         returns("C")
@@ -88,31 +88,32 @@ fun mapping(): List<GenericFunction> {
             """
                 for (element in this) {
                     val list = transform(element)
-                    result.addAll(list)
+                    collection.addAll(list)
                 }
-                return result
+                return collection
             """
         }
     }
 
     templates add f("groupBy(toKey: (T) -> K)") {
-        doc { "Groups the elements in the collection into a new [[Map]] using the supplied *toKey* function to calculate the key to group the elements by" }
+        doc { "Returns a map of the elements in original collection grouped by the result of given *toKey* function" }
         typeParam("K")
         returns("Map<K, List<T>>")
         body { "return groupByTo(HashMap<K, MutableList<T>>(), toKey)" }
     }
 
-    templates add f("groupByTo(result: MutableMap<K, MutableList<T>>, toKey: (T) -> K)") {
+    templates add f("groupByTo(map: MutableMap<K, MutableList<T>>, toKey: (T) -> K)") {
         typeParam("K")
+        doc { "Appends elements from original collection grouped by the result of given *toKey* function to the given *map*" }
         returns("Map<K, MutableList<T>>")
         body {
             """
                 for (element in this) {
                     val key = toKey(element)
-                    val list = result.getOrPut(key) { ArrayList<T>() }
+                    val list = map.getOrPut(key) { ArrayList<T>() }
                     list.add(element)
                 }
-                return result
+                return map
             """
         }
     }

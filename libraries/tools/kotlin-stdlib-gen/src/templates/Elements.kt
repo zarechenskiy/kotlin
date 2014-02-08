@@ -5,14 +5,13 @@ import templates.Family.*
 fun elements(): List<GenericFunction> {
     val templates = arrayListOf<GenericFunction>()
 
-    templates add f("indexOf(item: T)") {
-        doc { "Returns first index of item, or -1 if the array does not contain item" }
+    templates add f("indexOf(element: T)") {
+        doc { "Returns first index of *element*, or -1 if the collection does not contain element" }
         returns("Int")
-
         body {
             """
             var index = 0
-            for (element in this) {
+            for (item in this) {
                 if (element == item)
                     return index
                 index++
@@ -23,16 +22,16 @@ fun elements(): List<GenericFunction> {
 
         body(ArraysOfObjects) {
             """
-            if (item == null) {
-                for (i in indices) {
-                    if (this[i] == null) {
-                        return i
+            if (element == null) {
+                for (index in indices) {
+                    if (this[index] == null) {
+                        return index
                     }
                 }
             } else {
-                for (i in indices) {
-                    if (item == this[i]) {
-                        return i
+                for (index in indices) {
+                    if (element == this[index]) {
+                        return index
                     }
                 }
             }
@@ -41,9 +40,9 @@ fun elements(): List<GenericFunction> {
         }
         body(ArraysOfPrimitives) {
             """
-            for (i in indices) {
-                if (item == this[i]) {
-                    return i
+            for (index in indices) {
+                if (element == this[index]) {
+                    return index
                 }
             }
             return -1
@@ -52,7 +51,7 @@ fun elements(): List<GenericFunction> {
     }
 
     templates add f("elementAt(index : Int)") {
-        doc { "Returns element at index" }
+        doc { "Returns element at given *index*" }
         returns("T")
         body {
             """
@@ -65,8 +64,7 @@ fun elements(): List<GenericFunction> {
                 if (index == count++)
                     return element
             }
-            throw IndexOutOfBoundsException("Collection doesn't contain element at index ")
-
+            throw IndexOutOfBoundsException("Collection doesn't contain element at index")
             """
         }
         body(Streams) {
@@ -78,8 +76,7 @@ fun elements(): List<GenericFunction> {
                 if (index == count++)
                     return element
             }
-            throw IndexOutOfBoundsException("Collection doesn't contain element at index ")
-
+            throw IndexOutOfBoundsException("Collection doesn't contain element at index")
             """
         }
         body(Lists, ArraysOfObjects, ArraysOfPrimitives) {
@@ -164,7 +161,7 @@ fun elements(): List<GenericFunction> {
             """
             fun Iterator<T>.first() : T {
                 for (element in this) if (predicate(element)) return element
-                throw IllegalArgumentException("Collection doesn't have matching element")
+                throw IllegalArgumentException("Collection doesn't contain any element matching predicate")
             }
             val iterator = iterator()
             var last = iterator.first()
@@ -203,7 +200,7 @@ fun elements(): List<GenericFunction> {
 
     val bucks = '$'
     templates add f("single()") {
-        doc { "Returns single element" }
+        doc { "Returns single element, or throws exception if there is no or more than one element" }
         returns("T")
         body {
             """
@@ -231,7 +228,7 @@ fun elements(): List<GenericFunction> {
     }
 
     templates add f("single(predicate: (T) -> Boolean)") {
-        doc { "Returns single element matching the given *predicate*" }
+        doc { "Returns single element matching the given *predicate*, or throws exception if there is no or more than one element" }
         returns("T")
         body {
             """
@@ -252,7 +249,7 @@ fun elements(): List<GenericFunction> {
     }
 
     templates add f("singleOrNull(predicate: (T) -> Boolean)") {
-        doc { "Returns single element matching the given *predicate*, or null if element was not found" }
+        doc { "Returns single element matching the given *predicate*, or null if element was not found or more than one elements were found" }
         returns("T?")
         body {
             """

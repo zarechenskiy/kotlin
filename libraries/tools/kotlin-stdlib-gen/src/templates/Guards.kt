@@ -11,7 +11,7 @@ fun guards(): List<GenericFunction> {
     templates add f("requireNoNulls()") {
         include(Lists)
         exclude(ArraysOfPrimitives)
-        doc { "Returns an original Iterable containing all the non-*null* elements, throwing an [[IllegalArgumentException]] if there are any null elements" }
+        doc { "Returns an original collection containing all the non-*null* elements, throwing an [[IllegalArgumentException]] if there are any null elements" }
         typeParam("T:Any")
         toNullableT = true
         returns("SELF")
