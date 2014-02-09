@@ -266,7 +266,7 @@ public fun JetIfExpression.transformToWhen() {
     }
 
     val builder = JetPsiFactory.WhenBuilder()
-    branchIterator(this).forEach { ifExpression ->
+    for (ifExpression in branchIterator(this)) {
         ifExpression.getCondition()?.let { condition ->
             val orBranches = condition.splitToOrBranches()
             if (orBranches.isEmpty()) {
@@ -328,7 +328,7 @@ public fun JetWhenExpression.canMergeWithNext(): Boolean {
         val conditions1 = e1.getConditions()
         val conditions2 = e2.getConditions()
         return conditions1.size == conditions2.size &&
-            (conditions1.iterator() zip conditions2.iterator()).all { pair -> JetPsiMatcher.checkElementMatch(pair.first, pair.second)}
+            (conditions1 zip conditions2).all { pair -> JetPsiMatcher.checkElementMatch(pair.first, pair.second)}
     }
 
     fun JetWhenEntry.declarationNames(): Set<String> =
@@ -353,7 +353,7 @@ public fun JetWhenExpression.canMergeWithNext(): Boolean {
 
     val entries1 = getEntries()
     val entries2 = sibling.getEntries()
-    return entries1.size == entries2.size && (entries1.iterator() zip entries2.iterator()).all { pair ->
+    return entries1.size == entries2.size && (entries1 zip entries2).all { pair ->
         checkConditions(pair.first, pair.second) && checkBodies(pair.first, pair.second)
     }
 }
