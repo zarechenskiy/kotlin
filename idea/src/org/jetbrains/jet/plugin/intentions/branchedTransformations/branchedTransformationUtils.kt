@@ -373,7 +373,7 @@ public fun JetWhenExpression.mergeWithNext() {
     }
 
     val sibling = PsiTreeUtil.skipSiblingsForward(this, javaClass<PsiWhiteSpace>()) as JetWhenExpression
-    for ((entry1, entry2) in getEntries().iterator() zip sibling.getEntries().iterator()) {
+    for ((entry1, entry2) in getEntries() zip sibling.getEntries()) {
         entry1.getExpression() mergeWith entry2.getExpression()
     }
 

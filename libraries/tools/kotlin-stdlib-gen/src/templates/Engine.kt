@@ -12,6 +12,7 @@ enum class Family {
     Iterables
     Collections
     Lists
+    Maps
     ArraysOfObjects
     ArraysOfPrimitives
 }
@@ -33,7 +34,6 @@ class GenericFunction(val signature: String) : Comparable<GenericFunction> {
 
     var toNullableT: Boolean = false
     var makeInline: Boolean = false;
-    private val customReceivers = HashMap<Family, String>()
 
     val buildFamilies = HashSet<Family>(defaultFamilies.toList())
     private val buildPrimitives = HashSet<PrimitiveType>(PrimitiveType.values().toList())
@@ -82,10 +82,6 @@ class GenericFunction(val signature: String) : Comparable<GenericFunction> {
 
     fun returns(r: String) {
         defaultReturnType = r
-    }
-
-    fun Family.customReceiver(r: String) {
-        customReceivers[this] = r
     }
 
     fun typeParam(t: String) {
@@ -141,6 +137,7 @@ class GenericFunction(val signature: String) : Comparable<GenericFunction> {
             Iterables -> "Iterable<T>"
             Collections -> "Collection<T>"
             Lists -> "List<T>"
+            Maps -> "Map<K,V>"
             Streams -> "Stream<T>"
             ArraysOfObjects -> "Array<T>"
             ArraysOfPrimitives -> primitive?.let { it.name() + "Array" } ?: throw IllegalArgumentException("Primitive array should specify primitive type")
@@ -167,7 +164,12 @@ class GenericFunction(val signature: String) : Comparable<GenericFunction> {
                                       PrimitiveType.Float -> "0.0f"
                                       else -> "0"
                                   }
-                                  "T" -> primitive?.name() ?: token
+                                  "T" -> {
+                                      if (f == Maps)
+                                          "Map.Entry<K,V>"
+                                      else
+                                        primitive?.name() ?: token
+                                  }
                                   else -> token
                               })
             }
@@ -178,9 +180,13 @@ class GenericFunction(val signature: String) : Comparable<GenericFunction> {
         fun effectiveTypeParams(): List<String> {
             val types = ArrayList(typeParams)
             if (primitive == null) {
-                if (typeParams.all { !it.startsWith("T") } && !customReceivers.containsKey(f)) {
-                    types.add(0, "T")
+                val implicitTypeParameters = receiver.dropWhile { it != '<' }.drop(1).takeWhile { it != '>' }.split(",")
+                for (implicit in implicitTypeParameters.reverse()) {
+                    if (types.none { it.startsWith(implicit) }) {
+                        types.add(0, implicit)
+                    }
                 }
+
                 return types
             } else {
                 // primitive type arrays should drop constraints
@@ -211,7 +217,7 @@ class GenericFunction(val signature: String) : Comparable<GenericFunction> {
             builder.append(types.makeString(separator = ", ", prefix = "<", postfix = "> ").renderType())
         }
 
-        val receiverType = (customReceivers[f] ?:
+        val receiverType = (
         if (toNullableT) {
             receiver.replace("T>", "T?>")
         } else {

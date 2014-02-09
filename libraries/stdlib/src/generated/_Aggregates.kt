@@ -100,6 +100,15 @@ public fun <T> Iterable<T>.all(predicate: (T) -> Boolean) : Boolean {
 /**
  * Returns *true* if all elements match the given *predicate*
  */
+public fun <K, V> Map<K,V>.all(predicate: (Map.Entry<K,V>) -> Boolean) : Boolean {
+    for (element in this) if (!predicate(element)) return false
+    return true
+    
+}
+
+/**
+ * Returns *true* if all elements match the given *predicate*
+ */
 public fun <T> Stream<T>.all(predicate: (T) -> Boolean) : Boolean {
     for (element in this) if (!predicate(element)) return false
     return true
@@ -199,6 +208,15 @@ public fun <T> Iterable<T>.any(predicate: (T) -> Boolean) : Boolean {
 /**
  * Returns *true* if any element matches the given *predicate*
  */
+public fun <K, V> Map<K,V>.any(predicate: (Map.Entry<K,V>) -> Boolean) : Boolean {
+    for (element in this) if (predicate(element)) return true
+    return false
+    
+}
+
+/**
+ * Returns *true* if any element matches the given *predicate*
+ */
 public fun <T> Stream<T>.any(predicate: (T) -> Boolean) : Boolean {
     for (element in this) if (predicate(element)) return true
     return false
@@ -283,6 +301,13 @@ public fun <T> Iterable<T>.count() : Int {
     for (element in this) count++
     return count
     
+}
+
+/**
+ * Returns the number of elements
+ */
+public fun <K, V> Map<K,V>.count() : Int {
+    return size
 }
 
 /**
@@ -389,6 +414,16 @@ public fun ShortArray.count(predicate: (Short) -> Boolean) : Int {
  * Returns the number of elements matching the given *predicate*
  */
 public fun <T> Iterable<T>.count(predicate: (T) -> Boolean) : Int {
+    var count = 0
+    for (element in this) if (predicate(element)) count++
+    return count
+    
+}
+
+/**
+ * Returns the number of elements matching the given *predicate*
+ */
+public fun <K, V> Map<K,V>.count(predicate: (Map.Entry<K,V>) -> Boolean) : Int {
     var count = 0
     for (element in this) if (predicate(element)) count++
     return count
@@ -721,6 +756,14 @@ public fun ShortArray.forEach(operation: (Short) -> Unit) : Unit {
  * Performs the given *operation* on each element
  */
 public fun <T> Iterable<T>.forEach(operation: (T) -> Unit) : Unit {
+    for (element in this) operation(element)
+    
+}
+
+/**
+ * Performs the given *operation* on each element
+ */
+public fun <K, V> Map<K,V>.forEach(operation: (Map.Entry<K,V>) -> Unit) : Unit {
     for (element in this) operation(element)
     
 }
@@ -1108,6 +1151,27 @@ public fun <R: Comparable<R>, T: Any> Stream<T>.maxBy(f: (T) -> R) : T? {
 }
 
 /**
+ * Returns the first element yielding the largest value of the given function or null if there are no elements
+ */
+public fun <K, V, R: Comparable<R>> Map<K,V>.maxBy(f: (Map.Entry<K,V>) -> R) : Map.Entry<K,V>? {
+    val iterator = iterator()
+    if (!iterator.hasNext()) return null
+    
+    var maxElem = iterator.next()
+    var maxValue = f(maxElem)
+    while (iterator.hasNext()) {
+        val e = iterator.next()
+        val v = f(e)
+        if (maxValue < v) {
+           maxElem = e
+           maxValue = v
+        }
+    }
+    return maxElem
+    
+}
+
+/**
  * Returns the smallest element or null if there are no elements
  */
 public fun <T: Comparable<T>> Array<T>.min() : T? {
@@ -1474,6 +1538,27 @@ public fun <R: Comparable<R>, T: Any> Stream<T>.minBy(f: (T) -> R) : T? {
 }
 
 /**
+ * Returns the first element yielding the smallest value of the given function or null if there are no elements
+ */
+public fun <K, V, R: Comparable<R>> Map<K,V>.minBy(f: (Map.Entry<K,V>) -> R) : Map.Entry<K,V>? {
+    val iterator = iterator()
+    if (!iterator.hasNext()) return null
+    
+    var minElem = iterator.next()
+    var minValue = f(minElem)
+    while (iterator.hasNext()) {
+        val e = iterator.next()
+        val v = f(e)
+        if (minValue > v) {
+           minElem = e
+           minValue = v
+        }
+    }
+    return minElem
+    
+}
+
+/**
  * Returns *true* if no elements match the given *predicate*
  */
 public fun <T> Array<T>.none(predicate: (T) -> Boolean) : Boolean {
@@ -1558,6 +1643,15 @@ public fun ShortArray.none(predicate: (Short) -> Boolean) : Boolean {
  * Returns *true* if no elements match the given *predicate*
  */
 public fun <T> Iterable<T>.none(predicate: (T) -> Boolean) : Boolean {
+    for (element in this) if (predicate(element)) return false
+    return true
+    
+}
+
+/**
+ * Returns *true* if no elements match the given *predicate*
+ */
+public fun <K, V> Map<K,V>.none(predicate: (Map.Entry<K,V>) -> Boolean) : Boolean {
     for (element in this) if (predicate(element)) return false
     return true
     

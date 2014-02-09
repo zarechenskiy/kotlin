@@ -457,6 +457,14 @@ public fun <T> Iterable<T>.filter(predicate: (T)->Boolean) : List<T> {
 }
 
 /**
+ * Returns a list containing all elements matching the given *predicate*
+ */
+public fun <K, V> Map<K,V>.filter(predicate: (Map.Entry<K,V>)->Boolean) : List<Map.Entry<K,V>> {
+    return filterTo(ArrayList<Map.Entry<K,V>>(), predicate)
+    
+}
+
+/**
  * Returns a stream containing all elements matching the given *predicate*
  */
 public fun <T> Stream<T>.filter(predicate: (T)->Boolean) : Stream<T> {
@@ -541,6 +549,14 @@ public fun ShortArray.filterNot(predicate: (Short)->Boolean) : List<Short> {
  */
 public fun <T> Iterable<T>.filterNot(predicate: (T)->Boolean) : List<T> {
     return filterNotTo(ArrayList<T>(), predicate)
+    
+}
+
+/**
+ * Returns a list containing all elements not matching the given *predicate*
+ */
+public fun <K, V> Map<K,V>.filterNot(predicate: (Map.Entry<K,V>)->Boolean) : List<Map.Entry<K,V>> {
+    return filterNotTo(ArrayList<Map.Entry<K,V>>(), predicate)
     
 }
 
@@ -696,6 +712,15 @@ public fun <T, C: MutableCollection<in T>> Iterable<T>.filterNotTo(collection: C
 /**
  * Appends all elements not matching the given *predicate* to the given *collection*
  */
+public fun <K, V, C: MutableCollection<in Map.Entry<K,V>>> Map<K,V>.filterNotTo(collection: C, predicate: (Map.Entry<K,V>) -> Boolean) : C {
+    for (element in this) if (!predicate(element)) collection.add(element)
+    return collection
+    
+}
+
+/**
+ * Appends all elements not matching the given *predicate* to the given *collection*
+ */
 public fun <T, C: MutableCollection<in T>> Stream<T>.filterNotTo(collection: C, predicate: (T) -> Boolean) : C {
     for (element in this) if (!predicate(element)) collection.add(element)
     return collection
@@ -787,6 +812,15 @@ public fun <C: MutableCollection<in Short>> ShortArray.filterTo(collection: C, p
  * Appends all elements matching the given *predicate* into the given *collection*
  */
 public fun <T, C: MutableCollection<in T>> Iterable<T>.filterTo(collection: C, predicate: (T) -> Boolean) : C {
+    for (element in this) if (predicate(element)) collection.add(element)
+    return collection
+    
+}
+
+/**
+ * Appends all elements matching the given *predicate* into the given *collection*
+ */
+public fun <K, V, C: MutableCollection<in Map.Entry<K,V>>> Map<K,V>.filterTo(collection: C, predicate: (Map.Entry<K,V>) -> Boolean) : C {
     for (element in this) if (predicate(element)) collection.add(element)
     return collection
     

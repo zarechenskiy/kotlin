@@ -287,7 +287,7 @@ private fun processDataFlowInfo(dataFlowInfo: DataFlowInfo?, receiver: JetExpres
         }
 
         val nullabilityInfo: Map<DataFlowValue, Nullability> = dataFlowInfo.getCompleteNullabilityInfo()
-        val notNullVariables = nullabilityInfo.iterator()
+        val notNullVariables = nullabilityInfo
                 .filter { it.getValue() == Nullability.NOT_NULL }
                 .map { dataFlowValueToVariable(it.getKey()) }
                 .filterNotNullTo(HashSet<VariableDescriptor>())

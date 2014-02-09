@@ -14,6 +14,7 @@ fun aggregates(): List<GenericFunction> {
             return true
             """
         }
+        include(Maps)
     }
 
     templates add f("none(predicate: (T) -> Boolean)") {
@@ -25,6 +26,7 @@ fun aggregates(): List<GenericFunction> {
             return true
             """
         }
+        include(Maps)
     }
 
     templates add f("any(predicate: (T) -> Boolean)") {
@@ -36,6 +38,7 @@ fun aggregates(): List<GenericFunction> {
             return false
             """
         }
+        include(Maps)
     }
 
     templates add f("count(predicate: (T) -> Boolean)") {
@@ -48,6 +51,7 @@ fun aggregates(): List<GenericFunction> {
             return count
             """
         }
+        include(Maps)
     }
 
     templates add f("count()") {
@@ -60,7 +64,7 @@ fun aggregates(): List<GenericFunction> {
             return count
             """
         }
-        body(Collections, ArraysOfObjects, ArraysOfPrimitives) {
+        body(Maps, Collections, ArraysOfObjects, ArraysOfPrimitives) {
             "return size"
         }
     }
@@ -127,6 +131,31 @@ fun aggregates(): List<GenericFunction> {
             var minValue = f(minElem)
             for (i in 1..lastIndex) {
                 val e = this[i]
+                val v = f(e)
+                if (minValue > v) {
+                   minElem = e
+                   minValue = v
+                }
+            }
+            return minElem
+            """
+        }
+    }
+
+    templates add f("minBy(f: (T) -> R)") {
+        only(Maps)
+        doc { "Returns the first element yielding the smallest value of the given function or null if there are no elements" }
+        typeParam("R: Comparable<R>")
+        returns("T?")
+        body {
+            """
+            val iterator = iterator()
+            if (!iterator.hasNext()) return null
+
+            var minElem = iterator.next()
+            var minValue = f(minElem)
+            while (iterator.hasNext()) {
+                val e = iterator.next()
                 val v = f(e)
                 if (minValue > v) {
                    minElem = e
@@ -213,7 +242,30 @@ fun aggregates(): List<GenericFunction> {
         }
     }
 
+    templates add f("maxBy(f: (T) -> R)") {
+        only(Maps)
+        doc { "Returns the first element yielding the largest value of the given function or null if there are no elements" }
+        typeParam("R: Comparable<R>")
+        returns("T?")
+        body {
+            """
+            val iterator = iterator()
+            if (!iterator.hasNext()) return null
 
+            var maxElem = iterator.next()
+            var maxValue = f(maxElem)
+            while (iterator.hasNext()) {
+                val e = iterator.next()
+                val v = f(e)
+                if (maxValue < v) {
+                   maxElem = e
+                   maxValue = v
+                }
+            }
+            return maxElem
+            """
+        }
+    }
 
     templates add f("fold(initial: R, operation: (R, T) -> R)") {
         doc { "Accumulates value starting with *initial* value and applying *operation* from left to right to current accumulator value and each element" }
@@ -291,6 +343,7 @@ fun aggregates(): List<GenericFunction> {
             for (element in this) operation(element)
             """
         }
+        include(Maps)
     }
 
     return templates

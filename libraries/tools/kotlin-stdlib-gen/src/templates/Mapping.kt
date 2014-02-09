@@ -5,6 +5,26 @@ import templates.Family.*
 fun mapping(): List<GenericFunction> {
     val templates = arrayListOf<GenericFunction>()
 
+    templates add f("withIndices()") {
+        doc { "Returns a list containing pairs of each element of the original collection and their index" }
+        returns("List<Pair<Int, T>>")
+        body {
+            """
+            var index = 0
+            return mapTo(ArrayList<Pair<Int, T>>(), { index++ to it })
+            """
+        }
+
+        returns(Streams) { "Stream<Pair<Int, T>>" }
+        doc(Streams) { "Returns a stream containing pairs of each element of the original collection and their index" }
+        body(Streams) {
+            """
+            var index = 0
+            return TransformingStream(this, { index++ to it })
+            """
+        }
+    }
+
     templates add f("map(transform : (T) -> R)") {
         doc { "Returns a list containing the results of applying the given *transform* function to each element of the original collection" }
         typeParam("R")
@@ -18,7 +38,7 @@ fun mapping(): List<GenericFunction> {
         body(Streams) {
             "return TransformingStream(this, transform) "
         }
-
+        include(Maps)
     }
 
     templates add f("mapTo(collection: C, transform : (T) -> R)") {
@@ -39,6 +59,7 @@ fun mapping(): List<GenericFunction> {
                 return collection
             """
         }
+        include(Maps)
     }
 
     templates add f("flatMap(transform: (T)-> Iterable<R>)") {
@@ -49,6 +70,7 @@ fun mapping(): List<GenericFunction> {
         body {
             "return flatMapTo(ArrayList<R>(), transform)"
         }
+        include(Maps)
     }
 
     templates add f("flatMap(transform: (T)-> Stream<R>)") {
@@ -76,6 +98,7 @@ fun mapping(): List<GenericFunction> {
                 return collection
             """
         }
+        include(Maps)
     }
 
     templates add f("flatMapTo(collection: C, transform: (T) -> Stream<R>)") {
@@ -100,6 +123,7 @@ fun mapping(): List<GenericFunction> {
         typeParam("K")
         returns("Map<K, List<T>>")
         body { "return groupByTo(HashMap<K, MutableList<T>>(), toKey)" }
+        include(Maps)
     }
 
     templates add f("groupByTo(map: MutableMap<K, MutableList<T>>, toKey: (T) -> K)") {
@@ -116,6 +140,7 @@ fun mapping(): List<GenericFunction> {
                 return map
             """
         }
+        include(Maps)
     }
     return templates
 }

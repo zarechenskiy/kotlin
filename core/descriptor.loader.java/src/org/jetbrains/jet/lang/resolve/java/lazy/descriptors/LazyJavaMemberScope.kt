@@ -64,7 +64,7 @@ public abstract class LazyJavaMemberScope(
         ->
         val methods = memberIndex().findMethodsByName(name)
         val functions = LinkedHashSet(
-                methods.iterator()
+                methods
                       // values() and valueOf() are added manually, see LazyJavaClassDescriptor::getClassObjectDescriptor()
                       .filter{ m -> !DescriptorResolverUtils.shouldBeInEnumClassObject(m) }
                       .flatMap {
@@ -72,10 +72,10 @@ public abstract class LazyJavaMemberScope(
                               val function = resolveMethodToFunctionDescriptor(m, true)
                               val samAdapter = JavaFunctionResolver.resolveSamAdapter(function)
                               if (samAdapter != null)
-                                  listOf(function, samAdapter).iterator()
+                                  listOf(function, samAdapter)
                               else
-                                  listOf(function).iterator()
-                      }.toList())
+                                  listOf(function)
+                      })
 
         if (_containingDeclaration is JavaPackageFragmentDescriptor) {
             val klass = c.javaDescriptorResolver.resolveClass(_containingDeclaration.getFqName().child(name))

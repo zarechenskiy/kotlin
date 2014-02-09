@@ -79,16 +79,6 @@ public fun <K,V> Map<K,V>.iterator(): Iterator<Map.Entry<K,V>> {
 }
 
 /**
- * Transforms each [[Map.Entry]] in this [[Map]] with the given *transform* function and
- * adds each return value to the given *results* collection
- */
-public inline fun <K,V,R, C: MutableCollection<in R>> Map<K,V>.mapTo(result: C, transform: (Map.Entry<K,V>) -> R) : C {
-  for (item in this)
-    result.add(transform(item))
-  return result
-}
-
-/**
  * Populates the given *result* [[Map]] with the value returned by applying the *transform* function on each [[Map.Entry]] in this [[Map]]
  */
 public inline fun <K,V,R,C: MutableMap<K,R>> Map<K,V>.mapValuesTo(result: C, transform : (Map.Entry<K,V>) -> R) : C {
@@ -114,15 +104,6 @@ public fun <K,V> MutableMap<K,V>.putAll(vararg values: Pair<K, V>): Unit {
 public fun <K,V> Map<K,V>.toMap(map: MutableMap<K,V>): Map<K,V> {
     map.putAll(this)
     return map
-}
-
-/**
- * Returns a new List containing the results of applying the given *transform* function to each [[Map.Entry]] in this [[Map]]
- *
- * @includeFunctionBody ../../test/CollectionTest.kt map
- */
-public inline fun <K,V,R> Map<K,V>.map(transform: (Map.Entry<K,V>) -> R) : List<R> {
-    return mapTo(java.util.ArrayList<R>(this.size), transform)
 }
 
 /**
