@@ -82,5 +82,43 @@ fun generators(): List<GenericFunction> {
         }
     }
 
+    templates add f("zip(collection: Iterable<R>)") {
+        exclude(Streams)
+        doc {
+            """
+            Returns a list of pairs built from elements of both collections with same indexes. List has length of shortest collection.
+            """
+        }
+        typeParam("R")
+        returns("List<Pair<T,R>>")
+        body {
+            """
+                val first = iterator()
+                val second = collection.iterator()
+                val list = ArrayList<Pair<T,R>>()
+                while (first.hasNext() && second.hasNext()) {
+                    list.add(first.next() to second.next())
+                }
+                return list
+            """
+        }
+    }
+
+    templates add f("zip(stream: Stream<R>)") {
+        only(Streams)
+        doc {
+            """
+            Returns a stream of pairs built from elements of both collections with same indexes. List has length of shortest collection.
+            """
+        }
+        typeParam("R")
+        returns("Stream<Pair<T,R>>")
+        body {
+            """
+                return ZippingStream(this, stream)
+            """
+        }
+    }
+
     return templates
 }
