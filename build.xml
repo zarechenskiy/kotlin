@@ -651,7 +651,7 @@
 
         <cleandir dir="${output}/classes/j2k"/>
 
-        <kotlinc output="${output}/classes/j2k">
+        <kotlinc output="${output}/classes/j2k" stdlib="${snapshot.runtime}">
             <src path="${basedir}/j2k/src"/>
             <classpath path="${snapshot.compiler.home}/lib/kotlin-compiler.jar"/>
         </kotlinc>
