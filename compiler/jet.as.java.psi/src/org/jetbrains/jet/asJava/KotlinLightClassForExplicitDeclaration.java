@@ -84,7 +84,7 @@ public class KotlinLightClassForExplicitDeclaration extends KotlinWrappingLightC
 
     private static String getJvmInternalName(JetClassOrObject classOrObject) {
         if (JetPsiUtil.isLocal(classOrObject)) {
-            LightClassData data = getLightClassDataExactly(classOrObject);
+            LightClassDataForKotlinClass data = getLightClassDataExactly(classOrObject);
             return data != null ? data.getJvmInternalName() : "";
         }
         return PsiCodegenPredictor.getPredefinedJvmInternalName(classOrObject);
@@ -387,7 +387,7 @@ public class KotlinLightClassForExplicitDeclaration extends KotlinWrappingLightC
     @Override
     public PsiModifierList getModifierList() {
         if (modifierList == null) {
-            modifierList = new KotlinLightModifierList(KotlinLightClassForExplicitDeclaration.this.computeModifiers());
+            modifierList = new KotlinLightModifierList(computeModifiers());
         }
         return modifierList;
     }

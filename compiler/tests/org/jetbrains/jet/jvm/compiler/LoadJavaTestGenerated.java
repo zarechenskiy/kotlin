@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2013 JetBrains s.r.o.
+ * Copyright 2010-2014 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,6 +57,26 @@ public class LoadJavaTestGenerated extends AbstractLoadJavaTest {
         @TestMetadata("PackageLocalVisibility.java")
         public void testPackageLocalVisibility() throws Exception {
             doTestCompiledJava("compiler/testData/loadJava/compiledJava/PackageLocalVisibility.java");
+        }
+        
+        @TestMetadata("RawTypeWithUpperBound.java")
+        public void testRawTypeWithUpperBound() throws Exception {
+            doTestCompiledJava("compiler/testData/loadJava/compiledJava/RawTypeWithUpperBound.java");
+        }
+        
+        @TestMetadata("RawUpperBound.java")
+        public void testRawUpperBound() throws Exception {
+            doTestCompiledJava("compiler/testData/loadJava/compiledJava/RawUpperBound.java");
+        }
+        
+        @TestMetadata("RecursiveRawUpperBound.java")
+        public void testRecursiveRawUpperBound() throws Exception {
+            doTestCompiledJava("compiler/testData/loadJava/compiledJava/RecursiveRawUpperBound.java");
+        }
+        
+        @TestMetadata("RecursiveWildcardUpperBound.java")
+        public void testRecursiveWildcardUpperBound() throws Exception {
+            doTestCompiledJava("compiler/testData/loadJava/compiledJava/RecursiveWildcardUpperBound.java");
         }
         
         @TestMetadata("SubclassFromNested.java")

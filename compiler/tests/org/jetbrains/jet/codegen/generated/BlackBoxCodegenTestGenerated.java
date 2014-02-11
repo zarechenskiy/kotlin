@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2013 JetBrains s.r.o.
+ * Copyright 2010-2014 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2544,6 +2544,11 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
             doTest("compiler/testData/codegen/box/finally/kt3549.kt");
         }
         
+        @TestMetadata("kt3706.kt")
+        public void testKt3706() throws Exception {
+            doTest("compiler/testData/codegen/box/finally/kt3706.kt");
+        }
+        
         @TestMetadata("kt3867.kt")
         public void testKt3867() throws Exception {
             doTest("compiler/testData/codegen/box/finally/kt3867.kt");
@@ -2557,6 +2562,11 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
         @TestMetadata("kt3894.kt")
         public void testKt3894() throws Exception {
             doTest("compiler/testData/codegen/box/finally/kt3894.kt");
+        }
+        
+        @TestMetadata("kt4134.kt")
+        public void testKt4134() throws Exception {
+            doTest("compiler/testData/codegen/box/finally/kt4134.kt");
         }
         
         @TestMetadata("loopAndFinally.kt")
@@ -4255,6 +4265,11 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
         @TestMetadata("kt3576.kt")
         public void testKt3576() throws Exception {
             doTest("compiler/testData/codegen/box/primitiveTypes/kt3576.kt");
+        }
+        
+        @TestMetadata("kt4097.kt")
+        public void testKt4097() throws Exception {
+            doTest("compiler/testData/codegen/box/primitiveTypes/kt4097.kt");
         }
         
         @TestMetadata("kt4098.kt")

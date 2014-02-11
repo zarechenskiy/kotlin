@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2013 JetBrains s.r.o.
+ * Copyright 2010-2014 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -4556,6 +4556,11 @@ public class JetDiagnosticsTestGenerated extends AbstractJetDiagnosticsTest {
             @TestMetadata("mutableIterator.kt")
             public void testMutableIterator() throws Exception {
                 doTest("compiler/testData/diagnostics/tests/j+k/mutableIterator.kt");
+            }
+            
+            @TestMetadata("overrideRawType.kt")
+            public void testOverrideRawType() throws Exception {
+                doTest("compiler/testData/diagnostics/tests/j+k/overrideRawType.kt");
             }
             
             @TestMetadata("OverrideVararg.kt")

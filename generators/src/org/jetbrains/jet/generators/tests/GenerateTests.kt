@@ -57,6 +57,7 @@ import org.jetbrains.jet.plugin.highlighter.AbstractHighlightingTest
 import org.jetbrains.jet.plugin.folding.AbstractKotlinFoldingTest
 import org.jetbrains.jet.plugin.codeInsight.surroundWith.AbstractSurroundWithTest
 import org.jetbrains.jet.plugin.intentions.AbstractCodeTransformationTest
+import org.jetbrains.jet.plugin.AbstractSmartSelectionTest
 import org.jetbrains.jet.plugin.hierarchy.AbstractHierarchyTest
 import org.jetbrains.jet.plugin.codeInsight.moveUpDown.AbstractCodeMoverTest
 import org.jetbrains.jet.plugin.refactoring.inline.AbstractInlineTest
@@ -90,6 +91,7 @@ import org.jetbrains.jet.completion.AbstractCompiledKotlinInJavaCompletionTest
 import org.jetbrains.jet.completion.AbstractKotlinSourceInJavaCompletionTest
 import org.jetbrains.jet.plugin.intentions.AbstractIntentionTest
 import org.jetbrains.jet.checkers.AbstractJetDiagnosticsTestWithStdLib
+import org.jetbrains.jet.plugin.codeInsight.AbstractInsertImportOnPasteTest
 
 fun main(args: Array<String>) {
     System.setProperty("java.awt.headless", "true")
@@ -441,8 +443,13 @@ fun main(args: Array<String>) {
             model("copyPaste/conversion", extension = "java")
         }
 
+        testClass(javaClass<AbstractInsertImportOnPasteTest>()) {
+            model("copyPaste/imports", pattern = """^([^\.]+)\.kt$""", testMethod = "doTestCopy", testClassName = "Copy", recursive = false)
+            model("copyPaste/imports", pattern = """^([^\.]+)\.kt$""", testMethod = "doTestCut", testClassName = "Cut", recursive = false)
+        }
+
         testClass(javaClass<AbstractShortenRefsTest>()) {
-            model("shortenRefs")
+            model("shortenRefs", pattern = """^([^\.]+)\.kt$""")
         }
 
         testClass(javaClass<AbstractCompiledKotlinInJavaCompletionTest>()) {
@@ -451,6 +458,10 @@ fun main(args: Array<String>) {
 
         testClass(javaClass<AbstractKotlinSourceInJavaCompletionTest>()) {
             model("completion/injava", extension = "java")
+        }
+
+        testClass(javaClass<AbstractSmartSelectionTest>()) {
+            model("smartSelection", testMethod = "doTestSmartSelection", pattern = """^([^\.]+)\.kt$""")
         }
     }
 

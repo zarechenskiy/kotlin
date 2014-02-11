@@ -23,13 +23,14 @@ import org.jetbrains.jet.codegen.ClassFileFactory;
 import org.jetbrains.jet.codegen.intrinsics.IntrinsicMethods;
 import org.jetbrains.jet.codegen.state.GenerationState;
 import org.jetbrains.jet.codegen.state.JetTypeMapper;
+import org.jetbrains.jet.context.GlobalContext;
+import org.jetbrains.jet.context.GlobalContextImpl;
 import org.jetbrains.jet.di.DependencyInjectorGenerator;
 import org.jetbrains.jet.di.GivenExpression;
 import org.jetbrains.jet.di.InjectorForTopDownAnalyzer;
 import org.jetbrains.jet.lang.PlatformToKotlinClassMap;
 import org.jetbrains.jet.lang.descriptors.ModuleDescriptor;
 import org.jetbrains.jet.lang.descriptors.ModuleDescriptorImpl;
-import org.jetbrains.jet.lang.psi.JetImportsFactory;
 import org.jetbrains.jet.lang.resolve.*;
 import org.jetbrains.jet.lang.resolve.calls.CallResolver;
 import org.jetbrains.jet.lang.resolve.calls.CallResolverExtensionProvider;
@@ -39,12 +40,10 @@ import org.jetbrains.jet.lang.resolve.java.mapping.JavaToKotlinClassMap;
 import org.jetbrains.jet.lang.resolve.java.resolver.*;
 import org.jetbrains.jet.lang.resolve.kotlin.VirtualFileFinder;
 import org.jetbrains.jet.lang.resolve.lazy.ResolveSession;
-import org.jetbrains.jet.lang.resolve.lazy.ScopeProvider;
+import org.jetbrains.jet.lang.resolve.lazy.declarations.DeclarationProviderFactory;
 import org.jetbrains.jet.lang.types.DependencyClassByQualifiedNameResolverDummyImpl;
 import org.jetbrains.jet.lang.types.expressions.ExpressionTypingServices;
 import org.jetbrains.jet.lang.types.lang.KotlinBuiltIns;
-import org.jetbrains.jet.storage.LockBasedStorageManager;
-import org.jetbrains.jet.storage.LockBasedStorageManagerWithExceptionTracking;
 import org.jetbrains.jet.storage.StorageManager;
 
 import java.io.IOException;
@@ -52,7 +51,7 @@ import java.util.Arrays;
 import java.util.List;
 
 // NOTE: After making changes, you need to re-generate the injectors.
-//       To do that, you can run either this class
+//       To do that, you can run main in this class.
 public class GenerateInjectors {
 
     private GenerateInjectors() {
@@ -86,19 +85,19 @@ public class GenerateInjectors {
 
     private static DependencyInjectorGenerator generateInjectorForLazyResolve() throws IOException {
         DependencyInjectorGenerator generator = new DependencyInjectorGenerator();
+
         generator.addParameter(Project.class);
-        generator.addParameter(ResolveSession.class);
-        generator.addParameter(ModuleDescriptor.class);
-        generator.addPublicField(DescriptorResolver.class);
-        generator.addPublicField(ExpressionTypingServices.class);
-        generator.addPublicField(TypeResolver.class);
-        generator.addPublicField(ScopeProvider.class);
-        generator.addPublicField(AnnotationResolver.class);
-        generator.addPublicField(QualifiedExpressionResolver.class);
-        generator.addPublicField(JetImportsFactory.class);
+        generator.addParameter(GlobalContextImpl.class);
+        generator.addParameter(ModuleDescriptorImpl.class);
+        generator.addParameter(DeclarationProviderFactory.class);
+        generator.addParameter(BindingTrace.class);
+
+        generator.addPublicField(ResolveSession.class);
+
         generator.addField(CallResolverExtensionProvider.class);
-        generator.addField(false, PlatformToKotlinClassMap.class, null, new GivenExpression("moduleDescriptor.getPlatformToKotlinClassMap()"));
         generator.addField(false, StorageManager.class, null, new GivenExpression("resolveSession.getStorageManager()"));
+        generator.addField(false, PlatformToKotlinClassMap.class, null, new GivenExpression("moduleDescriptor.getPlatformToKotlinClassMap()"));
+
         generator.configure("compiler/frontend/src", "org.jetbrains.jet.di", "InjectorForLazyResolve", GenerateInjectors.class);
         return generator;
     }
@@ -136,7 +135,7 @@ public class GenerateInjectors {
         generator.addField(PsiBasedMethodSignatureChecker.class);
         generator.addField(PsiBasedExternalAnnotationResolver.class);
         generator.addField(MutablePackageFragmentProvider.class);
-        generator.addField(JavaPackageFragmentProviderImpl.class);
+        generator.addField(false, JavaPackageFragmentProvider.class, null, new GivenExpression("javaDescriptorResolver.getPackageFragmentProvider()"));
         generator.addField(false, VirtualFileFinder.class, "virtualFileFinder",
                            new GivenExpression(
                                    VirtualFileFinder.class.getName() + ".SERVICE.getInstance(project)"));
@@ -153,7 +152,8 @@ public class GenerateInjectors {
         generator.addParameter(BindingTrace.class);
 
         // Fields
-        generator.addField(true, LockBasedStorageManagerWithExceptionTracking.class, "storageManager", null);
+        generator.addField(true, GlobalContextImpl.class, null, new GivenExpression("org.jetbrains.jet.context.ContextPackage.GlobalContext()"));
+        generator.addField(false, StorageManager.class, null, new GivenExpression("globalContext.getStorageManager()"));
         generator.addPublicField(JavaClassFinderImpl.class);
         generator.addField(TraceBasedExternalSignatureResolver.class);
         generator.addField(TraceBasedJavaResolverCache.class);
@@ -161,7 +161,7 @@ public class GenerateInjectors {
         generator.addField(PsiBasedMethodSignatureChecker.class);
         generator.addField(PsiBasedExternalAnnotationResolver.class);
         generator.addPublicField(JavaDescriptorResolver.class);
-        generator.addField(JavaPackageFragmentProviderImpl.class);
+        generator.addField(false, JavaPackageFragmentProvider.class, null, new GivenExpression("javaDescriptorResolver.getPackageFragmentProvider()"));
         generator.addField(false, VirtualFileFinder.class, "virtualFileFinder",
                            new GivenExpression(VirtualFileFinder.class.getName() + ".SERVICE.getInstance(project)"));
         generator.addField(true, ModuleDescriptorImpl.class, "module",
@@ -185,7 +185,7 @@ public class GenerateInjectors {
 
         // Parameters
         generator.addPublicParameter(Project.class);
-        generator.addPublicParameter(TopDownAnalysisParameters.class);
+        generator.addParameter(TopDownAnalysisParameters.class);
         generator.addPublicParameter(BindingTrace.class);
         generator.addPublicParameter(ModuleDescriptorImpl.class);
         return generator;
@@ -197,7 +197,8 @@ public class GenerateInjectors {
         // Fields
         generator.addPublicField(ExpressionTypingServices.class);
         generator.addField(CallResolverExtensionProvider.class);
-        generator.addField(LockBasedStorageManager.class);
+        generator.addField(false, GlobalContext.class, null, new GivenExpression("org.jetbrains.jet.context.ContextPackage.GlobalContext()"));
+        generator.addField(false, StorageManager.class, null, new GivenExpression("globalContext.getStorageManager()"));
         generator.addField(false, PlatformToKotlinClassMap.class, null, new GivenExpression("moduleDescriptor.getPlatformToKotlinClassMap()"));
 
         // Parameters
@@ -217,9 +218,10 @@ public class GenerateInjectors {
         generator.addPublicField(TypeResolver.class);
         generator.addPublicField(CallResolver.class);
         generator.addField(CallResolverExtensionProvider.class);
-        generator.addField(LockBasedStorageManager.class);
+        generator.addField(false, StorageManager.class, null, new GivenExpression("globalContext.getStorageManager()"));
         generator.addField(true, KotlinBuiltIns.class, null, new GivenExpression("KotlinBuiltIns.getInstance()"));
         generator.addField(false, PlatformToKotlinClassMap.class, null, new GivenExpression("moduleDescriptor.getPlatformToKotlinClassMap()"));
+        generator.addField(false, GlobalContext.class, null, new GivenExpression("org.jetbrains.jet.context.ContextPackage.GlobalContext()"));
 
         // Parameters
         generator.addPublicParameter(Project.class);
@@ -239,6 +241,8 @@ public class GenerateInjectors {
         generator.addPublicParameter(Project.class);
 
         // Fields
+        generator.addField(false, GlobalContext.class, null,
+                           new GivenExpression("org.jetbrains.jet.context.ContextPackage.GlobalContext()"));
         generator.addField(false, BindingTrace.class, "bindingTrace",
                            new GivenExpression("jetTypeMapper.getBindingTrace()"));
         generator.addField(false, BindingContext.class, "bindingContext",
@@ -263,7 +267,7 @@ public class GenerateInjectors {
 
         // Parameters
         generator.addPublicParameter(Project.class);
-        generator.addPublicParameter(TopDownAnalysisParameters.class);
+        generator.addParameter(TopDownAnalysisParameters.class);
         generator.addPublicParameter(BindingTrace.class);
         generator.addPublicParameter(BodiesResolveContext.class);
         generator.addParameter(ModuleDescriptor.class);

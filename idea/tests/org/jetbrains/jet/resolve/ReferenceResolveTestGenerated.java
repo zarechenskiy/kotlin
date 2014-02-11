@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2013 JetBrains s.r.o.
+ * Copyright 2010-2014 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -135,6 +135,11 @@ public class ReferenceResolveTestGenerated extends AbstractReferenceResolveTest 
     @TestMetadata("InSecondClassObject.kt")
     public void testInSecondClassObject() throws Exception {
         doTest("idea/testData/resolve/references/InSecondClassObject.kt");
+    }
+    
+    @TestMetadata("JavaReference.kt")
+    public void testJavaReference() throws Exception {
+        doTest("idea/testData/resolve/references/JavaReference.kt");
     }
     
     @TestMetadata("PackageReference.kt")

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2013 JetBrains s.r.o.
+ * Copyright 2010-2014 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1174,6 +1174,11 @@ public class CodeTransformationTestGenerated extends AbstractCodeTransformationT
         @TestMetadata("unnecessaryParentheses7.kt")
         public void testUnnecessaryParentheses7() throws Exception {
             doTestRemoveUnnecessaryParentheses("idea/testData/intentions/removeUnnecessaryParentheses/unnecessaryParentheses7.kt");
+        }
+        
+        @TestMetadata("unnecessaryParentheses8.kt")
+        public void testUnnecessaryParentheses8() throws Exception {
+            doTestRemoveUnnecessaryParentheses("idea/testData/intentions/removeUnnecessaryParentheses/unnecessaryParentheses8.kt");
         }
         
     }
