@@ -35,7 +35,7 @@ import kotlin.test.assertEquals
 public class NoErrorsInStdlibTest: LightCodeInsightFixtureTestCase() {
     public fun testNoErrors() {
         val orderEntries = ModuleRootManager.getInstance(myModule!!)!!.getOrderEntries()
-        val orderEntry = orderEntries.find { it.getPresentableName() == JetJdkAndLibraryProjectDescriptor.LIBRARY_NAME }!!
+        val orderEntry = orderEntries.firstOrNull { it.getPresentableName() == JetJdkAndLibraryProjectDescriptor.LIBRARY_NAME }!!
         val root = orderEntry.getFiles(OrderRootType.SOURCES)[0]
 
         val psiManager = getPsiManager() // workaround for KT-3974 IllegalAccessError when accessing protected method inherited by outer class
