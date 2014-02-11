@@ -10,3 +10,7 @@ public fun <T> MutableCollection<in T>.addAll(iterable: Iterable<T>): Unit {
 public fun <T> MutableCollection<in T>.addAll(stream: Stream<T>): Unit {
     for (e in stream) add(e)
 }
+
+public fun <T> MutableCollection<in T>.addAll(array: Array<T>): Unit {
+    for (e in array) add(e)
+}

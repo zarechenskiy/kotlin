@@ -10,7 +10,7 @@ import java.util.*
 /**
  * Returns a list with elements in reversed order
  */
-public fun <T> Array<T>.reverse() : List<T> {
+public fun <T> Array<out T>.reverse() : List<T> {
     val list = toArrayList()
     Collections.reverse(list)
     return list
@@ -121,7 +121,7 @@ public fun <T: Comparable<T>> Iterable<T>.sort() : List<T> {
 /**
  * Returns a list of all elements, sorted by the specified *comparator*
  */
-public fun <T> Array<T>.sortBy(comparator : Comparator<T>) : List<T> {
+public fun <T> Array<out T>.sortBy(comparator : Comparator<T>) : List<T> {
     val sortedList = toArrayList()
     java.util.Collections.sort(sortedList, comparator)
     return sortedList
@@ -141,7 +141,7 @@ public fun <T> Iterable<T>.sortBy(comparator : Comparator<T>) : List<T> {
 /**
  * Returns a list of all elements, sorted by results of specified *order* function.
  */
-public fun <T, R: Comparable<R>> Array<T>.sortBy(order: (T) -> R) : List<T> {
+public fun <T, R: Comparable<R>> Array<out T>.sortBy(order: (T) -> R) : List<T> {
     val sortedList = toArrayList()
     val sortBy: Comparator<T> = comparator<T> {(x: T, y: T) -> order(x).compareTo(order(y))}
     java.util.Collections.sort(sortedList, sortBy)

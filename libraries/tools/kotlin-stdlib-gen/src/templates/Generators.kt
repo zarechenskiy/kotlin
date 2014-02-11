@@ -42,6 +42,20 @@ fun generators(): List<GenericFunction> {
         }
     }
 
+    templates add f("plus(array: Array<T>)") {
+        exclude(Streams)
+        doc { "Returns a list containing all elements of original collection and then all elements of the given *collection*" }
+        returns("List<T>")
+
+        body {
+            """
+                val answer = toArrayList()
+                answer.addAll(array)
+                return answer
+            """
+        }
+    }
+
     templates add f("plus(stream: Stream<T>)") {
         only(Streams)
         doc { "Returns a stream containing all elements of original stream and then all elements of the given *stream*" }
@@ -95,6 +109,28 @@ fun generators(): List<GenericFunction> {
             """
                 val first = iterator()
                 val second = collection.iterator()
+                val list = ArrayList<Pair<T,R>>()
+                while (first.hasNext() && second.hasNext()) {
+                    list.add(first.next() to second.next())
+                }
+                return list
+            """
+        }
+    }
+
+    templates add f("zip(array: Array<R>)") {
+        exclude(Streams)
+        doc {
+            """
+            Returns a list of pairs built from elements of both collections with same indexes. List has length of shortest collection.
+            """
+        }
+        typeParam("R")
+        returns("List<Pair<T,R>>")
+        body {
+            """
+                val first = iterator()
+                val second = array.iterator()
                 val list = ArrayList<Pair<T,R>>()
                 while (first.hasNext() && second.hasNext()) {
                     list.add(first.next() to second.next())

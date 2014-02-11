@@ -10,7 +10,7 @@ import java.util.*
 /**
  * Returns *true* if all elements match the given *predicate*
  */
-public fun <T> Array<T>.all(predicate: (T) -> Boolean) : Boolean {
+public fun <T> Array<out T>.all(predicate: (T) -> Boolean) : Boolean {
     for (element in this) if (!predicate(element)) return false
     return true
     
@@ -118,7 +118,7 @@ public fun <T> Stream<T>.all(predicate: (T) -> Boolean) : Boolean {
 /**
  * Returns *true* if any element matches the given *predicate*
  */
-public fun <T> Array<T>.any(predicate: (T) -> Boolean) : Boolean {
+public fun <T> Array<out T>.any(predicate: (T) -> Boolean) : Boolean {
     for (element in this) if (predicate(element)) return true
     return false
     
@@ -226,7 +226,7 @@ public fun <T> Stream<T>.any(predicate: (T) -> Boolean) : Boolean {
 /**
  * Returns the number of elements
  */
-public fun <T> Array<T>.count() : Int {
+public fun <T> Array<out T>.count() : Int {
     return size
 }
 
@@ -323,7 +323,7 @@ public fun <T> Stream<T>.count() : Int {
 /**
  * Returns the number of elements matching the given *predicate*
  */
-public fun <T> Array<T>.count(predicate: (T) -> Boolean) : Int {
+public fun <T> Array<out T>.count(predicate: (T) -> Boolean) : Int {
     var count = 0
     for (element in this) if (predicate(element)) count++
     return count
@@ -443,7 +443,7 @@ public fun <T> Stream<T>.count(predicate: (T) -> Boolean) : Int {
 /**
  * Accumulates value starting with *initial* value and applying *operation* from left to right to current accumulator value and each element
  */
-public fun <T, R> Array<T>.fold(initial: R, operation: (R, T) -> R) : R {
+public fun <T, R> Array<out T>.fold(initial: R, operation: (R, T) -> R) : R {
     var accumulator = initial
     for (element in this) accumulator = operation(accumulator, element)
     return accumulator
@@ -553,7 +553,7 @@ public fun <T, R> Stream<T>.fold(initial: R, operation: (R, T) -> R) : R {
 /**
  * Accumulates value starting with *initial* value and applying *operation* from right to left to each element and current accumulator value
  */
-public fun <T, R> Array<T>.foldRight(initial: R, operation: (T, R) -> R) : R {
+public fun <T, R> Array<out T>.foldRight(initial: R, operation: (T, R) -> R) : R {
     var index = size - 1
     var accumulator = initial
     while (index >= 0) {
@@ -683,7 +683,7 @@ public fun <T, R> List<T>.foldRight(initial: R, operation: (T, R) -> R) : R {
 /**
  * Performs the given *operation* on each element
  */
-public fun <T> Array<T>.forEach(operation: (T) -> Unit) : Unit {
+public fun <T> Array<out T>.forEach(operation: (T) -> Unit) : Unit {
     for (element in this) operation(element)
     
 }
@@ -779,7 +779,7 @@ public fun <T> Stream<T>.forEach(operation: (T) -> Unit) : Unit {
 /**
  * Returns the largest element or null if there are no elements
  */
-public fun <T: Comparable<T>> Array<T>.max() : T? {
+public fun <T: Comparable<T>> Array<out T>.max() : T? {
     if (isEmpty()) return null
     
     var max = this[0]
@@ -931,7 +931,7 @@ public fun <T: Comparable<T>> Stream<T>.max() : T? {
 /**
  * Returns the first element yielding the largest value of the given function or null if there are no elements
  */
-public fun <R: Comparable<R>, T: Any> Array<T>.maxBy(f: (T) -> R) : T? {
+public fun <R: Comparable<R>, T: Any> Array<out T>.maxBy(f: (T) -> R) : T? {
     if (isEmpty()) return null
     
     var maxElem = this[0]
@@ -1174,7 +1174,7 @@ public fun <K, V, R: Comparable<R>> Map<K,V>.maxBy(f: (Map.Entry<K,V>) -> R) : M
 /**
  * Returns the smallest element or null if there are no elements
  */
-public fun <T: Comparable<T>> Array<T>.min() : T? {
+public fun <T: Comparable<T>> Array<out T>.min() : T? {
     if (isEmpty()) return null
     var min = this[0]
     for (i in 1..lastIndex) {
@@ -1318,7 +1318,7 @@ public fun <T: Comparable<T>> Stream<T>.min() : T? {
 /**
  * Returns the first element yielding the smallest value of the given function or null if there are no elements
  */
-public fun <R: Comparable<R>, T: Any> Array<T>.minBy(f: (T) -> R) : T? {
+public fun <R: Comparable<R>, T: Any> Array<out T>.minBy(f: (T) -> R) : T? {
     if (size == 0) return null
     
     var minElem = this[0]
@@ -1561,7 +1561,7 @@ public fun <K, V, R: Comparable<R>> Map<K,V>.minBy(f: (Map.Entry<K,V>) -> R) : M
 /**
  * Returns *true* if no elements match the given *predicate*
  */
-public fun <T> Array<T>.none(predicate: (T) -> Boolean) : Boolean {
+public fun <T> Array<out T>.none(predicate: (T) -> Boolean) : Boolean {
     for (element in this) if (predicate(element)) return false
     return true
     
@@ -1669,7 +1669,7 @@ public fun <T> Stream<T>.none(predicate: (T) -> Boolean) : Boolean {
 /**
  * Accumulates value starting with the first element and applying *operation* from left to right to current accumulator value and each element
  */
-public fun <T> Array<T>.reduce(operation: (T, T) -> T) : T {
+public fun <T> Array<out T>.reduce(operation: (T, T) -> T) : T {
     val iterator = this.iterator()
     if (!iterator.hasNext()) throw UnsupportedOperationException("Empty iterable can't be reduced")
     
@@ -1834,7 +1834,7 @@ public fun <T> Stream<T>.reduce(operation: (T, T) -> T) : T {
 /**
  * Accumulates value starting with last element and applying *operation* from right to left to each element and current accumulator value
  */
-public fun <T> Array<T>.reduceRight(operation: (T, T) -> T) : T {
+public fun <T> Array<out T>.reduceRight(operation: (T, T) -> T) : T {
     var index = size - 1
     if (index < 0) throw UnsupportedOperationException("Empty iterable can't be reduced")
     

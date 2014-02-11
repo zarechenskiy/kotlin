@@ -10,7 +10,7 @@ import java.util.*
 /**
  * Returns element at given *index*
  */
-public fun <T> Array<T>.elementAt(index : Int) : T {
+public fun <T> Array<out T>.elementAt(index : Int) : T {
     return get(index)
     
 }
@@ -122,7 +122,7 @@ public fun <T> Stream<T>.elementAt(index : Int) : T {
 /**
  * Returns first element
  */
-public fun <T> Array<T>.first() : T {
+public fun <T> Array<out T>.first() : T {
     return this[0]
     
 }
@@ -224,7 +224,7 @@ public fun <T> Stream<T>.first() : T {
 /**
  * Returns first element matching the given *predicate*
  */
-public fun <T> Array<T>.first(predicate: (T) -> Boolean) : T {
+public fun <T> Array<out T>.first(predicate: (T) -> Boolean) : T {
     for (element in this) if (predicate(element)) return element
     throw IllegalArgumentException("No element matching predicate was found")
     
@@ -323,7 +323,7 @@ public fun <T> Stream<T>.first(predicate: (T) -> Boolean) : T {
 /**
  * Returns first element matching the given *predicate*, or *null* if element was not found
  */
-public fun <T> Array<T>.firstOrNull(predicate: (T) -> Boolean) : T? {
+public fun <T> Array<out T>.firstOrNull(predicate: (T) -> Boolean) : T? {
     for (element in this) if (predicate(element)) return element
     return null
     
@@ -422,7 +422,7 @@ public fun <T> Stream<T>.firstOrNull(predicate: (T) -> Boolean) : T? {
 /**
  * Returns first index of *element*, or -1 if the collection does not contain element
  */
-public fun <T> Array<T>.indexOf(element: T) : Int {
+public fun <T> Array<out T>.indexOf(element: T) : Int {
     if (element == null) {
         for (index in indices) {
             if (this[index] == null) {
@@ -575,7 +575,7 @@ public fun <T> Stream<T>.indexOf(element: T) : Int {
 /**
  * Returns last element
  */
-public fun <T> Array<T>.last() : T {
+public fun <T> Array<out T>.last() : T {
     if (size == 0)
         throw IllegalArgumentException("Collection is empty")
     return this[size - 1]
@@ -713,7 +713,7 @@ public fun <T> Stream<T>.last() : T {
 /**
  * Returns last element matching the given *predicate*
  */
-public fun <T> Array<T>.last(predicate: (T) -> Boolean) : T {
+public fun <T> Array<out T>.last(predicate: (T) -> Boolean) : T {
     fun Iterator<T>.first() : T {
         for (element in this) if (predicate(element)) return element
         throw IllegalArgumentException("Collection doesn't contain any element matching predicate")
@@ -922,7 +922,7 @@ public fun <T> Stream<T>.last(predicate: (T) -> Boolean) : T {
 /**
  * Returns last element matching the given *predicate*, or null if element was not found
  */
-public fun <T> Array<T>.lastOrNull(predicate: (T) -> Boolean) : T? {
+public fun <T> Array<out T>.lastOrNull(predicate: (T) -> Boolean) : T? {
     fun Iterator<T>.first() : T? {
         for (element in this) if (predicate(element)) return element
         return null
@@ -1153,7 +1153,7 @@ public fun <T> Stream<T>.lastOrNull(predicate: (T) -> Boolean) : T? {
 /**
  * Returns single element, or throws exception if there is no or more than one element
  */
-public fun <T> Array<T>.single() : T {
+public fun <T> Array<out T>.single() : T {
     if (size != 1)
         throw IllegalArgumentException("Collection has $size elements")
     return this[0]
@@ -1281,7 +1281,7 @@ public fun <T> Stream<T>.single() : T {
 /**
  * Returns single element matching the given *predicate*, or throws exception if there is no or more than one element
  */
-public fun <T> Array<T>.single(predicate: (T) -> Boolean) : T {
+public fun <T> Array<out T>.single(predicate: (T) -> Boolean) : T {
     fun Iterator<T>.first() : T {
         for (element in this) if (predicate(element)) return element
         throw IllegalArgumentException("Collection doesn't have matching element")
@@ -1490,7 +1490,7 @@ public fun <T> Stream<T>.single(predicate: (T) -> Boolean) : T {
 /**
  * Returns single element matching the given *predicate*, or null if element was not found or more than one elements were found
  */
-public fun <T> Array<T>.singleOrNull(predicate: (T) -> Boolean) : T? {
+public fun <T> Array<out T>.singleOrNull(predicate: (T) -> Boolean) : T? {
     fun Iterator<T>.first() : T? {
         for (element in this) if (predicate(element)) return element
         return null

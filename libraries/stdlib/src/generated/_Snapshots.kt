@@ -10,7 +10,7 @@ import java.util.*
 /**
  * Returns an ArrayList of all elements
  */
-public fun <T> Array<T>.toArrayList() : ArrayList<T> {
+public fun <T> Array<out T>.toArrayList() : ArrayList<T> {
     val list = ArrayList<T>(size)
     for (item in this) list.add(item)
     return list
@@ -114,7 +114,7 @@ public fun <T> Stream<T>.toArrayList() : ArrayList<T> {
 /**
  * Appends all elements to the given *collection*
  */
-public fun <T, C : MutableCollection<in T>> Array<T>.toCollection(collection : C) : C {
+public fun <T, C : MutableCollection<in T>> Array<out T>.toCollection(collection : C) : C {
     for (item in this) {
         collection.add(item)
     }
@@ -235,7 +235,7 @@ public fun <T, C : MutableCollection<in T>> Stream<T>.toCollection(collection : 
 /**
  * Returns a LinkedList containing all elements
  */
-public fun <T> Array<T>.toLinkedList() : LinkedList<T> {
+public fun <T> Array<out T>.toLinkedList() : LinkedList<T> {
     return toCollection(LinkedList<T>())
 }
 
@@ -312,7 +312,7 @@ public fun <T> Stream<T>.toLinkedList() : LinkedList<T> {
 /**
  * Returns a List containing all elements
  */
-public fun <T> Array<T>.toList() : List<T> {
+public fun <T> Array<out T>.toList() : List<T> {
     return toCollection(ArrayList<T>())
 }
 
@@ -413,7 +413,7 @@ public fun <T> Stream<T>.toList() : List<T> {
 /**
  * Returns a Set of all elements
  */
-public fun <T> Array<T>.toSet() : Set<T> {
+public fun <T> Array<out T>.toSet() : Set<T> {
     return toCollection(LinkedHashSet<T>())
 }
 
@@ -490,7 +490,7 @@ public fun <T> Stream<T>.toSet() : Set<T> {
 /**
  * Returns a sorted list of all elements
  */
-public fun <T: Comparable<T>> Array<T>.toSortedList() : List<T> {
+public fun <T: Comparable<T>> Array<out T>.toSortedList() : List<T> {
     return toArrayList().sort()
 }
 
@@ -567,7 +567,7 @@ public fun <T: Comparable<T>> Stream<T>.toSortedList() : List<T> {
 /**
  * Returns a SortedSet of all elements
  */
-public fun <T> Array<T>.toSortedSet() : SortedSet<T> {
+public fun <T> Array<out T>.toSortedSet() : SortedSet<T> {
     return toCollection(TreeSet<T>())
 }
 

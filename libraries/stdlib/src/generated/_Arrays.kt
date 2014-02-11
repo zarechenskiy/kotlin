@@ -10,7 +10,7 @@ import java.util.*
 /**
  * Returns true if the array is empty
  */
-public fun <T> Array<T>.isEmpty() : Boolean {
+public fun <T> Array<out T>.isEmpty() : Boolean {
     return size == 0
 }
 
@@ -73,7 +73,7 @@ public fun ShortArray.isEmpty() : Boolean {
 /**
  * Returns true if the array is not empty
  */
-public fun <T> Array<T>.isNotEmpty() : Boolean {
+public fun <T> Array<out T>.isNotEmpty() : Boolean {
     return !isEmpty()
 }
 

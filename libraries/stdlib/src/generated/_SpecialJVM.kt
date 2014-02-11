@@ -10,7 +10,7 @@ import java.util.*
 /**
  * Returns a list containing all elements that are instances of specified class
  */
-public fun <T, R: T> Array<T>.filterIsInstance(klass: Class<R>) : List<R> {
+public fun <T, R: T> Array<out T>.filterIsInstance(klass: Class<R>) : List<R> {
     return filterIsInstanceTo(ArrayList<R>(), klass)
     
 }
@@ -34,7 +34,7 @@ public fun <T, R: T> Stream<T>.filterIsInstance(klass: Class<R>) : Stream<T> {
 /**
  * Appends all elements that are instances of specified class into the given *collection*
  */
-public fun <T, C: MutableCollection<in R>, R: T> Array<T>.filterIsInstanceTo(collection: C, klass: Class<R>) : C {
+public fun <T, C: MutableCollection<in R>, R: T> Array<out T>.filterIsInstanceTo(collection: C, klass: Class<R>) : C {
     for (element in this) if (klass.isInstance(element)) collection.add(element as R)
     return collection
     

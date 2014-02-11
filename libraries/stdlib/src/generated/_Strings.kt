@@ -12,7 +12,7 @@ import java.util.*
  * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
  * a special *truncated* separator (which defaults to "..."
  */
-public fun <T> Array<T>.appendString(buffer: Appendable, separator: String = ", ", prefix: String ="", postfix: String = "", limit: Int = -1, truncated: String = "...") : Unit {
+public fun <T> Array<out T>.appendString(buffer: Appendable, separator: String = ", ", prefix: String ="", postfix: String = "", limit: Int = -1, truncated: String = "...") : Unit {
     buffer.append(prefix)
     var count = 0
     for (element in this) {
@@ -232,7 +232,7 @@ public fun <T> Stream<T>.appendString(buffer: Appendable, separator: String = ",
  * If a collection could be huge you can specify a non-negative value of *limit* which will only show a subset of the collection then it will
  * a special *truncated* separator (which defaults to "..."
  */
-public fun <T> Array<T>.makeString(separator: String = ", ", prefix: String = "", postfix: String = "", limit: Int = -1, truncated: String = "...") : String {
+public fun <T> Array<out T>.makeString(separator: String = ", ", prefix: String = "", postfix: String = "", limit: Int = -1, truncated: String = "...") : String {
     val buffer = StringBuilder()
     appendString(buffer, separator, prefix, postfix, limit, truncated)
     return buffer.toString()

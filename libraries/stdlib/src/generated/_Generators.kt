@@ -12,7 +12,7 @@ import java.util.*
  * where *first* collection contains elements for which predicate yielded *true*,
  * while *second* collection contains elements for which predicate yielded *false*
  */
-public fun <T> Array<T>.partition(predicate: (T) -> Boolean) : Pair<List<T>, List<T>> {
+public fun <T> Array<out T>.partition(predicate: (T) -> Boolean) : Pair<List<T>, List<T>> {
     val first = ArrayList<T>()
     val second = ArrayList<T>()
     for (element in this) {
@@ -219,7 +219,107 @@ public fun <T> Stream<T>.partition(predicate: (T) -> Boolean) : Pair<List<T>, Li
 /**
  * Returns a list containing all elements of original collection and then all elements of the given *collection*
  */
-public fun <T> Array<T>.plus(collection: Iterable<T>) : List<T> {
+public fun <T> Array<out T>.plus(array: Array<T>) : List<T> {
+    val answer = toArrayList()
+    answer.addAll(array)
+    return answer
+    
+}
+
+/**
+ * Returns a list containing all elements of original collection and then all elements of the given *collection*
+ */
+public fun BooleanArray.plus(array: Array<Boolean>) : List<Boolean> {
+    val answer = toArrayList()
+    answer.addAll(array)
+    return answer
+    
+}
+
+/**
+ * Returns a list containing all elements of original collection and then all elements of the given *collection*
+ */
+public fun ByteArray.plus(array: Array<Byte>) : List<Byte> {
+    val answer = toArrayList()
+    answer.addAll(array)
+    return answer
+    
+}
+
+/**
+ * Returns a list containing all elements of original collection and then all elements of the given *collection*
+ */
+public fun CharArray.plus(array: Array<Char>) : List<Char> {
+    val answer = toArrayList()
+    answer.addAll(array)
+    return answer
+    
+}
+
+/**
+ * Returns a list containing all elements of original collection and then all elements of the given *collection*
+ */
+public fun DoubleArray.plus(array: Array<Double>) : List<Double> {
+    val answer = toArrayList()
+    answer.addAll(array)
+    return answer
+    
+}
+
+/**
+ * Returns a list containing all elements of original collection and then all elements of the given *collection*
+ */
+public fun FloatArray.plus(array: Array<Float>) : List<Float> {
+    val answer = toArrayList()
+    answer.addAll(array)
+    return answer
+    
+}
+
+/**
+ * Returns a list containing all elements of original collection and then all elements of the given *collection*
+ */
+public fun IntArray.plus(array: Array<Int>) : List<Int> {
+    val answer = toArrayList()
+    answer.addAll(array)
+    return answer
+    
+}
+
+/**
+ * Returns a list containing all elements of original collection and then all elements of the given *collection*
+ */
+public fun LongArray.plus(array: Array<Long>) : List<Long> {
+    val answer = toArrayList()
+    answer.addAll(array)
+    return answer
+    
+}
+
+/**
+ * Returns a list containing all elements of original collection and then all elements of the given *collection*
+ */
+public fun ShortArray.plus(array: Array<Short>) : List<Short> {
+    val answer = toArrayList()
+    answer.addAll(array)
+    return answer
+    
+}
+
+/**
+ * Returns a list containing all elements of original collection and then all elements of the given *collection*
+ */
+public fun <T> Iterable<T>.plus(array: Array<T>) : List<T> {
+    val answer = toArrayList()
+    answer.addAll(array)
+    return answer
+    
+}
+
+/**
+ * Returns a list containing all elements of original collection and then all elements of the given *collection*
+ */
+public fun <T> Array<out T>.plus(collection: Iterable<T>) : List<T> {
     val answer = toArrayList()
     answer.addAll(collection)
     return answer
@@ -319,7 +419,7 @@ public fun <T> Iterable<T>.plus(collection: Iterable<T>) : List<T> {
 /**
  * Returns a list containing all elements of original collection and then the given element
  */
-public fun <T> Array<T>.plus(element: T) : List<T> {
+public fun <T> Array<out T>.plus(element: T) : List<T> {
     val answer = toArrayList()
     answer.add(element)
     return answer
@@ -439,7 +539,147 @@ public fun <T> Stream<T>.plus(stream: Stream<T>) : Stream<T> {
 /**
  * Returns a list of pairs built from elements of both collections with same indexes. List has length of shortest collection.
  */
-public fun <T, R> Array<T>.zip(collection: Iterable<R>) : List<Pair<T,R>> {
+public fun <T, R> Array<out T>.zip(array: Array<R>) : List<Pair<T,R>> {
+    val first = iterator()
+    val second = array.iterator()
+    val list = ArrayList<Pair<T,R>>()
+    while (first.hasNext() && second.hasNext()) {
+        list.add(first.next() to second.next())
+    }
+    return list
+    
+}
+
+/**
+ * Returns a list of pairs built from elements of both collections with same indexes. List has length of shortest collection.
+ */
+public fun <R> BooleanArray.zip(array: Array<R>) : List<Pair<Boolean,R>> {
+    val first = iterator()
+    val second = array.iterator()
+    val list = ArrayList<Pair<Boolean,R>>()
+    while (first.hasNext() && second.hasNext()) {
+        list.add(first.next() to second.next())
+    }
+    return list
+    
+}
+
+/**
+ * Returns a list of pairs built from elements of both collections with same indexes. List has length of shortest collection.
+ */
+public fun <R> ByteArray.zip(array: Array<R>) : List<Pair<Byte,R>> {
+    val first = iterator()
+    val second = array.iterator()
+    val list = ArrayList<Pair<Byte,R>>()
+    while (first.hasNext() && second.hasNext()) {
+        list.add(first.next() to second.next())
+    }
+    return list
+    
+}
+
+/**
+ * Returns a list of pairs built from elements of both collections with same indexes. List has length of shortest collection.
+ */
+public fun <R> CharArray.zip(array: Array<R>) : List<Pair<Char,R>> {
+    val first = iterator()
+    val second = array.iterator()
+    val list = ArrayList<Pair<Char,R>>()
+    while (first.hasNext() && second.hasNext()) {
+        list.add(first.next() to second.next())
+    }
+    return list
+    
+}
+
+/**
+ * Returns a list of pairs built from elements of both collections with same indexes. List has length of shortest collection.
+ */
+public fun <R> DoubleArray.zip(array: Array<R>) : List<Pair<Double,R>> {
+    val first = iterator()
+    val second = array.iterator()
+    val list = ArrayList<Pair<Double,R>>()
+    while (first.hasNext() && second.hasNext()) {
+        list.add(first.next() to second.next())
+    }
+    return list
+    
+}
+
+/**
+ * Returns a list of pairs built from elements of both collections with same indexes. List has length of shortest collection.
+ */
+public fun <R> FloatArray.zip(array: Array<R>) : List<Pair<Float,R>> {
+    val first = iterator()
+    val second = array.iterator()
+    val list = ArrayList<Pair<Float,R>>()
+    while (first.hasNext() && second.hasNext()) {
+        list.add(first.next() to second.next())
+    }
+    return list
+    
+}
+
+/**
+ * Returns a list of pairs built from elements of both collections with same indexes. List has length of shortest collection.
+ */
+public fun <R> IntArray.zip(array: Array<R>) : List<Pair<Int,R>> {
+    val first = iterator()
+    val second = array.iterator()
+    val list = ArrayList<Pair<Int,R>>()
+    while (first.hasNext() && second.hasNext()) {
+        list.add(first.next() to second.next())
+    }
+    return list
+    
+}
+
+/**
+ * Returns a list of pairs built from elements of both collections with same indexes. List has length of shortest collection.
+ */
+public fun <R> LongArray.zip(array: Array<R>) : List<Pair<Long,R>> {
+    val first = iterator()
+    val second = array.iterator()
+    val list = ArrayList<Pair<Long,R>>()
+    while (first.hasNext() && second.hasNext()) {
+        list.add(first.next() to second.next())
+    }
+    return list
+    
+}
+
+/**
+ * Returns a list of pairs built from elements of both collections with same indexes. List has length of shortest collection.
+ */
+public fun <R> ShortArray.zip(array: Array<R>) : List<Pair<Short,R>> {
+    val first = iterator()
+    val second = array.iterator()
+    val list = ArrayList<Pair<Short,R>>()
+    while (first.hasNext() && second.hasNext()) {
+        list.add(first.next() to second.next())
+    }
+    return list
+    
+}
+
+/**
+ * Returns a list of pairs built from elements of both collections with same indexes. List has length of shortest collection.
+ */
+public fun <T, R> Iterable<T>.zip(array: Array<R>) : List<Pair<T,R>> {
+    val first = iterator()
+    val second = array.iterator()
+    val list = ArrayList<Pair<T,R>>()
+    while (first.hasNext() && second.hasNext()) {
+        list.add(first.next() to second.next())
+    }
+    return list
+    
+}
+
+/**
+ * Returns a list of pairs built from elements of both collections with same indexes. List has length of shortest collection.
+ */
+public fun <T, R> Array<out T>.zip(collection: Iterable<R>) : List<Pair<T,R>> {
     val first = iterator()
     val second = collection.iterator()
     val list = ArrayList<Pair<T,R>>()

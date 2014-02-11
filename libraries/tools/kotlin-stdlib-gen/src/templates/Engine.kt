@@ -221,8 +221,12 @@ class GenericFunction(val signature: String) : Comparable<GenericFunction> {
         if (toNullableT) {
             receiver.replace("T>", "T?>")
         } else {
-            receiver
+            if (receiver == "Array<T>")
+                "Array<out T>"
+            else
+                receiver
         }).renderType()
+
 
         builder.append(receiverType)
         builder.append(".${signature.renderType()} : ${returnType.renderType()} {")

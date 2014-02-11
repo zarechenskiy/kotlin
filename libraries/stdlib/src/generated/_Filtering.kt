@@ -10,7 +10,7 @@ import java.util.*
 /**
  * Returns a list containing all elements except first *n* elements
  */
-public fun <T> Array<T>.drop(n: Int) : List<T> {
+public fun <T> Array<out T>.drop(n: Int) : List<T> {
     if (n >= size)
         return ArrayList<T>()
     
@@ -192,7 +192,7 @@ public fun <T> Stream<T>.drop(n: Int) : Stream<T> {
 /**
  * Returns a list containing all elements except first elements that satisfy the given *predicate*
  */
-public fun <T> Array<T>.dropWhile(predicate: (T)->Boolean) : List<T> {
+public fun <T> Array<out T>.dropWhile(predicate: (T)->Boolean) : List<T> {
     var yielding = false
     val list = ArrayList<T>()
     for (item in this)
@@ -379,7 +379,7 @@ public fun <T> Stream<T>.dropWhile(predicate: (T)->Boolean) : Stream<T> {
 /**
  * Returns a list containing all elements matching the given *predicate*
  */
-public fun <T> Array<T>.filter(predicate: (T)->Boolean) : List<T> {
+public fun <T> Array<out T>.filter(predicate: (T)->Boolean) : List<T> {
     return filterTo(ArrayList<T>(), predicate)
     
 }
@@ -475,7 +475,7 @@ public fun <T> Stream<T>.filter(predicate: (T)->Boolean) : Stream<T> {
 /**
  * Returns a list containing all elements not matching the given *predicate*
  */
-public fun <T> Array<T>.filterNot(predicate: (T)->Boolean) : List<T> {
+public fun <T> Array<out T>.filterNot(predicate: (T)->Boolean) : List<T> {
     return filterNotTo(ArrayList<T>(), predicate)
     
 }
@@ -622,7 +622,7 @@ public fun <C: MutableCollection<in T>, T: Any> Stream<T?>.filterNotNullTo(colle
 /**
  * Appends all elements not matching the given *predicate* to the given *collection*
  */
-public fun <T, C: MutableCollection<in T>> Array<T>.filterNotTo(collection: C, predicate: (T) -> Boolean) : C {
+public fun <T, C: MutableCollection<in T>> Array<out T>.filterNotTo(collection: C, predicate: (T) -> Boolean) : C {
     for (element in this) if (!predicate(element)) collection.add(element)
     return collection
     
@@ -730,7 +730,7 @@ public fun <T, C: MutableCollection<in T>> Stream<T>.filterNotTo(collection: C, 
 /**
  * Appends all elements matching the given *predicate* into the given *collection*
  */
-public fun <T, C: MutableCollection<in T>> Array<T>.filterTo(collection: C, predicate: (T) -> Boolean) : C {
+public fun <T, C: MutableCollection<in T>> Array<out T>.filterTo(collection: C, predicate: (T) -> Boolean) : C {
     for (element in this) if (predicate(element)) collection.add(element)
     return collection
     
@@ -838,7 +838,7 @@ public fun <T, C: MutableCollection<in T>> Stream<T>.filterTo(collection: C, pre
 /**
  * Returns a list containing first *n* elements
  */
-public fun <T> Array<T>.take(n: Int) : List<T> {
+public fun <T> Array<out T>.take(n: Int) : List<T> {
     var count = 0
     val realN = if (n > size) size else n
     val list = ArrayList<T>(realN)
@@ -1020,7 +1020,7 @@ public fun <T> Stream<T>.take(n: Int) : Stream<T> {
 /**
  * Returns a list containing first elements satisfying the given *predicate*
  */
-public fun <T> Array<T>.takeWhile(predicate: (T)->Boolean) : List<T> {
+public fun <T> Array<out T>.takeWhile(predicate: (T)->Boolean) : List<T> {
     val list = ArrayList<T>()
     for (item in this) {
          if(!predicate(item))

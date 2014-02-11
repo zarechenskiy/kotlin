@@ -10,7 +10,7 @@ import java.util.*
 /**
  * Returns a single list of all elements yielded from results of *transform* function being invoked on each element of original collection
  */
-public fun <T, R> Array<T>.flatMap(transform: (T)-> Iterable<R>) : List<R> {
+public fun <T, R> Array<out T>.flatMap(transform: (T)-> Iterable<R>) : List<R> {
     return flatMapTo(ArrayList<R>(), transform)
 }
 
@@ -94,7 +94,7 @@ public fun <T, R> Stream<T>.flatMap(transform: (T)-> Stream<R>) : Stream<R> {
 /**
  * Appends all elements yielded from results of *transform* function being invoked on each element of original collection, to the given *collection*
  */
-public fun <T, R, C: MutableCollection<in R>> Array<T>.flatMapTo(collection: C, transform: (T) -> Iterable<R>) : C {
+public fun <T, R, C: MutableCollection<in R>> Array<out T>.flatMapTo(collection: C, transform: (T) -> Iterable<R>) : C {
     for (element in this) {
         val list = transform(element)
         collection.addAll(list)
@@ -238,7 +238,7 @@ public fun <T, R, C: MutableCollection<in R>> Stream<T>.flatMapTo(collection: C,
 /**
  * Returns a map of the elements in original collection grouped by the result of given *toKey* function
  */
-public fun <T, K> Array<T>.groupBy(toKey: (T) -> K) : Map<K, List<T>> {
+public fun <T, K> Array<out T>.groupBy(toKey: (T) -> K) : Map<K, List<T>> {
     return groupByTo(HashMap<K, MutableList<T>>(), toKey)
 }
 
@@ -322,7 +322,7 @@ public fun <T, K> Stream<T>.groupBy(toKey: (T) -> K) : Map<K, List<T>> {
 /**
  * Appends elements from original collection grouped by the result of given *toKey* function to the given *map*
  */
-public fun <T, K> Array<T>.groupByTo(map: MutableMap<K, MutableList<T>>, toKey: (T) -> K) : Map<K, MutableList<T>> {
+public fun <T, K> Array<out T>.groupByTo(map: MutableMap<K, MutableList<T>>, toKey: (T) -> K) : Map<K, MutableList<T>> {
     for (element in this) {
         val key = toKey(element)
         val list = map.getOrPut(key) { ArrayList<T>() }
@@ -478,7 +478,7 @@ public fun <T, K> Stream<T>.groupByTo(map: MutableMap<K, MutableList<T>>, toKey:
 /**
  * Returns a list containing the results of applying the given *transform* function to each element of the original collection
  */
-public fun <T, R> Array<T>.map(transform : (T) -> R) : List<R> {
+public fun <T, R> Array<out T>.map(transform : (T) -> R) : List<R> {
     return mapTo(ArrayList<R>(), transform)
 }
 
@@ -563,7 +563,7 @@ public fun <T, R> Stream<T>.map(transform : (T) -> R) : Stream<R> {
  * Appends transformed elements of original collection using the given *transform* function
  * to the given *collection*
  */
-public fun <T, R, C: MutableCollection<in R>> Array<T>.mapTo(collection: C, transform : (T) -> R) : C {
+public fun <T, R, C: MutableCollection<in R>> Array<out T>.mapTo(collection: C, transform : (T) -> R) : C {
     for (item in this)
         collection.add(transform(item))
     return collection
@@ -694,7 +694,7 @@ public fun <T, R, C: MutableCollection<in R>> Stream<T>.mapTo(collection: C, tra
 /**
  * Returns a list containing pairs of each element of the original collection and their index
  */
-public fun <T> Array<T>.withIndices() : List<Pair<Int, T>> {
+public fun <T> Array<out T>.withIndices() : List<Pair<Int, T>> {
     var index = 0
     return mapTo(ArrayList<Pair<Int, T>>(), { index++ to it })
     

@@ -62,7 +62,7 @@ public fun Iterable<Float>.sum() : Float {
 /**
  * Returns the sum of all elements in the collection
  */
-public fun Array<Int>.sum() : Int {
+public fun Array<out Int>.sum() : Int {
     val iterator = iterator()
     var sum : Int = 0
     while (iterator.hasNext()) {
@@ -88,7 +88,7 @@ public fun IntArray.sum() : Int {
 /**
  * Returns the sum of all elements in the collection
  */
-public fun Array<Long>.sum() : Long {
+public fun Array<out Long>.sum() : Long {
     val iterator = iterator()
     var sum : Long = 0
     while (iterator.hasNext()) {
@@ -114,7 +114,7 @@ public fun LongArray.sum() : Long {
 /**
  * Returns the sum of all elements in the collection
  */
-public fun Array<Byte>.sum() : Int {
+public fun Array<out Byte>.sum() : Int {
     val iterator = iterator()
     var sum : Int = 0
     while (iterator.hasNext()) {
@@ -140,7 +140,7 @@ public fun ByteArray.sum() : Int {
 /**
  * Returns the sum of all elements in the collection
  */
-public fun Array<Short>.sum() : Int {
+public fun Array<out Short>.sum() : Int {
     val iterator = iterator()
     var sum : Int = 0
     while (iterator.hasNext()) {
@@ -166,7 +166,7 @@ public fun ShortArray.sum() : Int {
 /**
  * Returns the sum of all elements in the collection
  */
-public fun Array<Double>.sum() : Double {
+public fun Array<out Double>.sum() : Double {
     val iterator = iterator()
     var sum : Double = 0.0
     while (iterator.hasNext()) {
@@ -192,7 +192,7 @@ public fun DoubleArray.sum() : Double {
 /**
  * Returns the sum of all elements in the collection
  */
-public fun Array<Float>.sum() : Float {
+public fun Array<out Float>.sum() : Float {
     val iterator = iterator()
     var sum : Float = 0.0f
     while (iterator.hasNext()) {
