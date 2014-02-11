@@ -98,7 +98,7 @@ fun <T: PsiElement> PsiElement.replaced(newElement: T): T = replace(newElement) 
 
 fun JetElement.blockExpressionsOrSingle(): Iterable<JetElement> =
         if (this is JetBlockExpression) getStatements() else listOf(this)
-`
+
 fun JetElement.outermostLastBlockElement(predicate: (JetElement) -> Boolean = { true }): JetElement? {
     return JetPsiUtil.getOutermostLastBlockElement(this) { e -> e != null && predicate(e) }
 }
