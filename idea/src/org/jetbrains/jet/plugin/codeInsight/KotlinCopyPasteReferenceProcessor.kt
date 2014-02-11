@@ -102,7 +102,7 @@ public class KotlinCopyPasteReferenceProcessor() : CopyPastePostProcessor<Refere
             return null
         }
 
-        val collectedData = zip(startOffsets, endOffsets).toList().flatMap {
+        val collectedData = zip(startOffsets, endOffsets).flatMap {
             val (startOffset, endOffset) = it
             CollectHighlightsUtil.getElementsInRange(file, startOffset, endOffset).flatMap { element ->
                 collectReferenceDataFromElement(element, file, startOffset, startOffsets, endOffsets)
@@ -360,9 +360,9 @@ public class KotlinCopyPasteReferenceProcessor() : CopyPastePostProcessor<Refere
 private val ReferenceData.fqName: FqName
     get() = FqName(qClassName!!)
 
-private fun zip(first: IntArray, second: IntArray): Iterator<Pair<Int, Int>> {
+private fun zip(first: IntArray, second: IntArray): List<Pair<Int, Int>> {
     assert(first.size == second.size)
-    return first.iterator().zip(second.iterator())
+    return first.zip(second.toList())
 }
 
 private fun PsiElement.isInCopiedArea(fileCopiedFrom: JetFile, startOffsets: IntArray, endOffsets: IntArray): Boolean {

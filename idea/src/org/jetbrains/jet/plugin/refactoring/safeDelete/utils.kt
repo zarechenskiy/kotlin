@@ -54,7 +54,7 @@ fun PsiElement.removeOverrideModifier() {
             (this as JetModifierListOwner).getModifierList()?.getModifier(JetTokens.OVERRIDE_KEYWORD)?.delete()
         }
         is PsiMethod -> {
-            getModifierList().getAnnotations().find {
+            getModifierList().getAnnotations().firstOrNull {
                 annotation -> annotation.getQualifiedName() == "java.lang.Override"
             }?.delete()
         }
@@ -64,7 +64,7 @@ fun PsiElement.removeOverrideModifier() {
 fun PsiMethod.cleanUpOverrides() {
     val superMethods = findSuperMethods(true)
     for (overridingMethod in OverridingMethodsSearch.search(this, true).findAll()) {
-        val currentSuperMethods = overridingMethod.findSuperMethods(true).iterator() + superMethods.iterator()
+        val currentSuperMethods = overridingMethod.findSuperMethods(true) + superMethods
         if (currentSuperMethods.all { superMethod -> superMethod.unwrapped == unwrapped }) {
             overridingMethod.unwrapped?.removeOverrideModifier()
         }

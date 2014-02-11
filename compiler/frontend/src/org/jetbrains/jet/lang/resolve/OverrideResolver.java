@@ -278,11 +278,11 @@ public class OverrideResolver {
     public static void collectMissingImplementations(
             ClassDescriptor classDescriptor, Set<CallableMemberDescriptor> abstractNoImpl, Set<CallableMemberDescriptor> manyImpl
     ) {
-        Iterator<CallableMemberDescriptor> callableMembers = KotlinPackage.filterIsInstance(
-                classDescriptor.getDefaultType().getMemberScope().getAllDescriptors().iterator(), CallableMemberDescriptor.class
+        List<CallableMemberDescriptor> callableMembers = KotlinPackage.filterIsInstance(
+                classDescriptor.getDefaultType().getMemberScope().getAllDescriptors(), CallableMemberDescriptor.class
         );
-        while (callableMembers.hasNext()) {
-            collectMissingImplementations(callableMembers.next(), abstractNoImpl, manyImpl);
+        for (CallableMemberDescriptor member : callableMembers) {
+            collectMissingImplementations(member, abstractNoImpl, manyImpl);
         }
     }
 
