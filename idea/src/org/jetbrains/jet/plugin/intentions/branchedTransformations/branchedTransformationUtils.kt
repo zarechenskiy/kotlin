@@ -325,8 +325,8 @@ public fun JetWhenExpression.canMergeWithNext(): Boolean {
     fun checkConditions(e1: JetWhenEntry, e2: JetWhenEntry): Boolean {
         if (e1.isElse() != e2.isElse()) return false
 
-        val conditions1 = e1.getConditions()
-        val conditions2 = e2.getConditions()
+        val conditions1 = e1.getConditions().toList()
+        val conditions2 = e2.getConditions().toList()
         return conditions1.size == conditions2.size &&
             (conditions1 zip conditions2).all { pair -> JetPsiMatcher.checkElementMatch(pair.first, pair.second)}
     }
@@ -335,7 +335,7 @@ public fun JetWhenExpression.canMergeWithNext(): Boolean {
             getExpression()?.blockExpressionsOrSingle()
                     ?.filterIsInstance(javaClass<JetNamedDeclaration>())
                     ?.map { decl -> decl.getName() }
-                    ?.filterNotNull()?.toHashSet() ?: Collections.emptySet<String>()
+                    ?.filterNotNull()?.toSet() ?: Collections.emptySet<String>()
 
     fun checkBodies(e1: JetWhenEntry, e2: JetWhenEntry): Boolean {
         if (ContainerUtil.intersects(e1.declarationNames(), e2.declarationNames())) return false
