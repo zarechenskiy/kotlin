@@ -118,6 +118,7 @@ public abstract class Config {
             "/kotlin/Arrays.kt",
             "/kotlin/Maps.kt",
             "/kotlin/Exceptions.kt",
+            "/kotlin/MutableCollections.kt",
             "/kotlin/Functions.kt",
             "/generated/_Aggregates.kt",
             "/generated/_Arrays.kt",
