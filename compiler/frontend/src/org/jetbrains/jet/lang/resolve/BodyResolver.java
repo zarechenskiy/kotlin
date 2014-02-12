@@ -571,8 +571,6 @@ public class BodyResolver {
                 scope, propertyDescriptor.getTypeParameters(), NO_RECEIVER_PARAMETER, trace);
         JetType expectedTypeForInitializer = property.getTypeRef() != null ? propertyDescriptor.getType() : NO_EXPECTED_TYPE;
         expressionTypingServices.getType(propertyDeclarationInnerScope, initializer, expectedTypeForInitializer, context.getOuterDataFlowInfo(), trace);
-
-        EvaluatePackage.recordCompileTimeValueForInitializerIfNeeded(propertyDescriptor, initializer, expectedTypeForInitializer, trace);
     }
 
     @NotNull

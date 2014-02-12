@@ -2,14 +2,17 @@
 package test
 
 import testOther.some
+import testOther.A
 
-val normal: Int = 1
-val fromImported: Int = some
+val normal: A = A()
+val fromImported: A = some
 
 // FILE: fileDependencyRecursionOther.kt
 package testOther
 
 import test.normal
 
-val some: Int = 1
-val fromImported: Int = normal
+val some: A = A()
+val fromImported: A = normal
+
+class A

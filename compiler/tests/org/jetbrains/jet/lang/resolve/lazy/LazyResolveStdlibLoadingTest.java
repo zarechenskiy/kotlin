@@ -21,14 +21,18 @@ import org.jetbrains.jet.JetTestUtils;
 import org.jetbrains.jet.KotlinTestWithEnvironmentManagement;
 import org.jetbrains.jet.TestJdkKind;
 import org.jetbrains.jet.cli.jvm.compiler.JetCoreEnvironment;
+import org.jetbrains.jet.jvm.compiler.ExpectedLoadErrorsUtil;
 import org.jetbrains.jet.lang.descriptors.ModuleDescriptor;
 import org.jetbrains.jet.lang.descriptors.PackageViewDescriptor;
 import org.jetbrains.jet.lang.psi.JetFile;
 import org.jetbrains.jet.lang.resolve.name.FqName;
 import org.jetbrains.jet.lang.resolve.name.Name;
+import org.jetbrains.jet.renderer.DescriptorRenderer;
+import org.jetbrains.jet.renderer.DescriptorRendererBuilder;
 import org.jetbrains.jet.test.util.RecursiveDescriptorComparator;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -54,7 +58,18 @@ public class LazyResolveStdlibLoadingTest extends KotlinTestWithEnvironmentManag
         for (Name name : packageShortNames) {
             PackageViewDescriptor eager = module.getPackage(FqName.topLevel(name));
             PackageViewDescriptor lazy = lazyModule.getPackage(FqName.topLevel(name));
-            RecursiveDescriptorComparator.validateAndCompareDescriptors(eager, lazy, RecursiveDescriptorComparator.RECURSIVE, null);
+
+            RecursiveDescriptorComparator.Configuration configuration =
+                    RecursiveDescriptorComparator.RECURSIVE.withRenderer(
+                            new DescriptorRendererBuilder()
+                                    .setWithDefinedIn(false)
+                                    .setExcludedAnnotationClasses(Arrays.asList(new FqName(ExpectedLoadErrorsUtil.ANNOTATION_CLASS_NAME)))
+                                    .setOverrideRenderingPolicy(DescriptorRenderer.OverrideRenderingPolicy.RENDER_OPEN_OVERRIDE)
+                                    .setIncludePropertyConstant(false)
+                                    .setVerbose(true).build()
+                    );
+
+            RecursiveDescriptorComparator.validateAndCompareDescriptors(eager, lazy, configuration, null);
         }
     }
 

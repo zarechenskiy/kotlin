@@ -8,8 +8,8 @@ internal final class ClassVal {
         internal final fun <get-property2>(): jet.Int
     private final val property3: java.lang.Object
         private final fun <get-property3>(): java.lang.Object
-    protected final val property4: jet.String
+    protected final val property4: jet.String = ""
         protected final fun <get-property4>(): jet.String
-    public final val property5: jet.Int
+    public final val property5: jet.Int = 1.toInt()
         public final fun <get-property5>(): jet.Int
 }

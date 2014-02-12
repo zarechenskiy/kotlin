@@ -134,8 +134,6 @@ public class ExpressionTypingVisitorForStatements extends ExpressionTypingVisito
             JetType outType = propertyDescriptor.getType();
             JetTypeInfo typeInfo = facade.getTypeInfo(initializer, context.replaceExpectedType(outType));
             dataFlowInfo = typeInfo.getDataFlowInfo();
-
-            EvaluatePackage.recordCompileTimeValueForInitializerIfNeeded(propertyDescriptor, initializer, outType, context.trace);
         }
 
         {
