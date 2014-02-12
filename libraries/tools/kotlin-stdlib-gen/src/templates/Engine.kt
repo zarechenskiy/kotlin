@@ -33,7 +33,9 @@ class GenericFunction(val signature: String) : Comparable<GenericFunction> {
     val defaultFamilies = array(Iterables, Streams, ArraysOfObjects, ArraysOfPrimitives)
 
     var toNullableT: Boolean = false
-    var makeInline: Boolean = false;
+
+    var defaultInline = false
+    val inlineFamilies = HashMap<Family, Boolean>()
 
     val buildFamilies = HashSet<Family>(defaultFamilies.toList())
     private val buildPrimitives = HashSet<PrimitiveType>(PrimitiveType.values().toList())
@@ -86,6 +88,14 @@ class GenericFunction(val signature: String) : Comparable<GenericFunction> {
 
     fun typeParam(t: String) {
         typeParams.add(t)
+    }
+
+    fun inline(value : Boolean, vararg families: Family) {
+        if (families.isEmpty())
+            defaultInline = value
+        else
+            for (f in families)
+                inlineFamilies.put(f, value)
     }
 
     fun exclude(vararg families: Family) {
@@ -207,7 +217,7 @@ class GenericFunction(val signature: String) : Comparable<GenericFunction> {
         }
 
         builder.append("public ")
-        if (makeInline)
+        if (inlineFamilies[f] ?: defaultInline)
             builder.append("inline ")
 
         builder.append("fun ")

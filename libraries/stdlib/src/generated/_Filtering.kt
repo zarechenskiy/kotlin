@@ -192,7 +192,7 @@ public fun <T> Stream<T>.drop(n: Int) : Stream<T> {
 /**
  * Returns a list containing all elements except first elements that satisfy the given *predicate*
  */
-public fun <T> Array<out T>.dropWhile(predicate: (T)->Boolean) : List<T> {
+public inline fun <T> Array<out T>.dropWhile(predicate: (T)->Boolean) : List<T> {
     var yielding = false
     val list = ArrayList<T>()
     for (item in this)
@@ -209,7 +209,7 @@ public fun <T> Array<out T>.dropWhile(predicate: (T)->Boolean) : List<T> {
 /**
  * Returns a list containing all elements except first elements that satisfy the given *predicate*
  */
-public fun BooleanArray.dropWhile(predicate: (Boolean)->Boolean) : List<Boolean> {
+public inline fun BooleanArray.dropWhile(predicate: (Boolean)->Boolean) : List<Boolean> {
     var yielding = false
     val list = ArrayList<Boolean>()
     for (item in this)
@@ -226,7 +226,7 @@ public fun BooleanArray.dropWhile(predicate: (Boolean)->Boolean) : List<Boolean>
 /**
  * Returns a list containing all elements except first elements that satisfy the given *predicate*
  */
-public fun ByteArray.dropWhile(predicate: (Byte)->Boolean) : List<Byte> {
+public inline fun ByteArray.dropWhile(predicate: (Byte)->Boolean) : List<Byte> {
     var yielding = false
     val list = ArrayList<Byte>()
     for (item in this)
@@ -243,7 +243,7 @@ public fun ByteArray.dropWhile(predicate: (Byte)->Boolean) : List<Byte> {
 /**
  * Returns a list containing all elements except first elements that satisfy the given *predicate*
  */
-public fun CharArray.dropWhile(predicate: (Char)->Boolean) : List<Char> {
+public inline fun CharArray.dropWhile(predicate: (Char)->Boolean) : List<Char> {
     var yielding = false
     val list = ArrayList<Char>()
     for (item in this)
@@ -260,7 +260,7 @@ public fun CharArray.dropWhile(predicate: (Char)->Boolean) : List<Char> {
 /**
  * Returns a list containing all elements except first elements that satisfy the given *predicate*
  */
-public fun DoubleArray.dropWhile(predicate: (Double)->Boolean) : List<Double> {
+public inline fun DoubleArray.dropWhile(predicate: (Double)->Boolean) : List<Double> {
     var yielding = false
     val list = ArrayList<Double>()
     for (item in this)
@@ -277,7 +277,7 @@ public fun DoubleArray.dropWhile(predicate: (Double)->Boolean) : List<Double> {
 /**
  * Returns a list containing all elements except first elements that satisfy the given *predicate*
  */
-public fun FloatArray.dropWhile(predicate: (Float)->Boolean) : List<Float> {
+public inline fun FloatArray.dropWhile(predicate: (Float)->Boolean) : List<Float> {
     var yielding = false
     val list = ArrayList<Float>()
     for (item in this)
@@ -294,7 +294,7 @@ public fun FloatArray.dropWhile(predicate: (Float)->Boolean) : List<Float> {
 /**
  * Returns a list containing all elements except first elements that satisfy the given *predicate*
  */
-public fun IntArray.dropWhile(predicate: (Int)->Boolean) : List<Int> {
+public inline fun IntArray.dropWhile(predicate: (Int)->Boolean) : List<Int> {
     var yielding = false
     val list = ArrayList<Int>()
     for (item in this)
@@ -311,7 +311,7 @@ public fun IntArray.dropWhile(predicate: (Int)->Boolean) : List<Int> {
 /**
  * Returns a list containing all elements except first elements that satisfy the given *predicate*
  */
-public fun LongArray.dropWhile(predicate: (Long)->Boolean) : List<Long> {
+public inline fun LongArray.dropWhile(predicate: (Long)->Boolean) : List<Long> {
     var yielding = false
     val list = ArrayList<Long>()
     for (item in this)
@@ -328,7 +328,7 @@ public fun LongArray.dropWhile(predicate: (Long)->Boolean) : List<Long> {
 /**
  * Returns a list containing all elements except first elements that satisfy the given *predicate*
  */
-public fun ShortArray.dropWhile(predicate: (Short)->Boolean) : List<Short> {
+public inline fun ShortArray.dropWhile(predicate: (Short)->Boolean) : List<Short> {
     var yielding = false
     val list = ArrayList<Short>()
     for (item in this)
@@ -345,7 +345,7 @@ public fun ShortArray.dropWhile(predicate: (Short)->Boolean) : List<Short> {
 /**
  * Returns a list containing all elements except first elements that satisfy the given *predicate*
  */
-public fun <T> Iterable<T>.dropWhile(predicate: (T)->Boolean) : List<T> {
+public inline fun <T> Iterable<T>.dropWhile(predicate: (T)->Boolean) : List<T> {
     var yielding = false
     val list = ArrayList<T>()
     for (item in this)
@@ -379,7 +379,7 @@ public fun <T> Stream<T>.dropWhile(predicate: (T)->Boolean) : Stream<T> {
 /**
  * Returns a list containing all elements matching the given *predicate*
  */
-public fun <T> Array<out T>.filter(predicate: (T)->Boolean) : List<T> {
+public inline fun <T> Array<out T>.filter(predicate: (T)->Boolean) : List<T> {
     return filterTo(ArrayList<T>(), predicate)
     
 }
@@ -387,7 +387,7 @@ public fun <T> Array<out T>.filter(predicate: (T)->Boolean) : List<T> {
 /**
  * Returns a list containing all elements matching the given *predicate*
  */
-public fun BooleanArray.filter(predicate: (Boolean)->Boolean) : List<Boolean> {
+public inline fun BooleanArray.filter(predicate: (Boolean)->Boolean) : List<Boolean> {
     return filterTo(ArrayList<Boolean>(), predicate)
     
 }
@@ -395,7 +395,7 @@ public fun BooleanArray.filter(predicate: (Boolean)->Boolean) : List<Boolean> {
 /**
  * Returns a list containing all elements matching the given *predicate*
  */
-public fun ByteArray.filter(predicate: (Byte)->Boolean) : List<Byte> {
+public inline fun ByteArray.filter(predicate: (Byte)->Boolean) : List<Byte> {
     return filterTo(ArrayList<Byte>(), predicate)
     
 }
@@ -403,7 +403,7 @@ public fun ByteArray.filter(predicate: (Byte)->Boolean) : List<Byte> {
 /**
  * Returns a list containing all elements matching the given *predicate*
  */
-public fun CharArray.filter(predicate: (Char)->Boolean) : List<Char> {
+public inline fun CharArray.filter(predicate: (Char)->Boolean) : List<Char> {
     return filterTo(ArrayList<Char>(), predicate)
     
 }
@@ -411,7 +411,7 @@ public fun CharArray.filter(predicate: (Char)->Boolean) : List<Char> {
 /**
  * Returns a list containing all elements matching the given *predicate*
  */
-public fun DoubleArray.filter(predicate: (Double)->Boolean) : List<Double> {
+public inline fun DoubleArray.filter(predicate: (Double)->Boolean) : List<Double> {
     return filterTo(ArrayList<Double>(), predicate)
     
 }
@@ -419,7 +419,7 @@ public fun DoubleArray.filter(predicate: (Double)->Boolean) : List<Double> {
 /**
  * Returns a list containing all elements matching the given *predicate*
  */
-public fun FloatArray.filter(predicate: (Float)->Boolean) : List<Float> {
+public inline fun FloatArray.filter(predicate: (Float)->Boolean) : List<Float> {
     return filterTo(ArrayList<Float>(), predicate)
     
 }
@@ -427,7 +427,7 @@ public fun FloatArray.filter(predicate: (Float)->Boolean) : List<Float> {
 /**
  * Returns a list containing all elements matching the given *predicate*
  */
-public fun IntArray.filter(predicate: (Int)->Boolean) : List<Int> {
+public inline fun IntArray.filter(predicate: (Int)->Boolean) : List<Int> {
     return filterTo(ArrayList<Int>(), predicate)
     
 }
@@ -435,7 +435,7 @@ public fun IntArray.filter(predicate: (Int)->Boolean) : List<Int> {
 /**
  * Returns a list containing all elements matching the given *predicate*
  */
-public fun LongArray.filter(predicate: (Long)->Boolean) : List<Long> {
+public inline fun LongArray.filter(predicate: (Long)->Boolean) : List<Long> {
     return filterTo(ArrayList<Long>(), predicate)
     
 }
@@ -443,7 +443,7 @@ public fun LongArray.filter(predicate: (Long)->Boolean) : List<Long> {
 /**
  * Returns a list containing all elements matching the given *predicate*
  */
-public fun ShortArray.filter(predicate: (Short)->Boolean) : List<Short> {
+public inline fun ShortArray.filter(predicate: (Short)->Boolean) : List<Short> {
     return filterTo(ArrayList<Short>(), predicate)
     
 }
@@ -451,7 +451,7 @@ public fun ShortArray.filter(predicate: (Short)->Boolean) : List<Short> {
 /**
  * Returns a list containing all elements matching the given *predicate*
  */
-public fun <T> Iterable<T>.filter(predicate: (T)->Boolean) : List<T> {
+public inline fun <T> Iterable<T>.filter(predicate: (T)->Boolean) : List<T> {
     return filterTo(ArrayList<T>(), predicate)
     
 }
@@ -459,7 +459,7 @@ public fun <T> Iterable<T>.filter(predicate: (T)->Boolean) : List<T> {
 /**
  * Returns a list containing all elements matching the given *predicate*
  */
-public fun <K, V> Map<K,V>.filter(predicate: (Map.Entry<K,V>)->Boolean) : List<Map.Entry<K,V>> {
+public inline fun <K, V> Map<K,V>.filter(predicate: (Map.Entry<K,V>)->Boolean) : List<Map.Entry<K,V>> {
     return filterTo(ArrayList<Map.Entry<K,V>>(), predicate)
     
 }
@@ -475,7 +475,7 @@ public fun <T> Stream<T>.filter(predicate: (T)->Boolean) : Stream<T> {
 /**
  * Returns a list containing all elements not matching the given *predicate*
  */
-public fun <T> Array<out T>.filterNot(predicate: (T)->Boolean) : List<T> {
+public inline fun <T> Array<out T>.filterNot(predicate: (T)->Boolean) : List<T> {
     return filterNotTo(ArrayList<T>(), predicate)
     
 }
@@ -483,7 +483,7 @@ public fun <T> Array<out T>.filterNot(predicate: (T)->Boolean) : List<T> {
 /**
  * Returns a list containing all elements not matching the given *predicate*
  */
-public fun BooleanArray.filterNot(predicate: (Boolean)->Boolean) : List<Boolean> {
+public inline fun BooleanArray.filterNot(predicate: (Boolean)->Boolean) : List<Boolean> {
     return filterNotTo(ArrayList<Boolean>(), predicate)
     
 }
@@ -491,7 +491,7 @@ public fun BooleanArray.filterNot(predicate: (Boolean)->Boolean) : List<Boolean>
 /**
  * Returns a list containing all elements not matching the given *predicate*
  */
-public fun ByteArray.filterNot(predicate: (Byte)->Boolean) : List<Byte> {
+public inline fun ByteArray.filterNot(predicate: (Byte)->Boolean) : List<Byte> {
     return filterNotTo(ArrayList<Byte>(), predicate)
     
 }
@@ -499,7 +499,7 @@ public fun ByteArray.filterNot(predicate: (Byte)->Boolean) : List<Byte> {
 /**
  * Returns a list containing all elements not matching the given *predicate*
  */
-public fun CharArray.filterNot(predicate: (Char)->Boolean) : List<Char> {
+public inline fun CharArray.filterNot(predicate: (Char)->Boolean) : List<Char> {
     return filterNotTo(ArrayList<Char>(), predicate)
     
 }
@@ -507,7 +507,7 @@ public fun CharArray.filterNot(predicate: (Char)->Boolean) : List<Char> {
 /**
  * Returns a list containing all elements not matching the given *predicate*
  */
-public fun DoubleArray.filterNot(predicate: (Double)->Boolean) : List<Double> {
+public inline fun DoubleArray.filterNot(predicate: (Double)->Boolean) : List<Double> {
     return filterNotTo(ArrayList<Double>(), predicate)
     
 }
@@ -515,7 +515,7 @@ public fun DoubleArray.filterNot(predicate: (Double)->Boolean) : List<Double> {
 /**
  * Returns a list containing all elements not matching the given *predicate*
  */
-public fun FloatArray.filterNot(predicate: (Float)->Boolean) : List<Float> {
+public inline fun FloatArray.filterNot(predicate: (Float)->Boolean) : List<Float> {
     return filterNotTo(ArrayList<Float>(), predicate)
     
 }
@@ -523,7 +523,7 @@ public fun FloatArray.filterNot(predicate: (Float)->Boolean) : List<Float> {
 /**
  * Returns a list containing all elements not matching the given *predicate*
  */
-public fun IntArray.filterNot(predicate: (Int)->Boolean) : List<Int> {
+public inline fun IntArray.filterNot(predicate: (Int)->Boolean) : List<Int> {
     return filterNotTo(ArrayList<Int>(), predicate)
     
 }
@@ -531,7 +531,7 @@ public fun IntArray.filterNot(predicate: (Int)->Boolean) : List<Int> {
 /**
  * Returns a list containing all elements not matching the given *predicate*
  */
-public fun LongArray.filterNot(predicate: (Long)->Boolean) : List<Long> {
+public inline fun LongArray.filterNot(predicate: (Long)->Boolean) : List<Long> {
     return filterNotTo(ArrayList<Long>(), predicate)
     
 }
@@ -539,7 +539,7 @@ public fun LongArray.filterNot(predicate: (Long)->Boolean) : List<Long> {
 /**
  * Returns a list containing all elements not matching the given *predicate*
  */
-public fun ShortArray.filterNot(predicate: (Short)->Boolean) : List<Short> {
+public inline fun ShortArray.filterNot(predicate: (Short)->Boolean) : List<Short> {
     return filterNotTo(ArrayList<Short>(), predicate)
     
 }
@@ -547,7 +547,7 @@ public fun ShortArray.filterNot(predicate: (Short)->Boolean) : List<Short> {
 /**
  * Returns a list containing all elements not matching the given *predicate*
  */
-public fun <T> Iterable<T>.filterNot(predicate: (T)->Boolean) : List<T> {
+public inline fun <T> Iterable<T>.filterNot(predicate: (T)->Boolean) : List<T> {
     return filterNotTo(ArrayList<T>(), predicate)
     
 }
@@ -555,7 +555,7 @@ public fun <T> Iterable<T>.filterNot(predicate: (T)->Boolean) : List<T> {
 /**
  * Returns a list containing all elements not matching the given *predicate*
  */
-public fun <K, V> Map<K,V>.filterNot(predicate: (Map.Entry<K,V>)->Boolean) : List<Map.Entry<K,V>> {
+public inline fun <K, V> Map<K,V>.filterNot(predicate: (Map.Entry<K,V>)->Boolean) : List<Map.Entry<K,V>> {
     return filterNotTo(ArrayList<Map.Entry<K,V>>(), predicate)
     
 }
@@ -622,7 +622,7 @@ public fun <C: MutableCollection<in T>, T: Any> Stream<T?>.filterNotNullTo(colle
 /**
  * Appends all elements not matching the given *predicate* to the given *collection*
  */
-public fun <T, C: MutableCollection<in T>> Array<out T>.filterNotTo(collection: C, predicate: (T) -> Boolean) : C {
+public inline fun <T, C: MutableCollection<in T>> Array<out T>.filterNotTo(collection: C, predicate: (T) -> Boolean) : C {
     for (element in this) if (!predicate(element)) collection.add(element)
     return collection
     
@@ -631,7 +631,7 @@ public fun <T, C: MutableCollection<in T>> Array<out T>.filterNotTo(collection: 
 /**
  * Appends all elements not matching the given *predicate* to the given *collection*
  */
-public fun <C: MutableCollection<in Boolean>> BooleanArray.filterNotTo(collection: C, predicate: (Boolean) -> Boolean) : C {
+public inline fun <C: MutableCollection<in Boolean>> BooleanArray.filterNotTo(collection: C, predicate: (Boolean) -> Boolean) : C {
     for (element in this) if (!predicate(element)) collection.add(element)
     return collection
     
@@ -640,7 +640,7 @@ public fun <C: MutableCollection<in Boolean>> BooleanArray.filterNotTo(collectio
 /**
  * Appends all elements not matching the given *predicate* to the given *collection*
  */
-public fun <C: MutableCollection<in Byte>> ByteArray.filterNotTo(collection: C, predicate: (Byte) -> Boolean) : C {
+public inline fun <C: MutableCollection<in Byte>> ByteArray.filterNotTo(collection: C, predicate: (Byte) -> Boolean) : C {
     for (element in this) if (!predicate(element)) collection.add(element)
     return collection
     
@@ -649,7 +649,7 @@ public fun <C: MutableCollection<in Byte>> ByteArray.filterNotTo(collection: C, 
 /**
  * Appends all elements not matching the given *predicate* to the given *collection*
  */
-public fun <C: MutableCollection<in Char>> CharArray.filterNotTo(collection: C, predicate: (Char) -> Boolean) : C {
+public inline fun <C: MutableCollection<in Char>> CharArray.filterNotTo(collection: C, predicate: (Char) -> Boolean) : C {
     for (element in this) if (!predicate(element)) collection.add(element)
     return collection
     
@@ -658,7 +658,7 @@ public fun <C: MutableCollection<in Char>> CharArray.filterNotTo(collection: C, 
 /**
  * Appends all elements not matching the given *predicate* to the given *collection*
  */
-public fun <C: MutableCollection<in Double>> DoubleArray.filterNotTo(collection: C, predicate: (Double) -> Boolean) : C {
+public inline fun <C: MutableCollection<in Double>> DoubleArray.filterNotTo(collection: C, predicate: (Double) -> Boolean) : C {
     for (element in this) if (!predicate(element)) collection.add(element)
     return collection
     
@@ -667,7 +667,7 @@ public fun <C: MutableCollection<in Double>> DoubleArray.filterNotTo(collection:
 /**
  * Appends all elements not matching the given *predicate* to the given *collection*
  */
-public fun <C: MutableCollection<in Float>> FloatArray.filterNotTo(collection: C, predicate: (Float) -> Boolean) : C {
+public inline fun <C: MutableCollection<in Float>> FloatArray.filterNotTo(collection: C, predicate: (Float) -> Boolean) : C {
     for (element in this) if (!predicate(element)) collection.add(element)
     return collection
     
@@ -676,7 +676,7 @@ public fun <C: MutableCollection<in Float>> FloatArray.filterNotTo(collection: C
 /**
  * Appends all elements not matching the given *predicate* to the given *collection*
  */
-public fun <C: MutableCollection<in Int>> IntArray.filterNotTo(collection: C, predicate: (Int) -> Boolean) : C {
+public inline fun <C: MutableCollection<in Int>> IntArray.filterNotTo(collection: C, predicate: (Int) -> Boolean) : C {
     for (element in this) if (!predicate(element)) collection.add(element)
     return collection
     
@@ -685,7 +685,7 @@ public fun <C: MutableCollection<in Int>> IntArray.filterNotTo(collection: C, pr
 /**
  * Appends all elements not matching the given *predicate* to the given *collection*
  */
-public fun <C: MutableCollection<in Long>> LongArray.filterNotTo(collection: C, predicate: (Long) -> Boolean) : C {
+public inline fun <C: MutableCollection<in Long>> LongArray.filterNotTo(collection: C, predicate: (Long) -> Boolean) : C {
     for (element in this) if (!predicate(element)) collection.add(element)
     return collection
     
@@ -694,7 +694,7 @@ public fun <C: MutableCollection<in Long>> LongArray.filterNotTo(collection: C, 
 /**
  * Appends all elements not matching the given *predicate* to the given *collection*
  */
-public fun <C: MutableCollection<in Short>> ShortArray.filterNotTo(collection: C, predicate: (Short) -> Boolean) : C {
+public inline fun <C: MutableCollection<in Short>> ShortArray.filterNotTo(collection: C, predicate: (Short) -> Boolean) : C {
     for (element in this) if (!predicate(element)) collection.add(element)
     return collection
     
@@ -703,7 +703,7 @@ public fun <C: MutableCollection<in Short>> ShortArray.filterNotTo(collection: C
 /**
  * Appends all elements not matching the given *predicate* to the given *collection*
  */
-public fun <T, C: MutableCollection<in T>> Iterable<T>.filterNotTo(collection: C, predicate: (T) -> Boolean) : C {
+public inline fun <T, C: MutableCollection<in T>> Iterable<T>.filterNotTo(collection: C, predicate: (T) -> Boolean) : C {
     for (element in this) if (!predicate(element)) collection.add(element)
     return collection
     
@@ -712,7 +712,7 @@ public fun <T, C: MutableCollection<in T>> Iterable<T>.filterNotTo(collection: C
 /**
  * Appends all elements not matching the given *predicate* to the given *collection*
  */
-public fun <K, V, C: MutableCollection<in Map.Entry<K,V>>> Map<K,V>.filterNotTo(collection: C, predicate: (Map.Entry<K,V>) -> Boolean) : C {
+public inline fun <K, V, C: MutableCollection<in Map.Entry<K,V>>> Map<K,V>.filterNotTo(collection: C, predicate: (Map.Entry<K,V>) -> Boolean) : C {
     for (element in this) if (!predicate(element)) collection.add(element)
     return collection
     
@@ -721,7 +721,7 @@ public fun <K, V, C: MutableCollection<in Map.Entry<K,V>>> Map<K,V>.filterNotTo(
 /**
  * Appends all elements not matching the given *predicate* to the given *collection*
  */
-public fun <T, C: MutableCollection<in T>> Stream<T>.filterNotTo(collection: C, predicate: (T) -> Boolean) : C {
+public inline fun <T, C: MutableCollection<in T>> Stream<T>.filterNotTo(collection: C, predicate: (T) -> Boolean) : C {
     for (element in this) if (!predicate(element)) collection.add(element)
     return collection
     
@@ -730,7 +730,7 @@ public fun <T, C: MutableCollection<in T>> Stream<T>.filterNotTo(collection: C, 
 /**
  * Appends all elements matching the given *predicate* into the given *collection*
  */
-public fun <T, C: MutableCollection<in T>> Array<out T>.filterTo(collection: C, predicate: (T) -> Boolean) : C {
+public inline fun <T, C: MutableCollection<in T>> Array<out T>.filterTo(collection: C, predicate: (T) -> Boolean) : C {
     for (element in this) if (predicate(element)) collection.add(element)
     return collection
     
@@ -739,7 +739,7 @@ public fun <T, C: MutableCollection<in T>> Array<out T>.filterTo(collection: C, 
 /**
  * Appends all elements matching the given *predicate* into the given *collection*
  */
-public fun <C: MutableCollection<in Boolean>> BooleanArray.filterTo(collection: C, predicate: (Boolean) -> Boolean) : C {
+public inline fun <C: MutableCollection<in Boolean>> BooleanArray.filterTo(collection: C, predicate: (Boolean) -> Boolean) : C {
     for (element in this) if (predicate(element)) collection.add(element)
     return collection
     
@@ -748,7 +748,7 @@ public fun <C: MutableCollection<in Boolean>> BooleanArray.filterTo(collection: 
 /**
  * Appends all elements matching the given *predicate* into the given *collection*
  */
-public fun <C: MutableCollection<in Byte>> ByteArray.filterTo(collection: C, predicate: (Byte) -> Boolean) : C {
+public inline fun <C: MutableCollection<in Byte>> ByteArray.filterTo(collection: C, predicate: (Byte) -> Boolean) : C {
     for (element in this) if (predicate(element)) collection.add(element)
     return collection
     
@@ -757,7 +757,7 @@ public fun <C: MutableCollection<in Byte>> ByteArray.filterTo(collection: C, pre
 /**
  * Appends all elements matching the given *predicate* into the given *collection*
  */
-public fun <C: MutableCollection<in Char>> CharArray.filterTo(collection: C, predicate: (Char) -> Boolean) : C {
+public inline fun <C: MutableCollection<in Char>> CharArray.filterTo(collection: C, predicate: (Char) -> Boolean) : C {
     for (element in this) if (predicate(element)) collection.add(element)
     return collection
     
@@ -766,7 +766,7 @@ public fun <C: MutableCollection<in Char>> CharArray.filterTo(collection: C, pre
 /**
  * Appends all elements matching the given *predicate* into the given *collection*
  */
-public fun <C: MutableCollection<in Double>> DoubleArray.filterTo(collection: C, predicate: (Double) -> Boolean) : C {
+public inline fun <C: MutableCollection<in Double>> DoubleArray.filterTo(collection: C, predicate: (Double) -> Boolean) : C {
     for (element in this) if (predicate(element)) collection.add(element)
     return collection
     
@@ -775,7 +775,7 @@ public fun <C: MutableCollection<in Double>> DoubleArray.filterTo(collection: C,
 /**
  * Appends all elements matching the given *predicate* into the given *collection*
  */
-public fun <C: MutableCollection<in Float>> FloatArray.filterTo(collection: C, predicate: (Float) -> Boolean) : C {
+public inline fun <C: MutableCollection<in Float>> FloatArray.filterTo(collection: C, predicate: (Float) -> Boolean) : C {
     for (element in this) if (predicate(element)) collection.add(element)
     return collection
     
@@ -784,7 +784,7 @@ public fun <C: MutableCollection<in Float>> FloatArray.filterTo(collection: C, p
 /**
  * Appends all elements matching the given *predicate* into the given *collection*
  */
-public fun <C: MutableCollection<in Int>> IntArray.filterTo(collection: C, predicate: (Int) -> Boolean) : C {
+public inline fun <C: MutableCollection<in Int>> IntArray.filterTo(collection: C, predicate: (Int) -> Boolean) : C {
     for (element in this) if (predicate(element)) collection.add(element)
     return collection
     
@@ -793,7 +793,7 @@ public fun <C: MutableCollection<in Int>> IntArray.filterTo(collection: C, predi
 /**
  * Appends all elements matching the given *predicate* into the given *collection*
  */
-public fun <C: MutableCollection<in Long>> LongArray.filterTo(collection: C, predicate: (Long) -> Boolean) : C {
+public inline fun <C: MutableCollection<in Long>> LongArray.filterTo(collection: C, predicate: (Long) -> Boolean) : C {
     for (element in this) if (predicate(element)) collection.add(element)
     return collection
     
@@ -802,7 +802,7 @@ public fun <C: MutableCollection<in Long>> LongArray.filterTo(collection: C, pre
 /**
  * Appends all elements matching the given *predicate* into the given *collection*
  */
-public fun <C: MutableCollection<in Short>> ShortArray.filterTo(collection: C, predicate: (Short) -> Boolean) : C {
+public inline fun <C: MutableCollection<in Short>> ShortArray.filterTo(collection: C, predicate: (Short) -> Boolean) : C {
     for (element in this) if (predicate(element)) collection.add(element)
     return collection
     
@@ -811,7 +811,7 @@ public fun <C: MutableCollection<in Short>> ShortArray.filterTo(collection: C, p
 /**
  * Appends all elements matching the given *predicate* into the given *collection*
  */
-public fun <T, C: MutableCollection<in T>> Iterable<T>.filterTo(collection: C, predicate: (T) -> Boolean) : C {
+public inline fun <T, C: MutableCollection<in T>> Iterable<T>.filterTo(collection: C, predicate: (T) -> Boolean) : C {
     for (element in this) if (predicate(element)) collection.add(element)
     return collection
     
@@ -820,7 +820,7 @@ public fun <T, C: MutableCollection<in T>> Iterable<T>.filterTo(collection: C, p
 /**
  * Appends all elements matching the given *predicate* into the given *collection*
  */
-public fun <K, V, C: MutableCollection<in Map.Entry<K,V>>> Map<K,V>.filterTo(collection: C, predicate: (Map.Entry<K,V>) -> Boolean) : C {
+public inline fun <K, V, C: MutableCollection<in Map.Entry<K,V>>> Map<K,V>.filterTo(collection: C, predicate: (Map.Entry<K,V>) -> Boolean) : C {
     for (element in this) if (predicate(element)) collection.add(element)
     return collection
     
@@ -829,7 +829,7 @@ public fun <K, V, C: MutableCollection<in Map.Entry<K,V>>> Map<K,V>.filterTo(col
 /**
  * Appends all elements matching the given *predicate* into the given *collection*
  */
-public fun <T, C: MutableCollection<in T>> Stream<T>.filterTo(collection: C, predicate: (T) -> Boolean) : C {
+public inline fun <T, C: MutableCollection<in T>> Stream<T>.filterTo(collection: C, predicate: (T) -> Boolean) : C {
     for (element in this) if (predicate(element)) collection.add(element)
     return collection
     
@@ -1020,7 +1020,7 @@ public fun <T> Stream<T>.take(n: Int) : Stream<T> {
 /**
  * Returns a list containing first elements satisfying the given *predicate*
  */
-public fun <T> Array<out T>.takeWhile(predicate: (T)->Boolean) : List<T> {
+public inline fun <T> Array<out T>.takeWhile(predicate: (T)->Boolean) : List<T> {
     val list = ArrayList<T>()
     for (item in this) {
          if(!predicate(item))
@@ -1034,7 +1034,7 @@ public fun <T> Array<out T>.takeWhile(predicate: (T)->Boolean) : List<T> {
 /**
  * Returns a list containing first elements satisfying the given *predicate*
  */
-public fun BooleanArray.takeWhile(predicate: (Boolean)->Boolean) : List<Boolean> {
+public inline fun BooleanArray.takeWhile(predicate: (Boolean)->Boolean) : List<Boolean> {
     val list = ArrayList<Boolean>()
     for (item in this) {
          if(!predicate(item))
@@ -1048,7 +1048,7 @@ public fun BooleanArray.takeWhile(predicate: (Boolean)->Boolean) : List<Boolean>
 /**
  * Returns a list containing first elements satisfying the given *predicate*
  */
-public fun ByteArray.takeWhile(predicate: (Byte)->Boolean) : List<Byte> {
+public inline fun ByteArray.takeWhile(predicate: (Byte)->Boolean) : List<Byte> {
     val list = ArrayList<Byte>()
     for (item in this) {
          if(!predicate(item))
@@ -1062,7 +1062,7 @@ public fun ByteArray.takeWhile(predicate: (Byte)->Boolean) : List<Byte> {
 /**
  * Returns a list containing first elements satisfying the given *predicate*
  */
-public fun CharArray.takeWhile(predicate: (Char)->Boolean) : List<Char> {
+public inline fun CharArray.takeWhile(predicate: (Char)->Boolean) : List<Char> {
     val list = ArrayList<Char>()
     for (item in this) {
          if(!predicate(item))
@@ -1076,7 +1076,7 @@ public fun CharArray.takeWhile(predicate: (Char)->Boolean) : List<Char> {
 /**
  * Returns a list containing first elements satisfying the given *predicate*
  */
-public fun DoubleArray.takeWhile(predicate: (Double)->Boolean) : List<Double> {
+public inline fun DoubleArray.takeWhile(predicate: (Double)->Boolean) : List<Double> {
     val list = ArrayList<Double>()
     for (item in this) {
          if(!predicate(item))
@@ -1090,7 +1090,7 @@ public fun DoubleArray.takeWhile(predicate: (Double)->Boolean) : List<Double> {
 /**
  * Returns a list containing first elements satisfying the given *predicate*
  */
-public fun FloatArray.takeWhile(predicate: (Float)->Boolean) : List<Float> {
+public inline fun FloatArray.takeWhile(predicate: (Float)->Boolean) : List<Float> {
     val list = ArrayList<Float>()
     for (item in this) {
          if(!predicate(item))
@@ -1104,7 +1104,7 @@ public fun FloatArray.takeWhile(predicate: (Float)->Boolean) : List<Float> {
 /**
  * Returns a list containing first elements satisfying the given *predicate*
  */
-public fun IntArray.takeWhile(predicate: (Int)->Boolean) : List<Int> {
+public inline fun IntArray.takeWhile(predicate: (Int)->Boolean) : List<Int> {
     val list = ArrayList<Int>()
     for (item in this) {
          if(!predicate(item))
@@ -1118,7 +1118,7 @@ public fun IntArray.takeWhile(predicate: (Int)->Boolean) : List<Int> {
 /**
  * Returns a list containing first elements satisfying the given *predicate*
  */
-public fun LongArray.takeWhile(predicate: (Long)->Boolean) : List<Long> {
+public inline fun LongArray.takeWhile(predicate: (Long)->Boolean) : List<Long> {
     val list = ArrayList<Long>()
     for (item in this) {
          if(!predicate(item))
@@ -1132,7 +1132,7 @@ public fun LongArray.takeWhile(predicate: (Long)->Boolean) : List<Long> {
 /**
  * Returns a list containing first elements satisfying the given *predicate*
  */
-public fun ShortArray.takeWhile(predicate: (Short)->Boolean) : List<Short> {
+public inline fun ShortArray.takeWhile(predicate: (Short)->Boolean) : List<Short> {
     val list = ArrayList<Short>()
     for (item in this) {
          if(!predicate(item))
@@ -1146,7 +1146,7 @@ public fun ShortArray.takeWhile(predicate: (Short)->Boolean) : List<Short> {
 /**
  * Returns a list containing first elements satisfying the given *predicate*
  */
-public fun <T> Iterable<T>.takeWhile(predicate: (T)->Boolean) : List<T> {
+public inline fun <T> Iterable<T>.takeWhile(predicate: (T)->Boolean) : List<T> {
     val list = ArrayList<T>()
     for (item in this) {
          if(!predicate(item))

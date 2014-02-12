@@ -6,6 +6,7 @@ fun aggregates(): List<GenericFunction> {
     val templates = arrayListOf<GenericFunction>()
 
     templates add f("all(predicate: (T) -> Boolean)") {
+        inline(true)
         doc { "Returns *true* if all elements match the given *predicate*" }
         returns("Boolean")
         body {
@@ -18,6 +19,8 @@ fun aggregates(): List<GenericFunction> {
     }
 
     templates add f("none(predicate: (T) -> Boolean)") {
+        inline(true)
+
         doc { "Returns *true* if no elements match the given *predicate*" }
         returns("Boolean")
         body {
@@ -30,6 +33,8 @@ fun aggregates(): List<GenericFunction> {
     }
 
     templates add f("any(predicate: (T) -> Boolean)") {
+        inline(true)
+
         doc { "Returns *true* if any element matches the given *predicate*" }
         returns("Boolean")
         body {
@@ -42,6 +47,8 @@ fun aggregates(): List<GenericFunction> {
     }
 
     templates add f("count(predicate: (T) -> Boolean)") {
+        inline(true)
+
         doc { "Returns the number of elements matching the given *predicate*" }
         returns("Int")
         body {
@@ -101,6 +108,8 @@ fun aggregates(): List<GenericFunction> {
     }
 
     templates add f("minBy(f: (T) -> R)") {
+        inline(true)
+
         doc { "Returns the first element yielding the smallest value of the given function or null if there are no elements" }
         typeParam("R: Comparable<R>")
         typeParam("T: Any")
@@ -143,6 +152,8 @@ fun aggregates(): List<GenericFunction> {
     }
 
     templates add f("minBy(f: (T) -> R)") {
+        inline(true)
+
         only(Maps)
         doc { "Returns the first element yielding the smallest value of the given function or null if there are no elements" }
         typeParam("R: Comparable<R>")
@@ -201,6 +212,8 @@ fun aggregates(): List<GenericFunction> {
     }
 
     templates add f("maxBy(f: (T) -> R)") {
+        inline(true)
+
         doc { "Returns the first element yielding the largest value of the given function or null if there are no elements" }
         typeParam("R: Comparable<R>")
         typeParam("T: Any")
@@ -243,6 +256,8 @@ fun aggregates(): List<GenericFunction> {
     }
 
     templates add f("maxBy(f: (T) -> R)") {
+        inline(true)
+
         only(Maps)
         doc { "Returns the first element yielding the largest value of the given function or null if there are no elements" }
         typeParam("R: Comparable<R>")
@@ -268,6 +283,8 @@ fun aggregates(): List<GenericFunction> {
     }
 
     templates add f("fold(initial: R, operation: (R, T) -> R)") {
+        inline(true)
+
         doc { "Accumulates value starting with *initial* value and applying *operation* from left to right to current accumulator value and each element" }
         typeParam("R")
         returns("R")
@@ -281,6 +298,8 @@ fun aggregates(): List<GenericFunction> {
     }
 
     templates add f("foldRight(initial: R, operation: (T, R) -> R)") {
+        inline(true)
+
         only(Lists, ArraysOfObjects, ArraysOfPrimitives)
         doc { "Accumulates value starting with *initial* value and applying *operation* from right to left to each element and current accumulator value" }
         typeParam("R")
@@ -299,6 +318,8 @@ fun aggregates(): List<GenericFunction> {
 
 
     templates add f("reduce(operation: (T, T) -> T)") {
+        inline(true)
+
         doc { "Accumulates value starting with the first element and applying *operation* from left to right to current accumulator value and each element" }
         returns("T")
         body {
@@ -316,6 +337,8 @@ fun aggregates(): List<GenericFunction> {
     }
 
     templates add f("reduceRight(operation: (T, T) -> T)") {
+        inline(true)
+
         only(Lists, ArraysOfObjects, ArraysOfPrimitives)
         doc { "Accumulates value starting with last element and applying *operation* from right to left to each element and current accumulator value" }
         returns("T")
@@ -336,6 +359,8 @@ fun aggregates(): List<GenericFunction> {
 
 
     templates add f("forEach(operation: (T) -> Unit)") {
+        inline(true)
+
         doc { "Performs the given *operation* on each element" }
         returns("Unit")
         body {

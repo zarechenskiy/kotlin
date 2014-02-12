@@ -42,6 +42,8 @@ fun ordering(): List<GenericFunction> {
     }
 
     templates add f("sortBy(order: (T) -> R)") {
+        inline(true)
+
         doc {
             """
             Returns a list of all elements, sorted by results of specified *order* function.

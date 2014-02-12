@@ -105,6 +105,8 @@ fun elements(): List<GenericFunction> {
     }
 
     templates add f("first(predicate: (T) -> Boolean)") {
+        inline(true)
+
         doc { "Returns first element matching the given *predicate*" }
         returns("T")
         body {
@@ -116,6 +118,8 @@ fun elements(): List<GenericFunction> {
     }
 
     templates add f("firstOrNull(predicate: (T) -> Boolean)") {
+        inline(true)
+
         doc { "Returns first element matching the given *predicate*, or *null* if element was not found" }
         returns("T?")
         body {

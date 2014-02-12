@@ -71,6 +71,8 @@ fun generators(): List<GenericFunction> {
     }
 
     templates add f("partition(predicate: (T) -> Boolean)") {
+        inline(true)
+
         doc {
             """
             Splits original collection into pair of collections,

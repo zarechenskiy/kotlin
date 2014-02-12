@@ -3,7 +3,7 @@ package kotlin
 import kotlin.support.AbstractIterator
 
 public trait Stream<out T> {
-    fun iterator(): Iterator<T>
+    public fun iterator(): Iterator<T>
 }
 
 public fun <T> Iterable<T>.stream(): Stream<T> = object : Stream<T> {
@@ -12,7 +12,7 @@ public fun <T> Iterable<T>.stream(): Stream<T> = object : Stream<T> {
     }
 }
 
-class FilteringStream<T>(val stream: Stream<T>, val sendWhen: Boolean = true, val predicate: (T) -> Boolean) : Stream<T> {
+public class FilteringStream<T>(val stream: Stream<T>, val sendWhen: Boolean = true, val predicate: (T) -> Boolean) : Stream<T> {
     override fun iterator(): Iterator<T> = object : AbstractIterator<T>() {
         val iterator = stream.iterator()
         override fun computeNext() {
@@ -28,7 +28,7 @@ class FilteringStream<T>(val stream: Stream<T>, val sendWhen: Boolean = true, va
     }
 }
 
-class TransformingStream<T, R>(val stream: Stream<T>, val transformer: (T) -> R) : Stream<R> {
+public class TransformingStream<T, R>(val stream: Stream<T>, val transformer: (T) -> R) : Stream<R> {
     override fun iterator(): Iterator<R> = object : AbstractIterator<R>() {
         val iterator = stream.iterator()
         override fun computeNext() {
@@ -57,7 +57,7 @@ class ZippingStream<T1, T2>(val stream1: Stream<T1>, val stream2: Stream<T2>) : 
 }
 */
 
-class FlatteningStream<T, R>(val stream: Stream<T>, val transformer: (T) -> Stream<R>) : Stream<R> {
+public class FlatteningStream<T, R>(val stream: Stream<T>, val transformer: (T) -> Stream<R>) : Stream<R> {
     override fun iterator(): Iterator<R> = object : AbstractIterator<R>() {
         val iterator = stream.iterator()
         var itemIterator: Iterator<R>? = null
@@ -86,7 +86,7 @@ class FlatteningStream<T, R>(val stream: Stream<T>, val transformer: (T) -> Stre
     }
 }
 
-class LimitedStream<T>(val stream: Stream<T>, val stopWhen: Boolean = true, val predicate: (T) -> Boolean) : Stream<T> {
+public class LimitedStream<T>(val stream: Stream<T>, val stopWhen: Boolean = true, val predicate: (T) -> Boolean) : Stream<T> {
     override fun iterator(): Iterator<T> = object : AbstractIterator<T>() {
         val iterator = stream.iterator()
         override fun computeNext() {
@@ -104,7 +104,7 @@ class LimitedStream<T>(val stream: Stream<T>, val stopWhen: Boolean = true, val 
     }
 }
 
-class FunctionStream<T : Any>(val producer: () -> T?) : Stream<T> {
+public class FunctionStream<T : Any>(val producer: () -> T?) : Stream<T> {
     override fun iterator(): Iterator<T> = object : AbstractIterator<T>() {
 
         override fun computeNext() {

@@ -224,7 +224,7 @@ public fun <T> Stream<T>.first() : T {
 /**
  * Returns first element matching the given *predicate*
  */
-public fun <T> Array<out T>.first(predicate: (T) -> Boolean) : T {
+public inline fun <T> Array<out T>.first(predicate: (T) -> Boolean) : T {
     for (element in this) if (predicate(element)) return element
     throw IllegalArgumentException("No element matching predicate was found")
     
@@ -233,7 +233,7 @@ public fun <T> Array<out T>.first(predicate: (T) -> Boolean) : T {
 /**
  * Returns first element matching the given *predicate*
  */
-public fun BooleanArray.first(predicate: (Boolean) -> Boolean) : Boolean {
+public inline fun BooleanArray.first(predicate: (Boolean) -> Boolean) : Boolean {
     for (element in this) if (predicate(element)) return element
     throw IllegalArgumentException("No element matching predicate was found")
     
@@ -242,7 +242,7 @@ public fun BooleanArray.first(predicate: (Boolean) -> Boolean) : Boolean {
 /**
  * Returns first element matching the given *predicate*
  */
-public fun ByteArray.first(predicate: (Byte) -> Boolean) : Byte {
+public inline fun ByteArray.first(predicate: (Byte) -> Boolean) : Byte {
     for (element in this) if (predicate(element)) return element
     throw IllegalArgumentException("No element matching predicate was found")
     
@@ -251,7 +251,7 @@ public fun ByteArray.first(predicate: (Byte) -> Boolean) : Byte {
 /**
  * Returns first element matching the given *predicate*
  */
-public fun CharArray.first(predicate: (Char) -> Boolean) : Char {
+public inline fun CharArray.first(predicate: (Char) -> Boolean) : Char {
     for (element in this) if (predicate(element)) return element
     throw IllegalArgumentException("No element matching predicate was found")
     
@@ -260,7 +260,7 @@ public fun CharArray.first(predicate: (Char) -> Boolean) : Char {
 /**
  * Returns first element matching the given *predicate*
  */
-public fun DoubleArray.first(predicate: (Double) -> Boolean) : Double {
+public inline fun DoubleArray.first(predicate: (Double) -> Boolean) : Double {
     for (element in this) if (predicate(element)) return element
     throw IllegalArgumentException("No element matching predicate was found")
     
@@ -269,7 +269,7 @@ public fun DoubleArray.first(predicate: (Double) -> Boolean) : Double {
 /**
  * Returns first element matching the given *predicate*
  */
-public fun FloatArray.first(predicate: (Float) -> Boolean) : Float {
+public inline fun FloatArray.first(predicate: (Float) -> Boolean) : Float {
     for (element in this) if (predicate(element)) return element
     throw IllegalArgumentException("No element matching predicate was found")
     
@@ -278,7 +278,7 @@ public fun FloatArray.first(predicate: (Float) -> Boolean) : Float {
 /**
  * Returns first element matching the given *predicate*
  */
-public fun IntArray.first(predicate: (Int) -> Boolean) : Int {
+public inline fun IntArray.first(predicate: (Int) -> Boolean) : Int {
     for (element in this) if (predicate(element)) return element
     throw IllegalArgumentException("No element matching predicate was found")
     
@@ -287,7 +287,7 @@ public fun IntArray.first(predicate: (Int) -> Boolean) : Int {
 /**
  * Returns first element matching the given *predicate*
  */
-public fun LongArray.first(predicate: (Long) -> Boolean) : Long {
+public inline fun LongArray.first(predicate: (Long) -> Boolean) : Long {
     for (element in this) if (predicate(element)) return element
     throw IllegalArgumentException("No element matching predicate was found")
     
@@ -296,7 +296,7 @@ public fun LongArray.first(predicate: (Long) -> Boolean) : Long {
 /**
  * Returns first element matching the given *predicate*
  */
-public fun ShortArray.first(predicate: (Short) -> Boolean) : Short {
+public inline fun ShortArray.first(predicate: (Short) -> Boolean) : Short {
     for (element in this) if (predicate(element)) return element
     throw IllegalArgumentException("No element matching predicate was found")
     
@@ -305,7 +305,7 @@ public fun ShortArray.first(predicate: (Short) -> Boolean) : Short {
 /**
  * Returns first element matching the given *predicate*
  */
-public fun <T> Iterable<T>.first(predicate: (T) -> Boolean) : T {
+public inline fun <T> Iterable<T>.first(predicate: (T) -> Boolean) : T {
     for (element in this) if (predicate(element)) return element
     throw IllegalArgumentException("No element matching predicate was found")
     
@@ -314,7 +314,7 @@ public fun <T> Iterable<T>.first(predicate: (T) -> Boolean) : T {
 /**
  * Returns first element matching the given *predicate*
  */
-public fun <T> Stream<T>.first(predicate: (T) -> Boolean) : T {
+public inline fun <T> Stream<T>.first(predicate: (T) -> Boolean) : T {
     for (element in this) if (predicate(element)) return element
     throw IllegalArgumentException("No element matching predicate was found")
     
@@ -323,7 +323,7 @@ public fun <T> Stream<T>.first(predicate: (T) -> Boolean) : T {
 /**
  * Returns first element matching the given *predicate*, or *null* if element was not found
  */
-public fun <T> Array<out T>.firstOrNull(predicate: (T) -> Boolean) : T? {
+public inline fun <T> Array<out T>.firstOrNull(predicate: (T) -> Boolean) : T? {
     for (element in this) if (predicate(element)) return element
     return null
     
@@ -332,7 +332,7 @@ public fun <T> Array<out T>.firstOrNull(predicate: (T) -> Boolean) : T? {
 /**
  * Returns first element matching the given *predicate*, or *null* if element was not found
  */
-public fun BooleanArray.firstOrNull(predicate: (Boolean) -> Boolean) : Boolean? {
+public inline fun BooleanArray.firstOrNull(predicate: (Boolean) -> Boolean) : Boolean? {
     for (element in this) if (predicate(element)) return element
     return null
     
@@ -341,7 +341,7 @@ public fun BooleanArray.firstOrNull(predicate: (Boolean) -> Boolean) : Boolean? 
 /**
  * Returns first element matching the given *predicate*, or *null* if element was not found
  */
-public fun ByteArray.firstOrNull(predicate: (Byte) -> Boolean) : Byte? {
+public inline fun ByteArray.firstOrNull(predicate: (Byte) -> Boolean) : Byte? {
     for (element in this) if (predicate(element)) return element
     return null
     
@@ -350,7 +350,7 @@ public fun ByteArray.firstOrNull(predicate: (Byte) -> Boolean) : Byte? {
 /**
  * Returns first element matching the given *predicate*, or *null* if element was not found
  */
-public fun CharArray.firstOrNull(predicate: (Char) -> Boolean) : Char? {
+public inline fun CharArray.firstOrNull(predicate: (Char) -> Boolean) : Char? {
     for (element in this) if (predicate(element)) return element
     return null
     
@@ -359,7 +359,7 @@ public fun CharArray.firstOrNull(predicate: (Char) -> Boolean) : Char? {
 /**
  * Returns first element matching the given *predicate*, or *null* if element was not found
  */
-public fun DoubleArray.firstOrNull(predicate: (Double) -> Boolean) : Double? {
+public inline fun DoubleArray.firstOrNull(predicate: (Double) -> Boolean) : Double? {
     for (element in this) if (predicate(element)) return element
     return null
     
@@ -368,7 +368,7 @@ public fun DoubleArray.firstOrNull(predicate: (Double) -> Boolean) : Double? {
 /**
  * Returns first element matching the given *predicate*, or *null* if element was not found
  */
-public fun FloatArray.firstOrNull(predicate: (Float) -> Boolean) : Float? {
+public inline fun FloatArray.firstOrNull(predicate: (Float) -> Boolean) : Float? {
     for (element in this) if (predicate(element)) return element
     return null
     
@@ -377,7 +377,7 @@ public fun FloatArray.firstOrNull(predicate: (Float) -> Boolean) : Float? {
 /**
  * Returns first element matching the given *predicate*, or *null* if element was not found
  */
-public fun IntArray.firstOrNull(predicate: (Int) -> Boolean) : Int? {
+public inline fun IntArray.firstOrNull(predicate: (Int) -> Boolean) : Int? {
     for (element in this) if (predicate(element)) return element
     return null
     
@@ -386,7 +386,7 @@ public fun IntArray.firstOrNull(predicate: (Int) -> Boolean) : Int? {
 /**
  * Returns first element matching the given *predicate*, or *null* if element was not found
  */
-public fun LongArray.firstOrNull(predicate: (Long) -> Boolean) : Long? {
+public inline fun LongArray.firstOrNull(predicate: (Long) -> Boolean) : Long? {
     for (element in this) if (predicate(element)) return element
     return null
     
@@ -395,7 +395,7 @@ public fun LongArray.firstOrNull(predicate: (Long) -> Boolean) : Long? {
 /**
  * Returns first element matching the given *predicate*, or *null* if element was not found
  */
-public fun ShortArray.firstOrNull(predicate: (Short) -> Boolean) : Short? {
+public inline fun ShortArray.firstOrNull(predicate: (Short) -> Boolean) : Short? {
     for (element in this) if (predicate(element)) return element
     return null
     
@@ -404,7 +404,7 @@ public fun ShortArray.firstOrNull(predicate: (Short) -> Boolean) : Short? {
 /**
  * Returns first element matching the given *predicate*, or *null* if element was not found
  */
-public fun <T> Iterable<T>.firstOrNull(predicate: (T) -> Boolean) : T? {
+public inline fun <T> Iterable<T>.firstOrNull(predicate: (T) -> Boolean) : T? {
     for (element in this) if (predicate(element)) return element
     return null
     
@@ -413,7 +413,7 @@ public fun <T> Iterable<T>.firstOrNull(predicate: (T) -> Boolean) : T? {
 /**
  * Returns first element matching the given *predicate*, or *null* if element was not found
  */
-public fun <T> Stream<T>.firstOrNull(predicate: (T) -> Boolean) : T? {
+public inline fun <T> Stream<T>.firstOrNull(predicate: (T) -> Boolean) : T? {
     for (element in this) if (predicate(element)) return element
     return null
     

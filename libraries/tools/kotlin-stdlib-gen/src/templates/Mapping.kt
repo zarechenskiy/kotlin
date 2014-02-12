@@ -26,6 +26,8 @@ fun mapping(): List<GenericFunction> {
     }
 
     templates add f("map(transform : (T) -> R)") {
+        inline(true)
+
         doc { "Returns a list containing the results of applying the given *transform* function to each element of the original collection" }
         typeParam("R")
         returns("List<R>")
@@ -33,6 +35,7 @@ fun mapping(): List<GenericFunction> {
             "return mapTo(ArrayList<R>(), transform)"
         }
 
+        inline(false, Streams)
         returns(Streams) { "Stream<R>" }
         doc(Streams) { "Returns a stream containing the results of applying the given *transform* function to each element of the original stream" }
         body(Streams) {
@@ -42,6 +45,8 @@ fun mapping(): List<GenericFunction> {
     }
 
     templates add f("mapTo(collection: C, transform : (T) -> R)") {
+        inline(true)
+
         doc {
             """
             Appends transformed elements of original collection using the given *transform* function
@@ -63,6 +68,8 @@ fun mapping(): List<GenericFunction> {
     }
 
     templates add f("flatMap(transform: (T)-> Iterable<R>)") {
+        inline(true)
+
         exclude(Streams)
         doc { "Returns a single list of all elements yielded from results of *transform* function being invoked on each element of original collection" }
         typeParam("R")
@@ -84,6 +91,7 @@ fun mapping(): List<GenericFunction> {
     }
 
     templates add f("flatMapTo(collection: C, transform: (T) -> Iterable<R>)") {
+        inline(true)
         exclude(Streams)
         doc { "Appends all elements yielded from results of *transform* function being invoked on each element of original collection, to the given *collection*" }
         typeParam("R")
@@ -102,6 +110,8 @@ fun mapping(): List<GenericFunction> {
     }
 
     templates add f("flatMapTo(collection: C, transform: (T) -> Stream<R>)") {
+        inline(true)
+
         only(Streams)
         doc { "Appends all elements yielded from results of *transform* function being invoked on each element of original stream, to the given *collection*" }
         typeParam("R")
@@ -119,6 +129,8 @@ fun mapping(): List<GenericFunction> {
     }
 
     templates add f("groupBy(toKey: (T) -> K)") {
+        inline(true)
+
         doc { "Returns a map of the elements in original collection grouped by the result of given *toKey* function" }
         typeParam("K")
         returns("Map<K, List<T>>")
@@ -127,6 +139,8 @@ fun mapping(): List<GenericFunction> {
     }
 
     templates add f("groupByTo(map: MutableMap<K, MutableList<T>>, toKey: (T) -> K)") {
+        inline(true)
+
         typeParam("K")
         doc { "Appends elements from original collection grouped by the result of given *toKey* function to the given *map*" }
         returns("Map<K, MutableList<T>>")

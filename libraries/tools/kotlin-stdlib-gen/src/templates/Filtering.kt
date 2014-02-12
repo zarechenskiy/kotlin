@@ -84,6 +84,8 @@ fun filtering(): List<GenericFunction> {
     }
 
     templates add f("dropWhile(predicate: (T)->Boolean)") {
+        inline(true)
+
         doc { "Returns a list containing all elements except first elements that satisfy the given *predicate*" }
         returns("List<T>")
         body {
@@ -101,6 +103,7 @@ fun filtering(): List<GenericFunction> {
             """
         }
 
+        inline(false, Streams)
         doc(Streams) { "Returns a stream containing all elements except first elements that satisfy the given *predicate*" }
         returns(Streams) { "Stream<T>" }
         body(Streams) {
@@ -121,6 +124,8 @@ fun filtering(): List<GenericFunction> {
     }
 
     templates add f("takeWhile(predicate: (T)->Boolean)") {
+        inline(true)
+
         doc { "Returns a list containing first elements satisfying the given *predicate*" }
         returns("List<T>")
         body {
@@ -135,6 +140,7 @@ fun filtering(): List<GenericFunction> {
             """
         }
 
+        inline(false, Streams)
         doc(Streams) { "Returns a stream containing first elements satisfying the given *predicate*" }
         returns(Streams) { "Stream<T>" }
         body(Streams) {
@@ -145,6 +151,8 @@ fun filtering(): List<GenericFunction> {
     }
 
     templates add f("filter(predicate: (T)->Boolean)") {
+        inline(true)
+
         doc { "Returns a list containing all elements matching the given *predicate*" }
         returns("List<T>")
         body {
@@ -153,6 +161,7 @@ fun filtering(): List<GenericFunction> {
             """
         }
 
+        inline(false, Streams)
         doc(Streams) { "Returns a stream containing all elements matching the given *predicate*" }
         returns(Streams) { "Stream<T>" }
         body(Streams) {
@@ -164,6 +173,8 @@ fun filtering(): List<GenericFunction> {
     }
 
     templates add f("filterTo(collection: C, predicate: (T) -> Boolean)") {
+        inline(true)
+
         doc { "Appends all elements matching the given *predicate* into the given *collection*" }
         typeParam("C: MutableCollection<in T>")
         returns("C")
@@ -178,6 +189,8 @@ fun filtering(): List<GenericFunction> {
     }
 
     templates add f("filterNot(predicate: (T)->Boolean)") {
+        inline(true)
+
         doc { "Returns a list containing all elements not matching the given *predicate*" }
         returns("List<T>")
         body {
@@ -186,6 +199,7 @@ fun filtering(): List<GenericFunction> {
             """
         }
 
+        inline(false, Streams)
         doc(Streams) { "Returns a stream containing all elements not matching the given *predicate*" }
         returns(Streams) { "Stream<T>" }
         body(Streams) {
@@ -197,6 +211,8 @@ fun filtering(): List<GenericFunction> {
     }
 
     templates add f("filterNotTo(collection: C, predicate: (T) -> Boolean)") {
+        inline(true)
+
         doc { "Appends all elements not matching the given *predicate* to the given *collection*" }
         typeParam("C: MutableCollection<in T>")
         returns("C")

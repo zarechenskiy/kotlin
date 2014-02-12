@@ -141,7 +141,7 @@ public fun <T> Iterable<T>.sortBy(comparator : Comparator<T>) : List<T> {
 /**
  * Returns a list of all elements, sorted by results of specified *order* function.
  */
-public fun <T, R: Comparable<R>> Array<out T>.sortBy(order: (T) -> R) : List<T> {
+public inline fun <T, R: Comparable<R>> Array<out T>.sortBy(order: (T) -> R) : List<T> {
     val sortedList = toArrayList()
     val sortBy: Comparator<T> = comparator<T> {(x: T, y: T) -> order(x).compareTo(order(y))}
     java.util.Collections.sort(sortedList, sortBy)
@@ -152,7 +152,7 @@ public fun <T, R: Comparable<R>> Array<out T>.sortBy(order: (T) -> R) : List<T> 
 /**
  * Returns a list of all elements, sorted by results of specified *order* function.
  */
-public fun <T, R: Comparable<R>> Iterable<T>.sortBy(order: (T) -> R) : List<T> {
+public inline fun <T, R: Comparable<R>> Iterable<T>.sortBy(order: (T) -> R) : List<T> {
     val sortedList = toArrayList()
     val sortBy: Comparator<T> = comparator<T> {(x: T, y: T) -> order(x).compareTo(order(y))}
     java.util.Collections.sort(sortedList, sortBy)
