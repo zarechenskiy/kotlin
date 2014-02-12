@@ -60,7 +60,9 @@
                                     <fileset dir="${basedir}/../../stdlib/src/kotlin">
                                         <include name="Arrays.kt"/>
                                         <include name="Preconditions.kt"/>
-                                        <include name="Iterators.kt"/>
+                                        <include name="AbstractIterator.kt"/>
+                                        <include name="Functions.kt"/>
+                                        <include name="Integers.kt"/>
                                         <include name="JUtil.kt"/>
                                         <include name="Collections.kt"/>
                                         <include name="Maps.kt"/>
