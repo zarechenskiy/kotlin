@@ -102,6 +102,9 @@ public fun println() {
     System.out.println()
 }
 
+// Since System.in can change its value on the course of program running,
+// we should always delegate to current value and cannot just pass it to InputStreamReader constructor.
+// We could use "by" implementation, but we can only use "by" with traits and InputStream is abstract class.
 private val stdin: BufferedReader = BufferedReader(InputStreamReader(object : InputStream() {
     public override fun read(): Int {
         return System.`in`.read()
@@ -143,32 +146,6 @@ private val stdin: BufferedReader = BufferedReader(InputStreamReader(object : In
 /** Reads a line of input from [[System.in]] */
 public fun readLine(): String? = stdin.readLine()
 
-/** Uses the given resource then closes it down correctly whether an exception is thrown or not */
-public inline fun <T : Closeable, R> T.use(block: (T) -> R): R {
-    var closed = false
-    try {
-        return block(this)
-    } catch (e: Exception) {
-        closed = true
-        try {
-            this.close()
-        } catch (closeException: Exception) {
-            // eat the closeException as we are already throwing the original cause
-            // and we don't want to mask the real exception
-
-            // TODO on Java 7 we should call
-            // e.addSuppressed(closeException)
-            // to work like try-with-resources
-            // http://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html#suppressed-exceptions
-        }
-        throw e
-    } finally {
-        if (!closed) {
-            this.close()
-        }
-    }
-}
-
 /** Returns an [Iterator] of bytes over an input stream */
 public fun InputStream.iterator(): ByteIterator =
         object: ByteIterator() {
@@ -184,29 +161,37 @@ public fun InputStream.buffered(bufferSize: Int = defaultBufferSize): InputStrea
 else
     BufferedInputStream(this, bufferSize)
 
+/** Creates a reader on an input stream with specified *encoding* */
 public fun InputStream.reader(encoding: Charset = defaultCharset): InputStreamReader = InputStreamReader(this, encoding)
 
+/** Creates a reader on an input stream with specified *encoding* */
 public fun InputStream.reader(encoding: String): InputStreamReader = InputStreamReader(this, encoding)
 
+/** Creates a reader on an input stream with specified *encoding* */
 public fun InputStream.reader(encoding: CharsetDecoder): InputStreamReader = InputStreamReader(this, encoding)
 
 
+/** Creates a buffered output stream */
 public fun OutputStream.buffered(bufferSize: Int = defaultBufferSize): BufferedOutputStream
         = if (this is BufferedOutputStream) this else BufferedOutputStream(this, bufferSize)
 
+/** Creates a writer on an output stream with specified *encoding* */
 public fun OutputStream.writer(encoding: Charset = defaultCharset): OutputStreamWriter = OutputStreamWriter(this, encoding)
 
+/** Creates a writer on an output stream with specified *encoding* */
 public fun OutputStream.writer(encoding: String): OutputStreamWriter = OutputStreamWriter(this, encoding)
 
+/** Creates a writer on an output stream with specified *encoding* */
 public fun OutputStream.writer(encoding: CharsetEncoder): OutputStreamWriter = OutputStreamWriter(this, encoding)
 
 
+/** Creates a buffered reader, or returns self if Reader is already buffered */
 public fun Reader.buffered(bufferSize: Int = defaultBufferSize): BufferedReader
         = if (this is BufferedReader) this else BufferedReader(this, bufferSize)
 
+/** Creates a buffered writer, or returns self if Writer is already buffered */
 public fun Writer.buffered(bufferSize: Int = defaultBufferSize): BufferedWriter
         = if (this is BufferedWriter) this else BufferedWriter(this, bufferSize)
-
 
 /**
  * Iterates through each line of this reader then closing the [[Reader]] when its completed
@@ -214,7 +199,7 @@ public fun Writer.buffered(bufferSize: Int = defaultBufferSize): BufferedWriter
 public fun Reader.forEachLine(block: (String) -> Unit): Unit = useLines { lines -> lines.forEach(block) }
 
 public inline fun <T> Reader.useLines(block: (Stream<String>) -> T): T =
-        this.buffered().use<BufferedReader, T>{ block(it.lineStream()) }
+        this.buffered().use { block(it.lines()) }
 
 /**
  * Returns an iterator over each line.
@@ -224,9 +209,9 @@ public inline fun <T> Reader.useLines(block: (Stream<String>) -> T): T =
  * <br>
  * We suggest you try the method useLines() instead which closes the stream when the processing is complete.
  */
-public fun BufferedReader.lineStream(): Stream<String> = LineStream(this)
+public fun BufferedReader.lines(): Stream<String> = LinesStream(this)
 
-class LineStream(val reader: BufferedReader) : Stream<String> {
+class LinesStream(val reader: BufferedReader) : Stream<String> {
     override fun iterator(): Iterator<String> {
         return object : Iterator<String> {
             private var nextValue: String? = null

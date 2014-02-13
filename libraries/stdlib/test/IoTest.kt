@@ -12,7 +12,7 @@ class IoTest(){
     test fun testLineIteratorWithManualClose() {
         val reader = sample().buffered()
         try {
-            val list = reader.lineStream().toArrayList()
+            val list = reader.lines().toArrayList()
             assertEquals(arrayListOf("Hello", "World"), list)
         } finally {
             reader.close()
