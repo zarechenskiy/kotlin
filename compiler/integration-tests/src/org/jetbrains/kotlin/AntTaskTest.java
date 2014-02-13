@@ -97,20 +97,20 @@ public class AntTaskTest extends KotlinIntegrationTestBase {
 
     @Test
     public void javacCompiler() throws Exception {
-        doJvmAntTest("-cp", getKotlinAntPath(),
+        doJvmAntTest("-cp", getKotlinAntPath() + ":" + getKotlinRuntimePath(),
                      "-Dkotlin.home", getCompilerLib().getAbsolutePath());
     }
 
     @Test
     public void externalAnnotations() throws Exception {
-        doJvmAntTest("-cp", getKotlinAntPath(),
+        doJvmAntTest("-cp", getKotlinAntPath()+ ":" + getKotlinRuntimePath(),
                      "-Didea.sdk", getIdeaSdkHome(),
                      "-Dkotlin.home", getCompilerLib().getAbsolutePath());
     }
 
     @Test
     public void kotlinCompiler() throws Exception {
-        doJvmAntTest("-cp", getKotlinAntPath(),
+        doJvmAntTest("-cp", getKotlinAntPath()+ ":" + getKotlinRuntimePath(),
                      "-Didea.sdk", getIdeaSdkHome(),
                      "-Dkotlin.home", getCompilerLib().getAbsolutePath());
     }

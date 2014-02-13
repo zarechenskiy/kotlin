@@ -68,7 +68,7 @@ public abstract class KotlinIntegrationTestBase {
     protected int runCompiler(String logName, String... arguments) throws Exception {
         File lib = getCompilerLib();
 
-        String classpath = lib.getAbsolutePath() + File.separator + "kotlin-compiler.jar";
+        String classpath = lib.getAbsolutePath() + File.separator + "kotlin-compiler.jar" + ":" + getKotlinRuntimePath();
 
         Collection<String> javaArgs = new ArrayList<String>();
         javaArgs.add("-cp");
