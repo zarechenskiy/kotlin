@@ -819,10 +819,8 @@ public fun <T, R> Iterable<T>.zip(collection: Iterable<R>) : List<Pair<T,R>> {
 /**
  * Returns a stream of pairs built from elements of both collections with same indexes. List has length of shortest collection.
  */
-/*
 public fun <T, R> Stream<T>.zip(stream: Stream<R>) : Stream<Pair<T,R>> {
     return ZippingStream(this, stream)
     
 }
-*/
 

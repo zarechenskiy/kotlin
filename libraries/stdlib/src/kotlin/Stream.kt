@@ -41,7 +41,6 @@ public class TransformingStream<T, R>(val stream: Stream<T>, val transformer: (T
     }
 }
 
-/*
 class ZippingStream<T1, T2>(val stream1: Stream<T1>, val stream2: Stream<T2>) : Stream<Pair<T1,T2>> {
     override fun iterator(): Iterator<Pair<T1,T2>> = object : AbstractIterator<Pair<T1,T2>>() {
         val iterator1 = stream1.iterator()
@@ -55,7 +54,6 @@ class ZippingStream<T1, T2>(val stream1: Stream<T1>, val stream2: Stream<T2>) : 
         }
     }
 }
-*/
 
 public class FlatteningStream<T, R>(val stream: Stream<T>, val transformer: (T) -> Stream<R>) : Stream<R> {
     override fun iterator(): Iterator<R> = object : AbstractIterator<R>() {
