@@ -127,7 +127,8 @@ public class GenerateInjectors {
         generator.implementInterface(InjectorForTopDownAnalyzer.class);
         generateInjectorForTopDownAnalyzerCommon(generator);
         generator.addPublicField(JavaDescriptorResolver.class);
-        generator.addField(false, JavaToKotlinClassMap.class, null, new GivenExpression("org.jetbrains.jet.lang.resolve.java.mapping.JavaToKotlinClassMap.getInstance()"));
+        generator.addField(false, JavaToKotlinClassMap.class, null,
+                           new GivenExpression("org.jetbrains.jet.lang.resolve.java.mapping.JavaToKotlinClassMap.getInstance()"));
         generator.addField(JavaClassFinderImpl.class);
         generator.addField(TraceBasedExternalSignatureResolver.class);
         generator.addField(TraceBasedJavaResolverCache.class);
@@ -135,7 +136,6 @@ public class GenerateInjectors {
         generator.addField(PsiBasedMethodSignatureChecker.class);
         generator.addField(PsiBasedExternalAnnotationResolver.class);
         generator.addField(MutablePackageFragmentProvider.class);
-        generator.addField(false, JavaPackageFragmentProvider.class, null, new GivenExpression("javaDescriptorResolver.getPackageFragmentProvider()"));
         generator.addField(false, VirtualFileFinder.class, "virtualFileFinder",
                            new GivenExpression(
                                    VirtualFileFinder.class.getName() + ".SERVICE.getInstance(project)"));
@@ -161,7 +161,6 @@ public class GenerateInjectors {
         generator.addField(PsiBasedMethodSignatureChecker.class);
         generator.addField(PsiBasedExternalAnnotationResolver.class);
         generator.addPublicField(JavaDescriptorResolver.class);
-        generator.addField(false, JavaPackageFragmentProvider.class, null, new GivenExpression("javaDescriptorResolver.getPackageFragmentProvider()"));
         generator.addField(false, VirtualFileFinder.class, "virtualFileFinder",
                            new GivenExpression(VirtualFileFinder.class.getName() + ".SERVICE.getInstance(project)"));
         generator.addField(true, ModuleDescriptorImpl.class, "module",

@@ -87,11 +87,13 @@ import org.jetbrains.jet.completion.handlers.AbstractSmartCompletionHandlerTest
 import org.jetbrains.jet.generators.tests.generator.TestGeneratorUtil
 import org.jetbrains.jet.resolve.AbstractAdditionalLazyResolveDescriptorRendererTest
 import org.jetbrains.jet.resolve.AbstractReferenceResolveInLibrarySourcesTest
+import org.jetbrains.jet.resolve.constraintSystem.AbstractConstraintSystemTest
 import org.jetbrains.jet.completion.AbstractCompiledKotlinInJavaCompletionTest
 import org.jetbrains.jet.completion.AbstractKotlinSourceInJavaCompletionTest
 import org.jetbrains.jet.plugin.intentions.AbstractIntentionTest
 import org.jetbrains.jet.checkers.AbstractJetDiagnosticsTestWithStdLib
 import org.jetbrains.jet.plugin.codeInsight.AbstractInsertImportOnPasteTest
+import org.jetbrains.jet.resolve.AbstractReferenceToJavaWithWrongFileStructureTest
 
 fun main(args: Array<String>) {
     System.setProperty("java.awt.headless", "true")
@@ -114,6 +116,10 @@ fun main(args: Array<String>) {
 
         testClass(javaClass<AbstractResolvedCallsTest>()) {
             model("resolvedCalls")
+        }
+
+        testClass(javaClass<AbstractConstraintSystemTest>()) {
+            model("constraintSystem", extension = "bounds")
         }
 
         testClass(javaClass<AbstractJetParsingTest>()) {
@@ -336,6 +342,7 @@ fun main(args: Array<String>) {
             model("intentions/declarations/convertMemberToExtension", testMethod = "doTestConvertMemberToExtension")
             model("intentions/reconstructedType", testMethod = "doTestReconstructType")
             model("intentions/removeUnnecessaryParentheses", testMethod = "doTestRemoveUnnecessaryParentheses")
+            model("intentions/replaceWithDotQualifiedMethodCall", testMethod = "doTestReplaceWithDotQualifiedMethodCall")
         }
 
         testClass(javaClass<AbstractHierarchyTest>()) {
@@ -400,6 +407,10 @@ fun main(args: Array<String>) {
 
         testClass(javaClass<AbstractReferenceResolveInLibrarySourcesTest>()) {
             model("resolve/referenceInLib", recursive = false)
+        }
+
+        testClass(javaClass<AbstractReferenceToJavaWithWrongFileStructureTest>()) {
+            model("resolve/referenceToJavaWithWrongFileStructure", recursive = false)
         }
 
         testClass(javaClass<AbstractJetFindUsagesTest>()) {

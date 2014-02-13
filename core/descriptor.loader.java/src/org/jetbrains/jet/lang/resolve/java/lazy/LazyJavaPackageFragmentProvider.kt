@@ -10,32 +10,29 @@ import org.jetbrains.jet.lang.resolve.java.lazy.descriptors.LazyPackageFragmentF
 import org.jetbrains.jet.lang.resolve.java.resolver.DescriptorResolverUtils
 import org.jetbrains.jet.lang.resolve.java.resolver.JavaPackageFragmentProvider
 import org.jetbrains.jet.lang.resolve.java.lazy.descriptors.LazyJavaPackageFragment
-import org.jetbrains.jet.lang.resolve.name.Name
-import org.jetbrains.jet.lang.resolve.scopes.JetScope
 import org.jetbrains.jet.lang.resolve.kotlin.KotlinJvmBinaryClass
+import org.jetbrains.jet.lang.resolve.scopes.JetScope
 
-public open class LazyJavaPackageFragmentProvider(
-        private val outerContext: GlobalJavaResolverContext,
+public class LazyJavaPackageFragmentProvider(
+        outerContext: GlobalJavaResolverContext,
         private val _module: ModuleDescriptor
 ) : JavaPackageFragmentProvider {
+
     private val c = LazyJavaResolverContext(
             this,
+            FragmentClassResolver(),
             outerContext.storageManager,
             outerContext.finder,
             outerContext.kotlinClassFinder,
             outerContext.deserializedDescriptorResolver,
-            FragmentClassResolver(),
             outerContext.externalAnnotationResolver,
             outerContext.externalSignatureResolver,
             outerContext.errorReporter,
             outerContext.methodSignatureChecker,
-            outerContext.javaResolverCache,
-            outerContext.javaDescriptorResolver
+            outerContext.javaResolverCache
     )
 
     override fun getModule() = _module
-
-    override fun getJavaDescriptorResolver() = c.javaDescriptorResolver
 
     private val _packageFragments: MemoizedFunctionToNullable<FqName, LazyJavaPackageFragment> = c.storageManager.createMemoizedFunctionWithNullableValues {
         fqName ->
@@ -46,19 +43,20 @@ public open class LazyJavaPackageFragmentProvider(
         else {
             val jClass = c.findJavaClass(fqName)
             if (jClass != null && DescriptorResolverUtils.isJavaClassVisibleAsPackage(jClass)) {
-                LazyPackageFragmentForJavaClass(c, _module, jClass)
+                val correspondingClass = c.javaClassResolver.resolveClass(jClass)
+                if (correspondingClass != null) LazyPackageFragmentForJavaClass(c, _module, jClass) else null
             }
             else null
         }
     }
 
     override fun getPackageFragment(fqName: FqName) = _packageFragments(fqName)
-    override fun getPackageFragments(fqName: FqName) = getPackageFragment(fqName)?.let {listOf(it)} ?: listOf()
 
-    override fun getSubPackagesOf(fqName: FqName) = getPackageFragment(fqName)?.getMemberScope()?.getSubPackages()
-                                                                        ?: listOf<FqName>()
-    override fun getClassNamesInPackage(packageName: FqName) = getPackageFragment(packageName)?.getMemberScope()?.getAllClassNames()
-                                                                    ?: listOf<Name>()
+    override fun getPackageFragments(fqName: FqName) = getPackageFragment(fqName)?.let {listOf(it)}.orEmpty()
+
+    override fun getSubPackagesOf(fqName: FqName) = getPackageFragment(fqName)?.getMemberScope()?.getSubPackages().orEmpty()
+
+    override fun getClassNamesInPackage(packageName: FqName) = getPackageFragment(packageName)?.getMemberScope()?.getAllClassNames().orEmpty()
 
     fun getClass(fqName: FqName): ClassDescriptor? = c.javaClassResolver.resolveClassByFqName(fqName)
 
@@ -79,20 +77,18 @@ public open class LazyJavaPackageFragmentProvider(
                     return c.javaResolverCache.getClassResolvedFromSource(fqName)
                 }
             }
+            val resolvedClassifier = getContainingScope(javaClass)?.getClassifier(javaClass.getName())
+            return resolvedClassifier as? ClassDescriptor ?: c.javaResolverCache.getClass(javaClass)
+        }
 
-            val outer = javaClass.getOuterClass()
-            val scope = if (outer != null) {
-                val outerClass = resolveClass(outer)
-                if (outerClass == null) return outerContext.javaClassResolver.resolveClass(javaClass)
-                outerClass.getUnsubstitutedInnerClassesScope()
+        private fun getContainingScope(javaClass: JavaClass): JetScope? {
+            val outerClass = javaClass.getOuterClass()
+            if (outerClass != null) {
+                return resolveClass(outerClass)?.getUnsubstitutedInnerClassesScope()
             }
             else {
-                val outerPackage = getPackageFragment(fqName!!.parent())
-                if (outerPackage == null) return outerContext.javaClassResolver.resolveClass(javaClass)
-                outerPackage.getMemberScope()
+                return getPackageFragment(javaClass.getFqName()!!.parent())?.getMemberScope()
             }
-            return scope.getClassifier(javaClass.getName()) as? ClassDescriptor
-                        ?: outerContext.javaClassResolver.resolveClass(javaClass)
         }
 
         override fun resolveClassByFqName(fqName: FqName): ClassDescriptor? {
@@ -101,7 +97,7 @@ public open class LazyJavaPackageFragmentProvider(
 
             // TODO Here we prefer sources (something outside JDR subsystem) to binaries, which should actually be driven by module dependencies separation
             // See DeserializedDescriptorResolver.javaDescriptorFinder
-            val classFromSources = outerContext.javaClassResolver.resolveClassByFqName(fqName)
+            val classFromSources = c.javaResolverCache.getClassResolvedFromSource(fqName)
             if (classFromSources != null) return classFromSources
 
             val (jClass, kClass) = c.findClassInJava(fqName)
