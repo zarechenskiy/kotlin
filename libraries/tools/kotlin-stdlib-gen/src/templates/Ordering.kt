@@ -30,8 +30,7 @@ fun ordering(): List<GenericFunction> {
         body {
             """
             val sortedList = toArrayList()
-            val sortBy: Comparator<T> = comparator<T> {(x: T, y: T) -> x.compareTo(y)}
-            java.util.Collections.sort(sortedList, sortBy)
+            java.util.Collections.sort(sortedList)
             return sortedList
             """
         }

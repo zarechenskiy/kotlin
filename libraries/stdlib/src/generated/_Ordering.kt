@@ -112,8 +112,7 @@ public fun <T> Iterable<T>.reverse() : List<T> {
  */
 public fun <T: Comparable<T>> Iterable<T>.sort() : List<T> {
     val sortedList = toArrayList()
-    val sortBy: Comparator<T> = comparator<T> {(x: T, y: T) -> x.compareTo(y)}
-    java.util.Collections.sort(sortedList, sortBy)
+    java.util.Collections.sort(sortedList)
     return sortedList
     
 }
