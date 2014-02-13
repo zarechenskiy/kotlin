@@ -6,9 +6,10 @@ public class Testing {
 
 // note: "NUMBER" check also assures that FooPackage$src$ classes are not visible
 
+// EXIST: LibTrait$$TImpl
 // EXIST: LibClass
 // EXIST: LibTrait
 // EXIST: LibEnum
 // EXIST: LibObject
 // EXIST: FooPackage
-// NUMBER: 5
+// NUMBER: 6

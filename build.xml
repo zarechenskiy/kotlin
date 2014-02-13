@@ -351,13 +351,13 @@
             <isfalse value="${shrink}"/>
 
             <then>
-                <copy file="${output}/kotlin-compiler-before-shrink.jar"
-                      tofile="${kotlin-home}/lib/kotlin-compiler.jar"/>
+                <copy file="${output}/kotlin-compiler-before-shrink.jar" tofile="${kotlin-home}/lib/kotlin-compiler.jar"/>
             </then>
 
             <else>
                 <available property="rtjar" value="${java.home}/lib/rt.jar" file="${java.home}/lib/rt.jar"/>
                 <available property="rtjar" value="${java.home}/../Classes/classes.jar" file="${java.home}/../Classes/classes.jar"/>
+                <available property="jssejar" value="${java.home}/lib/jsse.jar" file="${java.home}/lib/jsse.jar"/>
 
                 <proguard><![CDATA[
                     -injars '${output}/kotlin-compiler-before-shrink.jar'(
@@ -397,6 +397,7 @@
 
                     -libraryjars '${rtjar}'
                     -libraryjars '${bootstrap.runtime}'
+                    -libraryjars '${jssejar}'
 
                     -target 1.6
                     -dontoptimize

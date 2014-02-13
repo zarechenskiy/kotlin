@@ -24,7 +24,9 @@ import com.intellij.codeInsight.template.impl.TemplateManagerImpl;
 import com.intellij.codeInsight.template.impl.TemplateState;
 import com.intellij.ide.DataManager;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.Result;
 import com.intellij.openapi.command.CommandProcessor;
+import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.intellij.openapi.editor.actionSystem.EditorActionManager;
 import com.intellij.testFramework.LightProjectDescriptor;
@@ -267,6 +269,14 @@ public class LiveTemplatesTest extends LightCodeInsightFixtureTestCase {
 
     private void typeAndNextTab(String s) {
         type(s);
+        nextTab();
+    }
+
+    private void type(String s) {
+        myFixture.type(s);
+    }
+
+    private void nextTab() {
         UIUtil.invokeAndWaitIfNeeded(new Runnable() {
             @Override
             public void run() {
@@ -276,21 +286,13 @@ public class LiveTemplatesTest extends LightCodeInsightFixtureTestCase {
                         ApplicationManager.getApplication().runWriteAction(new Runnable() {
                             @Override
                             public void run() {
-                                nextTab();
+                                getTemplateState().nextTab();
                             }
                         });
                     }
                 }, "nextTab", null);
             }
         });
-    }
-
-    private void type(String s) {
-        myFixture.type(s);
-    }
-
-    private void nextTab() {
-        getTemplateState().nextTab();
     }
 
     private void nextTab(int times) {

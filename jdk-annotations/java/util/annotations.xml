@@ -2110,6 +2110,9 @@
     <item name="java.util.Formatter java.util.Formatter format(java.util.Locale, java.lang.String, java.lang.Object...)">
         <annotation name="org.jetbrains.annotations.NotNull"/>
     </item>
+    <item name="java.util.Formatter java.util.Formatter format(java.util.Locale, java.lang.String, java.lang.Object...) 1">
+        <annotation name="org.jetbrains.annotations.NotNull"/>
+    </item>
     <item name="java.util.Formatter.BigDecimalLayoutForm java.util.Formatter.BigDecimalLayoutForm valueOf(java.lang.String)">
         <annotation name="org.jetbrains.annotations.NotNull"/>
     </item>
@@ -2983,12 +2986,21 @@
     <item name="java.util.Random void nextBytes(byte[]) 0">
         <annotation name="org.jetbrains.annotations.NotNull"/>
     </item>
+  <item name="java.util.ResourceBundle java.util.Set&lt;java.lang.String&gt; handleKeySet()">
+    <annotation name="org.jetbrains.annotations.NotNull"/>
+  </item>
+  <item name="java.util.ResourceBundle java.util.Enumeration&lt;java.lang.String&gt; getKeys()">
+    <annotation name="org.jetbrains.annotations.NotNull"/>
+  </item>
     <item name="java.util.ResourceBundle boolean containsKey(java.lang.String) 0">
         <annotation name="org.jetbrains.annotations.NotNull"/>
     </item>
     <item name="java.util.ResourceBundle java.lang.Object getObject(java.lang.String)">
         <annotation name="org.jetbrains.annotations.NotNull"/>
     </item>
+  <item name="java.util.ResourceBundle java.lang.Object getObject(java.lang.String) 0">
+    <annotation name="org.jetbrains.annotations.NotNull"/>
+  </item>
     <item name="java.util.ResourceBundle java.lang.Object handleGetObject(java.lang.String) 0">
         <annotation name="org.jetbrains.annotations.NotNull"/>
     </item>
@@ -2998,15 +3010,33 @@
     <item name="java.util.ResourceBundle java.lang.String[] getStringArray(java.lang.String)">
         <annotation name="org.jetbrains.annotations.NotNull"/>
     </item>
+  <item name="java.util.ResourceBundle java.lang.String getString(java.lang.String) 0">
+    <annotation name="org.jetbrains.annotations.NotNull"/>
+  </item>
+  <item name="java.util.ResourceBundle java.lang.String[] getStringArray(java.lang.String) 0">
+    <annotation name="org.jetbrains.annotations.NotNull"/>
+  </item>
+  <item name="java.util.ResourceBundle java.util.ResourceBundle getBundle(java.lang.String) 0">
+    <annotation name="org.jetbrains.annotations.NotNull"/>
+  </item>
     <item name="java.util.ResourceBundle java.util.ResourceBundle getBundle(java.lang.String, java.util.Locale) 1">
         <annotation name="org.jetbrains.annotations.NotNull"/>
     </item>
+  <item name="java.util.ResourceBundle java.util.ResourceBundle getBundle(java.lang.String, java.util.Locale) 0">
+    <annotation name="org.jetbrains.annotations.NotNull"/>
+  </item>
+  <item name="java.util.ResourceBundle java.util.ResourceBundle getBundle(java.lang.String, java.util.Locale, java.lang.ClassLoader) 0">
+    <annotation name="org.jetbrains.annotations.NotNull"/>
+  </item>
     <item name="java.util.ResourceBundle java.util.ResourceBundle getBundle(java.lang.String, java.util.Locale, java.lang.ClassLoader) 1">
         <annotation name="org.jetbrains.annotations.NotNull"/>
     </item>
     <item name="java.util.ResourceBundle java.util.ResourceBundle getBundle(java.lang.String, java.util.Locale, java.lang.ClassLoader) 2">
         <annotation name="org.jetbrains.annotations.NotNull"/>
     </item>
+  <item name="java.util.ResourceBundle java.util.ResourceBundle getBundle(java.lang.String, java.util.Locale, java.lang.ClassLoader, java.util.ResourceBundle.Control) 0">
+    <annotation name="org.jetbrains.annotations.NotNull"/>
+  </item>
     <item name="java.util.ResourceBundle java.util.ResourceBundle getBundle(java.lang.String, java.util.Locale, java.lang.ClassLoader, java.util.ResourceBundle.Control) 1">
         <annotation name="org.jetbrains.annotations.NotNull"/>
     </item>
@@ -3016,12 +3046,18 @@
     <item name="java.util.ResourceBundle java.util.ResourceBundle getBundle(java.lang.String, java.util.Locale, java.lang.ClassLoader, java.util.ResourceBundle.Control) 3">
         <annotation name="org.jetbrains.annotations.NotNull"/>
     </item>
+  <item name="java.util.ResourceBundle java.util.ResourceBundle getBundle(java.lang.String, java.util.Locale, java.util.ResourceBundle.Control) 0">
+    <annotation name="org.jetbrains.annotations.NotNull"/>
+  </item>
     <item name="java.util.ResourceBundle java.util.ResourceBundle getBundle(java.lang.String, java.util.Locale, java.util.ResourceBundle.Control) 1">
         <annotation name="org.jetbrains.annotations.NotNull"/>
     </item>
     <item name="java.util.ResourceBundle java.util.ResourceBundle getBundle(java.lang.String, java.util.Locale, java.util.ResourceBundle.Control) 2">
         <annotation name="org.jetbrains.annotations.NotNull"/>
     </item>
+  <item name="java.util.ResourceBundle java.util.ResourceBundle getBundle(java.lang.String, java.util.ResourceBundle.Control) 0">
+    <annotation name="org.jetbrains.annotations.NotNull"/>
+  </item>
     <item name="java.util.ResourceBundle java.util.ResourceBundle getBundle(java.lang.String, java.util.ResourceBundle.Control) 1">
         <annotation name="org.jetbrains.annotations.NotNull"/>
     </item>
