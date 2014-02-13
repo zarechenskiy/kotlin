@@ -1,5 +1,5 @@
-val x = LineStream<caret>
+val x = LinesStream<caret>
 
 // INVOCATION_COUNT: 1
-// EXIST: { lookupString:"LineStream", tailText:" (kotlin.io)" }
+// EXIST: { lookupString:"LinesStream", tailText:" (kotlin.io)" }
 // NUMBER: 1
