@@ -163,12 +163,12 @@ fun elements(): List<GenericFunction> {
         returns("T")
         body {
             """
-            fun Iterator<T>.first() : T {
-                for (element in this) if (predicate(element)) return element
+            fun first(it : Iterator<T>) : T {
+                for (element in it) if (predicate(element)) return element
                 throw IllegalArgumentException("Collection doesn't contain any element matching predicate")
             }
             val iterator = iterator()
-            var last = iterator.first()
+            var last = first(iterator)
             while (iterator.hasNext()) {
                 val element = iterator.next()
                 if (predicate(element))
@@ -184,12 +184,12 @@ fun elements(): List<GenericFunction> {
         returns("T?")
         body {
             """
-            fun Iterator<T>.first() : T? {
-                for (element in this) if (predicate(element)) return element
+            fun first(it : Iterator<T>) : T? {
+                for (element in it) if (predicate(element)) return element
                 return null
             }
             val iterator = iterator()
-            var last = iterator.first()
+            var last = first(iterator)
             if (last == null)
                 return null
             while (iterator.hasNext()) {
@@ -236,12 +236,12 @@ fun elements(): List<GenericFunction> {
         returns("T")
         body {
             """
-            fun Iterator<T>.first() : T {
-                for (element in this) if (predicate(element)) return element
+            fun first(it : Iterator<T>) : T {
+                for (element in it) if (predicate(element)) return element
                 throw IllegalArgumentException("Collection doesn't have matching element")
             }
             val iterator = iterator()
-            var single = iterator.first()
+            var single = first(iterator)
             while (iterator.hasNext()) {
                 val element = iterator.next()
                 if (predicate(element))
@@ -257,12 +257,12 @@ fun elements(): List<GenericFunction> {
         returns("T?")
         body {
             """
-            fun Iterator<T>.first() : T? {
-                for (element in this) if (predicate(element)) return element
+            fun first(it : Iterator<T>) : T? {
+                for (element in it) if (predicate(element)) return element
                 return null
             }
             val iterator = iterator()
-            var single = iterator.first()
+            var single = first(iterator)
             if (single == null)
                 return null
             while (iterator.hasNext()) {
