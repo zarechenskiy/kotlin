@@ -11,6 +11,7 @@
     <orderEntry type="module" module-name="cli-common" />
     <orderEntry type="module" module-name="util" />
     <orderEntry type="module" module-name="preloader" />
+    <orderEntry type="library" name="org.hamcrest:hamcrest-core:1.3" level="project" />
   </component>
 </module>
 

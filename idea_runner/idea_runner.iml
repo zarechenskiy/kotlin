@@ -7,6 +7,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" scope="RUNTIME" name="idea-full" level="project" />
     <orderEntry type="module" module-name="idea" scope="PROVIDED" />
+    <orderEntry type="library" name="org.hamcrest:hamcrest-core:1.3" level="project" />
   </component>
 </module>
 
