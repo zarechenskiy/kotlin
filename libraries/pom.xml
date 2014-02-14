@@ -94,13 +94,11 @@
         <module>docs/website</module>
 
         <module>examples/kotlin-java-example</module>
-      <!--
         <module>tools/kotlin-js-library</module>
         <module>tools/kotlin-js-tests</module>
         <module>tools/kotlin-js-tests-junit</module>
         <module>examples/js-example</module>
         <module>examples/browser-example</module>
-        -->
     </modules>
 
     <dependencies>
