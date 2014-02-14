@@ -3,9 +3,9 @@
     <property file="resources/manifest.properties" />
 
     <!-- Set to false to disable proguard run on kotlin-compiler.jar. Speeds up the build -->
-    <property name="shrink" value="false"/>
+    <property name="shrink" value="true"/>
     <!-- Set to false to disable compiler's @NotNull assertions. Speeds up the build -->
-    <property name="generate.assertions" value="false"/>
+    <property name="generate.assertions" value="true"/>
     <!-- Set to false to disable compiler's javadoc generation. Speeds up the build -->
     <property name="generate.javadoc" value="false"/>
 
@@ -399,7 +399,7 @@
                     META-INF/services/**,META-INF/native/**,META-INF/MANIFEST.MF,
                     messages/**)
 
-                    -outjars '${kotlin-home}/lib/kotlin-compiler.jar'
+                    -outjars '${snapshot.compiler.home}/lib/kotlin-compiler.jar'
 
                     -dontnote **
                     -dontwarn com.intellij.util.ui.IsRetina*
@@ -414,7 +414,7 @@
                     -dontwarn org.objectweb.asm.** # this is ASM3, the old version that we do not use
 
                     -libraryjars '${rtjar}'
-                    -libraryjars '${bootstrap.runtime}'
+                    -libraryjars '${snapshot.runtime}'
 
                     -target 1.6
                     -dontoptimize
