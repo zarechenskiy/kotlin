@@ -46,6 +46,7 @@ import org.jetbrains.jet.lang.types.JetType;
 import org.jetbrains.jet.lang.types.TypeUtils;
 import org.jetbrains.jet.lang.types.checker.JetTypeChecker;
 import org.jetbrains.jet.lang.types.expressions.ExpressionTypingServices;
+import org.jetbrains.jet.lang.types.expressions.LabelResolver;
 import org.jetbrains.jet.lang.types.lang.KotlinBuiltIns;
 
 import java.io.File;
@@ -536,7 +537,9 @@ public class JetTypeCheckerTest extends JetLiteFixture {
     private void assertErrorType(String expression) {
         Project project = getProject();
         JetExpression jetExpression = JetPsiFactory.createExpression(project, expression);
-        JetType type = expressionTypingServices.safeGetType(scopeWithImports, jetExpression, TypeUtils.NO_EXPECTED_TYPE, DataFlowInfo.EMPTY, JetTestUtils.DUMMY_TRACE);
+        JetType type = expressionTypingServices.safeGetType(
+                scopeWithImports, jetExpression, TypeUtils.NO_EXPECTED_TYPE, DataFlowInfo.EMPTY, JetTestUtils.DUMMY_TRACE,
+                LabelResolver.create());
         assertTrue("Error type expected but " + type + " returned", type.isError());
     }
 

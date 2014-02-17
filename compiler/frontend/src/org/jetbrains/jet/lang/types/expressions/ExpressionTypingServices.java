@@ -157,8 +157,16 @@ public class ExpressionTypingServices {
     }
 
     @NotNull
-    public JetType safeGetType(@NotNull JetScope scope, @NotNull JetExpression expression, @NotNull JetType expectedType, @NotNull DataFlowInfo dataFlowInfo, @NotNull BindingTrace trace) {
-        JetType type = getType(scope, expression, expectedType, dataFlowInfo, trace);
+    public JetType safeGetType(
+            @NotNull JetScope scope,
+            @NotNull JetExpression expression,
+            @NotNull JetType expectedType,
+            @NotNull DataFlowInfo dataFlowInfo,
+            @NotNull BindingTrace trace,
+            @NotNull LabelResolver labelResolver
+    ) {
+        ExpressionTypingContext context = ExpressionTypingContext.newContext(this, trace, scope, dataFlowInfo, expectedType, labelResolver);
+        JetType type = expressionTypingFacade.getTypeInfo(expression, context).getType();
         if (type != null) {
             return type;
         }
@@ -166,7 +174,13 @@ public class ExpressionTypingServices {
     }
 
     @NotNull
-    public JetTypeInfo getTypeInfo(@NotNull JetScope scope, @NotNull JetExpression expression, @NotNull JetType expectedType, @NotNull DataFlowInfo dataFlowInfo, @NotNull BindingTrace trace) {
+    public JetTypeInfo getTypeInfo(
+            @NotNull JetScope scope,
+            @NotNull JetExpression expression,
+            @NotNull JetType expectedType,
+            @NotNull DataFlowInfo dataFlowInfo,
+            @NotNull BindingTrace trace
+    ) {
         ExpressionTypingContext context = ExpressionTypingContext.newContext(this, trace, scope, dataFlowInfo, expectedType);
         return expressionTypingFacade.getTypeInfo(expression, context);
     }
@@ -177,7 +191,13 @@ public class ExpressionTypingServices {
     }
 
     @Nullable
-    public JetType getType(@NotNull JetScope scope, @NotNull JetExpression expression, @NotNull JetType expectedType, @NotNull DataFlowInfo dataFlowInfo, @NotNull BindingTrace trace) {
+    public JetType getType(
+            @NotNull JetScope scope,
+            @NotNull JetExpression expression,
+            @NotNull JetType expectedType,
+            @NotNull DataFlowInfo dataFlowInfo,
+            @NotNull BindingTrace trace
+    ) {
         return getTypeInfo(scope, expression, expectedType, dataFlowInfo, trace).getType();
     }
 

@@ -39,6 +39,7 @@ import org.jetbrains.jet.lang.types.TypeUtils;
 import org.jetbrains.jet.lang.types.checker.JetTypeChecker;
 import org.jetbrains.jet.lang.types.expressions.ExpressionTypingContext;
 import org.jetbrains.jet.lang.types.expressions.ExpressionTypingServices;
+import org.jetbrains.jet.lang.types.expressions.LabelResolver;
 import org.jetbrains.jet.lang.types.lang.KotlinBuiltIns;
 import org.jetbrains.jet.util.slicedmap.WritableSlice;
 
@@ -225,7 +226,7 @@ public class DelegatedPropertyResolver {
             traceToResolveDelegatedProperty.record(CONSTRAINT_SYSTEM_COMPLETER, calleeExpression, completer);
         }
         JetType delegateType = expressionTypingServices.safeGetType(propertyDeclarationInnerScope, delegateExpression, NO_EXPECTED_TYPE,
-                                                                    dataFlowInfo, traceToResolveDelegatedProperty);
+                                                                    dataFlowInfo, traceToResolveDelegatedProperty, LabelResolver.create());
         traceToResolveDelegatedProperty.commit(new TraceEntryFilter() {
             @Override
             public boolean accept(@Nullable WritableSlice<?, ?> slice, Object key) {

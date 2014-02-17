@@ -3091,6 +3091,11 @@ public class JetDiagnosticsTestGenerated extends AbstractJetDiagnosticsTest {
                 doTest("compiler/testData/diagnostics/tests/functionLiterals/kt4529.kt");
             }
             
+            @TestMetadata("kt4586LabeledFunctionLiteralInPropertyIninitializer.kt")
+            public void testKt4586LabeledFunctionLiteralInPropertyIninitializer() throws Exception {
+                doTest("compiler/testData/diagnostics/tests/functionLiterals/kt4586LabeledFunctionLiteralInPropertyIninitializer.kt");
+            }
+            
             @TestMetadata("LabeledFunctionLiterals.kt")
             public void testLabeledFunctionLiterals() throws Exception {
                 doTest("compiler/testData/diagnostics/tests/functionLiterals/LabeledFunctionLiterals.kt");

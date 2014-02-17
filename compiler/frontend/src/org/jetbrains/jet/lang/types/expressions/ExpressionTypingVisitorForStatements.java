@@ -127,7 +127,7 @@ public class ExpressionTypingVisitorForStatements extends ExpressionTypingVisito
         }
 
         VariableDescriptor propertyDescriptor = context.expressionTypingServices.getDescriptorResolver().
-                resolveLocalVariableDescriptor(scope, property, context.dataFlowInfo, context.trace);
+                resolveLocalVariableDescriptor(scope, property, context.dataFlowInfo, context.trace, context.labelResolver);
         JetExpression initializer = property.getInitializer();
         DataFlowInfo dataFlowInfo = context.dataFlowInfo;
         if (initializer != null) {

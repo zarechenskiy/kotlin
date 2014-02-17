@@ -4560,6 +4560,11 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
             doTest("compiler/testData/codegen/box/properties/kt4383.kt");
         }
         
+        @TestMetadata("kt4586LabeledFunctionLiteralInPropertyIninitializer.kt")
+        public void testKt4586LabeledFunctionLiteralInPropertyIninitializer() throws Exception {
+            doTest("compiler/testData/codegen/box/properties/kt4586LabeledFunctionLiteralInPropertyIninitializer.kt");
+        }
+        
         @TestMetadata("kt613.kt")
         public void testKt613() throws Exception {
             doTest("compiler/testData/codegen/box/properties/kt613.kt");

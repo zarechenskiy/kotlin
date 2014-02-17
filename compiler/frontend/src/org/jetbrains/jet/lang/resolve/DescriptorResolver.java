@@ -40,6 +40,7 @@ import org.jetbrains.jet.lang.resolve.scopes.WritableScopeImpl;
 import org.jetbrains.jet.lang.types.*;
 import org.jetbrains.jet.lang.types.checker.JetTypeChecker;
 import org.jetbrains.jet.lang.types.expressions.ExpressionTypingServices;
+import org.jetbrains.jet.lang.types.expressions.LabelResolver;
 import org.jetbrains.jet.lang.types.lang.KotlinBuiltIns;
 import org.jetbrains.jet.lexer.JetKeywordToken;
 import org.jetbrains.jet.lexer.JetTokens;
@@ -772,7 +773,8 @@ public class DescriptorResolver {
             JetScope scope,
             JetVariableDeclaration variable,
             DataFlowInfo dataFlowInfo,
-            BindingTrace trace
+            BindingTrace trace,
+            LabelResolver labelResolver
     ) {
         DeclarationDescriptor containingDeclaration = scope.getContainingDeclaration();
         if (JetPsiUtil.isScriptDeclaration(variable)) {
@@ -787,22 +789,22 @@ public class DescriptorResolver {
             );
 
             JetType type =
-                    getVariableType(propertyDescriptor, scope, variable, dataFlowInfo, false, trace); // For a local variable the type must not be deferred
+                    // For a local variable the type must not be deferred
+                    getVariableType(propertyDescriptor, scope, variable, dataFlowInfo, false, trace, labelResolver);
 
             ReceiverParameterDescriptor receiverParameter = ((ScriptDescriptor) containingDeclaration).getThisAsReceiverParameter();
             propertyDescriptor.setType(type, Collections.<TypeParameterDescriptor>emptyList(), receiverParameter, (JetType) null);
             trace.record(BindingContext.VARIABLE, variable, propertyDescriptor);
             return propertyDescriptor;
         }
-        else {
-            VariableDescriptorImpl variableDescriptor =
-                    resolveLocalVariableDescriptorWithType(scope, variable, null, trace);
+        VariableDescriptorImpl variableDescriptor =
+                resolveLocalVariableDescriptorWithType(scope, variable, null, trace);
 
-            JetType type =
-                    getVariableType(variableDescriptor, scope, variable, dataFlowInfo, false, trace); // For a local variable the type must not be deferred
-            variableDescriptor.setOutType(type);
-            return variableDescriptor;
-        }
+        JetType type =
+                // For a local variable the type must not be deferred
+                getVariableType(variableDescriptor, scope, variable, dataFlowInfo, false, trace, labelResolver);
+        variableDescriptor.setOutType(type);
+        return variableDescriptor;
     }
 
     @NotNull
@@ -881,7 +883,7 @@ public class DescriptorResolver {
         JetScope propertyScope = JetScopeUtils.getPropertyDeclarationInnerScope(propertyDescriptor, scope, typeParameterDescriptors,
                                                                                 NO_RECEIVER_PARAMETER, trace);
 
-        JetType type = getVariableType(propertyDescriptor, propertyScope, property, dataFlowInfo, true, trace);
+        JetType type = getVariableType(propertyDescriptor, propertyScope, property, dataFlowInfo, true, trace, LabelResolver.create());
 
         propertyDescriptor.setType(type, typeParameterDescriptors, getExpectedThisObjectIfNeeded(containingDeclaration),
                                    receiverDescriptor);
@@ -918,7 +920,8 @@ public class DescriptorResolver {
             @NotNull final JetVariableDeclaration variable,
             @NotNull final DataFlowInfo dataFlowInfo,
             boolean notLocal,
-            @NotNull final BindingTrace trace
+            @NotNull final BindingTrace trace,
+            @NotNull final LabelResolver labelResolver
     ) {
         JetTypeReference propertyTypeRef = variable.getTypeRef();
 
@@ -955,7 +958,7 @@ public class DescriptorResolver {
                             new Function0<JetType>() {
                                 @Override
                                 public JetType invoke() {
-                                    JetType type = resolveInitializerType(scope, initializer, dataFlowInfo, trace);
+                                    JetType type = resolveInitializerType(scope, initializer, dataFlowInfo, trace, labelResolver);
 
                                     EvaluatePackage.recordCompileTimeValueForInitializerIfNeeded(
                                             variableDescriptor, initializer, type, trace);
@@ -965,7 +968,7 @@ public class DescriptorResolver {
                     );
                 }
                 else {
-                    return resolveInitializerType(scope, initializer, dataFlowInfo, trace);
+                    return resolveInitializerType(scope, initializer, dataFlowInfo, trace, labelResolver);
                 }
             }
         }
@@ -1032,9 +1035,10 @@ public class DescriptorResolver {
             @NotNull JetScope scope,
             @NotNull JetExpression initializer,
             @NotNull DataFlowInfo dataFlowInfo,
-            @NotNull BindingTrace trace
+            @NotNull BindingTrace trace,
+            @NotNull LabelResolver labelResolver
     ) {
-        return expressionTypingServices.safeGetType(scope, initializer, TypeUtils.NO_EXPECTED_TYPE, dataFlowInfo, trace);
+        return expressionTypingServices.safeGetType(scope, initializer, TypeUtils.NO_EXPECTED_TYPE, dataFlowInfo, trace, labelResolver);
     }
 
     @Nullable
