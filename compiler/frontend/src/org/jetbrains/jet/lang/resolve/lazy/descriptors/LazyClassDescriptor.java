@@ -23,6 +23,7 @@ import com.intellij.psi.PsiElement;
 import jet.Function0;
 import jet.Function1;
 import jet.Unit;
+import kotlin.KotlinPackage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.lang.descriptors.*;
@@ -56,7 +57,7 @@ import static org.jetbrains.jet.lang.resolve.DescriptorUtils.isSyntheticClassObj
 import static org.jetbrains.jet.lang.resolve.ModifiersChecker.*;
 import static org.jetbrains.jet.lang.resolve.name.SpecialNames.getClassObjectName;
 
-public class LazyClassDescriptor extends ClassDescriptorBase implements LazyEntity, ClassDescriptor {
+public class LazyClassDescriptor extends ClassDescriptorBase implements LazyEntity, ClassDescriptorWithResolutionScopes {
     private static final Predicate<JetType> VALID_SUPERTYPE = new Predicate<JetType>() {
         @Override
         public boolean apply(JetType type) {
@@ -157,6 +158,7 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements LazyEnti
         return unsubstitutedMemberScope;
     }
 
+    @Override
     @NotNull
     public JetScope getScopeForClassHeaderResolution() {
         return scopeForClassHeaderResolution.invoke();
@@ -177,6 +179,7 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements LazyEnti
                 getScopeProvider().getResolutionScopeForDeclaration(scopeAnchor));
     }
 
+    @Override
     @NotNull
     public JetScope getScopeForMemberDeclarationResolution() {
         return scopeForMemberDeclarationResolution.invoke();
@@ -200,9 +203,26 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements LazyEnti
                 classObjectAdapterScope);
     }
 
+    @Override
     @NotNull
-    public JetScope getScopeForPropertyInitializerResolution() {
+    public JetScope getScopeForInitializerResolution() {
         return scopeForPropertyInitializerResolution.invoke();
+    }
+
+    @NotNull
+    @Override
+    public Collection<CallableMemberDescriptor> getDeclaredCallableMembers() {
+        //noinspection unchecked
+        return (Collection) KotlinPackage.filter(
+                unsubstitutedMemberScope.getDescriptorsFromDeclaredElements(),
+                new Function1<DeclarationDescriptor, Boolean>() {
+                    @Override
+                    public Boolean invoke(DeclarationDescriptor descriptor) {
+                        return descriptor instanceof CallableMemberDescriptor
+                               && ((CallableMemberDescriptor) descriptor).getKind() != CallableMemberDescriptor.Kind.FAKE_OVERRIDE;
+                    }
+                }
+        );
     }
 
     @NotNull
@@ -332,7 +352,7 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements LazyEnti
         getScopeForClassHeaderResolution();
         getScopeForMemberDeclarationResolution();
         ForceResolveUtil.forceResolveAllContents(getScopeForMemberLookup());
-        getScopeForPropertyInitializerResolution();
+        getScopeForInitializerResolution();
         getUnsubstitutedInnerClassesScope();
         ForceResolveUtil.forceResolveAllContents(getTypeConstructor());
         getUnsubstitutedPrimaryConstructor();
