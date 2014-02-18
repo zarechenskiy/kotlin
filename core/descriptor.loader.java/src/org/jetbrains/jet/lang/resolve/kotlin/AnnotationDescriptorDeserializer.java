@@ -37,10 +37,8 @@ import org.jetbrains.jet.lang.resolve.java.JvmAnnotationNames;
 import org.jetbrains.jet.lang.resolve.java.JvmClassName;
 import org.jetbrains.jet.lang.resolve.java.resolver.DescriptorResolverUtils;
 import org.jetbrains.jet.lang.resolve.java.resolver.ErrorReporter;
-import org.jetbrains.jet.lang.resolve.java.resolver.ResolverPackage;
 import org.jetbrains.jet.lang.resolve.name.Name;
 import org.jetbrains.jet.lang.types.ErrorUtils;
-import org.jetbrains.jet.lang.types.JetType;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -82,14 +80,14 @@ public class AnnotationDescriptorDeserializer extends BaseDescriptorDeserializer
         if (kotlinClass == null) {
             // This means that the resource we're constructing the descriptor from is no longer present: KotlinClassFinder had found the
             // class earlier, but it can't now
-            errorReporter.reportAnnotationLoadingError("Kotlin class for loading class annotations is not found: " + descriptor, null);
+            errorReporter.reportLoadingError("Kotlin class for loading class annotations is not found: " + descriptor, null);
             return Annotations.EMPTY;
         }
         try {
             return loadClassAnnotationsFromClass(kotlinClass);
         }
         catch (IOException e) {
-            errorReporter.reportAnnotationLoadingError("Error loading member annotations from Kotlin class: " + kotlinClass, e);
+            errorReporter.reportLoadingError("Error loading member annotations from Kotlin class: " + kotlinClass, e);
             return Annotations.EMPTY;
         }
     }
@@ -208,9 +206,9 @@ public class AnnotationDescriptorDeserializer extends BaseDescriptorDeserializer
             @NotNull AnnotatedCallableKind kind,
             @NotNull MemberSignature signature
     ) {
-        KotlinJvmBinaryClass kotlinClass = findClassWithMemberAnnotations(container, proto, nameResolver, kind);
+        KotlinJvmBinaryClass kotlinClass = findClassWithAnnotationsAndInitializers(container, proto, nameResolver, kind);
         if (kotlinClass == null) {
-            errorReporter.reportAnnotationLoadingError("Kotlin class for loading member annotations is not found: " + container, null);
+            errorReporter.reportLoadingError("Kotlin class for loading member annotations is not found: " + container, null);
             return Annotations.EMPTY;
         }
 

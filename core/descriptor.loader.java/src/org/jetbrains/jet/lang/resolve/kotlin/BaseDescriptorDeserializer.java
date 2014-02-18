@@ -96,7 +96,7 @@ public abstract class BaseDescriptorDeserializer {
     }
 
     @Nullable
-    protected KotlinJvmBinaryClass findClassWithMemberAnnotations(
+    protected KotlinJvmBinaryClass findClassWithAnnotationsAndInitializers(
             @NotNull ClassOrPackageFragmentDescriptor container,
             @NotNull ProtoBuf.Callable proto,
             @NotNull NameResolver nameResolver,

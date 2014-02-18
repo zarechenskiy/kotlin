@@ -150,7 +150,7 @@ public class VirtualFileKotlinClass implements KotlinJvmBinaryClass {
     }
 
     @Override
-    public void loadMemberAnnotations(@NotNull final MemberVisitor memberVisitor) {
+    public void visitMembers(@NotNull final MemberVisitor memberVisitor) {
         try {
             new ClassReader(file.contentsToByteArray()).accept(new ClassVisitor(ASM4) {
                 @Override
