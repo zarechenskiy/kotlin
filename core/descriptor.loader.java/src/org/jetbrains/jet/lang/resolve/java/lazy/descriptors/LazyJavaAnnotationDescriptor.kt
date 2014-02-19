@@ -32,7 +32,6 @@ import org.jetbrains.jet.lang.resolve.java.lazy.types.toAttributes
 import org.jetbrains.jet.renderer.DescriptorRenderer
 import org.jetbrains.jet.lang.resolve.java.mapping.JavaToKotlinClassMap
 import org.jetbrains.jet.lang.types.TypeUtils
-import org.jetbrains.jet.lang.resolve.java.resolver.resolveCompileTimeConstantValue
 import org.jetbrains.jet.lang.resolve.java.AnnotationLoadingUtil
 
 private object DEPRECATED_IN_JAVA : JavaLiteralAnnotationArgument {
@@ -94,7 +93,7 @@ class LazyJavaAnnotationDescriptor(
 
     private fun resolveAnnotationArgument(argument: JavaAnnotationArgument?): CompileTimeConstant<*>? {
         return when (argument) {
-            is JavaLiteralAnnotationArgument -> ConstantUtils.createCompileTimeConstant(argument.getValue(), true, false, null)
+            is JavaLiteralAnnotationArgument -> createCompileTimeConstant(argument.getValue(), true, false, null)
             is JavaReferenceAnnotationArgument -> resolveFromReference(argument.resolve())
             is JavaArrayAnnotationArgument -> resolveFromArray(argument.getName() ?: DEFAULT_ANNOTATION_MEMBER_NAME, argument.getElements())
             is JavaAnnotationAsAnnotationArgument -> resolveFromAnnotation(argument.getAnnotation())
