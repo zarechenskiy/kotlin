@@ -72,7 +72,7 @@ public class ControlStructureTypingUtils {
         ResolutionCandidate<CallableDescriptor> resolutionCandidate = ResolutionCandidate.<CallableDescriptor>create(function, null);
         CallResolver callResolver = context.expressionTypingServices.getCallResolver();
         OverloadResolutionResults<FunctionDescriptor> results = callResolver.resolveCallWithKnownCandidate(
-                call, tracing, context, resolutionCandidate, dataFlowInfoForArguments);
+                call, tracing, context, resolutionCandidate, dataFlowInfoForArguments).getResolutionResults();
         assert results.isSingleResult() : "Not single result after resolving one known candidate";
         return results.getResultingCall();
     }

@@ -34,8 +34,7 @@ import org.jetbrains.jet.lang.resolve.calls.context.ContextDependency;
 import org.jetbrains.jet.lang.resolve.calls.model.ResolvedCallImpl;
 import org.jetbrains.jet.lang.resolve.calls.model.ResolvedCallWithTrace;
 import org.jetbrains.jet.lang.resolve.calls.model.VariableAsFunctionResolvedCall;
-import org.jetbrains.jet.lang.resolve.calls.results.OverloadResolutionResults;
-import org.jetbrains.jet.lang.resolve.calls.results.OverloadResolutionResultsImpl;
+import org.jetbrains.jet.lang.resolve.calls.results.ResolutionResults.ResolutionResults;
 import org.jetbrains.jet.lang.resolve.calls.tasks.ExplicitReceiverKind;
 import org.jetbrains.jet.lang.resolve.calls.tasks.ResolutionCandidate;
 import org.jetbrains.jet.lang.resolve.calls.tasks.ResolutionTask;
@@ -207,9 +206,9 @@ public class CallTransformer<D extends CallableDescriptor, F extends D> {
 
             // 'invoke' call resolve
             TracingStrategyForInvoke tracingForInvoke = new TracingStrategyForInvoke(calleeExpression, functionCall);
-            OverloadResolutionResults<FunctionDescriptor> results = callResolver.resolveCallForInvoke(
+            ResolutionResults<FunctionDescriptor> results = callResolver.resolveCallForInvoke(
                     basicCallResolutionContext, tracingForInvoke);
-            Collection<ResolvedCallWithTrace<FunctionDescriptor>> calls = ((OverloadResolutionResultsImpl<FunctionDescriptor>)results).getResultingCalls();
+            Collection<ResolvedCallWithTrace<FunctionDescriptor>> calls = results.getResolutionResults().getResultingCalls();
 
             return Collections2.transform(calls, new Function<ResolvedCallWithTrace<FunctionDescriptor>, ResolvedCallWithTrace<FunctionDescriptor>>() {
                 @Override

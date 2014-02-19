@@ -23,7 +23,7 @@ import org.jetbrains.jet.lang.psi.CallKey;
 import org.jetbrains.jet.lang.psi.JetExpression;
 import org.jetbrains.jet.lang.resolve.DelegatingBindingTrace;
 import org.jetbrains.jet.lang.resolve.calls.model.ResolvedCallWithTrace;
-import org.jetbrains.jet.lang.resolve.calls.results.OverloadResolutionResultsImpl;
+import org.jetbrains.jet.lang.resolve.calls.results.ResolutionResults.ResolutionResults;
 
 public class TemporaryResolutionResultsCache implements ResolutionResultsCache {
     private final ResolutionResultsCache parentCache;
@@ -40,17 +40,17 @@ public class TemporaryResolutionResultsCache implements ResolutionResultsCache {
     public <D extends CallableDescriptor> void recordResolutionResults(
             @NotNull CallKey callKey,
             @NotNull MemberType<D> memberType,
-            @NotNull OverloadResolutionResultsImpl<D> results
+            @NotNull ResolutionResults<D> results
     ) {
         innerCache.recordResolutionResults(callKey, memberType, results);
     }
 
     @Nullable
     @Override
-    public <D extends CallableDescriptor> OverloadResolutionResultsImpl<D> getResolutionResults(
+    public <D extends CallableDescriptor> ResolutionResults<D> getResolutionResults(
             @NotNull CallKey callKey, @NotNull MemberType<D> memberType
     ) {
-        OverloadResolutionResultsImpl<D> results = innerCache.getResolutionResults(callKey, memberType);
+        ResolutionResults<D> results = innerCache.getResolutionResults(callKey, memberType);
         if (results != null) {
             return results;
         }

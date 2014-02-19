@@ -27,7 +27,7 @@ import org.jetbrains.jet.lang.psi.JetExpression;
 import org.jetbrains.jet.lang.resolve.BindingContext;
 import org.jetbrains.jet.lang.resolve.DelegatingBindingTrace;
 import org.jetbrains.jet.lang.resolve.calls.model.ResolvedCallWithTrace;
-import org.jetbrains.jet.lang.resolve.calls.results.OverloadResolutionResultsImpl;
+import org.jetbrains.jet.lang.resolve.calls.results.ResolutionResults.ResolutionResults;
 import org.jetbrains.jet.util.slicedmap.BasicWritableSlice;
 import org.jetbrains.jet.util.slicedmap.Slices;
 import org.jetbrains.jet.util.slicedmap.WritableSlice;
@@ -36,12 +36,15 @@ import static org.jetbrains.jet.lang.psi.Call.CallType;
 import static org.jetbrains.jet.lang.psi.Call.CallType.*;
 
 public class ResolutionResultsCacheImpl implements ResolutionResultsCache {
-    public static final WritableSlice<CallKey, OverloadResolutionResultsImpl<FunctionDescriptor>>
-            RESOLUTION_RESULTS_FOR_FUNCTION = Slices.createSimpleSlice();
-    public static final WritableSlice<CallKey, OverloadResolutionResultsImpl<VariableDescriptor>> RESOLUTION_RESULTS_FOR_PROPERTY = Slices.createSimpleSlice();
+    public static final WritableSlice<CallKey, ResolutionResults<FunctionDescriptor>> RESOLUTION_RESULTS_FOR_FUNCTION =
+            Slices.createSimpleSlice();
+    public static final WritableSlice<CallKey, ResolutionResults<VariableDescriptor>> RESOLUTION_RESULTS_FOR_PROPERTY =
+            Slices.createSimpleSlice();
     public static final WritableSlice<CallKey, DelegatingBindingTrace> TRACE_DELTAS_CACHE = Slices.createSimpleSlice();
-    public static final WritableSlice<CallKey, CallCandidateResolutionContext<? extends CallableDescriptor>> DEFERRED_COMPUTATION_FOR_CALL = Slices.createSimpleSlice();
-    public static final WritableSlice<CallKey, ResolvedCallWithTrace<? extends CallableDescriptor>> RESOLVED_CALL_FOR_ARGUMENT = Slices.createSimpleSlice();
+    public static final WritableSlice<CallKey, CallCandidateResolutionContext<? extends CallableDescriptor>> DEFERRED_COMPUTATION_FOR_CALL =
+            Slices.createSimpleSlice();
+    public static final WritableSlice<CallKey, ResolvedCallWithTrace<? extends CallableDescriptor>> RESOLVED_CALL_FOR_ARGUMENT =
+            Slices.createSimpleSlice();
 
     static {
         BasicWritableSlice.initSliceDebugNames(ResolutionResultsCacheImpl.class);
@@ -51,20 +54,27 @@ public class ResolutionResultsCacheImpl implements ResolutionResultsCache {
             BindingContext.EMPTY, "Internal binding context in resolution results cache");
 
     @NotNull
-    private static <D extends CallableDescriptor> WritableSlice<CallKey, OverloadResolutionResultsImpl<D>> getSliceByMemberType(@NotNull MemberType<D> memberType) {
+    private static <D extends CallableDescriptor> WritableSlice<CallKey, ResolutionResults<D>> getSliceByMemberType(@NotNull MemberType<D> memberType) {
         //noinspection unchecked
-        return (WritableSlice<CallKey, OverloadResolutionResultsImpl<D>>)
+        return (WritableSlice<CallKey, ResolutionResults<D>>)
                 (memberType == FUNCTION_MEMBER_TYPE ? RESOLUTION_RESULTS_FOR_FUNCTION : RESOLUTION_RESULTS_FOR_PROPERTY);
     }
 
     @Override
-    public <D extends CallableDescriptor> void recordResolutionResults(@NotNull CallKey callKey, @NotNull MemberType<D> memberType, @NotNull OverloadResolutionResultsImpl<D> results) {
+    public <D extends CallableDescriptor> void recordResolutionResults(
+            @NotNull CallKey callKey,
+            @NotNull MemberType<D> memberType,
+            @NotNull ResolutionResults<D> results
+    ) {
         trace.record(getSliceByMemberType(memberType), callKey, results);
     }
 
     @Override
     @Nullable
-    public <D extends CallableDescriptor> OverloadResolutionResultsImpl<D> getResolutionResults(@NotNull CallKey callKey, @NotNull MemberType<D> memberType) {
+    public <D extends CallableDescriptor> ResolutionResults<D> getResolutionResults(
+            @NotNull CallKey callKey,
+            @NotNull MemberType<D> memberType
+    ) {
         return trace.get(getSliceByMemberType(memberType), callKey);
     }
 

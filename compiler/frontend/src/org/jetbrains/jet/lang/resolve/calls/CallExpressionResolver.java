@@ -233,7 +233,7 @@ public class CallExpressionResolver {
     ) {
         CallResolver callResolver = expressionTypingServices.getCallResolver();
         OverloadResolutionResultsImpl<FunctionDescriptor> results = callResolver.resolveFunctionCall(
-                BasicCallResolutionContext.create(context, call, checkArguments));
+                BasicCallResolutionContext.create(context, call, checkArguments)).getResolutionResults();
         if (!results.isNothing()) {
             checkSuper(call.getExplicitReceiver(), results, context.trace, callExpression);
             result[0] = true;
@@ -254,7 +254,7 @@ public class CallExpressionResolver {
         BasicCallResolutionContext contextForVariable = BasicCallResolutionContext.create(
                 context.replaceTraceAndCache(temporaryForVariable),
                 call, CheckValueArgumentsMode.ENABLED);
-        OverloadResolutionResults<VariableDescriptor> resolutionResult = callResolver.resolveSimpleProperty(contextForVariable);
+        OverloadResolutionResults<VariableDescriptor> resolutionResult = callResolver.resolveSimpleProperty(contextForVariable).getResolutionResults();
         if (resolutionResult.isSuccess()) {
             temporaryForVariable.commit();
             checkSuper(receiver, resolutionResult, context.trace, nameExpression);
