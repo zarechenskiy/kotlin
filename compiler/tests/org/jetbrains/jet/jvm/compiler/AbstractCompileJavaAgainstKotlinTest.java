@@ -42,5 +42,14 @@ public abstract class AbstractCompileJavaAgainstKotlinTest extends TestCaseWithT
                 "-d", tmpdir.getPath()
         );
         JetTestUtils.compileJavaFiles(Collections.singleton(javaFile), options);
+        boolean b = true;
+        boolean b1 = false;
+        foo(b, b1);
+    }
+
+    private void foo(boolean b, boolean b1) {
+        if (!(b && b1)) {
+
+        }
     }
 }
