@@ -84,6 +84,8 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements LazyEnti
     private final NotNullLazyValue<JetScope> scopeForMemberDeclarationResolution;
     private final NotNullLazyValue<JetScope> scopeForPropertyInitializerResolution;
 
+    private final NullableLazyValue<Void> forceResolveAllContents;
+
     public LazyClassDescriptor(
             @NotNull ResolveSession resolveSession,
             @NotNull DeclarationDescriptor containingDeclaration,
@@ -96,6 +98,7 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements LazyEnti
         if (classLikeInfo.getCorrespondingClassOrObject() != null) {
             this.resolveSession.getTrace().record(BindingContext.CLASS, classLikeInfo.getCorrespondingClassOrObject(), this);
         }
+        this.resolveSession.getTrace().record(BindingContext.FQNAME_TO_CLASS_DESCRIPTOR, DescriptorUtils.getFqName(this), this);
 
         this.originalClassInfo = classLikeInfo;
         this.declarationProvider = resolveSession.getDeclarationProviderFactory().getClassMemberDeclarationProvider(classLikeInfo);
@@ -150,6 +153,13 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements LazyEnti
                 return computeScopeForPropertyInitializerResolution();
             }
         });
+        this.forceResolveAllContents = storageManager.createRecursionTolerantNullableLazyValue(new Function0<Void>() {
+            @Override
+            public Void invoke() {
+                doForceResolveAllContents();
+                return null;
+            }
+        }, null);
     }
 
     @NotNull
@@ -339,10 +349,19 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements LazyEnti
 
     @Override
     public void forceResolveAllContents() {
+        forceResolveAllContents.invoke();
+    }
+
+    private void doForceResolveAllContents() {
         ForceResolveUtil.forceResolveAllContents(getAnnotations());
-        getClassObjectDescriptor();
+
+        ClassDescriptor classObjectDescriptor = getClassObjectDescriptor();
+        if (classObjectDescriptor != null) {
+            ForceResolveUtil.forceResolveAllContents(classObjectDescriptor);
+        }
+
         getClassObjectType();
-        getConstructors();
+        ForceResolveUtil.forceResolveAllContents(getConstructors());
         getContainingDeclaration();
         getThisAsReceiverParameter();
         getKind();
@@ -400,7 +419,8 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements LazyEnti
                         findAndDisconnectLoopsInTypeHierarchy(supertypes);
                         return Unit.VALUE;
                     }
-                });
+                }
+        );
 
         private final NotNullLazyValue<List<TypeParameterDescriptor>> parameters = resolveSession.getStorageManager().createLazyValue(new Function0<List<TypeParameterDescriptor>>() {
             @Override
@@ -416,6 +436,15 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements LazyEnti
                 return parameters;
             }
         });
+
+        private final NullableLazyValue<Void> forceResolveAllContents =
+                resolveSession.getStorageManager().createRecursionTolerantNullableLazyValue(new Function0<Void>() {
+                    @Override
+                    public Void invoke() {
+                        doForceResolveAllContents();
+                        return null;
+                    }
+                }, null);
 
         @NotNull
         @Override
@@ -480,9 +509,13 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements LazyEnti
 
         @Override
         public void forceResolveAllContents() {
+            forceResolveAllContents.invoke();
+        }
+
+        private void doForceResolveAllContents() {
             ForceResolveUtil.forceResolveAllContents(getAnnotations());
-            getSupertypes();
-            getParameters();
+            ForceResolveUtil.forceResolveAllContents(getSupertypes());
+            ForceResolveUtil.forceResolveAllContents(getParameters());
         }
     }
 

@@ -59,6 +59,26 @@ public class JetJavaFacadeTest extends JetLightCodeInsightFixtureTestCase {
         doTestWrapMethod(true);
     }
 
+    public void testLocalClassSubclass() {
+        doTestWrapClass();
+    }
+
+    public void testClassWithObjectLiteralInClassObjectField() {
+        doTestWrapClass();
+    }
+
+    public void testClassWithObjectLiteralInConstructorProperty() {
+        doTestWrapClass();
+    }
+
+    public void testClassWithObjectLiteralInFun() {
+        doTestWrapClass();
+    }
+
+    public void testClassWithObjectLiteralInField() {
+        doTestWrapClass();
+    }
+
     public void testWrapFunInClassObject() {
         doTestWrapMethod(true);
     }
