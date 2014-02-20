@@ -31,6 +31,7 @@ import org.jetbrains.jet.lang.PlatformToKotlinClassMap;
 import org.jetbrains.jet.lang.descriptors.*;
 import org.jetbrains.jet.lang.descriptors.impl.*;
 import org.jetbrains.jet.lang.psi.*;
+import org.jetbrains.jet.lang.resolve.lazy.ForceResolveUtil;
 import org.jetbrains.jet.lang.resolve.lazy.ResolveSession;
 import org.jetbrains.jet.lang.resolve.lazy.declarations.FileBasedDeclarationProviderFactory;
 import org.jetbrains.jet.lang.resolve.name.FqName;
@@ -178,6 +179,7 @@ public class TopDownAnalyzer {
                             private void visitClassOrObject(@NotNull JetClassOrObject classOrObject) {
                                 ClassDescriptorWithResolutionScopes descriptor =
                                         (ClassDescriptorWithResolutionScopes) resolveSession.getClassDescriptor(classOrObject);
+                                ForceResolveUtil.forceResolveAllContents(descriptor);
                                 c.getClasses().put(classOrObject, descriptor);
                                 registerDeclarations(classOrObject.getDeclarations());
                             }
@@ -210,15 +212,17 @@ public class TopDownAnalyzer {
 
                             @Override
                             public void visitNamedFunction(@NotNull JetNamedFunction function) {
-                                c.getFunctions().put(function,
-                                                           (SimpleFunctionDescriptor) resolveSession.resolveToDescriptor(function));
+                                SimpleFunctionDescriptor descriptor = (SimpleFunctionDescriptor) resolveSession.resolveToDescriptor(function);
+                                ForceResolveUtil.forceResolveAllContents(descriptor);
+                                c.getFunctions().put(function, descriptor);
                                 registerScope(function, function);
                             }
 
                             @Override
                             public void visitProperty(@NotNull JetProperty property) {
-                                c.getProperties().put(property,
-                                                            (PropertyDescriptor) resolveSession.resolveToDescriptor(property));
+                                PropertyDescriptor descriptor = (PropertyDescriptor) resolveSession.resolveToDescriptor(property);
+                                ForceResolveUtil.forceResolveAllContents(descriptor);
+                                c.getProperties().put(property, descriptor);
                                 registerScope(property, property);
                                 registerScope(property.getGetter(), property);
                                 registerScope(property.getSetter(), property);
