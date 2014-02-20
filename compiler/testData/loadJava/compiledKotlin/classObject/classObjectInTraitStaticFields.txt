@@ -4,12 +4,12 @@ internal trait Test {
     
     internal class object <class-object-for-Test> {
         /*primary*/ private constructor <class-object-for-Test>()
-        public final val prop1: jet.Int = 10.toInt()
+        public final val prop1: jet.Int = 10
             public final fun <get-prop1>(): jet.Int
         public final var prop2: jet.Int
             public final fun <get-prop2>(): jet.Int
             protected final fun <set-prop2>(/*0*/ <set-?>: jet.Int): jet.Unit
-        public final val prop3: jet.Int = 12.toInt()
+        public final val prop3: jet.Int = 12
             public final fun <get-prop3>(): jet.Int
         internal final var prop4: jet.Int
             internal final fun <get-prop4>(): jet.Int

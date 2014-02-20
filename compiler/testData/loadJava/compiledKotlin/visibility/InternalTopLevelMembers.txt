@@ -1,5 +1,5 @@
 package test
 
-internal val x: jet.Int = 0.toInt()
+internal val x: jet.Int = 0
     internal fun <get-x>(): jet.Int
 internal fun f(): jet.Int
