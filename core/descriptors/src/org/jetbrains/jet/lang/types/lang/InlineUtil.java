@@ -29,7 +29,7 @@ import org.jetbrains.jet.lang.resolve.constants.EnumValue;
 
 public class InlineUtil {
 
-    public static boolean DEFAULT_INLINE_FLAG = false;
+    public static boolean DEFAULT_INLINE_FLAG = true;
 
     public static boolean DEFAULT_INLINE_FLAG_FOR_TEST = true;
 
