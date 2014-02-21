@@ -3003,9 +3003,13 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
     }
 
     private void callAugAssignMethod(JetBinaryExpression expression, CallableMethod callable, Type lhsType, boolean keepReturnValue) {
+        JetSimpleNameExpression reference = expression.getOperationReference();
         ResolvedCall<? extends CallableDescriptor> resolvedCall =
-                bindingContext.get(BindingContext.RESOLVED_CALL, expression.getOperationReference());
+                bindingContext.get(BindingContext.RESOLVED_CALL, reference);
+        Call call = bindingContext.get(BindingContext.CALL, reference);
+
         assert resolvedCall != null;
+        assert call != null;
 
         StackValue value = gen(expression.getLeft());
         if (keepReturnValue) {
@@ -3014,12 +3018,7 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
         value.put(lhsType, v);
         StackValue receiver = StackValue.onStack(lhsType);
 
-        if (!(resolvedCall.getResultingDescriptor() instanceof ConstructorDescriptor)) { // otherwise already
-            receiver = StackValue.receiver(resolvedCall, receiver, this, callable);
-            receiver.put(receiver.type, v);
-        }
-
-        pushArgumentsAndInvoke(resolvedCall, callable, CallGenerator.NOT_INLINE);
+        invokeMethodWithArguments(call, callable, resolvedCall, receiver);
 
         if (keepReturnValue) {
             value.store(callable.getReturnType(), v);
