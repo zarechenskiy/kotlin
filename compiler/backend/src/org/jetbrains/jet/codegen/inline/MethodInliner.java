@@ -32,7 +32,7 @@ public class MethodInliner {
     private final InliningInfo parent;
 
     @Nullable
-    private final Type lambdaInfo;
+    private final Type lambdaType;
 
     private final LambdaFieldRemapper lambdaFieldRemapper;
 
@@ -52,20 +52,20 @@ public class MethodInliner {
      * @param node
      * @param parameters
      * @param parent
-     * @param lambdaInfo - in case on lambda 'invoke' inlining
+     * @param lambdaType - in case on lambda 'invoke' inlining
      */
     public MethodInliner(
             @NotNull MethodNode node,
             Parameters parameters,
             @NotNull InliningInfo parent,
-            @Nullable Type lambdaInfo,
+            @Nullable Type lambdaType,
             LambdaFieldRemapper lambdaFieldRemapper,
             boolean isSameModule
     ) {
         this.node = node;
         this.parameters = parameters;
         this.parent = parent;
-        this.lambdaInfo = lambdaInfo;
+        this.lambdaType = lambdaType;
         this.lambdaFieldRemapper = lambdaFieldRemapper;
         this.isSameModule = isSameModule;
         this.typeMapper = parent.state.getTypeMapper();
@@ -248,8 +248,8 @@ public class MethodInliner {
 
         node.accept(transformedNode);
 
-        if (lambdaInfo != null) {
-            transformCaptured(transformedNode, parameters, lambdaInfo, lambdaFieldRemapper);
+        if (lambdaType != null) {
+            transformCaptured(transformedNode);
         }
         return transformedNode;
     }
@@ -433,13 +433,10 @@ public class MethodInliner {
         }
     }
 
-    static List<FieldAccess> transformCaptured(
-            @NotNull MethodNode node,
-            @NotNull Parameters paramsToSearch,
-            @NotNull Type lambdaClassType,
-            @NotNull LambdaFieldRemapper lambdaFieldRemapper
-    ) {
-        List<FieldAccess> capturedFields = new ArrayList<FieldAccess>();
+    private void transformCaptured(@NotNull MethodNode node) {
+        if (lambdaType == null) {
+            return;
+        }
 
         //remove all this and shift all variables to captured ones size
         AbstractInsnNode cur = node.instructions.getFirst();
@@ -448,12 +445,11 @@ public class MethodInliner {
                 FieldInsnNode fieldInsnNode = (FieldInsnNode) cur;
                 //TODO check closure
                 String owner = fieldInsnNode.owner;
-                if (lambdaFieldRemapper.canProcess(fieldInsnNode.owner, lambdaClassType.getInternalName())) {
+                if (this.lambdaFieldRemapper.canProcess(fieldInsnNode.owner, lambdaType.getInternalName())) {
                     String name = fieldInsnNode.name;
                     String desc = fieldInsnNode.desc;
 
-                    Collection<CapturedParamInfo> vars = paramsToSearch.getCaptured();
-                    CapturedParamInfo result = lambdaFieldRemapper.findField(fieldInsnNode, paramsToSearch.getCaptured());
+                    CapturedParamInfo result = this.lambdaFieldRemapper.findField(fieldInsnNode, parameters.getCaptured());
 
                     if (result == null) {
                         throw new UnsupportedOperationException("Coudn't find field " +
@@ -462,38 +458,18 @@ public class MethodInliner {
                                                                 name +
                                                                 " (" +
                                                                 desc +
-                                                                ") in captured vars of " + lambdaClassType);
+                                                                ") in captured vars of " + lambdaType);
                     }
 
                     if (result.isSkipped()) {
                         //lambda class transformation skip this captured
                     } else {
-                        cur = lambdaFieldRemapper.doTransform(node, fieldInsnNode, result);
-
-                        //AbstractInsnNode prev = getPreviousNoLableNoLine(cur);
-                        //
-                        //assert prev.getType() == AbstractInsnNode.VAR_INSN;
-                        //VarInsnNode loadThis = (VarInsnNode) prev;
-                        //assert /*loadThis.var == info.getCapturedVarsSize() - 1 && */loadThis.getOpcode() == Opcodes.ALOAD;
-                        //
-                        //int opcode = fieldInsnNode.getOpcode() == Opcodes.GETFIELD ? result.getType().getOpcode(Opcodes.ILOAD) : result.getType().getOpcode(Opcodes.ISTORE);
-                        //VarInsnNode insn = new VarInsnNode(opcode, result.getIndex());
-                        //
-                        //node.instructions.remove(prev); //remove aload this
-                        //node.instructions.insertBefore(cur, insn);
-                        //node.instructions.remove(cur); //remove aload field
-                        //
-                        //cur = insn;
-                        //
-                        //FieldAccess fieldAccess = new FieldAccess(fieldInsnNode.name, fieldInsnNode.desc, new FieldAccess("" + loadThis.var, lambdaClassType.getInternalName()));
-                        //capturedFields.add(fieldAccess);
+                        cur = this.lambdaFieldRemapper.doTransform(node, fieldInsnNode, result);
                     }
                 }
             }
             cur = cur.getNext();
         }
-
-        return capturedFields;
     }
 
     public static AbstractInsnNode getPreviousNoLabelNoLine(AbstractInsnNode cur) {
