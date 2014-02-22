@@ -68,7 +68,7 @@ public abstract class AbstractControlFlowTest extends KotlinTestWithEnvironment 
         }
 
         try {
-            processCFData(file, data);
+            processCFData(file, data, bindingContext);
         }
         catch (IOException e) {
             throw new RuntimeException(e);
@@ -89,7 +89,7 @@ public abstract class AbstractControlFlowTest extends KotlinTestWithEnvironment 
         }
     }
 
-    private void processCFData(File file, Map<JetElement, Pseudocode> data) throws IOException {
+    protected void processCFData(File file, Map<JetElement, Pseudocode> data, BindingContext bindingContext) throws IOException {
         Collection<Pseudocode> pseudocodes = data.values();
 
         StringBuilder instructionDump = new StringBuilder();
@@ -116,32 +116,29 @@ public abstract class AbstractControlFlowTest extends KotlinTestWithEnvironment 
 
             instructionDump.append(correspondingElement.getText());
             instructionDump.append("\n---------------------\n");
-            dumpInstructions((PseudocodeImpl) pseudocode, instructionDump);
+            dumpInstructions((PseudocodeImpl) pseudocode, instructionDump, bindingContext);
             instructionDump.append("=====================\n");
-            
-            //check edges directions
-            Collection<Instruction> instructions = ((PseudocodeImpl)pseudocode).getAllInstructions();
-            for (Instruction instruction : instructions) {
-                if (!((InstructionImpl)instruction).isDead()) {
-                    for (Instruction nextInstruction : instruction.getNextInstructions()) {
-                        assertTrue("instruction '" + instruction + "' has '" + nextInstruction + "' among next instructions list, but not vice versa",
-                                   nextInstruction.getPreviousInstructions().contains(instruction));
-                    }
-                    for (Instruction prevInstruction : instruction.getPreviousInstructions()) {
-                        assertTrue("instruction '" + instruction + "' has '" + prevInstruction + "' among previous instructions list, but not vice versa",
-                                   prevInstruction.getNextInstructions().contains(instruction));
-                    }
-                }
-            }
+            checkEdgesDirections(pseudocode);
         }
 
         File expectedInstructionsFile = JetTestUtils.replaceExtension(file, "instructions");
         JetTestUtils.assertEqualsToFile(expectedInstructionsFile, instructionDump.toString());
+    }
 
-//                        StringBuilder graphDump = new StringBuilder();
-//                        for (Pseudocode pseudocode : pseudocodes) {
-//                            topOrderDump(pseudocode.)
-//                        }
+    protected void checkEdgesDirections(Pseudocode pseudocode) {
+        Collection<Instruction> instructions = ((PseudocodeImpl)pseudocode).getAllInstructions();
+        for (Instruction instruction : instructions) {
+            if (!((InstructionImpl)instruction).isDead()) {
+                for (Instruction nextInstruction : instruction.getNextInstructions()) {
+                    assertTrue("instruction '" + instruction + "' has '" + nextInstruction + "' among next instructions list, but not vice versa",
+                               nextInstruction.getPreviousInstructions().contains(instruction));
+                }
+                for (Instruction prevInstruction : instruction.getPreviousInstructions()) {
+                    assertTrue("instruction '" + instruction + "' has '" + prevInstruction + "' among previous instructions list, but not vice versa",
+                               prevInstruction.getNextInstructions().contains(instruction));
+                }
+            }
+        }
     }
 
     public void dfsDump(PseudocodeImpl pseudocode, StringBuilder nodes, StringBuilder edges, Map<Instruction, String> nodeNames) {
@@ -160,11 +157,14 @@ public abstract class AbstractControlFlowTest extends KotlinTestWithEnvironment 
         throw new UnsupportedOperationException(); // TODO
     }
 
-    private static String formatInstruction(Instruction instruction, int maxLength, Set<Instruction> remainedAfterPostProcessInstructions) {
-        String[] parts = instruction.toString().split("\n");
+    private static String getInstructionPrefix(Instruction instruction, Set<Instruction> remainedAfterPostProcessInstructions) {
         boolean isRemovedThroughPostProcess = !remainedAfterPostProcessInstructions.contains(instruction);
         assert isRemovedThroughPostProcess == ((InstructionImpl)instruction).isDead();
-        String prefix = isRemovedThroughPostProcess ? "-   " : "    ";
+        return isRemovedThroughPostProcess ? "-   " : "    ";
+    }
+
+    protected static String formatInstruction(Instruction instruction, int maxLength, String prefix) {
+        String[] parts = instruction.toString().split("\n");
         if (parts.length == 1) {
             return prefix + String.format("%1$-" + maxLength + "s", instruction);
         }
@@ -207,35 +207,13 @@ public abstract class AbstractControlFlowTest extends KotlinTestWithEnvironment 
         return sb.toString();
     }
 
-    public void dumpInstructions(PseudocodeImpl pseudocode, @NotNull StringBuilder out) {
+    public void dumpInstructions(PseudocodeImpl pseudocode, @NotNull StringBuilder out, BindingContext bindingContext) {
         List<Instruction> instructions = pseudocode.getAllInstructions();
         Set<Instruction> remainedAfterPostProcessInstructions = Sets.newHashSet(pseudocode.getInstructions());
         List<PseudocodeImpl.PseudocodeLabel> labels = pseudocode.getLabels();
         List<PseudocodeImpl> locals = new ArrayList<PseudocodeImpl>();
-        int maxLength = 0;
-        int maxNextLength = 0;
-        for (Instruction instruction : instructions) {
-            String instuctionText = instruction.toString();
-            if (instuctionText.length() > maxLength) {
-                String[] parts = instuctionText.split("\n");
-                if (parts.length > 1) {
-                    for (String part : parts) {
-                        if (part.length() > maxLength) {
-                            maxLength = part.length();
-                        }
-                    }
-                }
-                else {
-                    if (instuctionText.length() > maxLength) {
-                        maxLength = instuctionText.length();
-                    }
-                }
-            }
-            String instructionListText = formatInstructionList(instruction.getNextInstructions());
-            if (instructionListText.length() > maxNextLength) {
-                maxNextLength = instructionListText.length();
-            }
-        }
+        int maxLength = countMaxInstructionLength(instructions);
+        int maxNextLength = countMaxInstructionNextLength(instructions);
         for (int i = 0; i < instructions.size(); i++) {
             Instruction instruction = instructions.get(i);
             if (instruction instanceof LocalFunctionDeclarationInstruction) {
@@ -250,7 +228,8 @@ public abstract class AbstractControlFlowTest extends KotlinTestWithEnvironment 
 
             StringBuilder line = new StringBuilder();
 
-            line.append(formatInstruction(instruction, maxLength, remainedAfterPostProcessInstructions));
+            String prefix = getInstructionPrefix(instruction, remainedAfterPostProcessInstructions);
+            line.append(formatInstruction(instruction, maxLength, prefix));
 
             // Only print NEXT and PREV if the values are non-trivial
             Instruction next = i == instructions.size() - 1 ? null : instructions.get(i + 1);
@@ -268,8 +247,42 @@ public abstract class AbstractControlFlowTest extends KotlinTestWithEnvironment 
             out.append("\n");
         }
         for (PseudocodeImpl local : locals) {
-            dumpInstructions(local, out);
+            dumpInstructions(local, out, bindingContext);
         }
+    }
+
+    public static int countMaxInstructionLength(List<Instruction> instructions) {
+        int maxLength = 0;
+        for (Instruction instruction : instructions) {
+            String instuctionText = instruction.toString();
+            if (instuctionText.length() > maxLength) {
+                String[] parts = instuctionText.split("\n");
+                if (parts.length > 1) {
+                    for (String part : parts) {
+                        if (part.length() > maxLength) {
+                            maxLength = part.length();
+                        }
+                    }
+                }
+                else {
+                    if (instuctionText.length() > maxLength) {
+                        maxLength = instuctionText.length();
+                    }
+                }
+            }
+        }
+        return maxLength;
+    }
+
+    public static int countMaxInstructionNextLength(List<Instruction> instructions) {
+        int maxNextLength = 0;
+        for (Instruction instruction : instructions) {
+            String instructionListText = formatInstructionList(instruction.getNextInstructions());
+            if (instructionListText.length() > maxNextLength) {
+                maxNextLength = instructionListText.length();
+            }
+        }
+        return maxNextLength;
     }
 
     private static boolean sameContents(@Nullable Instruction natural, Collection<Instruction> actual) {
