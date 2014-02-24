@@ -159,12 +159,12 @@ public class InlineCodegen implements ParentCodegenAware, Inliner {
                                            jvmSignature.getGenericsSignature(),
                                            null);
 
-            FunctionCodegen functionCodegen = new FunctionCodegen(context, null, state, getParentCodegen());
-            functionCodegen.generateMethodBody(node, functionDescriptor, context.getParentContext().intoFunction(functionDescriptor),
+            FunctionCodegen.generateMethodBody(node, functionDescriptor, context.getParentContext().intoFunction(functionDescriptor),
                                                jvmSignature,
                                                new FunctionGenerationStrategy.FunctionDefault(state,
                                                                                               functionDescriptor,
-                                                                                              (JetDeclarationWithBody) element));
+                                                                                              (JetDeclarationWithBody) element),
+                                               getParentCodegen());
             //TODO
             node.visitMaxs(20, 20);
             node.visitEnd();
@@ -325,19 +325,18 @@ public class InlineCodegen implements ParentCodegenAware, Inliner {
 
         MethodContext parentContext = codegen.getContext();
 
-        FunctionCodegen functionCodegen = new FunctionCodegen(parentContext, null, codegen.getState(), codegen.getParentCodegen());
         MethodContext context = parentContext.intoClosure(descriptor, codegen, typeMapper).intoFunction(descriptor);
 
         JvmMethodSignature jvmMethodSignature = typeMapper.mapSignature(descriptor);
         Method asmMethod = jvmMethodSignature.getAsmMethod();
         MethodNode methodNode = new MethodNode(Opcodes.ASM4, getMethodAsmFlags(descriptor, context.getContextKind()), asmMethod.getName(), asmMethod.getDescriptor(), jvmMethodSignature.getGenericsSignature(), null);
 
-        functionCodegen.generateMethodBody(methodNode, descriptor, context, jvmMethodSignature, new FunctionGenerationStrategy.FunctionDefault(state, descriptor, declaration) {
+        FunctionCodegen.generateMethodBody(methodNode, descriptor, context, jvmMethodSignature, new FunctionGenerationStrategy.FunctionDefault(state, descriptor, declaration) {
             @Override
             public boolean generateLocalVarTable() {
                 return false;
             }
-        });
+        }, codegen.getParentCodegen());
 
         return transformClosure(methodNode, info);
     }
