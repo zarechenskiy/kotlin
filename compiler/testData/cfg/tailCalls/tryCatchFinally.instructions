@@ -10,39 +10,39 @@ fun test() : Unit {
 }
 ---------------------
 L0:
-    <START>
-    mark({ try { test() } catch (any : Exception) { test() } finally { test() } })
-    mark(try { test() } catch (any : Exception) { test() } finally { test() })
-    jmp?(L2 [onException])                                                            NEXT:[v(any : Exception), jmp?(L3 [onExceptionToFinallyBlock])]
-    jmp?(L3 [onExceptionToFinallyBlock])                                              NEXT:[mark({ test() }), mark({ test() })]
-    mark({ test() })
-    mark(test())
-    call(test, test)
-    jmp(L4 [afterCatches])                                                            NEXT:[jmp(L5 [skipFinallyToErrorBlock])]
+  0 <START>
+  1 mark({ try { test() } catch (any : Exception) { test() } finally { test() } })
+  1 mark(try { test() } catch (any : Exception) { test() } finally { test() })
+  1 jmp?(L2 [onException])                                                            NEXT:[v(any : Exception), jmp?(L3 [onExceptionToFinallyBlock])]
+  1 jmp?(L3 [onExceptionToFinallyBlock])                                              NEXT:[mark({ test() }), mark({ test() })]
+  2 mark({ test() })
+  2 mark(test())
+  2 call(test, test)
+  1 jmp(L4 [afterCatches])                                                            NEXT:[jmp(L5 [skipFinallyToErrorBlock])]
 L2 [onException]:
-    v(any : Exception)                                                                PREV:[jmp?(L2 [onException])]
-    w(any)
-    mark({ test() })
-    mark(test())
-    call(test, test)
-    jmp(L4 [afterCatches])
+  2 v(any : Exception)                                                                PREV:[jmp?(L2 [onException])]
+  2 w(any)
+  3 mark({ test() })
+  3 mark(test())
+  3 call(test, test)
+  2 jmp(L4 [afterCatches])
 L4 [afterCatches]:
-    jmp(L5 [skipFinallyToErrorBlock])                                                 NEXT:[mark({ test() })]                                                                  PREV:[jmp(L4 [afterCatches]), jmp(L4 [afterCatches])]
+  1 jmp(L5 [skipFinallyToErrorBlock])                                                 NEXT:[mark({ test() })]                                                                  PREV:[jmp(L4 [afterCatches]), jmp(L4 [afterCatches])]
 L3 [onExceptionToFinallyBlock]:
 L6 [start finally]:
-    mark({ test() })                                                                  PREV:[jmp?(L3 [onExceptionToFinallyBlock])]
-    mark(test())
-    call(test, test)
+  2 mark({ test() })                                                                  PREV:[jmp?(L3 [onExceptionToFinallyBlock])]
+  2 mark(test())
+  2 call(test, test)
 L7 [finish finally]:
-    jmp(error)                                                                        NEXT:[<ERROR>]
+  1 jmp(error)                                                                        NEXT:[<ERROR>]
 L5 [skipFinallyToErrorBlock]:
-    mark({ test() })                                                                  PREV:[jmp(L5 [skipFinallyToErrorBlock])]
-    mark(test())
-    call(test, test)
+  2 mark({ test() })                                                                  PREV:[jmp(L5 [skipFinallyToErrorBlock])]
+  2 mark(test())
+  2 call(test, test)
 L1:
-    <END>                                                                             NEXT:[<SINK>]
+  0 <END>                                                                             NEXT:[<SINK>]
 error:
-    <ERROR>                                                                           PREV:[jmp(error)]
+  0 <ERROR>                                                                           PREV:[jmp(error)]
 sink:
-    <SINK>                                                                            PREV:[<ERROR>, <END>]
+  0 <SINK>                                                                            PREV:[<ERROR>, <END>]
 =====================

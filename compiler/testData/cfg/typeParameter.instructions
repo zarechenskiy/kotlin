@@ -4,13 +4,13 @@ fun <T> foo() {
 }
 ---------------------
 L0:
-    <START>
-    mark({ T })
-    error(T, No resolved call)
+  0 <START>
+  1 mark({ T })
+  1 error(T, No resolved call)
 L1:
-    <END>                         NEXT:[<SINK>]
+  0 <END>                         NEXT:[<SINK>]
 error:
-    <ERROR>                       PREV:[]
+  0 <ERROR>                       PREV:[]
 sink:
-    <SINK>                        PREV:[<ERROR>, <END>]
+  0 <SINK>                        PREV:[<ERROR>, <END>]
 =====================

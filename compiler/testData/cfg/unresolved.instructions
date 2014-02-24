@@ -4,19 +4,19 @@ fun test(a: Any) {
 }
 ---------------------
 L0:
-    <START>
-    v(a: Any)
-    w(a)
-    mark({ a.foo() })
-    mark(a.foo())
-    mark(foo())
-    error(foo, No resolved call)
-    error(foo, No resolved call)
-    r(a)
+  0 <START>
+  0 v(a: Any)
+  0 w(a)
+  1 mark({ a.foo() })
+  1 mark(a.foo())
+  1 mark(foo())
+  1 error(foo, No resolved call)
+  1 error(foo, No resolved call)
+  1 r(a)
 L1:
-    <END>                           NEXT:[<SINK>]
+  0 <END>                           NEXT:[<SINK>]
 error:
-    <ERROR>                         PREV:[]
+  0 <ERROR>                         PREV:[]
 sink:
-    <SINK>                          PREV:[<ERROR>, <END>]
+  0 <SINK>                          PREV:[<ERROR>, <END>]
 =====================

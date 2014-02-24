@@ -8,30 +8,30 @@ tailRecursive fun test() : Int {
 }
 ---------------------
 L0:
-    <START>
-    mark({ try { // do nothing } finally { return test() } })
-    mark(try { // do nothing } finally { return test() })
-    jmp?(L2 [onExceptionToFinallyBlock])                         NEXT:[mark({ return test() }), mark({ // do nothing })]
-    mark({ // do nothing })
-    read (Unit)
-    jmp(L3 [skipFinallyToErrorBlock])                            NEXT:[mark({ return test() })]
+  0 <START>
+  1 mark({ try { // do nothing } finally { return test() } })
+  1 mark(try { // do nothing } finally { return test() })
+  1 jmp?(L2 [onExceptionToFinallyBlock])                         NEXT:[mark({ return test() }), mark({ // do nothing })]
+  2 mark({ // do nothing })
+  2 read (Unit)
+  1 jmp(L3 [skipFinallyToErrorBlock])                            NEXT:[mark({ return test() })]
 L2 [onExceptionToFinallyBlock]:
 L4 [start finally]:
-    mark({ return test() })                                      PREV:[jmp?(L2 [onExceptionToFinallyBlock])]
-    mark(test())
-    call(test, test)
-    ret(*) L1                                                    NEXT:[<END>]
+  2 mark({ return test() })                                      PREV:[jmp?(L2 [onExceptionToFinallyBlock])]
+  2 mark(test())
+  2 call(test, test)
+  2 ret(*) L1                                                    NEXT:[<END>]
 L5 [finish finally]:
--   jmp(error)                                                   NEXT:[<ERROR>]                                                      PREV:[]
+- 1 jmp(error)                                                   NEXT:[<ERROR>]                                                      PREV:[]
 L3 [skipFinallyToErrorBlock]:
-    mark({ return test() })                                      PREV:[jmp(L3 [skipFinallyToErrorBlock])]
-    mark(test())
-    call(test, test)
-    ret(*) L1
+  2 mark({ return test() })                                      PREV:[jmp(L3 [skipFinallyToErrorBlock])]
+  2 mark(test())
+  2 call(test, test)
+  2 ret(*) L1
 L1:
-    <END>                                                        NEXT:[<SINK>]                                                       PREV:[ret(*) L1, ret(*) L1]
+  0 <END>                                                        NEXT:[<SINK>]                                                       PREV:[ret(*) L1, ret(*) L1]
 error:
-    <ERROR>                                                      PREV:[]
+  0 <ERROR>                                                      PREV:[]
 sink:
-    <SINK>                                                       PREV:[<ERROR>, <END>]
+  0 <SINK>                                                       PREV:[<ERROR>, <END>]
 =====================

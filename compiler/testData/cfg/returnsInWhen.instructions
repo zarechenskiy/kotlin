@@ -6,24 +6,24 @@ fun illegalWhenBlock(a: Any): Any {
 }
 ---------------------
 L0:
-    <START>
-    v(a: Any)
-    w(a)
-    mark({ when(a) { is Int -> return a } })
-    mark(when(a) { is Int -> return a })
-    r(a)
-    mark(is Int -> return a)
-    jmp?(L4)                                    NEXT:[<END>, r(a)]
+  0 <START>
+  0 v(a: Any)
+  0 w(a)
+  1 mark({ when(a) { is Int -> return a } })
+  1 mark(when(a) { is Int -> return a })
+  1 r(a)
+  1 mark(is Int -> return a)
+  1 jmp?(L4)                                    NEXT:[<END>, r(a)]
 L3:
-    r(a)
-    ret(*) L1                                   NEXT:[<END>]
--   jmp(L2)                                     PREV:[]
+  1 r(a)
+  1 ret(*) L1                                   NEXT:[<END>]
+- 1 jmp(L2)                                     PREV:[]
 L1:
 L2:
 L4:
-    <END>                                       NEXT:[<SINK>]                                      PREV:[jmp?(L4), ret(*) L1]
+  0 <END>                                       NEXT:[<SINK>]                                      PREV:[jmp?(L4), ret(*) L1]
 error:
-    <ERROR>                                     PREV:[]
+  0 <ERROR>                                     PREV:[]
 sink:
-    <SINK>                                      PREV:[<ERROR>, <END>]
+  0 <SINK>                                      PREV:[<ERROR>, <END>]
 =====================

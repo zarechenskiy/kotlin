@@ -5,42 +5,42 @@ tailRecursive fun sum(x: Long, sum: Long): Long {
 }
 ---------------------
 L0:
-    <START>
-    v(x: Long)
-    w(x)
-    v(sum: Long)
-    w(sum)
-    mark({ if (x == 0.toLong()) return sum return sum(x - 1, sum + x) })
-    mark(if (x == 0.toLong()) return sum)
-    mark(x == 0.toLong())
-    r(x)
-    mark(0.toLong())
-    mark(toLong())
-    r(0)
-    call(toLong, toLong)
-    call(==, equals)
-    jf(L2)                                                                  NEXT:[read (Unit), r(sum)]
-    r(sum)
-    ret(*) L1                                                               NEXT:[<END>]
--   jmp(L3)                                                                 NEXT:[mark(sum(x - 1, sum + x))]                                               PREV:[]
+  0 <START>
+  0 v(x: Long)
+  0 w(x)
+  0 v(sum: Long)
+  0 w(sum)
+  1 mark({ if (x == 0.toLong()) return sum return sum(x - 1, sum + x) })
+  1 mark(if (x == 0.toLong()) return sum)
+  1 mark(x == 0.toLong())
+  1 r(x)
+  1 mark(0.toLong())
+  1 mark(toLong())
+  1 r(0)
+  1 call(toLong, toLong)
+  1 call(==, equals)
+  1 jf(L2)                                                                  NEXT:[read (Unit), r(sum)]
+  1 r(sum)
+  1 ret(*) L1                                                               NEXT:[<END>]
+- 1 jmp(L3)                                                                 NEXT:[mark(sum(x - 1, sum + x))]                                               PREV:[]
 L2:
-    read (Unit)                                                             PREV:[jf(L2)]
+  1 read (Unit)                                                             PREV:[jf(L2)]
 L3:
-    mark(sum(x - 1, sum + x))
-    mark(x - 1)
-    r(x)
-    r(1)
-    call(-, minus)
-    mark(sum + x)
-    r(sum)
-    r(x)
-    call(+, plus)
-    call(sum, sum)
-    ret(*) L1
+  1 mark(sum(x - 1, sum + x))
+  1 mark(x - 1)
+  1 r(x)
+  1 r(1)
+  1 call(-, minus)
+  1 mark(sum + x)
+  1 r(sum)
+  1 r(x)
+  1 call(+, plus)
+  1 call(sum, sum)
+  1 ret(*) L1
 L1:
-    <END>                                                                   NEXT:[<SINK>]                                                                  PREV:[ret(*) L1, ret(*) L1]
+  0 <END>                                                                   NEXT:[<SINK>]                                                                  PREV:[ret(*) L1, ret(*) L1]
 error:
-    <ERROR>                                                                 PREV:[]
+  0 <ERROR>                                                                 PREV:[]
 sink:
-    <SINK>                                                                  PREV:[<ERROR>, <END>]
+  0 <SINK>                                                                  PREV:[<ERROR>, <END>]
 =====================

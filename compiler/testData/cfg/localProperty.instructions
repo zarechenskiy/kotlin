@@ -10,30 +10,30 @@ fun foo() {
 }
 ---------------------
 L0:
-    <START>
-    mark({ class B { val a: Int get() { val b: Int return b } } })
-    v(val a: Int get() { val b: Int return b })
-    jmp?(L2)                                                          NEXT:[<END>, d(get() { val b: Int return b })]
-    d(get() { val b: Int return b })                                  NEXT:[<SINK>]
+  0 <START>
+  1 mark({ class B { val a: Int get() { val b: Int return b } } })
+  1 v(val a: Int get() { val b: Int return b })
+  1 jmp?(L2)                                                          NEXT:[<END>, d(get() { val b: Int return b })]
+  1 d(get() { val b: Int return b })                                  NEXT:[<SINK>]
 L1:
 L2:
-    <END>                                                             NEXT:[<SINK>]                                                            PREV:[jmp?(L2)]
+  0 <END>                                                             NEXT:[<SINK>]                                                            PREV:[jmp?(L2)]
 error:
-    <ERROR>                                                           PREV:[]
+  0 <ERROR>                                                           PREV:[]
 sink:
-    <SINK>                                                            PREV:[<ERROR>, <END>, d(get() { val b: Int return b })]
+  0 <SINK>                                                            PREV:[<ERROR>, <END>, d(get() { val b: Int return b })]
 L3:
-    <START>
-    mark({ val b: Int return b })
-    v(val b: Int)
-    r(b)
-    ret(*) L4
+  2 <START>
+  3 mark({ val b: Int return b })
+  3 v(val b: Int)
+  3 r(b)
+  3 ret(*) L4
 L4:
-    <END>                            NEXT:[<SINK>]
+  2 <END>                            NEXT:[<SINK>]
 error:
-    <ERROR>                          PREV:[]
+  2 <ERROR>                          PREV:[]
 sink:
-    <SINK>                           PREV:[<ERROR>, <END>]
+  2 <SINK>                           PREV:[<ERROR>, <END>]
 =====================
 == get_a ==
 get() {
@@ -42,15 +42,15 @@ get() {
             }
 ---------------------
 L3:
-    <START>
-    mark({ val b: Int return b })
-    v(val b: Int)
-    r(b)
-    ret(*) L4
+  2 <START>
+  3 mark({ val b: Int return b })
+  3 v(val b: Int)
+  3 r(b)
+  3 ret(*) L4
 L4:
-    <END>                            NEXT:[<SINK>]
+  2 <END>                            NEXT:[<SINK>]
 error:
-    <ERROR>                          PREV:[]
+  2 <ERROR>                          PREV:[]
 sink:
-    <SINK>                           PREV:[<ERROR>, <END>]
+  2 <SINK>                           PREV:[<ERROR>, <END>]
 =====================

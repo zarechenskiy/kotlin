@@ -6,46 +6,46 @@ fun t1() {
 }
 ---------------------
 L0:
-    <START>
-    mark({ for (i in 1..2) { doSmth(i) } })
-    mark(for (i in 1..2) { doSmth(i) })
-    mark(1..2)
-    r(1)
-    r(2)
-    call(.., rangeTo)
-    v(i)
-    w(i)
+  0 <START>
+  1 mark({ for (i in 1..2) { doSmth(i) } })
+  2 mark(for (i in 1..2) { doSmth(i) })
+  2 mark(1..2)
+  2 r(1)
+  2 r(2)
+  2 call(.., rangeTo)
+  2 v(i)
+  2 w(i)
 L3:
-    jmp?(L2)                                   NEXT:[read (Unit), mark({ doSmth(i) })]
+  2 jmp?(L2)                                   NEXT:[read (Unit), mark({ doSmth(i) })]
 L4 [loop entry point]:
 L5 [body entry point]:
-    mark({ doSmth(i) })                        PREV:[jmp?(L2), jmp?(L4 [loop entry point])]
-    mark(doSmth(i))
-    r(i)
-    call(doSmth, doSmth)
-    jmp?(L4 [loop entry point])                NEXT:[mark({ doSmth(i) }), read (Unit)]
+  3 mark({ doSmth(i) })                        PREV:[jmp?(L2), jmp?(L4 [loop entry point])]
+  3 mark(doSmth(i))
+  3 r(i)
+  3 call(doSmth, doSmth)
+  2 jmp?(L4 [loop entry point])                NEXT:[mark({ doSmth(i) }), read (Unit)]
 L2:
-    read (Unit)                                PREV:[jmp?(L2), jmp?(L4 [loop entry point])]
+  2 read (Unit)                                PREV:[jmp?(L2), jmp?(L4 [loop entry point])]
 L1:
-    <END>                                      NEXT:[<SINK>]
+  0 <END>                                      NEXT:[<SINK>]
 error:
-    <ERROR>                                    PREV:[]
+  0 <ERROR>                                    PREV:[]
 sink:
-    <SINK>                                     PREV:[<ERROR>, <END>]
+  0 <SINK>                                     PREV:[<ERROR>, <END>]
 =====================
 == doSmth ==
 fun doSmth(i: Int) {}
 ---------------------
 L0:
-    <START>
-    v(i: Int)
-    w(i)
-    mark({})
-    read (Unit)
+  0 <START>
+  0 v(i: Int)
+  0 w(i)
+  1 mark({})
+  1 read (Unit)
 L1:
-    <END>          NEXT:[<SINK>]
+  0 <END>          NEXT:[<SINK>]
 error:
-    <ERROR>        PREV:[]
+  0 <ERROR>        PREV:[]
 sink:
-    <SINK>         PREV:[<ERROR>, <END>]
+  0 <SINK>         PREV:[<ERROR>, <END>]
 =====================

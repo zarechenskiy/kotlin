@@ -5,31 +5,31 @@ abstract class Bar {
 }
 ---------------------
 L0:
-    <START>
-    v(abstract var bar : String)
+  0 <START>
+  0 v(abstract var bar : String)
 L1:
-    <END>                           NEXT:[<SINK>]
+  0 <END>                           NEXT:[<SINK>]
 error:
-    <ERROR>                         PREV:[]
+  0 <ERROR>                         PREV:[]
 sink:
-    <SINK>                          PREV:[<ERROR>, <END>]
+  0 <SINK>                          PREV:[<ERROR>, <END>]
 =====================
 == foo ==
 fun foo() = "foo" + this.$bar
 ---------------------
 L0:
-    <START>
-    mark("foo" + this.$bar)
-    mark("foo")
-    r("foo")
-    mark(this.$bar)
-    r(this)
-    r($bar)
-    call(+, plus)
+  0 <START>
+  0 mark("foo" + this.$bar)
+  0 mark("foo")
+  0 r("foo")
+  0 mark(this.$bar)
+  0 r(this)
+  0 r($bar)
+  0 call(+, plus)
 L1:
-    <END>                      NEXT:[<SINK>]
+  0 <END>                      NEXT:[<SINK>]
 error:
-    <ERROR>                    PREV:[]
+  0 <ERROR>                    PREV:[]
 sink:
-    <SINK>                     PREV:[<ERROR>, <END>]
+  0 <SINK>                     PREV:[<ERROR>, <END>]
 =====================

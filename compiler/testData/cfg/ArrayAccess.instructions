@@ -10,40 +10,40 @@ fun foo() {
 }
 ---------------------
 L0:
-    <START>
-    mark({ val a = Array<Int> 3 a[10] = 4 2 a[10] 100 a[10] += 1 })
-    v(val a = Array<Int>)
-    mark(Array<Int>)
-    call(Array, <init>)
-    w(a)
-    r(3)
-    mark(a[10])
-    r(a)
-    r(10)
-    r(4)
-    call(a[10], set)
-    r(2)
-    mark(a[10])
-    r(a)
-    r(10)
-    call(a[10], get)
-    r(100)
-    mark(a[10] += 1)
-    mark(a[10])
-    r(a)
-    r(10)
-    call(a[10], get)
-    r(1)
-    call(+=, plus)
-    mark(a[10])
-    r(a)
-    r(10)
-    r(1)
-    call(a[10], set)
+  0 <START>
+  1 mark({ val a = Array<Int> 3 a[10] = 4 2 a[10] 100 a[10] += 1 })
+  1 v(val a = Array<Int>)
+  1 mark(Array<Int>)
+  1 call(Array, <init>)
+  1 w(a)
+  1 r(3)
+  1 mark(a[10])
+  1 r(a)
+  1 r(10)
+  1 r(4)
+  1 call(a[10], set)
+  1 r(2)
+  1 mark(a[10])
+  1 r(a)
+  1 r(10)
+  1 call(a[10], get)
+  1 r(100)
+  1 mark(a[10] += 1)
+  1 mark(a[10])
+  1 r(a)
+  1 r(10)
+  1 call(a[10], get)
+  1 r(1)
+  1 call(+=, plus)
+  1 mark(a[10])
+  1 r(a)
+  1 r(10)
+  1 r(1)
+  1 call(a[10], set)
 L1:
-    <END>                                                              NEXT:[<SINK>]
+  0 <END>                                                              NEXT:[<SINK>]
 error:
-    <ERROR>                                                            PREV:[]
+  0 <ERROR>                                                            PREV:[]
 sink:
-    <SINK>                                                             PREV:[<ERROR>, <END>]
+  0 <SINK>                                                             PREV:[<ERROR>, <END>]
 =====================

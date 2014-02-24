@@ -4,41 +4,41 @@ fun foo() {
 }
 ---------------------
 L0:
-    <START>
-    mark({ {} })
-    mark({})
-    jmp?(L2)        NEXT:[r({}), d({})]
-    d({})           NEXT:[<SINK>]
+  0 <START>
+  1 mark({ {} })
+  1 mark({})
+  1 jmp?(L2)        NEXT:[r({}), d({})]
+  1 d({})           NEXT:[<SINK>]
 L2:
-    r({})           PREV:[jmp?(L2)]
+  1 r({})           PREV:[jmp?(L2)]
 L1:
-    <END>           NEXT:[<SINK>]
+  0 <END>           NEXT:[<SINK>]
 error:
-    <ERROR>         PREV:[]
+  0 <ERROR>         PREV:[]
 sink:
-    <SINK>          PREV:[<ERROR>, <END>, d({})]
+  0 <SINK>          PREV:[<ERROR>, <END>, d({})]
 L3:
-    <START>
-    mark()
-    read (Unit)
+  2 <START>
+  3 mark()
+  3 read (Unit)
 L4:
-    <END>          NEXT:[<SINK>]
+  2 <END>          NEXT:[<SINK>]
 error:
-    <ERROR>        PREV:[]
+  2 <ERROR>        PREV:[]
 sink:
-    <SINK>         PREV:[<ERROR>, <END>]
+  2 <SINK>         PREV:[<ERROR>, <END>]
 =====================
 == anonymous_0 ==
 {}
 ---------------------
 L3:
-    <START>
-    mark()
-    read (Unit)
+  2 <START>
+  3 mark()
+  3 read (Unit)
 L4:
-    <END>          NEXT:[<SINK>]
+  2 <END>          NEXT:[<SINK>]
 error:
-    <ERROR>        PREV:[]
+  2 <ERROR>        PREV:[]
 sink:
-    <SINK>         PREV:[<ERROR>, <END>]
+  2 <SINK>         PREV:[<ERROR>, <END>]
 =====================

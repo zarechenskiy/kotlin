@@ -5,20 +5,20 @@ fun foo(x: Int) {
 }
 ---------------------
 L0:
-    <START>
-    v(x: Int)
-    w(x)
-    mark({ val (a, b) = x a })
-    r(x)
-    v(a)
-    w(a)
-    v(b)
-    w(b)
-    r(a)
+  0 <START>
+  0 v(x: Int)
+  0 w(x)
+  1 mark({ val (a, b) = x a })
+  1 r(x)
+  1 v(a)
+  1 w(a)
+  1 v(b)
+  1 w(b)
+  1 r(a)
 L1:
-    <END>                         NEXT:[<SINK>]
+  0 <END>                         NEXT:[<SINK>]
 error:
-    <ERROR>                       PREV:[]
+  0 <ERROR>                       PREV:[]
 sink:
-    <SINK>                        PREV:[<ERROR>, <END>]
+  0 <SINK>                        PREV:[<ERROR>, <END>]
 =====================

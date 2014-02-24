@@ -4,15 +4,15 @@ fun main(arg : Array<String>) {
 }
 ---------------------
 L0:
-    <START>
-    v(arg : Array<String>)
-    w(arg)
-    mark({ a })
-    error(a, No resolved call)
+  0 <START>
+  0 v(arg : Array<String>)
+  0 w(arg)
+  1 mark({ a })
+  1 error(a, No resolved call)
 L1:
-    <END>                         NEXT:[<SINK>]
+  0 <END>                         NEXT:[<SINK>]
 error:
-    <ERROR>                       PREV:[]
+  0 <ERROR>                       PREV:[]
 sink:
-    <SINK>                        PREV:[<ERROR>, <END>]
+  0 <SINK>                        PREV:[<ERROR>, <END>]
 =====================

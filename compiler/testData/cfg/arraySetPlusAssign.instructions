@@ -4,26 +4,26 @@ fun foo(a: Array<Int>) {
 }
 ---------------------
 L0:
-    <START>
-    v(a: Array<Int>)
-    w(a)
-    mark({ a[0] += 1 })
-    mark(a[0] += 1)
-    mark(a[0])
-    r(a)
-    r(0)
-    call(a[0], get)
-    r(1)
-    call(+=, plus)
-    mark(a[0])
-    r(a)
-    r(0)
-    r(1)
-    call(a[0], set)
+  0 <START>
+  0 v(a: Array<Int>)
+  0 w(a)
+  1 mark({ a[0] += 1 })
+  1 mark(a[0] += 1)
+  1 mark(a[0])
+  1 r(a)
+  1 r(0)
+  1 call(a[0], get)
+  1 r(1)
+  1 call(+=, plus)
+  1 mark(a[0])
+  1 r(a)
+  1 r(0)
+  1 r(1)
+  1 call(a[0], set)
 L1:
-    <END>                  NEXT:[<SINK>]
+  0 <END>                  NEXT:[<SINK>]
 error:
-    <ERROR>                PREV:[]
+  0 <ERROR>                PREV:[]
 sink:
-    <SINK>                 PREV:[<ERROR>, <END>]
+  0 <SINK>                 PREV:[<ERROR>, <END>]
 =====================

@@ -12,46 +12,46 @@ fun f() {
 }
 ---------------------
 L0:
-    <START>
-    mark({ class LocalClass() { fun f() { val x = "" fun loc() { val x3 = "" } } } })
-    jmp?(L2)                                                                             NEXT:[<END>, d(fun f() { val x = "" fun loc() { val x3 = "" } })]
-    d(fun f() { val x = "" fun loc() { val x3 = "" } })                                  NEXT:[<SINK>]
+  0 <START>
+  1 mark({ class LocalClass() { fun f() { val x = "" fun loc() { val x3 = "" } } } })
+  1 jmp?(L2)                                                                             NEXT:[<END>, d(fun f() { val x = "" fun loc() { val x3 = "" } })]
+  1 d(fun f() { val x = "" fun loc() { val x3 = "" } })                                  NEXT:[<SINK>]
 L1:
 L2:
-    <END>                                                                                NEXT:[<SINK>]                                                                               PREV:[jmp?(L2)]
+  0 <END>                                                                                NEXT:[<SINK>]                                                                               PREV:[jmp?(L2)]
 error:
-    <ERROR>                                                                              PREV:[]
+  0 <ERROR>                                                                              PREV:[]
 sink:
-    <SINK>                                                                               PREV:[<ERROR>, <END>, d(fun f() { val x = "" fun loc() { val x3 = "" } })]
+  0 <SINK>                                                                               PREV:[<ERROR>, <END>, d(fun f() { val x = "" fun loc() { val x3 = "" } })]
 L3:
-    <START>
-    mark({ val x = "" fun loc() { val x3 = "" } })
-    v(val x = "")
-    mark("")
-    r("")
-    w(x)
-    jmp?(L5)                                          NEXT:[<END>, d(fun loc() { val x3 = "" })]
-    d(fun loc() { val x3 = "" })                      NEXT:[<SINK>]
+  2 <START>
+  3 mark({ val x = "" fun loc() { val x3 = "" } })
+  3 v(val x = "")
+  3 mark("")
+  3 r("")
+  3 w(x)
+  3 jmp?(L5)                                          NEXT:[<END>, d(fun loc() { val x3 = "" })]
+  3 d(fun loc() { val x3 = "" })                      NEXT:[<SINK>]
 L4:
 L5:
-    <END>                                             NEXT:[<SINK>]                                            PREV:[jmp?(L5)]
+  2 <END>                                             NEXT:[<SINK>]                                            PREV:[jmp?(L5)]
 error:
-    <ERROR>                                           PREV:[]
+  2 <ERROR>                                           PREV:[]
 sink:
-    <SINK>                                            PREV:[<ERROR>, <END>, d(fun loc() { val x3 = "" })]
+  2 <SINK>                                            PREV:[<ERROR>, <END>, d(fun loc() { val x3 = "" })]
 L6:
-    <START>
-    mark({ val x3 = "" })
-    v(val x3 = "")
-    mark("")
-    r("")
-    w(x3)
+  4 <START>
+  5 mark({ val x3 = "" })
+  5 v(val x3 = "")
+  5 mark("")
+  5 r("")
+  5 w(x3)
 L7:
-    <END>                    NEXT:[<SINK>]
+  4 <END>                    NEXT:[<SINK>]
 error:
-    <ERROR>                  PREV:[]
+  4 <ERROR>                  PREV:[]
 sink:
-    <SINK>                   PREV:[<ERROR>, <END>]
+  4 <SINK>                   PREV:[<ERROR>, <END>]
 =====================
 == f ==
 fun f() {
@@ -63,34 +63,34 @@ fun f() {
         }
 ---------------------
 L3:
-    <START>
-    mark({ val x = "" fun loc() { val x3 = "" } })
-    v(val x = "")
-    mark("")
-    r("")
-    w(x)
-    jmp?(L5)                                          NEXT:[<END>, d(fun loc() { val x3 = "" })]
-    d(fun loc() { val x3 = "" })                      NEXT:[<SINK>]
+  2 <START>
+  3 mark({ val x = "" fun loc() { val x3 = "" } })
+  3 v(val x = "")
+  3 mark("")
+  3 r("")
+  3 w(x)
+  3 jmp?(L5)                                          NEXT:[<END>, d(fun loc() { val x3 = "" })]
+  3 d(fun loc() { val x3 = "" })                      NEXT:[<SINK>]
 L4:
 L5:
-    <END>                                             NEXT:[<SINK>]                                            PREV:[jmp?(L5)]
+  2 <END>                                             NEXT:[<SINK>]                                            PREV:[jmp?(L5)]
 error:
-    <ERROR>                                           PREV:[]
+  2 <ERROR>                                           PREV:[]
 sink:
-    <SINK>                                            PREV:[<ERROR>, <END>, d(fun loc() { val x3 = "" })]
+  2 <SINK>                                            PREV:[<ERROR>, <END>, d(fun loc() { val x3 = "" })]
 L6:
-    <START>
-    mark({ val x3 = "" })
-    v(val x3 = "")
-    mark("")
-    r("")
-    w(x3)
+  4 <START>
+  5 mark({ val x3 = "" })
+  5 v(val x3 = "")
+  5 mark("")
+  5 r("")
+  5 w(x3)
 L7:
-    <END>                    NEXT:[<SINK>]
+  4 <END>                    NEXT:[<SINK>]
 error:
-    <ERROR>                  PREV:[]
+  4 <ERROR>                  PREV:[]
 sink:
-    <SINK>                   PREV:[<ERROR>, <END>]
+  4 <SINK>                   PREV:[<ERROR>, <END>]
 =====================
 == loc ==
 fun loc() {
@@ -98,16 +98,16 @@ fun loc() {
             }
 ---------------------
 L6:
-    <START>
-    mark({ val x3 = "" })
-    v(val x3 = "")
-    mark("")
-    r("")
-    w(x3)
+  4 <START>
+  5 mark({ val x3 = "" })
+  5 v(val x3 = "")
+  5 mark("")
+  5 r("")
+  5 w(x3)
 L7:
-    <END>                    NEXT:[<SINK>]
+  4 <END>                    NEXT:[<SINK>]
 error:
-    <ERROR>                  PREV:[]
+  4 <ERROR>                  PREV:[]
 sink:
-    <SINK>                   PREV:[<ERROR>, <END>]
+  4 <SINK>                   PREV:[<ERROR>, <END>]
 =====================

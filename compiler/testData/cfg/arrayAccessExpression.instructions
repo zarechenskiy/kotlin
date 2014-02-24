@@ -4,25 +4,25 @@ abstract class Ab {
 }
 ---------------------
 L0:
-    <START>
+  0 <START>
 L1:
-    <END>      NEXT:[<SINK>]
+  0 <END>      NEXT:[<SINK>]
 error:
-    <ERROR>    PREV:[]
+  0 <ERROR>    PREV:[]
 sink:
-    <SINK>     PREV:[<ERROR>, <END>]
+  0 <SINK>     PREV:[<ERROR>, <END>]
 =====================
 == getArray ==
 abstract fun getArray() : Array<Int>
 ---------------------
 L0:
-    <START>
+  0 <START>
 L1:
-    <END>      NEXT:[<SINK>]
+  0 <END>      NEXT:[<SINK>]
 error:
-    <ERROR>    PREV:[]
+  0 <ERROR>    PREV:[]
 sink:
-    <SINK>     PREV:[<ERROR>, <END>]
+  0 <SINK>     PREV:[<ERROR>, <END>]
 =====================
 == test ==
 fun test(ab: Ab) {
@@ -30,21 +30,21 @@ fun test(ab: Ab) {
 }
 ---------------------
 L0:
-    <START>
-    v(ab: Ab)
-    w(ab)
-    mark({ ab.getArray()[1] })
-    mark(ab.getArray()[1])
-    mark(ab.getArray())
-    mark(getArray())
-    r(ab)
-    call(getArray, getArray)
-    r(1)
-    call(ab.getArray()[1], get)
+  0 <START>
+  0 v(ab: Ab)
+  0 w(ab)
+  1 mark({ ab.getArray()[1] })
+  1 mark(ab.getArray()[1])
+  1 mark(ab.getArray())
+  1 mark(getArray())
+  1 r(ab)
+  1 call(getArray, getArray)
+  1 r(1)
+  1 call(ab.getArray()[1], get)
 L1:
-    <END>                          NEXT:[<SINK>]
+  0 <END>                          NEXT:[<SINK>]
 error:
-    <ERROR>                        PREV:[]
+  0 <ERROR>                        PREV:[]
 sink:
-    <SINK>                         PREV:[<ERROR>, <END>]
+  0 <SINK>                         PREV:[<ERROR>, <END>]
 =====================

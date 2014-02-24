@@ -5,18 +5,18 @@ fun test() {
 }
 ---------------------
 L0:
-    <START>
-    mark({ throw Exception() test() })
-    mark(throw Exception())
-    mark(Exception())
-    call(Exception, <init>)
-    throw (throw Exception())             NEXT:[<ERROR>]
--   mark(test())                          PREV:[]
--   call(test, test)                      PREV:[]
+  0 <START>
+  1 mark({ throw Exception() test() })
+  1 mark(throw Exception())
+  1 mark(Exception())
+  1 call(Exception, <init>)
+  1 throw (throw Exception())             NEXT:[<ERROR>]
+- 1 mark(test())                          PREV:[]
+- 1 call(test, test)                      PREV:[]
 L1:
-    <END>                                 NEXT:[<SINK>]                                PREV:[]
+  0 <END>                                 NEXT:[<SINK>]                                PREV:[]
 error:
-    <ERROR>                               PREV:[throw (throw Exception())]
+  0 <ERROR>                               PREV:[throw (throw Exception())]
 sink:
-    <SINK>                                PREV:[<ERROR>, <END>]
+  0 <SINK>                                PREV:[<ERROR>, <END>]
 =====================

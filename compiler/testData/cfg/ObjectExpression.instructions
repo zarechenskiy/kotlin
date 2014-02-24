@@ -4,25 +4,25 @@ trait A {
 }
 ---------------------
 L0:
-    <START>
+  0 <START>
 L1:
-    <END>      NEXT:[<SINK>]
+  0 <END>      NEXT:[<SINK>]
 error:
-    <ERROR>    PREV:[]
+  0 <ERROR>    PREV:[]
 sink:
-    <SINK>     PREV:[<ERROR>, <END>]
+  0 <SINK>     PREV:[<ERROR>, <END>]
 =====================
 == foo ==
 fun foo() : Int
 ---------------------
 L0:
-    <START>
+  0 <START>
 L1:
-    <END>      NEXT:[<SINK>]
+  0 <END>      NEXT:[<SINK>]
 error:
-    <ERROR>    PREV:[]
+  0 <ERROR>    PREV:[]
 sink:
-    <SINK>     PREV:[<ERROR>, <END>]
+  0 <SINK>     PREV:[<ERROR>, <END>]
 =====================
 == B ==
 class B : A {
@@ -30,27 +30,27 @@ class B : A {
 }
 ---------------------
 L0:
-    <START>
-    unsupported(DELEGATOR_SUPER_CLASS : A)
+  0 <START>
+  0 unsupported(DELEGATOR_SUPER_CLASS : A)
 L1:
-    <END>                                     NEXT:[<SINK>]
+  0 <END>                                     NEXT:[<SINK>]
 error:
-    <ERROR>                                   PREV:[]
+  0 <ERROR>                                   PREV:[]
 sink:
-    <SINK>                                    PREV:[<ERROR>, <END>]
+  0 <SINK>                                    PREV:[<ERROR>, <END>]
 =====================
 == foo ==
 override fun foo() = 10
 ---------------------
 L0:
-    <START>
-    r(10)
+  0 <START>
+  0 r(10)
 L1:
-    <END>      NEXT:[<SINK>]
+  0 <END>      NEXT:[<SINK>]
 error:
-    <ERROR>    PREV:[]
+  0 <ERROR>    PREV:[]
 sink:
-    <SINK>     PREV:[<ERROR>, <END>]
+  0 <SINK>     PREV:[<ERROR>, <END>]
 =====================
 == foo ==
 fun foo(b: B) : Int {
@@ -59,24 +59,24 @@ fun foo(b: B) : Int {
 }
 ---------------------
 L0:
-    <START>
-    v(b: B)
-    w(b)
-    mark({ val o = object : A by b {} return o.foo() })
-    v(val o = object : A by b {})
-    mark(object : A by b {})
-    r(b)
-    r(object : A by b {})
-    w(o)
-    mark(o.foo())
-    mark(foo())
-    r(o)
-    call(foo, foo)
-    ret(*) L1
+  0 <START>
+  0 v(b: B)
+  0 w(b)
+  1 mark({ val o = object : A by b {} return o.foo() })
+  1 v(val o = object : A by b {})
+  1 mark(object : A by b {})
+  1 r(b)
+  1 r(object : A by b {})
+  1 w(o)
+  1 mark(o.foo())
+  1 mark(foo())
+  1 r(o)
+  1 call(foo, foo)
+  1 ret(*) L1
 L1:
-    <END>                                                  NEXT:[<SINK>]
+  0 <END>                                                  NEXT:[<SINK>]
 error:
-    <ERROR>                                                PREV:[]
+  0 <ERROR>                                                PREV:[]
 sink:
-    <SINK>                                                 PREV:[<ERROR>, <END>]
+  0 <SINK>                                                 PREV:[<ERROR>, <END>]
 =====================

@@ -1,0 +1,34 @@
+== foo ==
+fun foo() {
+    "before"
+    if (true) {
+        val a = 1
+    }
+    else {
+        val b = 2
+    }
+    "after"
+}
+---------------------
+ 0 <START>                                                                  INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 1 mark({ "before" if (true) { val a = 1 } else { val b = 2 } "after" })    INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 1 mark("before")                                                           INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 1 r("before")                                                              INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 1 mark(if (true) { val a = 1 } else { val b = 2 })                         INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 1 r(true)                                                                  INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 1 jf(L2)                                                                   INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 2 mark({ val a = 1 })                                                      INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 2 v(val a = 1)                                                             INIT: in: {}    out: {a=I- D+}    USE: in: {}    out: {}
+ 2 r(1)                                                                     INIT: in: {a=I- D+}    out: {a=I- D+}    USE: in: {}    out: {}
+ 2 w(a)                                                                     INIT: in: {a=I- D+}    out: {a=I+ D+}    USE: in: {}    out: {}
+ 1 jmp(L3)                                                                  INIT: in: {a=I+ D+}    out: {a=I+ D+}    USE: in: {}    out: {}
+ 2 mark({ val b = 2 })                                                      INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 2 v(val b = 2)                                                             INIT: in: {}    out: {b=I- D+}    USE: in: {}    out: {}
+ 2 r(2)                                                                     INIT: in: {b=I- D+}    out: {b=I- D+}    USE: in: {}    out: {}
+ 2 w(b)                                                                     INIT: in: {b=I- D+}    out: {b=I+ D+}    USE: in: {}    out: {}
+ 1 mark("after")                                                            INIT: in: {a=I+ D+, b=I+ D+}    out: {a=I+ D+, b=I+ D+}    USE: in: {}    out: {}
+ 1 r("after")                                                               INIT: in: {a=I+ D+, b=I+ D+}    out: {a=I+ D+, b=I+ D+}    USE: in: {}    out: {}
+ 0 <END>                                                                    INIT: in: {a=I+ D+, b=I+ D+}    out: {a=I+ D+, b=I+ D+}    USE: in: {}    out: {}
+ 0 <ERROR>                                                                  INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 0 <SINK>                                                                   INIT: in: {a=I+ D+, b=I+ D+}    out: {a=I+ D+, b=I+ D+}    USE: in: {}    out: {}
+=====================

@@ -160,10 +160,12 @@ public abstract class AbstractControlFlowTest extends KotlinTestWithEnvironment 
     private static String getInstructionPrefix(Instruction instruction, Set<Instruction> remainedAfterPostProcessInstructions) {
         boolean isRemovedThroughPostProcess = !remainedAfterPostProcessInstructions.contains(instruction);
         assert isRemovedThroughPostProcess == ((InstructionImpl)instruction).isDead();
-        return isRemovedThroughPostProcess ? "-   " : "    ";
+        return isRemovedThroughPostProcess ? "-" : " ";
     }
 
     protected static String formatInstruction(Instruction instruction, int maxLength, String prefix) {
+        String depthPrefix = String.format("%2d ", instruction.getLexicalScope().getDepth());
+        prefix = prefix + depthPrefix;
         String[] parts = instruction.toString().split("\n");
         if (parts.length == 1) {
             return prefix + String.format("%1$-" + maxLength + "s", instruction);

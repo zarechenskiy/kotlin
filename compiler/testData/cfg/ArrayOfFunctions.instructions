@@ -4,21 +4,21 @@ fun test(array: Array<(Int)->Unit>) {
 }
 ---------------------
 L0:
-    <START>
-    v(array: Array<(Int)->Unit>)
-    w(array)
-    mark({ array[11](3) })
-    mark(array[11](3))
-    mark(array[11])
-    r(array)
-    r(11)
-    call(array[11], get)
-    r(3)
-    call(array[11], <for expression array[11]>)
+  0 <START>
+  0 v(array: Array<(Int)->Unit>)
+  0 w(array)
+  1 mark({ array[11](3) })
+  1 mark(array[11](3))
+  1 mark(array[11])
+  1 r(array)
+  1 r(11)
+  1 call(array[11], get)
+  1 r(3)
+  1 call(array[11], <for expression array[11]>)
 L1:
-    <END>                                          NEXT:[<SINK>]
+  0 <END>                                          NEXT:[<SINK>]
 error:
-    <ERROR>                                        PREV:[]
+  0 <ERROR>                                        PREV:[]
 sink:
-    <SINK>                                         PREV:[<ERROR>, <END>]
+  0 <SINK>                                         PREV:[<ERROR>, <END>]
 =====================

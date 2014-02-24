@@ -1,0 +1,30 @@
+== foo ==
+fun foo() {
+    "before"
+    do {
+        var a = 2
+    } while (a > 0)
+    "after"
+}
+---------------------
+ 0 <START>                                                      INIT: in: {}    out: {}    USE: in: {a=LAST_READ}    out: {a=LAST_READ}
+ 1 mark({ "before" do { var a = 2 } while (a > 0) "after" })    INIT: in: {}    out: {}    USE: in: {a=LAST_READ}    out: {a=LAST_READ}
+ 1 mark("before")                                               INIT: in: {}    out: {}    USE: in: {a=LAST_READ}    out: {a=LAST_READ}
+ 1 r("before")                                                  INIT: in: {}    out: {}    USE: in: {a=LAST_READ}    out: {a=LAST_READ}
+ 2 mark(do { var a = 2 } while (a > 0))                         INIT: in: {}    out: {}    USE: in: {a=LAST_READ}    out: {a=LAST_READ}
+ 2 mark({ var a = 2 })                                          INIT: in: {a=I+ D+}    out: {a=I+ D+}    USE: in: {a=LAST_READ}    out: {a=LAST_READ}
+ 2 v(var a = 2)                                                 INIT: in: {a=I+ D+}    out: {a=I+ D+}    USE: in: {a=LAST_READ}    out: {a=LAST_READ}
+ 2 r(2)                                                         INIT: in: {a=I+ D+}    out: {a=I+ D+}    USE: in: {a=LAST_READ}    out: {a=LAST_READ}
+ 2 w(a)                                                         INIT: in: {a=I+ D+}    out: {a=I+ D+}    USE: in: {a=LAST_READ}    out: {a=LAST_READ}
+ 2 mark(a > 0)                                                  INIT: in: {a=I+ D+}    out: {a=I+ D+}    USE: in: {a=LAST_READ}    out: {a=LAST_READ}
+ 2 r(a)                                                         INIT: in: {a=I+ D+}    out: {a=I+ D+}    USE: in: {a=LAST_READ}    out: {a=LAST_READ}
+ 2 r(0)                                                         INIT: in: {a=I+ D+}    out: {a=I+ D+}    USE: in: {a=LAST_READ}    out: {a=LAST_READ}
+ 2 call(>, compareTo)                                           INIT: in: {a=I+ D+}    out: {a=I+ D+}    USE: in: {a=LAST_READ}    out: {a=LAST_READ}
+ 2 jt(L2 [loop entry point])                                    INIT: in: {a=I+ D+}    out: {a=I+ D+}    USE: in: {a=LAST_READ}    out: {a=LAST_READ}
+ 2 read (Unit)                                                  INIT: in: {a=I+ D+}    out: {a=I+ D+}    USE: in: {}    out: {}
+ 1 mark("after")                                                INIT: in: {a=I+ D+}    out: {a=I+ D+}    USE: in: {}    out: {}
+ 1 r("after")                                                   INIT: in: {a=I+ D+}    out: {a=I+ D+}    USE: in: {}    out: {}
+ 0 <END>                                                        INIT: in: {a=I+ D+}    out: {a=I+ D+}    USE: in: {}    out: {}
+ 0 <ERROR>                                                      INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 0 <SINK>                                                       INIT: in: {a=I+ D+}    out: {a=I+ D+}    USE: in: {}    out: {}
+=====================

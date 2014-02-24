@@ -9,14 +9,14 @@ class C {
 }
 ---------------------
 L0:
-    <START>
-    v(val a: Int get() = 1)
-    mark({ $a })
-    r($a)
+  0 <START>
+  0 v(val a: Int get() = 1)
+  1 mark({ $a })
+  1 r($a)
 L1:
-    <END>                      NEXT:[<SINK>]
+  0 <END>                      NEXT:[<SINK>]
 error:
-    <ERROR>                    PREV:[]
+  0 <ERROR>                    PREV:[]
 sink:
-    <SINK>                     PREV:[<ERROR>, <END>]
+  0 <SINK>                     PREV:[<ERROR>, <END>]
 =====================

@@ -1,0 +1,48 @@
+== foo ==
+fun foo() {
+    "before"
+    val bar = object {
+        {
+            val x = 1
+        }
+        fun foo() {
+            val a = 2
+        }
+    }
+    "after"
+}
+---------------------
+ 0 <START>                                                                                  INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 1 mark({ "before" val bar = object { { val x = 1 } fun foo() { val a = 2 } } "after" })    INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 1 mark("before")                                                                           INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 1 r("before")                                                                              INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 1 v(val bar = object { { val x = 1 } fun foo() { val a = 2 } })                            INIT: in: {}    out: {bar=I- D+}    USE: in: {}    out: {}
+ 1 mark(object { { val x = 1 } fun foo() { val a = 2 } })                                   INIT: in: {bar=I- D+}    out: {bar=I- D+}    USE: in: {}    out: {}
+ 2 mark({ val x = 1 })                                                                      INIT: in: {bar=I- D+}    out: {bar=I- D+}    USE: in: {}    out: {}
+ 2 v(val x = 1)                                                                             INIT: in: {bar=I- D+}    out: {bar=I- D+, x=I- D+}    USE: in: {}    out: {}
+ 2 r(1)                                                                                     INIT: in: {bar=I- D+, x=I- D+}    out: {bar=I- D+, x=I- D+}    USE: in: {}    out: {}
+ 2 w(x)                                                                                     INIT: in: {bar=I- D+, x=I- D+}    out: {bar=I- D+, x=I+ D+}    USE: in: {}    out: {}
+ 1 jmp?(L2)                                                                                 INIT: in: {bar=I- D+, x=I+ D+}    out: {bar=I- D+, x=I+ D+}    USE: in: {}    out: {}
+ 1 d(fun foo() { val a = 2 })                                                               INIT: in: {a=I+ D+, bar=I- D+, x=I+ D+}    out: {a=I+ D+, bar=I- D+, x=I+ D+}    USE: in: {}    out: {}
+ 1 r(object { { val x = 1 } fun foo() { val a = 2 } })                                      INIT: in: {bar=I- D+, x=I+ D+}    out: {bar=I- D+, x=I+ D+}    USE: in: {}    out: {}
+ 1 w(bar)                                                                                   INIT: in: {bar=I- D+, x=I+ D+}    out: {bar=I+ D+, x=I+ D+}    USE: in: {}    out: {}
+ 1 mark("after")                                                                            INIT: in: {bar=I+ D+, x=I+ D+}    out: {bar=I+ D+, x=I+ D+}    USE: in: {}    out: {}
+ 1 r("after")                                                                               INIT: in: {bar=I+ D+, x=I+ D+}    out: {bar=I+ D+, x=I+ D+}    USE: in: {}    out: {}
+ 0 <END>                                                                                    INIT: in: {bar=I+ D+, x=I+ D+}    out: {bar=I+ D+, x=I+ D+}    USE: in: {}    out: {}
+ 0 <ERROR>                                                                                  INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 0 <SINK>                                                                                   INIT: in: {a=I+ D+, bar=I- D+, x=I+ D+}    out: {a=I+ D+, bar=I- D+, x=I+ D+}    USE: in: {}    out: {}
+=====================
+== foo ==
+fun foo() {
+            val a = 2
+        }
+---------------------
+ 2 <START>                INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 3 mark({ val a = 2 })    INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 3 v(val a = 2)           INIT: in: {}    out: {a=I- D+}    USE: in: {}    out: {}
+ 3 r(2)                   INIT: in: {a=I- D+}    out: {a=I- D+}    USE: in: {}    out: {}
+ 3 w(a)                   INIT: in: {a=I- D+}    out: {a=I+ D+}    USE: in: {}    out: {}
+ 2 <END>                  INIT: in: {a=I+ D+}    out: {a=I+ D+}    USE: in: {}    out: {}
+ 2 <ERROR>                INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 2 <SINK>                 INIT: in: {a=I+ D+}    out: {a=I+ D+}    USE: in: {}    out: {}
+=====================
