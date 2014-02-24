@@ -16,8 +16,6 @@ import org.jetbrains.asm4.tree.analysis.*;
 import org.jetbrains.jet.codegen.ClosureCodegen;
 import org.jetbrains.jet.codegen.StackValue;
 import org.jetbrains.jet.codegen.state.JetTypeMapper;
-import org.jetbrains.jet.lang.descriptors.ValueParameterDescriptor;
-import org.jetbrains.jet.lang.resolve.java.AsmTypeConstants;
 import org.jetbrains.jet.utils.UtilsPackage;
 
 import java.util.*;
@@ -153,15 +151,13 @@ public class MethodInliner {
 
                     putStackValuesIntoLocals(info.getParamsWithoutCapturedValOrVar(), valueParamShift, this, desc);
 
-                    List<ParameterInfo> lambdaParameters = invokeCall.getParameters();
-
-                    Parameters params = new Parameters(lambdaParameters, Parameters.transformList(capturedRemapper.markRecaptured(info.getCapturedVars(), info), lambdaParameters.size()));
+                    Parameters lambdaParameters = info.addAllParameters(ParametersBuilder.newBuilder(), capturedRemapper).buildParameters();
 
                     setInlining(true);
-                    MethodInliner inliner = new MethodInliner(info.getNode(), params, parent.subInline(parent.nameGenerator.subGenerator("lambda")), info.getLambdaClassType(),
+                    MethodInliner inliner = new MethodInliner(info.getNode(), lambdaParameters, parent.subInline(parent.nameGenerator.subGenerator("lambda")), info.getLambdaClassType(),
                                                               capturedRemapper, true /*cause all call in same module as lambda*/);
 
-                    VarRemapper.ParamRemapper remapper = new VarRemapper.ParamRemapper(params, valueParamShift);
+                    VarRemapper.ParamRemapper remapper = new VarRemapper.ParamRemapper(lambdaParameters, valueParamShift);
                     inliner.doTransformAndMerge(this.mv, remapper); //TODO add skipped this and receiver
                     Method bridge = typeMapper.mapSignature(ClosureCodegen.getInvokeFunction(info.getFunctionDescriptor())).getAsmMethod();
                     Method delegate = typeMapper.mapSignature(info.getFunctionDescriptor()).getAsmMethod();
@@ -295,7 +291,7 @@ public class MethodInliner {
                             }
                         }
 
-                        invokeCalls.add(new InvokeCall(varIndex, calcParametersForInvokeCall(lambdaInfo, desc), lambdaInfo));
+                        invokeCalls.add(new InvokeCall(varIndex, lambdaInfo));
                     }
                     else if (isLambdaConstructorCall(owner, name)) {
                         Map<Integer, InvokeCall> infos = new HashMap<Integer, InvokeCall>();
@@ -309,7 +305,7 @@ public class MethodInliner {
                                     int varIndex = ((VarInsnNode) insnNode).var;
                                     LambdaInfo lambdaInfo = getLambda(varIndex);
                                     if (lambdaInfo != null) {
-                                        infos.put(i, new InvokeCall(varIndex, null, lambdaInfo));
+                                        infos.put(i, new InvokeCall(varIndex, lambdaInfo));
                                         node.instructions.remove(insnNode);
                                     }
                                 }
@@ -346,34 +342,6 @@ public class MethodInliner {
         }
 
         return node;
-    }
-
-    @Nullable
-    private List<ParameterInfo> calcParametersForInvokeCall(@Nullable LambdaInfo info, @NotNull String desc) {
-        if (info == null) {
-            return null;
-        }
-
-        List<ParameterInfo> result = new ArrayList<ParameterInfo>();
-
-        //add skipped this cause closure doesn't have it
-        //result.add(ParameterInfo.STUB);
-        ParameterInfo thiz = new ParameterInfo(AsmTypeConstants.OBJECT_TYPE, true, -1, -1);
-        thiz.setLambda(info);
-
-        result.add(thiz);
-        int index = 1;
-
-
-        List<ValueParameterDescriptor> valueParameters = info.getFunctionDescriptor().getValueParameters();
-        for (ValueParameterDescriptor parameter : valueParameters) {
-            Type type = typeMapper.mapType(parameter.getType());
-            result.add(new ParameterInfo(type, false, index++, -1));
-            if (type.getSize() == 2) {
-                result.add(ParameterInfo.STUB);
-            }
-        }
-        return result;
     }
 
     @Nullable

@@ -18,24 +18,14 @@ package org.jetbrains.jet.codegen.inline;
 
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-
 class InvokeCall {
 
     public final int index;
 
-    private final List<ParameterInfo> parameters;
-
     public final LambdaInfo lambdaInfo;
 
-    InvokeCall(int index, @Nullable List<ParameterInfo> parameterInfos, @Nullable LambdaInfo lambdaInfo) {
+    InvokeCall(int index, @Nullable LambdaInfo lambdaInfo) {
         this.index = index;
-        this.parameters = parameterInfos;
         this.lambdaInfo = lambdaInfo;
-    }
-
-    @Nullable
-    public List<ParameterInfo> getParameters() {
-        return parameters;
     }
 }

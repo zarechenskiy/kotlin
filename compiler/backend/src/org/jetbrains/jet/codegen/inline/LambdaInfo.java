@@ -25,9 +25,11 @@ import org.jetbrains.jet.codegen.context.EnclosedValueDescriptor;
 import org.jetbrains.jet.codegen.state.JetTypeMapper;
 import org.jetbrains.jet.lang.descriptors.ClassDescriptor;
 import org.jetbrains.jet.lang.descriptors.FunctionDescriptor;
+import org.jetbrains.jet.lang.descriptors.ValueParameterDescriptor;
 import org.jetbrains.jet.lang.psi.JetFunctionLiteral;
 import org.jetbrains.jet.lang.psi.JetFunctionLiteralExpression;
 import org.jetbrains.jet.lang.resolve.BindingContext;
+import org.jetbrains.jet.lang.resolve.java.AsmTypeConstants;
 
 import java.util.*;
 
@@ -132,10 +134,6 @@ public class LambdaInfo {
         }
     }
 
-    public int getParamOffset() {
-        return paramOffset;
-    }
-
     public void setParamOffset(int paramOffset) {
         this.paramOffset = paramOffset;
         shiftParams(paramOffset);
@@ -144,6 +142,24 @@ public class LambdaInfo {
     public List<Type> getParamsWithoutCapturedValOrVar() {
         Type[] types = typeMapper.mapSignature(functionDescriptor).getAsmMethod().getArgumentTypes();
         return Arrays.asList(types);
+    }
+
+    public ParametersBuilder addAllParameters(@NotNull ParametersBuilder builder, @NotNull LambdaFieldRemapper remapper) {
+        //add skipped this cause closure doesn't have it
+        builder.addThis(AsmTypeConstants.OBJECT_TYPE, true).setLambda(this);
+
+        List<ValueParameterDescriptor> valueParameters = getFunctionDescriptor().getValueParameters();
+        for (ValueParameterDescriptor parameter : valueParameters) {
+            Type type = typeMapper.mapType(parameter.getType());
+            builder.addNextParameter(type, false, null);
+        }
+
+
+        List<CapturedParamInfo> infos = remapper.markRecaptured(getCapturedVars(), this);
+        for (CapturedParamInfo info : infos) {
+            builder.addCapturedParam(info.getFieldName(), info.getType(), info.isSkipped, info);
+        }
+        return builder;
     }
 
     public int getCapturedVarsSize() {

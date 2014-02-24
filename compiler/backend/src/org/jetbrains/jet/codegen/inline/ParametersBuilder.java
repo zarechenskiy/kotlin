@@ -36,9 +36,10 @@ public class  ParametersBuilder {
         return new ParametersBuilder();
     }
 
-    public ParametersBuilder addThis(Type type, boolean skipped) {
-        addParameter(new ParameterInfo(type, skipped, nextIndex, -1));
-        return this;
+    public ParameterInfo addThis(Type type, boolean skipped) {
+        ParameterInfo info = new ParameterInfo(type, skipped, nextIndex, -1);
+        addParameter(info);
+        return info;
     }
 
     public ParametersBuilder addNextParameter(Type type, boolean skipped, @Nullable ParameterInfo original) {
