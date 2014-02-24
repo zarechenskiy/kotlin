@@ -64,14 +64,11 @@ public class LambdaFieldRemapper {
 
     @Nullable
     public CapturedParamInfo findField(FieldInsnNode fieldInsnNode, Collection<CapturedParamInfo> captured) {
-        String name = fieldInsnNode.name;
-        CapturedParamInfo result = null;
         for (CapturedParamInfo valueDescriptor : captured) {
-            if (valueDescriptor.getFieldName().equals(name)) {
-                result = valueDescriptor;
-                break;
+            if (valueDescriptor.getFieldName().equals(fieldInsnNode.name)) {
+                return valueDescriptor;
             }
         }
-        return result;
+        return null;
     }
 }

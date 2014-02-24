@@ -20,35 +20,21 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-class InlinableAccess {
+class InvokeCall {
 
     public final int index;
 
-    public final boolean inlinable;
-
     private final List<ParameterInfo> parameters;
 
-    private LambdaInfo info;
+    public final LambdaInfo lambdaInfo;
 
-    InlinableAccess(int index, boolean isInlinable, List<ParameterInfo> parameterInfos) {
+    InvokeCall(int index, @Nullable List<ParameterInfo> parameterInfos, @Nullable LambdaInfo lambdaInfo) {
         this.index = index;
-        inlinable = isInlinable;
         this.parameters = parameterInfos;
-    }
-
-    public boolean isInlinable() {
-        return inlinable;
+        this.lambdaInfo = lambdaInfo;
     }
 
     @Nullable
-    public LambdaInfo getInfo() {
-        return info;
-    }
-
-    public void setInfo(LambdaInfo info) {
-        this.info = info;
-    }
-
     public List<ParameterInfo> getParameters() {
         return parameters;
     }

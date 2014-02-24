@@ -262,7 +262,7 @@ public class InlineCodegen implements ParentCodegenAware, CallGenerator {
 
             if (index >= 0 && couldBeRemapped) {
                 CapturedParamInfo capturedParamInfo = activeLambda.getCapturedVars().get(index);
-                capturedParamInfo.setRemapIndex(remappedIndex != null ? remappedIndex : StackValue.local(info.getIndex(), info.getType()));
+                capturedParamInfo.setRemapValue(remappedIndex != null ? remappedIndex : StackValue.local(info.getIndex(), info.getType()));
             }
 
             doWithParameter(info);

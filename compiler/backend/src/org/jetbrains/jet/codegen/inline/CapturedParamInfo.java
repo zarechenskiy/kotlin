@@ -68,7 +68,7 @@ public class CapturedParamInfo extends ParameterInfo {
     }
 
     public CapturedParamInfo newIndex(int newIndex) {
-        return clone(newIndex, getRemapIndex());
+        return clone(newIndex, getRemapValue());
     }
 
     public CapturedParamInfo clone(int newIndex, int newRamapIndex) {
