@@ -221,6 +221,11 @@ public class CompileKotlinAgainstInlineKotlinTestGenerated extends AbstractCompi
         doBoxTest("compiler/testData/codegen/boxInline/use");
     }
     
+    @TestMetadata("vararg")
+    public void testVararg() throws Exception {
+        doBoxTest("compiler/testData/codegen/boxInline/vararg");
+    }
+    
     @TestMetadata("with")
     public void testWith() throws Exception {
         doBoxTest("compiler/testData/codegen/boxInline/with");

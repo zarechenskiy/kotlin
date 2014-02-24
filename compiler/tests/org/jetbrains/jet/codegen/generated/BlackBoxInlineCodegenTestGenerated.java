@@ -221,6 +221,11 @@ public class BlackBoxInlineCodegenTestGenerated extends AbstractBlackBoxCodegenT
         doTestMultiFile("compiler/testData/codegen/boxInline/use");
     }
     
+    @TestMetadata("vararg")
+    public void testVararg() throws Exception {
+        doTestMultiFile("compiler/testData/codegen/boxInline/vararg");
+    }
+    
     @TestMetadata("with")
     public void testWith() throws Exception {
         doTestMultiFile("compiler/testData/codegen/boxInline/with");
