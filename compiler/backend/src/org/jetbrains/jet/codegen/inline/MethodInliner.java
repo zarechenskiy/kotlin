@@ -462,7 +462,7 @@ public class MethodInliner {
                     }
 
                     if (result.isSkipped()) {
-                        //lambda class transformation skip this captured
+                        //lambda class transformation: skip captured this
                     } else {
                         cur = this.lambdaFieldRemapper.doTransform(node, fieldInsnNode, result);
                     }
