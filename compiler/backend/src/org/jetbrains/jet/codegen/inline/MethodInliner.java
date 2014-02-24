@@ -32,7 +32,7 @@ public class MethodInliner {
     private final InliningInfo parent;
 
     @Nullable
-    private final Type lambdaInfo;
+    private final Type lambdaType;
 
     private final LambdaFieldRemapper lambdaFieldRemapper;
 
@@ -52,20 +52,20 @@ public class MethodInliner {
      * @param node
      * @param parameters
      * @param parent
-     * @param lambdaInfo - in case on lambda 'invoke' inlining
+     * @param lambdaType - in case on lambda 'invoke' inlining
      */
     public MethodInliner(
             @NotNull MethodNode node,
             Parameters parameters,
             @NotNull InliningInfo parent,
-            @Nullable Type lambdaInfo,
+            @Nullable Type lambdaType,
             LambdaFieldRemapper lambdaFieldRemapper,
             boolean isSameModule
     ) {
         this.node = node;
         this.parameters = parameters;
         this.parent = parent;
-        this.lambdaInfo = lambdaInfo;
+        this.lambdaType = lambdaType;
         this.lambdaFieldRemapper = lambdaFieldRemapper;
         this.isSameModule = isSameModule;
         this.typeMapper = parent.state.getTypeMapper();
@@ -248,7 +248,7 @@ public class MethodInliner {
 
         node.accept(transformedNode);
 
-        if (lambdaInfo != null) {
+        if (lambdaType != null) {
             transformCaptured(transformedNode);
         }
         return transformedNode;
@@ -434,7 +434,7 @@ public class MethodInliner {
     }
 
     private void transformCaptured(@NotNull MethodNode node) {
-        if (lambdaInfo == null) {
+        if (lambdaType == null) {
             return;
         }
 
@@ -445,7 +445,7 @@ public class MethodInliner {
                 FieldInsnNode fieldInsnNode = (FieldInsnNode) cur;
                 //TODO check closure
                 String owner = fieldInsnNode.owner;
-                if (this.lambdaFieldRemapper.canProcess(fieldInsnNode.owner, lambdaInfo.getInternalName())) {
+                if (this.lambdaFieldRemapper.canProcess(fieldInsnNode.owner, lambdaType.getInternalName())) {
                     String name = fieldInsnNode.name;
                     String desc = fieldInsnNode.desc;
 
@@ -458,7 +458,7 @@ public class MethodInliner {
                                                                 name +
                                                                 " (" +
                                                                 desc +
-                                                                ") in captured vars of " + lambdaInfo);
+                                                                ") in captured vars of " + lambdaType);
                     }
 
                     if (result.isSkipped()) {
