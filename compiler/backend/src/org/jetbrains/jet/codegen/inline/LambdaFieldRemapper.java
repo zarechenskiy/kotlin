@@ -31,12 +31,7 @@ import static org.jetbrains.jet.codegen.inline.MethodInliner.getPreviousNoLabelN
 public class LambdaFieldRemapper {
 
     public AbstractInsnNode doTransform(MethodNode node, FieldInsnNode fieldInsnNode, CapturedParamInfo capturedField) {
-        AbstractInsnNode loadThis = getPreviousNoLabelNoLine(fieldInsnNode);
-
-        assert loadThis.getType() == AbstractInsnNode.VAR_INSN || loadThis.getType() == AbstractInsnNode.FIELD_INSN :
-                "Field access instruction should go after load this but goes after " + loadThis;
-        assert loadThis.getOpcode() == Opcodes.ALOAD || loadThis.getOpcode() == Opcodes.GETSTATIC :
-                "This should be loaded by ALOAD or GETSTATIC but " + loadThis.getOpcode();
+        AbstractInsnNode loadThis = getPreviousThis(fieldInsnNode);
 
         int opcode = fieldInsnNode.getOpcode() == Opcodes.GETFIELD ? capturedField.getType().getOpcode(Opcodes.ILOAD) : capturedField.getType().getOpcode(Opcodes.ISTORE);
         VarInsnNode newInstruction = new VarInsnNode(opcode, capturedField.getIndex());
@@ -46,6 +41,16 @@ public class LambdaFieldRemapper {
         node.instructions.remove(fieldInsnNode); //remove aload field
 
         return newInstruction;
+    }
+
+    protected static AbstractInsnNode getPreviousThis(FieldInsnNode fieldInsnNode) {
+        AbstractInsnNode loadThis = getPreviousNoLabelNoLine(fieldInsnNode);
+
+        assert loadThis.getType() == AbstractInsnNode.VAR_INSN || loadThis.getType() == AbstractInsnNode.FIELD_INSN :
+                "Field access instruction should go after load this but goes after " + loadThis;
+        assert loadThis.getOpcode() == Opcodes.ALOAD || loadThis.getOpcode() == Opcodes.GETSTATIC :
+                "This should be loaded by ALOAD or GETSTATIC but " + loadThis.getOpcode();
+        return loadThis;
     }
 
     public List<CapturedParamInfo> markRecaptured(List<CapturedParamInfo> originalCaptured, LambdaInfo lambda) {

@@ -57,11 +57,7 @@ public class InlineFieldRemapper extends LambdaFieldRemapper {
             return super.doTransform(node, fieldInsnNode, capturedField);
         }
 
-        AbstractInsnNode prev = getPreviousNoLabelNoLine(fieldInsnNode);
-
-        assert prev.getType() == AbstractInsnNode.VAR_INSN || prev.getType() == AbstractInsnNode.FIELD_INSN;
-        AbstractInsnNode loadThis = prev;
-        assert /*loadThis.var == info.getCapturedVarsSize() - 1 && */loadThis.getOpcode() == Opcodes.ALOAD || loadThis.getOpcode() == Opcodes.GETSTATIC;
+        AbstractInsnNode loadThis = getPreviousThis(fieldInsnNode);
 
         int opcode = Opcodes.GETSTATIC;
 
