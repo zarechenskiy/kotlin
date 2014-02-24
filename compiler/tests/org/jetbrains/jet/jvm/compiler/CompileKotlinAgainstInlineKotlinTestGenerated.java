@@ -151,6 +151,11 @@ public class CompileKotlinAgainstInlineKotlinTestGenerated extends AbstractCompi
         doBoxTest("compiler/testData/codegen/boxInline/params");
     }
     
+    @TestMetadata("plusAssign")
+    public void testPlusAssign() throws Exception {
+        doBoxTest("compiler/testData/codegen/boxInline/plusAssign");
+    }
+    
     @TestMetadata("regeneratedLambdaName")
     public void testRegeneratedLambdaName() throws Exception {
         doBoxTest("compiler/testData/codegen/boxInline/regeneratedLambdaName");
