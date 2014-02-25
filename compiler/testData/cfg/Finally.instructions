@@ -502,12 +502,12 @@ L0:
   2 r(a)
   2 call(.., rangeTo)
   2 v(i)
-  2 w(i)
 L3:
-  2 jmp?(L2)                                                                             NEXT:[read (Unit), mark({ try { 1 if (2 > 3) { continue @ } } finally { 2 } })]
+  2 jmp?(L2)                                                                             NEXT:[read (Unit), w(i)]
 L4 [loop entry point]:
 L5 [body entry point]:
-  3 mark({ try { 1 if (2 > 3) { continue @ } } finally { 2 } })                          PREV:[jmp?(L2), jmp(L4 [loop entry point]), jmp?(L4 [loop entry point])]
+  2 w(i)                                                                                 PREV:[jmp?(L2), jmp(L4 [loop entry point]), jmp?(L4 [loop entry point])]
+  3 mark({ try { 1 if (2 > 3) { continue @ } } finally { 2 } })
   3 mark(try { 1 if (2 > 3) { continue @ } } finally { 2 })
   3 jmp?(L6 [onExceptionToFinallyBlock])                                                 NEXT:[mark({ 2 }), mark({ 1 if (2 > 3) { continue @ } })]
   4 mark({ 1 if (2 > 3) { continue @ } })
@@ -523,7 +523,7 @@ L8 [start finally]:
   6 mark({ 2 })
   6 r(2)
 L9 [finish finally]:
-  5 jmp(L4 [loop entry point])                                                           NEXT:[mark({ try { 1 if (2 > 3) { continue @ } } finally { 2 } })]
+  5 jmp(L4 [loop entry point])                                                           NEXT:[w(i)]
 - 4 jmp(L10)                                                                             NEXT:[jmp(L11 [skipFinallyToErrorBlock])]                                                   PREV:[]
 L7:
   4 read (Unit)                                                                          PREV:[jf(L7)]
@@ -536,7 +536,7 @@ L6 [onExceptionToFinallyBlock]:
 L11 [skipFinallyToErrorBlock]:
   6 mark({ 2 })                                                                          PREV:[jmp(L11 [skipFinallyToErrorBlock])]
   6 r(2)
-  2 jmp?(L4 [loop entry point])                                                          NEXT:[mark({ try { 1 if (2 > 3) { continue @ } } finally { 2 } }), read (Unit)]
+  2 jmp?(L4 [loop entry point])                                                          NEXT:[w(i), read (Unit)]
 L2:
   2 read (Unit)                                                                          PREV:[jmp?(L2), jmp?(L4 [loop entry point])]
 L1:
@@ -576,12 +576,12 @@ L0:
   3 r(a)
   3 call(.., rangeTo)
   3 v(i)
-  3 w(i)
 L4:
-  3 jmp?(L3)                                                                               NEXT:[read (Unit), mark({ 1 if (2 > 3) { continue @ } })]
+  3 jmp?(L3)                                                                               NEXT:[read (Unit), w(i)]
 L5 [loop entry point]:
 L6 [body entry point]:
-  4 mark({ 1 if (2 > 3) { continue @ } })                                                  PREV:[jmp?(L3), jmp(L5 [loop entry point]), jmp?(L5 [loop entry point])]
+  3 w(i)                                                                                   PREV:[jmp?(L3), jmp(L5 [loop entry point]), jmp?(L5 [loop entry point])]
+  4 mark({ 1 if (2 > 3) { continue @ } })
   4 r(1)
   4 mark(if (2 > 3) { continue @ })
   4 mark(2 > 3)
@@ -590,12 +590,12 @@ L6 [body entry point]:
   4 call(>, compareTo)
   4 jf(L7)                                                                                 NEXT:[read (Unit), mark({ continue @ })]
   5 mark({ continue @ })
-  5 jmp(L5 [loop entry point])                                                             NEXT:[mark({ 1 if (2 > 3) { continue @ } })]
+  5 jmp(L5 [loop entry point])                                                             NEXT:[w(i)]
 - 4 jmp(L8)                                                                                NEXT:[jmp?(L5 [loop entry point])]                                                            PREV:[]
 L7:
   4 read (Unit)                                                                            PREV:[jf(L7)]
 L8:
-  3 jmp?(L5 [loop entry point])                                                            NEXT:[mark({ 1 if (2 > 3) { continue @ } }), read (Unit)]
+  3 jmp?(L5 [loop entry point])                                                            NEXT:[w(i), read (Unit)]
 L3:
   3 read (Unit)                                                                            PREV:[jmp?(L3), jmp?(L5 [loop entry point])]
   2 r(5)
@@ -645,12 +645,12 @@ L0:
   3 r(a)
   3 call(.., rangeTo)
   3 v(i)
-  3 w(i)
 L4:
-  3 jmp?(L3)                                                                             NEXT:[read (Unit), mark({ 1 if (2 > 3) { continue @ } })]
+  3 jmp?(L3)                                                                             NEXT:[read (Unit), w(i)]
 L5 [loop entry point]:
 L6 [body entry point]:
-  4 mark({ 1 if (2 > 3) { continue @ } })                                                PREV:[jmp?(L3), jmp(L5 [loop entry point]), jmp?(L5 [loop entry point])]
+  3 w(i)                                                                                 PREV:[jmp?(L3), jmp(L5 [loop entry point]), jmp?(L5 [loop entry point])]
+  4 mark({ 1 if (2 > 3) { continue @ } })
   4 r(1)
   4 mark(if (2 > 3) { continue @ })
   4 mark(2 > 3)
@@ -659,12 +659,12 @@ L6 [body entry point]:
   4 call(>, compareTo)
   4 jf(L7)                                                                               NEXT:[read (Unit), mark({ continue @ })]
   5 mark({ continue @ })
-  5 jmp(L5 [loop entry point])                                                           NEXT:[mark({ 1 if (2 > 3) { continue @ } })]
+  5 jmp(L5 [loop entry point])                                                           NEXT:[w(i)]
 - 4 jmp(L8)                                                                              NEXT:[jmp?(L5 [loop entry point])]                                                          PREV:[]
 L7:
   4 read (Unit)                                                                          PREV:[jf(L7)]
 L8:
-  3 jmp?(L5 [loop entry point])                                                          NEXT:[mark({ 1 if (2 > 3) { continue @ } }), read (Unit)]
+  3 jmp?(L5 [loop entry point])                                                          NEXT:[w(i), read (Unit)]
 L3:
   3 read (Unit)                                                                          PREV:[jmp?(L3), jmp?(L5 [loop entry point])]
   1 jmp(L9 [skipFinallyToErrorBlock])                                                    NEXT:[mark({ 2 })]

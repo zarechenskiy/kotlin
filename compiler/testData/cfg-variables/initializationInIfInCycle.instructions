@@ -20,8 +20,8 @@ fun foo1(numbers: Collection<Int>) {
  2 mark(for (i in numbers) { val b: Boolean if (1 < 2) { b = false } else { b = true } use(b) continue })        INIT: in: {numbers=I+ D+}    out: {numbers=I+ D+}    USE: in: {b=LAST_WRITTEN, numbers=LAST_READ}    out: {b=LAST_WRITTEN, numbers=LAST_READ}
  2 r(numbers)                                                                                                    INIT: in: {numbers=I+ D+}    out: {numbers=I+ D+}    USE: in: {b=LAST_WRITTEN}    out: {b=LAST_WRITTEN, numbers=LAST_READ}
  2 v(i)                                                                                                          INIT: in: {numbers=I+ D+}    out: {i=I- D+, numbers=I+ D+}    USE: in: {b=LAST_WRITTEN}    out: {b=LAST_WRITTEN}
- 2 w(i)                                                                                                          INIT: in: {i=I- D+, numbers=I+ D+}    out: {i=I+ D+, numbers=I+ D+}    USE: in: {b=LAST_WRITTEN}    out: {b=LAST_WRITTEN}
- 2 jmp?(L2)                                                                                                      INIT: in: {i=I+ D+, numbers=I+ D+}    out: {i=I+ D+, numbers=I+ D+}    USE: in: {b=LAST_WRITTEN}    out: {b=LAST_WRITTEN}
+ 2 jmp?(L2)                                                                                                      INIT: in: {i=I- D+, numbers=I+ D+}    out: {i=I- D+, numbers=I+ D+}    USE: in: {b=LAST_WRITTEN}    out: {b=LAST_WRITTEN}
+ 2 w(i)                                                                                                          INIT: in: {b=I+ D+, i=I- D+, numbers=I+ D+}    out: {b=I+ D+, i=I+ D+, numbers=I+ D+}    USE: in: {b=LAST_WRITTEN}    out: {b=LAST_WRITTEN}
  3 mark({ val b: Boolean if (1 < 2) { b = false } else { b = true } use(b) continue })                           INIT: in: {b=I+ D+, i=I+ D+, numbers=I+ D+}    out: {b=I+ D+, i=I+ D+, numbers=I+ D+}    USE: in: {b=LAST_WRITTEN}    out: {b=LAST_WRITTEN}
  3 v(val b: Boolean)                                                                                             INIT: in: {b=I+ D+, i=I+ D+, numbers=I+ D+}    out: {b=I+ D+, i=I+ D+, numbers=I+ D+}    USE: in: {b=LAST_WRITTEN}    out: {b=LAST_WRITTEN}
  3 mark(if (1 < 2) { b = false } else { b = true })                                                              INIT: in: {b=I+ D+, i=I+ D+, numbers=I+ D+}    out: {b=I+ D+, i=I+ D+, numbers=I+ D+}    USE: in: {b=LAST_WRITTEN}    out: {b=LAST_WRITTEN}
@@ -42,10 +42,10 @@ fun foo1(numbers: Collection<Int>) {
  3 call(use, use)                                                                                                INIT: in: {b=I+ D+, i=I+ D+, numbers=I+ D+}    out: {b=I+ D+, i=I+ D+, numbers=I+ D+}    USE: in: {b=LAST_WRITTEN}    out: {b=LAST_WRITTEN}
  3 jmp(L4 [loop entry point])                                                                                    INIT: in: {b=I+ D+, i=I+ D+, numbers=I+ D+}    out: {b=I+ D+, i=I+ D+, numbers=I+ D+}    USE: in: {b=LAST_WRITTEN}    out: {b=LAST_WRITTEN}
  2 jmp?(L4 [loop entry point])                                                                                   INIT:    USE:
- 2 read (Unit)                                                                                                   INIT: in: {i=I+ D+, numbers=I+ D+}    out: {i=I+ D+, numbers=I+ D+}    USE: in: {}    out: {}
- 0 <END>                                                                                                         INIT: in: {i=I+ D+, numbers=I+ D+}    out: {i=I+ D+, numbers=I+ D+}    USE: in: {}    out: {}
+ 2 read (Unit)                                                                                                   INIT: in: {i=I- D+, numbers=I+ D+}    out: {i=I- D+, numbers=I+ D+}    USE: in: {}    out: {}
+ 0 <END>                                                                                                         INIT: in: {i=I- D+, numbers=I+ D+}    out: {i=I- D+, numbers=I+ D+}    USE: in: {}    out: {}
  0 <ERROR>                                                                                                       INIT: in: {}    out: {}    USE: in: {}    out: {}
- 0 <SINK>                                                                                                        INIT: in: {i=I+ D+, numbers=I+ D+}    out: {i=I+ D+, numbers=I+ D+}    USE: in: {}    out: {}
+ 0 <SINK>                                                                                                        INIT: in: {i=I- D+, numbers=I+ D+}    out: {i=I- D+, numbers=I+ D+}    USE: in: {}    out: {}
 =====================
 == use ==
 fun use(vararg a: Any?) = a
