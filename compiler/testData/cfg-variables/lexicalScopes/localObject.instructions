@@ -20,13 +20,13 @@ fun foo() {
  2 v(val a = 1)                                                                     INIT: in: {}    out: {a=I- D+}    USE: in: {}    out: {}
  2 r(1)                                                                             INIT: in: {a=I- D+}    out: {a=I- D+}    USE: in: {}    out: {}
  2 w(a)                                                                             INIT: in: {a=I- D+}    out: {a=I+ D+}    USE: in: {}    out: {}
- 1 jmp?(L2)                                                                         INIT: in: {a=I+ D+}    out: {a=I+ D+}    USE: in: {}    out: {}
- 1 d(fun foo() { val b = 2 })                                                       INIT: in: {a=I+ D+, b=I+ D+}    out: {a=I+ D+, b=I+ D+}    USE: in: {}    out: {}
- 1 mark("after")                                                                    INIT: in: {a=I+ D+}    out: {a=I+ D+}    USE: in: {}    out: {}
- 1 r("after")                                                                       INIT: in: {a=I+ D+}    out: {a=I+ D+}    USE: in: {}    out: {}
- 0 <END>                                                                            INIT: in: {a=I+ D+}    out: {a=I+ D+}    USE: in: {}    out: {}
+ 1 jmp?(L2)                                                                         INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 1 d(fun foo() { val b = 2 })                                                       INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 1 mark("after")                                                                    INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 1 r("after")                                                                       INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 0 <END>                                                                            INIT: in: {}    out: {}    USE: in: {}    out: {}
  0 <ERROR>                                                                          INIT: in: {}    out: {}    USE: in: {}    out: {}
- 0 <SINK>                                                                           INIT: in: {a=I+ D+, b=I+ D+}    out: {a=I+ D+, b=I+ D+}    USE: in: {}    out: {}
+ 0 <SINK>                                                                           INIT: in: {}    out: {}    USE: in: {}    out: {}
 =====================
 == foo ==
 fun foo() {
@@ -38,7 +38,7 @@ fun foo() {
  3 v(val b = 2)           INIT: in: {}    out: {b=I- D+}    USE: in: {}    out: {}
  3 r(2)                   INIT: in: {b=I- D+}    out: {b=I- D+}    USE: in: {}    out: {}
  3 w(b)                   INIT: in: {b=I- D+}    out: {b=I+ D+}    USE: in: {}    out: {}
- 2 <END>                  INIT: in: {b=I+ D+}    out: {b=I+ D+}    USE: in: {}    out: {}
+ 2 <END>                  INIT: in: {}    out: {}    USE: in: {}    out: {}
  2 <ERROR>                INIT: in: {}    out: {}    USE: in: {}    out: {}
- 2 <SINK>                 INIT: in: {b=I+ D+}    out: {b=I+ D+}    USE: in: {}    out: {}
+ 2 <SINK>                 INIT: in: {}    out: {}    USE: in: {}    out: {}
 =====================

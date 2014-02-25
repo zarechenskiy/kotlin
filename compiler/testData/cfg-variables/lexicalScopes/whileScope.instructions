@@ -12,10 +12,10 @@ fun foo() {
  1 mark("before")                                            INIT: in: {}    out: {}    USE: in: {}    out: {}
  1 r("before")                                               INIT: in: {}    out: {}    USE: in: {}    out: {}
  1 mark(while (true) { val a: Int })                         INIT: in: {}    out: {}    USE: in: {}    out: {}
- 1 r(true)                                                   INIT: in: {a=I- D+}    out: {a=I- D+}    USE: in: {}    out: {}
- 2 mark({ val a: Int })                                      INIT: in: {a=I- D+}    out: {a=I- D+}    USE: in: {}    out: {}
- 2 v(val a: Int)                                             INIT: in: {a=I- D+}    out: {a=I- D+}    USE: in: {}    out: {}
- 1 jmp(L2 [loop entry point])                                INIT: in: {a=I- D+}    out: {a=I- D+}    USE: in: {}    out: {}
+ 1 r(true)                                                   INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 2 mark({ val a: Int })                                      INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 2 v(val a: Int)                                             INIT: in: {}    out: {a=I- D+}    USE: in: {}    out: {}
+ 1 jmp(L2 [loop entry point])                                INIT: in: {}    out: {}    USE: in: {}    out: {}
  1 read (Unit)                                               INIT:    USE:
  1 mark("after")                                             INIT:    USE:
  1 r("after")                                                INIT:    USE:

@@ -9,24 +9,24 @@ fun foo() {
     "after"
 }
 ---------------------
- 0 <START>                                                                         INIT: in: {}    out: {}    USE: in: {a=LAST_READ, x=LAST_READ, y=LAST_READ}    out: {a=LAST_READ, x=LAST_READ, y=LAST_READ}
- 1 mark({ val a = 1 "before" val f = { (x: Int) -> val y = x + a y } "after" })    INIT: in: {}    out: {}    USE: in: {a=LAST_READ, x=LAST_READ, y=LAST_READ}    out: {a=LAST_READ, x=LAST_READ, y=LAST_READ}
- 1 v(val a = 1)                                                                    INIT: in: {}    out: {a=I- D+}    USE: in: {a=LAST_READ, x=LAST_READ, y=LAST_READ}    out: {a=LAST_READ, x=LAST_READ, y=LAST_READ}
- 1 r(1)                                                                            INIT: in: {a=I- D+}    out: {a=I- D+}    USE: in: {a=LAST_READ, x=LAST_READ, y=LAST_READ}    out: {a=LAST_READ, x=LAST_READ, y=LAST_READ}
- 1 w(a)                                                                            INIT: in: {a=I- D+}    out: {a=I+ D+}    USE: in: {a=LAST_READ, x=LAST_READ, y=LAST_READ}    out: {a=LAST_READ, x=LAST_READ, y=LAST_READ}
- 1 mark("before")                                                                  INIT: in: {a=I+ D+}    out: {a=I+ D+}    USE: in: {a=LAST_READ, x=LAST_READ, y=LAST_READ}    out: {a=LAST_READ, x=LAST_READ, y=LAST_READ}
- 1 r("before")                                                                     INIT: in: {a=I+ D+}    out: {a=I+ D+}    USE: in: {a=LAST_READ, x=LAST_READ, y=LAST_READ}    out: {a=LAST_READ, x=LAST_READ, y=LAST_READ}
- 1 v(val f = { (x: Int) -> val y = x + a y })                                      INIT: in: {a=I+ D+}    out: {a=I+ D+, f=I- D+}    USE: in: {a=LAST_READ, x=LAST_READ, y=LAST_READ}    out: {a=LAST_READ, x=LAST_READ, y=LAST_READ}
- 1 mark({ (x: Int) -> val y = x + a y })                                           INIT: in: {a=I+ D+, f=I- D+}    out: {a=I+ D+, f=I- D+}    USE: in: {a=LAST_READ, x=LAST_READ, y=LAST_READ}    out: {a=LAST_READ, x=LAST_READ, y=LAST_READ}
- 1 jmp?(L2)                                                                        INIT: in: {a=I+ D+, f=I- D+}    out: {a=I+ D+, f=I- D+}    USE: in: {a=LAST_READ, x=LAST_READ, y=LAST_READ}    out: {a=LAST_READ, x=LAST_READ, y=LAST_READ}
- 1 d({ (x: Int) -> val y = x + a y })                                              INIT: in: {a=I+ D+, f=I- D+, x=I+ D+, y=I+ D+}    out: {a=I+ D+, f=I- D+, x=I+ D+, y=I+ D+}    USE: in: {a=LAST_READ, x=LAST_READ, y=LAST_READ}    out: {a=LAST_READ, x=LAST_READ, y=LAST_READ}
+ 0 <START>                                                                         INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 1 mark({ val a = 1 "before" val f = { (x: Int) -> val y = x + a y } "after" })    INIT: in: {}    out: {}    USE: in: {a=LAST_READ}    out: {a=LAST_READ}
+ 1 v(val a = 1)                                                                    INIT: in: {}    out: {a=I- D+}    USE: in: {a=LAST_READ}    out: {a=LAST_READ}
+ 1 r(1)                                                                            INIT: in: {a=I- D+}    out: {a=I- D+}    USE: in: {a=LAST_READ}    out: {a=LAST_READ}
+ 1 w(a)                                                                            INIT: in: {a=I- D+}    out: {a=I+ D+}    USE: in: {a=LAST_READ}    out: {a=LAST_READ}
+ 1 mark("before")                                                                  INIT: in: {a=I+ D+}    out: {a=I+ D+}    USE: in: {a=LAST_READ}    out: {a=LAST_READ}
+ 1 r("before")                                                                     INIT: in: {a=I+ D+}    out: {a=I+ D+}    USE: in: {a=LAST_READ}    out: {a=LAST_READ}
+ 1 v(val f = { (x: Int) -> val y = x + a y })                                      INIT: in: {a=I+ D+}    out: {a=I+ D+, f=I- D+}    USE: in: {a=LAST_READ}    out: {a=LAST_READ}
+ 1 mark({ (x: Int) -> val y = x + a y })                                           INIT: in: {a=I+ D+, f=I- D+}    out: {a=I+ D+, f=I- D+}    USE: in: {a=LAST_READ}    out: {a=LAST_READ}
+ 1 jmp?(L2)                                                                        INIT: in: {a=I+ D+, f=I- D+}    out: {a=I+ D+, f=I- D+}    USE: in: {a=LAST_READ}    out: {a=LAST_READ}
+ 1 d({ (x: Int) -> val y = x + a y })                                              INIT: in: {a=I+ D+, f=I- D+}    out: {a=I+ D+, f=I- D+}    USE: in: {a=LAST_READ}    out: {a=LAST_READ}
  1 r({ (x: Int) -> val y = x + a y })                                              INIT: in: {a=I+ D+, f=I- D+}    out: {a=I+ D+, f=I- D+}    USE: in: {}    out: {}
  1 w(f)                                                                            INIT: in: {a=I+ D+, f=I- D+}    out: {a=I+ D+, f=I+ D+}    USE: in: {}    out: {}
  1 mark("after")                                                                   INIT: in: {a=I+ D+, f=I+ D+}    out: {a=I+ D+, f=I+ D+}    USE: in: {}    out: {}
  1 r("after")                                                                      INIT: in: {a=I+ D+, f=I+ D+}    out: {a=I+ D+, f=I+ D+}    USE: in: {}    out: {}
- 0 <END>                                                                           INIT: in: {a=I+ D+, f=I+ D+}    out: {a=I+ D+, f=I+ D+}    USE: in: {}    out: {}
+ 0 <END>                                                                           INIT: in: {}    out: {}    USE: in: {}    out: {}
  0 <ERROR>                                                                         INIT: in: {}    out: {}    USE: in: {}    out: {}
- 0 <SINK>                                                                          INIT: in: {a=I+ D+, f=I- D+, x=I+ D+, y=I+ D+}    out: {a=I+ D+, f=I- D+, x=I+ D+, y=I+ D+}    USE: in: {}    out: {}
+ 0 <SINK>                                                                          INIT: in: {}    out: {}    USE: in: {}    out: {}
 =====================
 == anonymous_0 ==
 { (x: Int) ->
@@ -34,9 +34,9 @@ fun foo() {
         y
     }
 ---------------------
- 2 <START>                  INIT: in: {}    out: {}    USE: in: {a=LAST_READ, x=LAST_READ, y=LAST_READ}    out: {a=LAST_READ, x=LAST_READ, y=LAST_READ}
- 2 v(x: Int)                INIT: in: {}    out: {x=I- D+}    USE: in: {a=LAST_READ, x=LAST_READ, y=LAST_READ}    out: {a=LAST_READ, x=LAST_READ, y=LAST_READ}
- 2 w(x)                     INIT: in: {x=I- D+}    out: {x=I+ D+}    USE: in: {a=LAST_READ, x=LAST_READ, y=LAST_READ}    out: {a=LAST_READ, x=LAST_READ, y=LAST_READ}
+ 2 <START>                  INIT: in: {}    out: {}    USE: in: {a=LAST_READ, x=LAST_READ}    out: {a=LAST_READ, x=LAST_READ}
+ 2 v(x: Int)                INIT: in: {}    out: {x=I- D+}    USE: in: {a=LAST_READ, x=LAST_READ}    out: {a=LAST_READ, x=LAST_READ}
+ 2 w(x)                     INIT: in: {x=I- D+}    out: {x=I+ D+}    USE: in: {a=LAST_READ, x=LAST_READ}    out: {a=LAST_READ, x=LAST_READ}
  3 mark(val y = x + a y)    INIT: in: {x=I+ D+}    out: {x=I+ D+}    USE: in: {a=LAST_READ, x=LAST_READ, y=LAST_READ}    out: {a=LAST_READ, x=LAST_READ, y=LAST_READ}
  3 v(val y = x + a)         INIT: in: {x=I+ D+}    out: {x=I+ D+, y=I- D+}    USE: in: {a=LAST_READ, x=LAST_READ, y=LAST_READ}    out: {a=LAST_READ, x=LAST_READ, y=LAST_READ}
  3 mark(x + a)              INIT: in: {x=I+ D+, y=I- D+}    out: {x=I+ D+, y=I- D+}    USE: in: {a=LAST_READ, x=LAST_READ, y=LAST_READ}    out: {a=LAST_READ, x=LAST_READ, y=LAST_READ}
@@ -45,7 +45,7 @@ fun foo() {
  3 call(+, plus)            INIT: in: {x=I+ D+, y=I- D+}    out: {x=I+ D+, y=I- D+}    USE: in: {y=LAST_READ}    out: {y=LAST_READ}
  3 w(y)                     INIT: in: {x=I+ D+, y=I- D+}    out: {x=I+ D+, y=I+ D+}    USE: in: {y=LAST_READ}    out: {y=LAST_READ}
  3 r(y)                     INIT: in: {x=I+ D+, y=I+ D+}    out: {x=I+ D+, y=I+ D+}    USE: in: {}    out: {y=LAST_READ}
- 2 <END>                    INIT: in: {x=I+ D+, y=I+ D+}    out: {x=I+ D+, y=I+ D+}    USE: in: {}    out: {}
+ 2 <END>                    INIT: in: {x=I+ D+}    out: {x=I+ D+}    USE: in: {}    out: {}
  2 <ERROR>                  INIT: in: {}    out: {}    USE: in: {}    out: {}
- 2 <SINK>                   INIT: in: {x=I+ D+, y=I+ D+}    out: {x=I+ D+, y=I+ D+}    USE: in: {}    out: {}
+ 2 <SINK>                   INIT: in: {x=I+ D+}    out: {x=I+ D+}    USE: in: {}    out: {}
 =====================

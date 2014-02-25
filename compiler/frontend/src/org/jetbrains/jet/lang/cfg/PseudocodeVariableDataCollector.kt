@@ -19,12 +19,14 @@ package org.jetbrains.jet.lang.cfg
 import org.jetbrains.jet.lang.cfg.pseudocode.Instruction
 import org.jetbrains.jet.lang.cfg.pseudocode.LocalFunctionDeclarationInstruction
 import org.jetbrains.jet.lang.cfg.pseudocode.Pseudocode
-import org.jetbrains.jet.lang.descriptors.FunctionDescriptor
 import org.jetbrains.jet.lang.descriptors.VariableDescriptor
-import org.jetbrains.jet.lang.psi.JetElement
 import org.jetbrains.jet.lang.resolve.BindingContext
-import org.jetbrains.jet.lang.resolve.DescriptorUtils
 import org.jetbrains.jet.lang.cfg.PseudocodeTraverser.*
+import org.jetbrains.jet.lang.cfg.pseudocode.LexicalScope
+import org.jetbrains.jet.lang.cfg.pseudocode.VariableDeclarationInstruction
+import org.jetbrains.jet.utils.addToStdlib.*
+
+import kotlin.properties.Delegates
 
 import java.util.*
 
@@ -32,6 +34,7 @@ public class PseudocodeVariableDataCollector(
         private val bindingContext: BindingContext,
         private val pseudocode: Pseudocode
 ) : PseudocodeTraverser() {
+    val lexicalScopeVariableInfo: LexicalScopeVariableInfo by Delegates.lazy { computeLexicalScopesInfo(pseudocode) }
 
     suppress("UNCHECKED_CAST")
     public fun <D> collectDataJ(
@@ -118,9 +121,13 @@ public class PseudocodeVariableDataCollector(
                 val lastInstruction = getLastInstruction(subroutinePseudocode, traversalOrder)
                 val previousValue = edgesMap.get(instruction)
                 val newValue = edgesMap.get(lastInstruction)
-                if (previousValue != newValue && newValue != null) {
+                val updatedValue = if (newValue == null) null else
+                    Edges.create(
+                        removeVariablesDeclaredInLeavingLexicalScope(lastInstruction, instruction, newValue.`in`),
+                        removeVariablesDeclaredInLeavingLexicalScope(lastInstruction, instruction, newValue.out))
+                if (previousValue != updatedValue && updatedValue != null) {
                     changed[0] = true
-                    edgesMap.put(instruction, newValue)
+                    edgesMap.put(instruction, updatedValue)
                 }
                 continue
             }
@@ -131,7 +138,8 @@ public class PseudocodeVariableDataCollector(
             for (previousInstruction in allPreviousInstructions) {
                 val previousData = edgesMap.get(previousInstruction)
                 if (previousData != null) {
-                    incomingEdgesData.add(previousData.out)
+                    incomingEdgesData.add(removeVariablesDeclaredInLeavingLexicalScope(
+                            previousInstruction, instruction, previousData.out))
                 }
             }
             val mergedData = instructionDataMergeStrategy.execute(instruction, incomingEdgesData)
@@ -140,5 +148,49 @@ public class PseudocodeVariableDataCollector(
                 edgesMap.put(instruction, mergedData)
             }
         }
+    }
+
+    private fun <D> removeVariablesDeclaredInLeavingLexicalScope(
+            from: Instruction,
+            to: Instruction,
+            data: Map<VariableDescriptor, D>
+    ): Map<VariableDescriptor, D> {
+        val toDepth = to.getLexicalScope().depth
+        if (toDepth >= from.getLexicalScope().depth) return data
+
+        return data.filter { variable ->
+            val lexicalScope = lexicalScopeVariableInfo.declaredIn[variable]
+            lexicalScope == null || lexicalScope.depth <= toDepth
+        }
+    }
+
+    fun computeLexicalScopesInfo(pseudocode: Pseudocode): LexicalScopeVariableInfo {
+        val lexicalScopeVariableInfo = LexicalScopeInfoVariableImpl()
+        PseudocodeTraverser.traverse(pseudocode, TraversalOrder.FORWARD, { instruction ->
+            if (instruction is VariableDeclarationInstruction) {
+                val variableDeclarationElement = instruction.getVariableDeclarationElement()
+                val descriptor = bindingContext.get(BindingContext.DECLARATION_TO_DESCRIPTOR, variableDeclarationElement)
+                if (descriptor is VariableDescriptor) {
+                    lexicalScopeVariableInfo.registerVariableDeclaredInScope(descriptor, instruction.getLexicalScope())
+                }
+            }
+        })
+        return lexicalScopeVariableInfo
+    }
+}
+
+public trait LexicalScopeVariableInfo {
+    val declaredIn : Map<VariableDescriptor, LexicalScope>
+    val scopeVariables : Map<LexicalScope, Collection<VariableDescriptor>>
+}
+
+public class LexicalScopeInfoVariableImpl : LexicalScopeVariableInfo {
+    override val declaredIn = HashMap<VariableDescriptor, LexicalScope>()
+    override val scopeVariables = HashMap<LexicalScope, MutableCollection<VariableDescriptor>>()
+
+    fun registerVariableDeclaredInScope(variable: VariableDescriptor, lexicalScope: LexicalScope) {
+        declaredIn[variable] = lexicalScope
+        val variablesInScope = scopeVariables.getOrPut(lexicalScope, { ArrayList<VariableDescriptor>() })
+        variablesInScope.add(variable)
     }
 }

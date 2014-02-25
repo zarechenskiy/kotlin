@@ -7,10 +7,10 @@ fun foo() {
     "after"
 }
 ---------------------
- 0 <START>                                                      INIT: in: {}    out: {}    USE: in: {i=LAST_READ}    out: {i=LAST_READ}
- 1 mark({ "before" for (i in 1..10) { val a = i } "after" })    INIT: in: {}    out: {}    USE: in: {i=LAST_READ}    out: {i=LAST_READ}
- 1 mark("before")                                               INIT: in: {}    out: {}    USE: in: {i=LAST_READ}    out: {i=LAST_READ}
- 1 r("before")                                                  INIT: in: {}    out: {}    USE: in: {i=LAST_READ}    out: {i=LAST_READ}
+ 0 <START>                                                      INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 1 mark({ "before" for (i in 1..10) { val a = i } "after" })    INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 1 mark("before")                                               INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 1 r("before")                                                  INIT: in: {}    out: {}    USE: in: {}    out: {}
  2 mark(for (i in 1..10) { val a = i })                         INIT: in: {}    out: {}    USE: in: {i=LAST_READ}    out: {i=LAST_READ}
  2 mark(1..10)                                                  INIT: in: {}    out: {}    USE: in: {i=LAST_READ}    out: {i=LAST_READ}
  2 r(1)                                                         INIT: in: {}    out: {}    USE: in: {i=LAST_READ}    out: {i=LAST_READ}
@@ -18,16 +18,16 @@ fun foo() {
  2 call(.., rangeTo)                                            INIT: in: {}    out: {}    USE: in: {i=LAST_READ}    out: {i=LAST_READ}
  2 v(i)                                                         INIT: in: {}    out: {i=I- D+}    USE: in: {i=LAST_READ}    out: {i=LAST_READ}
  2 jmp?(L2)                                                     INIT: in: {i=I- D+}    out: {i=I- D+}    USE: in: {i=LAST_READ}    out: {i=LAST_READ}
- 2 w(i)                                                         INIT: in: {a=I+ D+, i=I- D+}    out: {a=I+ D+, i=I+ D+}    USE: in: {i=LAST_READ}    out: {i=LAST_READ}
- 3 mark({ val a = i })                                          INIT: in: {a=I+ D+, i=I+ D+}    out: {a=I+ D+, i=I+ D+}    USE: in: {i=LAST_READ}    out: {i=LAST_READ}
- 3 v(val a = i)                                                 INIT: in: {a=I+ D+, i=I+ D+}    out: {a=I+ D+, i=I+ D+}    USE: in: {i=LAST_READ}    out: {i=LAST_READ}
- 3 r(i)                                                         INIT: in: {a=I+ D+, i=I+ D+}    out: {a=I+ D+, i=I+ D+}    USE: in: {i=LAST_READ}    out: {i=LAST_READ}
- 3 w(a)                                                         INIT: in: {a=I+ D+, i=I+ D+}    out: {a=I+ D+, i=I+ D+}    USE: in: {i=LAST_READ}    out: {i=LAST_READ}
- 2 jmp?(L4 [loop entry point])                                  INIT: in: {a=I+ D+, i=I+ D+}    out: {a=I+ D+, i=I+ D+}    USE: in: {i=LAST_READ}    out: {i=LAST_READ}
- 2 read (Unit)                                                  INIT: in: {a=I+ D+, i=I- D+}    out: {a=I+ D+, i=I- D+}    USE: in: {}    out: {}
- 1 mark("after")                                                INIT: in: {a=I+ D+, i=I- D+}    out: {a=I+ D+, i=I- D+}    USE: in: {}    out: {}
- 1 r("after")                                                   INIT: in: {a=I+ D+, i=I- D+}    out: {a=I+ D+, i=I- D+}    USE: in: {}    out: {}
- 0 <END>                                                        INIT: in: {a=I+ D+, i=I- D+}    out: {a=I+ D+, i=I- D+}    USE: in: {}    out: {}
+ 2 w(i)                                                         INIT: in: {i=I- D+}    out: {i=I+ D+}    USE: in: {i=LAST_READ}    out: {i=LAST_READ}
+ 3 mark({ val a = i })                                          INIT: in: {i=I+ D+}    out: {i=I+ D+}    USE: in: {i=LAST_READ}    out: {i=LAST_READ}
+ 3 v(val a = i)                                                 INIT: in: {i=I+ D+}    out: {a=I- D+, i=I+ D+}    USE: in: {i=LAST_READ}    out: {i=LAST_READ}
+ 3 r(i)                                                         INIT: in: {a=I- D+, i=I+ D+}    out: {a=I- D+, i=I+ D+}    USE: in: {i=LAST_READ}    out: {i=LAST_READ}
+ 3 w(a)                                                         INIT: in: {a=I- D+, i=I+ D+}    out: {a=I+ D+, i=I+ D+}    USE: in: {i=LAST_READ}    out: {i=LAST_READ}
+ 2 jmp?(L4 [loop entry point])                                  INIT: in: {i=I+ D+}    out: {i=I+ D+}    USE: in: {i=LAST_READ}    out: {i=LAST_READ}
+ 2 read (Unit)                                                  INIT: in: {i=I- D+}    out: {i=I- D+}    USE: in: {}    out: {}
+ 1 mark("after")                                                INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 1 r("after")                                                   INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 0 <END>                                                        INIT: in: {}    out: {}    USE: in: {}    out: {}
  0 <ERROR>                                                      INIT: in: {}    out: {}    USE: in: {}    out: {}
- 0 <SINK>                                                       INIT: in: {a=I+ D+, i=I- D+}    out: {a=I+ D+, i=I- D+}    USE: in: {}    out: {}
+ 0 <SINK>                                                       INIT: in: {}    out: {}    USE: in: {}    out: {}
 =====================

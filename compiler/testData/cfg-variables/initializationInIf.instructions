@@ -10,7 +10,7 @@ fun foo() {
     use(b)
 }
 ---------------------
- 0 <START>                                                                       INIT: in: {}    out: {}    USE: in: {b=LAST_WRITTEN}    out: {b=LAST_WRITTEN}
+ 0 <START>                                                                       INIT: in: {}    out: {}    USE: in: {}    out: {}
  1 mark({ val b: Boolean if (1 < 2) { b = false } else { b = true } use(b) })    INIT: in: {}    out: {}    USE: in: {b=LAST_WRITTEN}    out: {b=LAST_WRITTEN}
  1 v(val b: Boolean)                                                             INIT: in: {}    out: {b=I- D+}    USE: in: {b=LAST_WRITTEN}    out: {b=LAST_WRITTEN}
  1 mark(if (1 < 2) { b = false } else { b = true })                              INIT: in: {b=I- D+}    out: {b=I- D+}    USE: in: {b=LAST_WRITTEN}    out: {b=LAST_WRITTEN}
@@ -29,9 +29,9 @@ fun foo() {
  1 mark(use(b))                                                                  INIT: in: {b=I+ D+}    out: {b=I+ D+}    USE: in: {b=LAST_READ}    out: {b=LAST_READ}
  1 r(b)                                                                          INIT: in: {b=I+ D+}    out: {b=I+ D+}    USE: in: {}    out: {b=LAST_READ}
  1 call(use, use)                                                                INIT: in: {b=I+ D+}    out: {b=I+ D+}    USE: in: {}    out: {}
- 0 <END>                                                                         INIT: in: {b=I+ D+}    out: {b=I+ D+}    USE: in: {}    out: {}
+ 0 <END>                                                                         INIT: in: {}    out: {}    USE: in: {}    out: {}
  0 <ERROR>                                                                       INIT: in: {}    out: {}    USE: in: {}    out: {}
- 0 <SINK>                                                                        INIT: in: {b=I+ D+}    out: {b=I+ D+}    USE: in: {}    out: {}
+ 0 <SINK>                                                                        INIT: in: {}    out: {}    USE: in: {}    out: {}
 =====================
 == use ==
 fun use(vararg a: Any?) = a
