@@ -112,6 +112,16 @@ public class PseudocodeVariableDataCollector(
                 allPreviousInstructions = previousInstructions
             }
 
+            fun updateEdgeDataForInstruction(
+                    previousValue: Edges<Map<VariableDescriptor, D>>?,
+                    newValue: Edges<Map<VariableDescriptor, D>>?
+            ) {
+                if (previousValue != newValue && newValue != null) {
+                    changed[0] = true
+                    edgesMap.put(instruction, newValue)
+                }
+            }
+
             if (shouldLookInside(instruction, lookInside)) {
                 val functionInstruction = (instruction as LocalFunctionDeclarationInstruction)
                 val subroutinePseudocode = functionInstruction.getBody()
@@ -125,10 +135,7 @@ public class PseudocodeVariableDataCollector(
                     Edges.create(
                         removeVariablesDeclaredInLeavingLexicalScope(lastInstruction, instruction, newValue.`in`),
                         removeVariablesDeclaredInLeavingLexicalScope(lastInstruction, instruction, newValue.out))
-                if (previousValue != updatedValue && updatedValue != null) {
-                    changed[0] = true
-                    edgesMap.put(instruction, updatedValue)
-                }
+                updateEdgeDataForInstruction(previousValue, updatedValue)
                 continue
             }
             val previousDataValue = edgesMap.get(instruction)
@@ -143,10 +150,7 @@ public class PseudocodeVariableDataCollector(
                 }
             }
             val mergedData = instructionDataMergeStrategy.execute(instruction, incomingEdgesData)
-            if (!mergedData.equals(previousDataValue)) {
-                changed[0] = true
-                edgesMap.put(instruction, mergedData)
-            }
+            updateEdgeDataForInstruction(previousDataValue, mergedData)
         }
     }
 
