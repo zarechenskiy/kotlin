@@ -651,7 +651,7 @@ public class BodyResolver {
         if (type instanceof DeferredType) {
             DeferredType deferredType = (DeferredType) type;
             if (!deferredType.isComputed()) {
-                deferredType.getActualType();
+                deferredType.getDelegate();
             }
         }
     }
@@ -674,7 +674,7 @@ public class BodyResolver {
                 DeferredType deferredType = queue.pullFirst();
                 if (!deferredType.isComputed()) {
                     try {
-                        deferredType.getActualType(); // to compute
+                        deferredType.getDelegate(); // to compute
                     }
                     catch (ReenteringLazyValueComputationException e) {
                         // A problem should be reported while computing the type
