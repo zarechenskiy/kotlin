@@ -32,6 +32,7 @@ import org.jetbrains.jet.lang.descriptors.*;
 import org.jetbrains.jet.lang.descriptors.impl.*;
 import org.jetbrains.jet.lang.psi.*;
 import org.jetbrains.jet.lang.resolve.lazy.ForceResolveUtil;
+import org.jetbrains.jet.lang.resolve.lazy.LazyImportScope;
 import org.jetbrains.jet.lang.resolve.lazy.ResolveSession;
 import org.jetbrains.jet.lang.resolve.lazy.declarations.FileBasedDeclarationProviderFactory;
 import org.jetbrains.jet.lang.resolve.name.FqName;
@@ -231,6 +232,7 @@ public class TopDownAnalyzer {
                 );
             }
             overrideResolver.check(c);
+            resolveAndCheckImports(c, resolveSession);
         }
         else {
             typeHierarchyResolver.process(c, outerScope, owner, declarations);
@@ -247,6 +249,13 @@ public class TopDownAnalyzer {
 
         c.debug("Exit");
         c.printDebugOutput(System.out);
+    }
+
+    private static void resolveAndCheckImports(@NotNull TopDownAnalysisContext c, @NotNull ResolveSession resolveSession) {
+        for (JetFile file : c.getFiles()) {
+            LazyImportScope fileScope = resolveSession.getScopeProvider().getExplicitImportsScopeForFile(file);
+            fileScope.forceResolveAllContents();
+        }
     }
 
     private static Collection<JetFile> getFiles(Collection<? extends PsiElement> declarations) {
