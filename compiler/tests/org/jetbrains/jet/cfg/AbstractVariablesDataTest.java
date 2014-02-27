@@ -23,12 +23,14 @@ import org.jetbrains.jet.lang.cfg.PseudocodeVariablesData;
 import org.jetbrains.jet.lang.cfg.pseudocode.Instruction;
 import org.jetbrains.jet.lang.cfg.pseudocode.Pseudocode;
 import org.jetbrains.jet.lang.cfg.pseudocode.PseudocodeImpl;
+import org.jetbrains.jet.lang.cfg.pseudocodeTraverser.Edges;
 import org.jetbrains.jet.lang.descriptors.VariableDescriptor;
 import org.jetbrains.jet.lang.resolve.BindingContext;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
-import static org.jetbrains.jet.lang.cfg.PseudocodeTraverser.Edges;
 import static org.jetbrains.jet.lang.cfg.PseudocodeVariablesData.VariableInitState;
 import static org.jetbrains.jet.lang.cfg.PseudocodeVariablesData.VariableUseState;
 
@@ -64,8 +66,8 @@ public abstract class AbstractVariablesDataTest extends AbstractControlFlowTest 
     }
 
     private <D> void dumpEdgesData(@NotNull Edges<Map<VariableDescriptor, D>> edges, @NotNull StringBuilder out) {
-        out.append(" in: ").append(renderVariableMap(edges.in))
-           .append("    out: ").append(renderVariableMap(edges.out));
+        out.append(" in: ").append(renderVariableMap(edges.getIn()))
+           .append("    out: ").append(renderVariableMap(edges.getOut()));
     }
 
     private <D> String renderVariableMap(Map<VariableDescriptor, D> map) {
