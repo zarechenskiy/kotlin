@@ -212,7 +212,7 @@ public abstract class AbstractLazyMemberScope<D extends DeclarationDescriptor, D
     }
 
     @NotNull
-    /*package*/ Collection<DeclarationDescriptor> getDescriptorsFromDeclaredElements() {
+    private Collection<DeclarationDescriptor> getDescriptorsFromDeclaredElements() {
         return descriptorsFromDeclaredElements.invoke();
     }
 
