@@ -26,7 +26,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.lang.descriptors.*;
 import org.jetbrains.jet.lang.descriptors.impl.MutableClassDescriptor;
-import org.jetbrains.jet.lang.descriptors.impl.MutableClassDescriptorLite;
 import org.jetbrains.jet.lang.descriptors.impl.MutablePackageFragmentDescriptor;
 import org.jetbrains.jet.lang.descriptors.impl.PackageLikeBuilder;
 import org.jetbrains.jet.lang.psi.*;
@@ -39,7 +38,7 @@ import org.jetbrains.jet.renderer.DescriptorRenderer;
 import javax.inject.Inject;
 import java.util.*;
 
-import static org.jetbrains.jet.lang.diagnostics.Errors.*;
+import static org.jetbrains.jet.lang.diagnostics.Errors.REDECLARATION;
 
 public class DeclarationResolver {
     @NotNull
@@ -272,6 +271,7 @@ public class DeclarationResolver {
     }
 
     private void checkRedeclarationsInPackages(@NotNull TopDownAnalysisContext c) {
+        if (TopDownAnalyzer.LAZY) return;
         for (MutablePackageFragmentDescriptor packageFragment : Sets.newHashSet(c.getPackageFragments().values())) {
             PackageViewDescriptor packageView = packageFragment.getContainingDeclaration().getPackage(packageFragment.getFqName());
             JetScope packageViewScope = packageView.getMemberScope();
@@ -328,17 +328,16 @@ public class DeclarationResolver {
         return declarations;
     }
 
-    private void checkRedeclarationsInInnerClassNames(@NotNull TopDownAnalysisContext c) {
+    public void checkRedeclarationsInInnerClassNames(@NotNull TopDownAnalysisContext c) {
         for (ClassDescriptorWithResolutionScopes classDescriptor : c.getClasses().values()) {
-            MutableClassDescriptor mutableClassDescriptor = (MutableClassDescriptor) classDescriptor;
             if (classDescriptor.getKind() == ClassKind.CLASS_OBJECT) {
                 // Class objects should be considered during analysing redeclarations in classes
                 continue;
             }
 
-            Collection<DeclarationDescriptor> allDescriptors = mutableClassDescriptor.getScopeForMemberLookup().getOwnDeclaredDescriptors();
+            Collection<DeclarationDescriptor> allDescriptors = classDescriptor.getScopeForMemberLookup().getOwnDeclaredDescriptors();
 
-            MutableClassDescriptorLite classObj = mutableClassDescriptor.getClassObjectDescriptor();
+            ClassDescriptorWithResolutionScopes classObj = classDescriptor.getClassObjectDescriptor();
             if (classObj != null) {
                 Collection<DeclarationDescriptor> classObjDescriptors = classObj.getScopeForMemberLookup().getOwnDeclaredDescriptors();
                 if (!classObjDescriptors.isEmpty()) {

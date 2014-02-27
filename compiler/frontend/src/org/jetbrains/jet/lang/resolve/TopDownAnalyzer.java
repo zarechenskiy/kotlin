@@ -17,10 +17,13 @@
 package org.jetbrains.jet.lang.resolve;
 
 import com.google.common.base.Predicates;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.intellij.psi.PsiElement;
 import kotlin.Function1;
 import kotlin.KotlinPackage;
+import com.intellij.util.containers.ContainerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.context.GlobalContext;
@@ -30,11 +33,13 @@ import org.jetbrains.jet.di.InjectorForTopDownAnalyzerBasic;
 import org.jetbrains.jet.lang.PlatformToKotlinClassMap;
 import org.jetbrains.jet.lang.descriptors.*;
 import org.jetbrains.jet.lang.descriptors.impl.*;
+import org.jetbrains.jet.lang.diagnostics.Errors;
 import org.jetbrains.jet.lang.psi.*;
 import org.jetbrains.jet.lang.resolve.lazy.ForceResolveUtil;
 import org.jetbrains.jet.lang.resolve.lazy.LazyImportScope;
 import org.jetbrains.jet.lang.resolve.lazy.ResolveSession;
 import org.jetbrains.jet.lang.resolve.lazy.declarations.FileBasedDeclarationProviderFactory;
+import org.jetbrains.jet.lang.resolve.lazy.descriptors.LazyPackageDescriptor;
 import org.jetbrains.jet.lang.resolve.name.FqName;
 import org.jetbrains.jet.lang.resolve.name.Name;
 import org.jetbrains.jet.lang.resolve.scopes.JetScope;
@@ -138,6 +143,8 @@ public class TopDownAnalyzer {
                     trace
             ).getResolveSession();
 
+            final Multimap<FqName, JetElement> topLevelFqNames = HashMultimap.create();
+
             // fill in the context
             for (PsiElement declaration : declarations) {
                 declaration.accept(
@@ -145,6 +152,15 @@ public class TopDownAnalyzer {
                             private void registerDeclarations(@NotNull List<JetDeclaration> declarations) {
                                 for (JetDeclaration jetDeclaration : declarations) {
                                     jetDeclaration.accept(this);
+                                }
+                            }
+
+                            private void registerTopLevelFqName(@NotNull JetNamedDeclaration declaration, @NotNull DeclarationDescriptor descriptor) {
+                                if (DescriptorUtils.isTopLevelDeclaration(descriptor)) {
+                                    FqName fqName = JetPsiUtil.getFQName(declaration);
+                                    if (fqName != null) {
+                                        topLevelFqNames.put(fqName, declaration);
+                                    }
                                 }
                             }
 
@@ -176,6 +192,8 @@ public class TopDownAnalyzer {
 
                                     DescriptorResolver.resolvePackageHeader(packageDirective, moduleDescriptor, trace);
                                     registerDeclarations(file.getDeclarations());
+
+                                    topLevelFqNames.put(JetPsiUtil.getFQName(file), packageDirective);
                                 }
                             }
 
@@ -184,6 +202,8 @@ public class TopDownAnalyzer {
                                         (ClassDescriptorWithResolutionScopes) resolveSession.getClassDescriptor(classOrObject);
                                 ForceResolveUtil.forceResolveAllContents(descriptor);
                                 c.getClasses().put(classOrObject, descriptor);
+
+                                registerTopLevelFqName(classOrObject, descriptor);
 
                                 boolean classObjectAlreadyFound = false;
                                 for (JetDeclaration jetDeclaration : classOrObject.getDeclarations()) {
@@ -237,6 +257,9 @@ public class TopDownAnalyzer {
                                 PropertyDescriptor descriptor = (PropertyDescriptor) resolveSession.resolveToDescriptor(property);
                                 ForceResolveUtil.forceResolveAllContents(descriptor);
                                 c.getProperties().put(property, descriptor);
+
+                                registerTopLevelFqName(property, descriptor);
+
                                 registerScope(property, property);
                                 registerScope(property.getGetter(), property);
                                 registerScope(property.getSetter(), property);
@@ -244,6 +267,9 @@ public class TopDownAnalyzer {
                         }
                 );
             }
+
+            checkRedeclarationsInPackages(resolveSession, topLevelFqNames);
+            declarationResolver.checkRedeclarationsInInnerClassNames(c);
             overrideResolver.check(c);
             resolveAndCheckImports(c, resolveSession);
         }
@@ -269,6 +295,54 @@ public class TopDownAnalyzer {
             LazyImportScope fileScope = resolveSession.getScopeProvider().getExplicitImportsScopeForFile(file);
             fileScope.forceResolveAllContents();
         }
+    }
+
+    private void checkRedeclarationsInPackages(@NotNull ResolveSession resolveSession, @NotNull Multimap<FqName, JetElement> topLevelFqNames) {
+        for (Map.Entry<FqName, Collection<JetElement>> entry : topLevelFqNames.asMap().entrySet()) {
+            FqName fqName = entry.getKey();
+            Collection<JetElement> declarationsOrPackageDirectives = entry.getValue();
+
+            if (fqName.isRoot()) continue;
+
+            Set<DeclarationDescriptor> descriptors = getTopLevelDescriptorsByFqName(resolveSession, fqName);
+
+            if (descriptors.size() > 1) {
+                for (JetElement declarationOrPackageDirective : declarationsOrPackageDirectives) {
+                    PsiElement reportAt = declarationOrPackageDirective instanceof JetNamedDeclaration
+                                          ? declarationOrPackageDirective
+                                          : ((JetPackageDirective) declarationOrPackageDirective).getNameIdentifier();
+                    trace.report(Errors.REDECLARATION.on(reportAt, fqName.shortName().asString()));
+                }
+            }
+        }
+    }
+
+    @NotNull
+    private static Set<DeclarationDescriptor> getTopLevelDescriptorsByFqName(@NotNull ResolveSession resolveSession, @NotNull FqName fqName) {
+        FqName parentFqName = fqName.parent();
+
+        Set<DeclarationDescriptor> descriptors = new HashSet<DeclarationDescriptor>();
+
+        LazyPackageDescriptor parentFragment = resolveSession.getPackageFragment(parentFqName);
+        if (parentFragment != null) {
+            // Filter out extension properties
+            descriptors.addAll(
+                    KotlinPackage.filter(
+                            parentFragment.getMemberScope().getProperties(fqName.shortName()),
+                            new Function1<VariableDescriptor, Boolean>() {
+                                @Override
+                                public Boolean invoke(VariableDescriptor descriptor) {
+                                    return descriptor.getReceiverParameter() == null;
+                                }
+                            }
+                    )
+            );
+        }
+
+        ContainerUtil.addIfNotNull(descriptors, resolveSession.getPackageFragment(fqName));
+
+        descriptors.addAll(resolveSession.getTopLevelClassDescriptors(fqName));
+        return descriptors;
     }
 
     private static Collection<JetFile> getFiles(Collection<? extends PsiElement> declarations) {
