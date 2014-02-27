@@ -47,6 +47,11 @@ public class VariablesDataTestGenerated extends AbstractVariablesDataTest {
         doTest("compiler/testData/cfg-variables/initializationInIfInCycle.kt");
     }
     
+    @TestMetadata("referenceToPropertyInitializer.kt")
+    public void testReferenceToPropertyInitializer() throws Exception {
+        doTest("compiler/testData/cfg-variables/referenceToPropertyInitializer.kt");
+    }
+    
     @TestMetadata("variablesDeclaredInFunctionLiteral.kt")
     public void testVariablesDeclaredInFunctionLiteral() throws Exception {
         doTest("compiler/testData/cfg-variables/variablesDeclaredInFunctionLiteral.kt");

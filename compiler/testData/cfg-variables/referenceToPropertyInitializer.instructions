@@ -1,0 +1,109 @@
+== TestFunctionLiteral ==
+class TestFunctionLiteral {
+    val sum: (Int)->Int = { (x: Int) ->
+        sum(x - 1) + x
+    }
+}
+---------------------
+ 0 <START>                                                    INIT: in: {}    out: {}    USE: in: {sum=LAST_READ}    out: {sum=LAST_READ}
+ 0 v(val sum: (Int)->Int = { (x: Int) -> sum(x - 1) + x })    INIT: in: {}    out: {sum=I- D+}    USE: in: {sum=LAST_READ}    out: {sum=LAST_READ}
+ 0 mark({ (x: Int) -> sum(x - 1) + x })                       INIT: in: {sum=I- D+}    out: {sum=I- D+}    USE: in: {sum=LAST_READ}    out: {sum=LAST_READ}
+ 0 jmp?(L2)                                                   INIT: in: {sum=I- D+}    out: {sum=I- D+}    USE: in: {sum=LAST_READ}    out: {sum=LAST_READ}
+ 0 d({ (x: Int) -> sum(x - 1) + x })                          INIT: in: {sum=I- D+}    out: {sum=I- D+}    USE: in: {sum=LAST_READ}    out: {sum=LAST_READ}
+ 0 r({ (x: Int) -> sum(x - 1) + x })                          INIT: in: {sum=I- D+}    out: {sum=I- D+}    USE: in: {}    out: {}
+ 0 w(sum)                                                     INIT: in: {sum=I- D+}    out: {sum=I+ D+}    USE: in: {}    out: {}
+ 0 <END>                                                      INIT: in: {sum=I+ D+}    out: {sum=I+ D+}    USE: in: {}    out: {}
+ 0 <ERROR>                                                    INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 0 <SINK>                                                     INIT: in: {sum=I- D+}    out: {sum=I- D+}    USE: in: {}    out: {}
+=====================
+== anonymous_0 ==
+{ (x: Int) ->
+        sum(x - 1) + x
+    }
+---------------------
+ 1 <START>                 INIT: in: {}    out: {}    USE: in: {sum=LAST_READ, x=LAST_READ}    out: {sum=LAST_READ, x=LAST_READ}
+ 1 v(x: Int)               INIT: in: {}    out: {x=I- D+}    USE: in: {sum=LAST_READ, x=LAST_READ}    out: {sum=LAST_READ, x=LAST_READ}
+ 1 w(x)                    INIT: in: {x=I- D+}    out: {x=I+ D+}    USE: in: {sum=LAST_READ, x=LAST_READ}    out: {sum=LAST_READ, x=LAST_READ}
+ 2 mark(sum(x - 1) + x)    INIT: in: {x=I+ D+}    out: {x=I+ D+}    USE: in: {sum=LAST_READ, x=LAST_READ}    out: {sum=LAST_READ, x=LAST_READ}
+ 2 mark(sum(x - 1) + x)    INIT: in: {x=I+ D+}    out: {x=I+ D+}    USE: in: {sum=LAST_READ, x=LAST_READ}    out: {sum=LAST_READ, x=LAST_READ}
+ 2 mark(sum(x - 1))        INIT: in: {x=I+ D+}    out: {x=I+ D+}    USE: in: {sum=LAST_READ, x=LAST_READ}    out: {sum=LAST_READ, x=LAST_READ}
+ 2 r(sum)                  INIT: in: {x=I+ D+}    out: {x=I+ D+}    USE: in: {x=LAST_READ}    out: {sum=LAST_READ, x=LAST_READ}
+ 2 mark(x - 1)             INIT: in: {x=I+ D+}    out: {x=I+ D+}    USE: in: {x=LAST_READ}    out: {x=LAST_READ}
+ 2 r(x)                    INIT: in: {x=I+ D+}    out: {x=I+ D+}    USE: in: {x=LAST_READ}    out: {x=LAST_READ}
+ 2 r(1)                    INIT: in: {x=I+ D+}    out: {x=I+ D+}    USE: in: {x=LAST_READ}    out: {x=LAST_READ}
+ 2 call(-, minus)          INIT: in: {x=I+ D+}    out: {x=I+ D+}    USE: in: {x=LAST_READ}    out: {x=LAST_READ}
+ 2 call(sum, invoke)       INIT: in: {x=I+ D+}    out: {x=I+ D+}    USE: in: {x=LAST_READ}    out: {x=LAST_READ}
+ 2 r(x)                    INIT: in: {x=I+ D+}    out: {x=I+ D+}    USE: in: {}    out: {x=LAST_READ}
+ 2 call(+, plus)           INIT: in: {x=I+ D+}    out: {x=I+ D+}    USE: in: {}    out: {}
+ 1 <END>                   INIT: in: {x=I+ D+}    out: {x=I+ D+}    USE: in: {}    out: {}
+ 1 <ERROR>                 INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 1 <SINK>                  INIT: in: {x=I+ D+}    out: {x=I+ D+}    USE: in: {}    out: {}
+=====================
+== A ==
+open class A(val a: A)
+---------------------
+ 0 <START>        INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 0 v(val a: A)    INIT: in: {}    out: {a=I- D+}    USE: in: {}    out: {}
+ 0 w(a)           INIT: in: {a=I- D+}    out: {a=I+ D+}    USE: in: {}    out: {}
+ 0 <END>          INIT: in: {a=I+ D+}    out: {a=I+ D+}    USE: in: {}    out: {}
+ 0 <ERROR>        INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 0 <SINK>         INIT: in: {a=I+ D+}    out: {a=I+ D+}    USE: in: {}    out: {}
+=====================
+== TestObjectLiteral ==
+class TestObjectLiteral {
+    val obj: A = object: A(obj) {
+        {
+            val x = obj
+        }
+        fun foo() {
+            val y = obj
+        }
+    }
+}
+---------------------
+ 0 <START>                                                                         INIT: in: {}    out: {}    USE: in: {obj=LAST_READ}    out: {obj=LAST_READ}
+ 0 v(val obj: A = object: A(obj) { { val x = obj } fun foo() { val y = obj } })    INIT: in: {}    out: {obj=I- D+}    USE: in: {obj=LAST_READ}    out: {obj=LAST_READ}
+ 0 mark(object: A(obj) { { val x = obj } fun foo() { val y = obj } })              INIT: in: {obj=I- D+}    out: {obj=I- D+}    USE: in: {obj=LAST_READ}    out: {obj=LAST_READ}
+ 0 r(obj)                                                                          INIT: in: {obj=I- D+}    out: {obj=I- D+}    USE: in: {obj=LAST_READ}    out: {obj=LAST_READ}
+ 1 mark({ val x = obj })                                                           INIT: in: {obj=I- D+}    out: {obj=I- D+}    USE: in: {obj=LAST_READ}    out: {obj=LAST_READ}
+ 1 v(val x = obj)                                                                  INIT: in: {obj=I- D+}    out: {obj=I- D+, x=I- D+}    USE: in: {obj=LAST_READ}    out: {obj=LAST_READ}
+ 1 r(obj)                                                                          INIT: in: {obj=I- D+, x=I- D+}    out: {obj=I- D+, x=I- D+}    USE: in: {obj=LAST_READ}    out: {obj=LAST_READ}
+ 1 w(x)                                                                            INIT: in: {obj=I- D+, x=I- D+}    out: {obj=I- D+, x=I+ D+}    USE: in: {obj=LAST_READ}    out: {obj=LAST_READ}
+ 0 jmp?(L2)                                                                        INIT: in: {obj=I- D+}    out: {obj=I- D+}    USE: in: {obj=LAST_READ}    out: {obj=LAST_READ}
+ 0 d(fun foo() { val y = obj })                                                    INIT: in: {obj=I- D+}    out: {obj=I- D+}    USE: in: {obj=LAST_READ}    out: {obj=LAST_READ}
+ 0 r(object: A(obj) { { val x = obj } fun foo() { val y = obj } })                 INIT: in: {obj=I- D+}    out: {obj=I- D+}    USE: in: {}    out: {}
+ 0 w(obj)                                                                          INIT: in: {obj=I- D+}    out: {obj=I+ D+}    USE: in: {}    out: {}
+ 0 <END>                                                                           INIT: in: {obj=I+ D+}    out: {obj=I+ D+}    USE: in: {}    out: {}
+ 0 <ERROR>                                                                         INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 0 <SINK>                                                                          INIT: in: {obj=I- D+}    out: {obj=I- D+}    USE: in: {}    out: {}
+=====================
+== foo ==
+fun foo() {
+            val y = obj
+        }
+---------------------
+ 1 <START>                  INIT: in: {}    out: {}    USE: in: {obj=LAST_READ}    out: {obj=LAST_READ}
+ 2 mark({ val y = obj })    INIT: in: {}    out: {}    USE: in: {obj=LAST_READ}    out: {obj=LAST_READ}
+ 2 v(val y = obj)           INIT: in: {}    out: {y=I- D+}    USE: in: {obj=LAST_READ}    out: {obj=LAST_READ}
+ 2 r(obj)                   INIT: in: {y=I- D+}    out: {y=I- D+}    USE: in: {}    out: {obj=LAST_READ}
+ 2 w(y)                     INIT: in: {y=I- D+}    out: {y=I+ D+}    USE: in: {}    out: {}
+ 1 <END>                    INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 1 <ERROR>                  INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 1 <SINK>                   INIT: in: {}    out: {}    USE: in: {}    out: {}
+=====================
+== TestOther ==
+class TestOther {
+    val x: Int = x + 1
+}
+---------------------
+ 0 <START>                  INIT: in: {}    out: {}    USE: in: {x=LAST_READ}    out: {x=LAST_READ}
+ 0 v(val x: Int = x + 1)    INIT: in: {}    out: {x=I- D+}    USE: in: {x=LAST_READ}    out: {x=LAST_READ}
+ 0 mark(x + 1)              INIT: in: {x=I- D+}    out: {x=I- D+}    USE: in: {x=LAST_READ}    out: {x=LAST_READ}
+ 0 r(x)                     INIT: in: {x=I- D+}    out: {x=I- D+}    USE: in: {}    out: {x=LAST_READ}
+ 0 r(1)                     INIT: in: {x=I- D+}    out: {x=I- D+}    USE: in: {}    out: {}
+ 0 call(+, plus)            INIT: in: {x=I- D+}    out: {x=I- D+}    USE: in: {}    out: {}
+ 0 w(x)                     INIT: in: {x=I- D+}    out: {x=I+ D+}    USE: in: {}    out: {}
+ 0 <END>                    INIT: in: {x=I+ D+}    out: {x=I+ D+}    USE: in: {}    out: {}
+ 0 <ERROR>                  INIT: in: {}    out: {}    USE: in: {}    out: {}
+ 0 <SINK>                   INIT: in: {x=I+ D+}    out: {x=I+ D+}    USE: in: {}    out: {}
+=====================

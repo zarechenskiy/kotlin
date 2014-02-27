@@ -28,17 +28,17 @@ fun local(x: Int) {
         val a = x + b
     }
 ---------------------
- 2 <START>                    INIT: in: {b=I+ D+}    out: {b=I+ D+}    USE: in: {b=LAST_READ, x=LAST_READ}    out: {b=LAST_READ, x=LAST_READ}
- 2 v(x: Int)                  INIT: in: {b=I+ D+}    out: {b=I+ D+, x=I- D+}    USE: in: {b=LAST_READ, x=LAST_READ}    out: {b=LAST_READ, x=LAST_READ}
- 2 w(x)                       INIT: in: {b=I+ D+, x=I- D+}    out: {b=I+ D+, x=I+ D+}    USE: in: {b=LAST_READ, x=LAST_READ}    out: {b=LAST_READ, x=LAST_READ}
- 3 mark({ val a = x + b })    INIT: in: {b=I+ D+, x=I+ D+}    out: {b=I+ D+, x=I+ D+}    USE: in: {b=LAST_READ, x=LAST_READ}    out: {b=LAST_READ, x=LAST_READ}
- 3 v(val a = x + b)           INIT: in: {b=I+ D+, x=I+ D+}    out: {a=I- D+, b=I+ D+, x=I+ D+}    USE: in: {b=LAST_READ, x=LAST_READ}    out: {b=LAST_READ, x=LAST_READ}
- 3 mark(x + b)                INIT: in: {a=I- D+, b=I+ D+, x=I+ D+}    out: {a=I- D+, b=I+ D+, x=I+ D+}    USE: in: {b=LAST_READ, x=LAST_READ}    out: {b=LAST_READ, x=LAST_READ}
- 3 r(x)                       INIT: in: {a=I- D+, b=I+ D+, x=I+ D+}    out: {a=I- D+, b=I+ D+, x=I+ D+}    USE: in: {b=LAST_READ}    out: {b=LAST_READ, x=LAST_READ}
- 3 r(b)                       INIT: in: {a=I- D+, b=I+ D+, x=I+ D+}    out: {a=I- D+, b=I+ D+, x=I+ D+}    USE: in: {}    out: {b=LAST_READ}
- 3 call(+, plus)              INIT: in: {a=I- D+, b=I+ D+, x=I+ D+}    out: {a=I- D+, b=I+ D+, x=I+ D+}    USE: in: {}    out: {}
- 3 w(a)                       INIT: in: {a=I- D+, b=I+ D+, x=I+ D+}    out: {a=I+ D+, b=I+ D+, x=I+ D+}    USE: in: {}    out: {}
- 2 <END>                      INIT: in: {b=I+ D+, x=I+ D+}    out: {b=I+ D+, x=I+ D+}    USE: in: {}    out: {}
+ 2 <START>                    INIT: in: {}    out: {}    USE: in: {b=LAST_READ, x=LAST_READ}    out: {b=LAST_READ, x=LAST_READ}
+ 2 v(x: Int)                  INIT: in: {}    out: {x=I- D+}    USE: in: {b=LAST_READ, x=LAST_READ}    out: {b=LAST_READ, x=LAST_READ}
+ 2 w(x)                       INIT: in: {x=I- D+}    out: {x=I+ D+}    USE: in: {b=LAST_READ, x=LAST_READ}    out: {b=LAST_READ, x=LAST_READ}
+ 3 mark({ val a = x + b })    INIT: in: {x=I+ D+}    out: {x=I+ D+}    USE: in: {b=LAST_READ, x=LAST_READ}    out: {b=LAST_READ, x=LAST_READ}
+ 3 v(val a = x + b)           INIT: in: {x=I+ D+}    out: {a=I- D+, x=I+ D+}    USE: in: {b=LAST_READ, x=LAST_READ}    out: {b=LAST_READ, x=LAST_READ}
+ 3 mark(x + b)                INIT: in: {a=I- D+, x=I+ D+}    out: {a=I- D+, x=I+ D+}    USE: in: {b=LAST_READ, x=LAST_READ}    out: {b=LAST_READ, x=LAST_READ}
+ 3 r(x)                       INIT: in: {a=I- D+, x=I+ D+}    out: {a=I- D+, x=I+ D+}    USE: in: {b=LAST_READ}    out: {b=LAST_READ, x=LAST_READ}
+ 3 r(b)                       INIT: in: {a=I- D+, x=I+ D+}    out: {a=I- D+, x=I+ D+}    USE: in: {}    out: {b=LAST_READ}
+ 3 call(+, plus)              INIT: in: {a=I- D+, x=I+ D+}    out: {a=I- D+, x=I+ D+}    USE: in: {}    out: {}
+ 3 w(a)                       INIT: in: {a=I- D+, x=I+ D+}    out: {a=I+ D+, x=I+ D+}    USE: in: {}    out: {}
+ 2 <END>                      INIT: in: {x=I+ D+}    out: {x=I+ D+}    USE: in: {}    out: {}
  2 <ERROR>                    INIT: in: {}    out: {}    USE: in: {}    out: {}
- 2 <SINK>                     INIT: in: {b=I+ D+, x=I+ D+}    out: {b=I+ D+, x=I+ D+}    USE: in: {}    out: {}
+ 2 <SINK>                     INIT: in: {x=I+ D+}    out: {x=I+ D+}    USE: in: {}    out: {}
 =====================
