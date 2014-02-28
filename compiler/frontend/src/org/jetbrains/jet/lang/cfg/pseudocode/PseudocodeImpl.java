@@ -114,7 +114,7 @@ public class PseudocodeImpl implements Pseudocode {
     @NotNull
     private static Set<LocalFunctionDeclarationInstruction> getLocalDeclarations(@NotNull Pseudocode pseudocode) {
         Set<LocalFunctionDeclarationInstruction> localDeclarations = Sets.newLinkedHashSet();
-        for (Instruction instruction : pseudocode.getInstructions()) {
+        for (Instruction instruction : ((PseudocodeImpl)pseudocode).mutableInstructionList) {
             if (instruction instanceof LocalFunctionDeclarationInstruction) {
                 localDeclarations.add((LocalFunctionDeclarationInstruction) instruction);
                 localDeclarations.addAll(getLocalDeclarations(((LocalFunctionDeclarationInstruction)instruction).getBody()));
@@ -264,9 +264,20 @@ public class PseudocodeImpl implements Pseudocode {
         postPrecessed = true;
         errorInstruction.setSink(getSinkInstruction());
         exitInstruction.setSink(getSinkInstruction());
-        for (int i = 0, instructionsSize = mutableInstructionList.size(); i < instructionsSize; i++) {
-            processInstruction(mutableInstructionList.get(i), i);
+        int index = 0;
+        for (Instruction instruction : mutableInstructionList) {
+            processInstruction(instruction, index);
+            index++;
         }
+        if (getParent() != null) return;
+
+        collectAndCacheReachableInstructions();
+        for (LocalFunctionDeclarationInstruction localFunctionDeclarationInstruction : getLocalDeclarations()) {
+            ((PseudocodeImpl) localFunctionDeclarationInstruction.getBody()).collectAndCacheReachableInstructions();
+        }
+    }
+
+    private void collectAndCacheReachableInstructions() {
         Set<Instruction> reachableInstructions = collectReachableInstructions();
         for (Instruction instruction : mutableInstructionList) {
             if (reachableInstructions.contains(instruction)) {

@@ -142,6 +142,11 @@ public class ControlFlowTestGenerated extends AbstractControlFlowTest {
         doTest("compiler/testData/cfg/If.kt");
     }
     
+    @TestMetadata("incomplete.kt")
+    public void testIncomplete() throws Exception {
+        doTest("compiler/testData/cfg/incomplete.kt");
+    }
+    
     @TestMetadata("incrementAtTheEnd.kt")
     public void testIncrementAtTheEnd() throws Exception {
         doTest("compiler/testData/cfg/incrementAtTheEnd.kt");
