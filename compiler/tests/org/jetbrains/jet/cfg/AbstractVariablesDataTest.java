@@ -42,7 +42,7 @@ public abstract class AbstractVariablesDataTest extends AbstractControlFlowTest 
 
     @Override
     public void dumpInstructions(PseudocodeImpl pseudocode, @NotNull StringBuilder out, BindingContext bindingContext) {
-        PseudocodeVariablesData pseudocodeVariablesData = new PseudocodeVariablesData(pseudocode, bindingContext);
+        PseudocodeVariablesData pseudocodeVariablesData = new PseudocodeVariablesData(pseudocode.getTopMostParentOrThis(), bindingContext);
         Map<Instruction, Edges<Map<VariableDescriptor, VariableInitState>>> variableInitializers =
                 pseudocodeVariablesData.getVariableInitializers();
         Map<Instruction, Edges<Map<VariableDescriptor, VariableUseState>>> useStatusData =
