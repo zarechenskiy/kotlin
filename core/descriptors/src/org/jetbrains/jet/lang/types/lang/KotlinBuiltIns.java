@@ -40,7 +40,7 @@ import static org.jetbrains.jet.lang.types.lang.PrimitiveType.*;
 public class KotlinBuiltIns {
     public static final JetScope STUB = JetScope.EMPTY;
 
-    public static final String BUILT_INS_PACKAGE_NAME_STRING = "jet";
+    public static final String BUILT_INS_PACKAGE_NAME_STRING = "kotlin";
     public static final Name BUILT_INS_PACKAGE_NAME = Name.identifier(BUILT_INS_PACKAGE_NAME_STRING);
     public static final FqName BUILT_INS_PACKAGE_FQ_NAME = FqName.topLevel(BUILT_INS_PACKAGE_NAME);
 
@@ -308,11 +308,6 @@ public class KotlinBuiltIns {
     }
 
     @NotNull
-    public ClassDescriptor getHashable() {
-        return getBuiltInClassByName("Hashable");
-    }
-
-    @NotNull
     public ClassDescriptor getUnit() {
         return getBuiltInClassByName("Unit");
     }
@@ -364,11 +359,6 @@ public class KotlinBuiltIns {
     @NotNull
     public ClassDescriptor getSuppressAnnotationClass() {
         return getBuiltInClassByName("suppress");
-    }
-
-    @NotNull
-    public ClassDescriptor getVolatileAnnotationClass() {
-        return getBuiltInClassByName("volatile");
     }
 
     @NotNull
@@ -514,7 +504,6 @@ public class KotlinBuiltIns {
                 getString(),
                 getCharSequence(),
                 getThrowable(),
-                getBuiltInClassByName("Hashable"),
 
                 getIterator(),
                 getIterable(),
@@ -534,7 +523,6 @@ public class KotlinBuiltIns {
                 getMutableMap(),
                 getMutableMapEntry(),
 
-                getVolatileAnnotationClass(),
                 getDataClassAnnotation(),
                 getAnnotation(),
                 getComparable(),
@@ -954,10 +942,6 @@ public class KotlinBuiltIns {
     static boolean containsAnnotation(DeclarationDescriptor descriptor, ClassDescriptor annotationClass) {
         FqName fqName = DescriptorUtils.getFqName(annotationClass).toSafe();
         return descriptor.getOriginal().getAnnotations().findAnnotation(fqName) != null;
-    }
-
-    public boolean isVolatile(@NotNull PropertyDescriptor descriptor) {
-        return containsAnnotation(descriptor, getVolatileAnnotationClass());
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

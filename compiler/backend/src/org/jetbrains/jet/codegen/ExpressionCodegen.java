@@ -77,9 +77,6 @@ import static org.jetbrains.jet.lang.resolve.java.AsmTypeConstants.*;
 import static org.jetbrains.jet.lang.resolve.scopes.receivers.ReceiverValue.NO_RECEIVER;
 
 public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implements LocalLookup, ParentCodegenAware {
-
-    private static final String CLASS_NO_PATTERN_MATCHED_EXCEPTION = "jet/NoPatternMatchedException";
-    private static final String CLASS_TYPE_CAST_EXCEPTION = "jet/TypeCastException";
     private static final Set<DeclarationDescriptor> INTEGRAL_RANGES = KotlinBuiltIns.getInstance().getIntegralRanges();
 
     private int myLastLineNumber = -1;
@@ -1026,7 +1023,7 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
             v.load(incrementVar, incrementType);
 
             Type methodParamType = asmElementType.getSort() == Type.LONG ? Type.LONG_TYPE : Type.INT_TYPE;
-            v.invokestatic("jet/runtime/ProgressionUtil", "getProgressionFinalElement",
+            v.invokestatic("kotlin/internal/InternalPackage", "getProgressionFinalElement",
                            Type.getMethodDescriptor(methodParamType, methodParamType, methodParamType, methodParamType));
 
             finalVar = createLoopTempVariable(asmElementType);
@@ -1192,7 +1189,7 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
         }
         else {
             Type type = expressionType(expression);
-            Type targetType = type.equals(JET_UNIT_TYPE) ? type : OBJECT_TYPE;
+            Type targetType = type.equals(UNIT_TYPE) ? type : OBJECT_TYPE;
 
             gen(expression, targetType);
 
@@ -2355,7 +2352,7 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
                 gen(arguments.get(0).getArgumentExpression(), type);
             }
             else {
-                String owner = "jet/runtime/Intrinsics$SpreadBuilder";
+                String owner = "kotlin/jvm/internal/SpreadBuilder";
                 v.anew(Type.getObjectType(owner));
                 v.dup();
                 v.invokespecial(owner, "<init>", "()V");
@@ -3047,7 +3044,7 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
             v.dup();
             Label ok = new Label();
             v.ifnonnull(ok);
-            v.invokestatic("jet/runtime/Intrinsics", "throwNpe", "()V");
+            v.invokestatic("kotlin/jvm/internal/Intrinsics", "throwNpe", "()V");
             v.mark(ok);
             return StackValue.onStack(base.type);
         }
@@ -3230,8 +3227,8 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
         else {
             v.load(index, OBJECT_TYPE);
             generateInitializer.fun(variableDescriptor);
-            v.putfield(sharedVarType.getInternalName(), "ref",
-                       sharedVarType == JET_SHARED_VAR_TYPE ? "Ljava/lang/Object;" : varType.getDescriptor());
+            v.putfield(sharedVarType.getInternalName(), "element",
+                       sharedVarType.equals(OBJECT_REF_TYPE) ? "Ljava/lang/Object;" : varType.getDescriptor());
         }
     }
 
@@ -3322,7 +3319,7 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
             v.iconst(0);
             v.store(indexIndex, Type.INT_TYPE);
 
-            gen(args.get(1), JET_FUNCTION1_TYPE);
+            gen(args.get(1), FUNCTION1_TYPE);
 
             Label begin = new Label();
             Label end = new Label();
@@ -3334,7 +3331,7 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
             v.dup2();
             v.load(indexIndex, Type.INT_TYPE);
             v.invokestatic("java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;");
-            v.invokeinterface("jet/Function1", "invoke", "(Ljava/lang/Object;)Ljava/lang/Object;");
+            v.invokeinterface(FUNCTION1_TYPE.getInternalName(), "invoke", "(Ljava/lang/Object;)Ljava/lang/Object;");
             v.load(indexIndex, Type.INT_TYPE);
             v.iinc(indexIndex, 1);
             v.swap();
@@ -3587,7 +3584,7 @@ The "returned" value of try expression with no finally is either the last expres
                         v.ifnonnull(nonnull);
                         JetType leftType = bindingContext.get(BindingContext.EXPRESSION_TYPE, left);
                         assert leftType != null;
-                        throwNewException(CLASS_TYPE_CAST_EXCEPTION, DescriptorRenderer.TEXT.renderType(leftType) +
+                        throwNewException("kotlin/TypeCastException", DescriptorRenderer.TEXT.renderType(leftType) +
                                                                      " cannot be cast to " +
                                                                      DescriptorRenderer.TEXT.renderType(rightType));
                         v.mark(nonnull);
@@ -3730,7 +3727,7 @@ The "returned" value of try expression with no finally is either the last expres
                 // a result is expected
                 if (Boolean.TRUE.equals(bindingContext.get(BindingContext.EXHAUSTIVE_WHEN, expression))) {
                     // when() is supposed to be exhaustive
-                    throwNewException(CLASS_NO_PATTERN_MATCHED_EXCEPTION);
+                    throwNewException("kotlin/NoWhenBranchMatchedException");
                 }
                 else {
                     // non-exhaustive when() with no else -> Unit must be expected
