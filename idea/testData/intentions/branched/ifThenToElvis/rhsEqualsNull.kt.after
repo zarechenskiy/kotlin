@@ -1,0 +1,5 @@
+fun main(args: Array<String>) {
+    val bar = "bar"
+    val foo: String? = "foo"
+    foo ?: bar
+}
