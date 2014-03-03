@@ -477,7 +477,7 @@ public inline fun String.dropWhile(predicate: (Char) -> Boolean): String = dropW
  *
  * @includeFunctionBody ../../test/StringTest.kt drop
  */
-public fun String.drop(n: Int): String = substring(n)
+public fun String.drop(n: Int): String = substring(Math.min(length, n))
 
 /**
  * Returns an Appendable containing the first characters that satisfy the given *predicate*
@@ -501,7 +501,7 @@ public inline fun String.takeWhile(predicate: (Char) -> Boolean): String = takeW
  *
  * @includeFunctionBody ../../test/StringTest.kt take
  */
-public fun String.take(n: Int): String = substring(0, n)
+public fun String.take(n: Int): String = substring(0, Math.min(length, n))
 
 /** Copies all characters into the given collection */
 public fun <C: MutableCollection<in Char>> String.toCollection(result: C): C {

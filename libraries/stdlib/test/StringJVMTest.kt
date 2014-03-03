@@ -252,7 +252,9 @@ class StringJVMTest {
     test fun drop() {
         val data = "abcd1234"
         assertEquals("d1234", data.drop(3))
-        assertEquals(data, data.drop(-2))
+        fails {
+            data.drop(-2)
+        }
         assertEquals("", data.drop(data.length + 5))
     }
 
@@ -265,7 +267,9 @@ class StringJVMTest {
     test fun take() {
         val data = "abcd1234"
         assertEquals("abc", data.take(3))
-        assertEquals("", data.take(-7))
+        fails {
+            data.take(-7)
+        }
         assertEquals(data, data.take(data.length + 42))
     }
 
