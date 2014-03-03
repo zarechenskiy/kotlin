@@ -159,8 +159,8 @@ public abstract class CodegenContext<T extends DeclarationDescriptor> {
     }
 
     @NotNull
-    public FieldOwnerContext intoPackagePart(@NotNull PackageFragmentDescriptor descriptor) {
-        return new PackageContext(descriptor, this);
+    public PackageContext intoPackagePart(@NotNull PackageFragmentDescriptor descriptor, Type packagePartType) {
+        return new PackageContext(descriptor, this, packagePartType);
     }
 
     @NotNull
@@ -180,7 +180,11 @@ public abstract class CodegenContext<T extends DeclarationDescriptor> {
 
     @NotNull
     public MethodContext intoFunction(FunctionDescriptor descriptor) {
-        return new MethodContext(descriptor, getContextKind(), this, null);
+        return new MethodContext(descriptor, getContextKind(), this, null, false);
+    }
+
+    public MethodContext intoInlinedLambda(FunctionDescriptor descriptor) {
+        return new MethodContext(descriptor, getContextKind(), this, null, true);
     }
 
     @NotNull
