@@ -113,12 +113,15 @@ public abstract class Config {
     @NotNull
     public static final List<String> STDLIB_FILE_NAMES = Arrays.asList(
             "/kotlin/Preconditions.kt",
-            "/kotlin/JUtil.kt",
-            "/kotlin/Arrays.kt",
-            "/kotlin/Maps.kt",
-            "/kotlin/Exceptions.kt",
-            "/kotlin/MutableCollections.kt",
             "/kotlin/Functions.kt",
+            "/kotlin/collections/JUtil.kt",
+            "/kotlin/collections/Iterators.kt",
+            "/kotlin/collections/Arrays.kt",
+            "/kotlin/collections/Maps.kt",
+            "/kotlin/collections/Exceptions.kt",
+            "/kotlin/collections/MutableCollections.kt",
+            "/kotlin/collections/Stream.kt",
+            "/kotlin/support/AbstractIterator.kt",
             "/generated/_Aggregates.kt",
             "/generated/_Arrays.kt",
             "/generated/_DownTo.kt",
@@ -131,10 +134,8 @@ public abstract class Config {
             "/generated/_Ordering.kt",
             "/generated/_Snapshots.kt",
             "/generated/_Strings.kt",
-            "/kotlin/support/AbstractIterator.kt",
             "/kotlin/Standard.kt",
-            "/kotlin/Strings.kt",
-            "/kotlin/Stream.kt",
+            "/kotlin/text/Strings.kt",
             "/kotlin/dom/Dom.kt",
             "/kotlin/test/Test.kt"
     );

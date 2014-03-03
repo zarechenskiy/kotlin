@@ -44,11 +44,11 @@ public class NavigateToStdlibSourceRegressionTest extends NavigateToLibraryRegre
     }
 
     public void testJavaClass() throws IOException {
-        doNavigationInSourcesTest("libraries/stdlib/src/kotlin/Maps.kt", "Collections", "java.util.Collections");
+        doNavigationInSourcesTest("libraries/stdlib/src/kotlin/collections/Maps.kt", "Collections", "java.util.Collections");
     }
 
     public void testKotlinClass() throws IOException {
-        doNavigationInSourcesTest("libraries/stdlib/src/kotlin/Stream.kt", "AbstractIterator", "kotlin.support.AbstractIterator");
+        doNavigationInSourcesTest("libraries/stdlib/src/kotlin/collections/Stream.kt", "AbstractIterator", "kotlin.support.AbstractIterator");
     }
 
     public void testClassWithJavaAnalog() throws IOException {

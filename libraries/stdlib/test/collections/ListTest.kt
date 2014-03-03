@@ -7,7 +7,7 @@ import org.junit.Test as test
 class ListTest {
 
     test fun _toString() {
-        val data = arrayList("foo", "bar")
+        val data = arrayListOf("foo", "bar")
         assertEquals("[foo, bar]", data.toString())
     }
 
@@ -17,14 +17,14 @@ class ListTest {
     }
 
     test fun head() {
-        val data = arrayList("foo", "bar")
+        val data = arrayListOf("foo", "bar")
         assertEquals("foo", data.head)
     }
 
     test fun tail() {
-        val data = arrayList("foo", "bar", "whatnot")
+        val data = arrayListOf("foo", "bar", "whatnot")
         val actual = data.tail
-        val expected = arrayList("bar", "whatnot")
+        val expected = arrayListOf("bar", "whatnot")
         assertEquals(expected, actual)
     }
 
@@ -34,22 +34,22 @@ class ListTest {
     }
 
     test fun first() {
-        val data = arrayList("foo", "bar")
+        val data = arrayListOf("foo", "bar")
         assertEquals("foo", data.first)
     }
 
     test fun last() {
-        val data = arrayList("foo", "bar")
+        val data = arrayListOf("foo", "bar")
         assertEquals("bar", data.last)
     }
 
     test fun forEachWithIndex() {
-        val data = arrayList("foo", "bar")
+        val data = arrayListOf("foo", "bar")
         var index = 0
 
-        data.forEachWithIndex { (i, d) ->
-            assertEquals(i, index)
-            assertEquals(d, data[index])
+        data.withIndices().forEach {
+            assertEquals(it.first, index)
+            assertEquals(it.second, data[index])
             index++
         }
 
@@ -57,7 +57,7 @@ class ListTest {
     }
 
     test fun withIndices() {
-        val data = arrayList("foo", "bar")
+        val data = arrayListOf("foo", "bar")
         var index = 0
 
         for ((i, d) in data.withIndices()) {
@@ -71,7 +71,7 @@ class ListTest {
 
     test fun lastIndex() {
         val emptyData = ArrayList<String>()
-        val data = arrayList("foo", "bar")
+        val data = arrayListOf("foo", "bar")
 
         assertEquals(-1, emptyData.lastIndex)
         assertEquals(1, data.lastIndex)

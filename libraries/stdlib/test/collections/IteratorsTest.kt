@@ -92,7 +92,7 @@ class StreamsTest {
     }
 
     test fun iterationOverIterator() {
-        val c = arrayList(0, 1, 2, 3, 4, 5)
+        val c = arrayListOf(0, 1, 2, 3, 4, 5)
         var s = ""
         for (i in c.iterator()) {
             s = s + i.toString()
@@ -106,7 +106,7 @@ class StreamsTest {
     }
 
     test fun iterableExtension() {
-        val c = arrayList(0, 1, 2, 3, 4, 5)
+        val c = arrayListOf(0, 1, 2, 3, 4, 5)
         val d = ArrayList<Int>()
         c.iterator().takeWhileTo(d, {i -> i < 4 })
         assertEquals(4, d.size())

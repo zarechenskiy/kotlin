@@ -153,7 +153,7 @@ fun Document?.get(selector: String): List<Element> {
             val id = selector.substring(1)
             val element = this?.getElementById(id)
             return if (element != null)
-                arrayList<Element>(element)
+                arrayListOf(element)
             else
                 emptyElementList()
         } else {
@@ -174,7 +174,7 @@ fun Element.get(selector: String): List<Element> {
     } else if (selector.startsWith("#")) {
         val element = this.ownerDocument?.getElementById(selector.substring(1))
         return if (element != null)
-            arrayList<Element>(element)
+            arrayListOf(element)
         else
             emptyElementList()
     } else {

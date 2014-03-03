@@ -5,7 +5,7 @@ import java.util.*
 import org.junit.Test
 
 class SetTest {
-    val data = hashSet("foo", "bar")
+    val data = hashSetOf("foo", "bar")
 
     Test fun any() {
         assertTrue {
@@ -33,7 +33,7 @@ class SetTest {
         }
         assertEquals(1, foo.size)
 
-        assertEquals(hashSet("foo"), foo)
+        assertEquals(hashSetOf("foo"), foo)
 
         assertTrue("Filter on a Set should return a Set") {
             foo is Set<String>
@@ -49,17 +49,12 @@ class SetTest {
     }
 
     Test fun map() {
-        /**
-          TODO compiler bug
-          we should be able to remove the explicit type on the function
-          http://youtrack.jetbrains.net/issue/KT-849
-        */
         val lengths = data.map{s -> s.length}
         assertTrue {
             lengths.all{it == 3}
         }
         assertEquals(2, lengths.size)
-        assertEquals(arrayList(3, 3), lengths)
+        assertEquals(arrayListOf(3, 3), lengths)
     }
 
 }

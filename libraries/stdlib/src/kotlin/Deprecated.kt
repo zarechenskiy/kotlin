@@ -33,6 +33,13 @@ public fun <K, V> sortedMap(vararg values: Pair<K, V>): SortedMap<K, V> = sorted
 deprecated("Use linkedMapOf(...) instead")
 public fun <K, V> linkedMap(vararg values: Pair<K, V>): LinkedHashMap<K, V> = linkedMapOf(*values)
 
+deprecated("Do not use this method")
+public fun <T> Iterator<T>.toList(): List<T> {
+    val list = ArrayList<T>()
+    for (it in this) list.add(it)
+    return list
+}
+
 /**
  * A helper method for creating a [[Callable]] from a function
  */
