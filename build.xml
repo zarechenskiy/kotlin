@@ -444,7 +444,7 @@
 
                     -libraryjars '${rtjar}'
                     -libraryjars '${jssejar}'
-                    -libraryjars '${bootstrap.runtime}'
+                    -libraryjars '${snapshot.runtime}'
 
                     -target 1.6
                     -dontoptimize
@@ -548,33 +548,12 @@
     </target>
 
     <target name="jdkAnnotations">
-      <copy file="dependencies/annotations/kotlin-jdk-annotations.jar" todir="${kotlin-home}/lib"/>
+      <copy file="dependencies/annotations/kotlin-jdk-annotations.jar" todir="${snapshot.compiler.home}/lib"/>
     </target>
 
     <target name="androidSdkAnnotations">
-      <copy file="dependencies/annotations/kotlin-android-sdk-annotations.jar" todir="${kotlin-home}/lib"/>
+      <copy file="dependencies/annotations/kotlin-android-sdk-annotations.jar" todir="${snapshot.compiler.home}/lib"/>
     </target>
-
-    <macrodef name="pack_annotations">
-        <attribute name="annotationsdir"/>
-        <attribute name="jarfile"/>
-        <attribute name="title"/>
-
-        <sequential>
-            <jar destfile="${snapshot.compiler.home}/lib/@{jarfile}">
-                <fileset dir="@{annotationsdir}"/>
-                <zipfileset file="${snapshot.compiler.home}/build.txt" prefix="META-INF"/>
-
-                <manifest>
-                  <attribute name="Built-By" value="${manifest.impl.vendor}"/>
-
-                  <attribute name="Implementation-Vendor" value="${manifest.impl.vendor}"/>
-                  <attribute name="Implementation-Title" value="@{title}"/>
-                  <attribute name="Implementation-Version" value="${build.number}"/>
-                </manifest>
-            </jar>
-        </sequential>
-    </macrodef>
 
     <macrodef name="bootstrap_kotlinc">
       <attribute name="src"/>
