@@ -1487,9 +1487,6 @@ public fun <T> Stream<T>.single(predicate: (T) -> Boolean) : T {
     
 }
 
-// TODO: compatibility hack, remove after build
-fun <T> Iterator<T>.iterator() = this
-
 /**
  * Returns single element matching the given *predicate*, or null if element was not found or more than one elements were found
  */

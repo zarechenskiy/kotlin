@@ -13,6 +13,11 @@ public fun <T> java.util.Enumeration<T>.iterator(): Iterator<T> = object: Iterat
     public override fun next() : T = nextElement()
 }
 
+/**
+ * Returns the given iterator itself. This allows to use an instance of iterator in a ranged for-loop
+ */
+public fun <T> Iterator<T>.iterator(): Iterator<T> = this
+
 /*
  * Extension functions on the standard Kotlin types to behave like the java.lang.* and java.util.* collections
  */
