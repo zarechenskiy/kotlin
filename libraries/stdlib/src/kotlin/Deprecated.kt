@@ -54,3 +54,14 @@ public /*inline*/ fun runnable(action: () -> Unit): Runnable {
         }
     }
 }
+
+deprecated("Use withIndices() followed by forEach {}")
+public inline fun <T> List<T>.forEachWithIndex(operation : (Int, T) -> Unit): Unit =  withIndices().forEach {
+    operation(it.first, it.second)
+}
+
+deprecated("Function with undefined semantic")
+public fun <T> countTo(n: Int): (T) -> Boolean {
+    var count = 0
+    return { ++count; count <= n }
+}
