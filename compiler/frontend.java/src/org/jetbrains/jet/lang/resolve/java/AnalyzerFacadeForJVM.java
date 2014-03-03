@@ -28,9 +28,7 @@ import org.jetbrains.jet.analyzer.AnalyzerFacadeForEverything;
 import org.jetbrains.jet.context.ContextPackage;
 import org.jetbrains.jet.context.GlobalContext;
 import org.jetbrains.jet.context.GlobalContextImpl;
-import org.jetbrains.jet.di.InjectorForJavaDescriptorResolver;
-import org.jetbrains.jet.di.InjectorForJavaDescriptorResolverUtil;
-import org.jetbrains.jet.di.InjectorForLazyResolve;
+import org.jetbrains.jet.di.InjectorForLazyResolveWithJava;
 import org.jetbrains.jet.di.InjectorForTopDownAnalyzerForJvm;
 import org.jetbrains.jet.lang.descriptors.DependencyKind;
 import org.jetbrains.jet.lang.descriptors.ModuleDescriptor;
@@ -40,7 +38,6 @@ import org.jetbrains.jet.lang.resolve.*;
 import org.jetbrains.jet.lang.resolve.java.mapping.JavaToKotlinClassMap;
 import org.jetbrains.jet.lang.resolve.lazy.ResolveSession;
 import org.jetbrains.jet.lang.resolve.lazy.declarations.FileBasedDeclarationProviderFactory;
-import org.jetbrains.jet.lang.resolve.name.FqName;
 import org.jetbrains.jet.lang.resolve.name.Name;
 import org.jetbrains.jet.lang.types.lang.KotlinBuiltIns;
 
@@ -55,8 +52,7 @@ public enum AnalyzerFacadeForJVM implements AnalyzerFacade {
     public static final List<ImportPath> DEFAULT_IMPORTS = ImmutableList.of(
             new ImportPath("java.lang.*"),
             new ImportPath("kotlin.*"),
-            new ImportPath("kotlin.io.*"),
-            new ImportPath("jet.*"));
+            new ImportPath("kotlin.io.*"));
 
     private AnalyzerFacadeForJVM() {
     }
@@ -87,9 +83,7 @@ public enum AnalyzerFacadeForJVM implements AnalyzerFacade {
     @NotNull
     @Override
     public ResolveSession getLazyResolveSession(@NotNull Project fileProject, @NotNull Collection<JetFile> files) {
-        BindingTraceContext javaResolverTrace = new BindingTraceContext();
-        InjectorForJavaDescriptorResolver injector = InjectorForJavaDescriptorResolverUtil.create(fileProject, javaResolverTrace);
-        return createLazyResolveSession(fileProject, files, javaResolverTrace, injector, true);
+        return createLazyResolveSession(fileProject, files, new BindingTraceContext(), true);
     }
 
     @NotNull
@@ -97,30 +91,31 @@ public enum AnalyzerFacadeForJVM implements AnalyzerFacade {
             @NotNull Project project,
             @NotNull Collection<JetFile> files,
             @NotNull BindingTrace trace,
-            @NotNull InjectorForJavaDescriptorResolver injector,
             boolean addBuiltIns
     ) {
-        final JavaClassFinderImpl classFinder = injector.getJavaClassFinder();
+        GlobalContextImpl globalContext = ContextPackage.GlobalContext();
 
         // TODO: Replace with stub declaration provider
-        GlobalContextImpl globalContext = injector.getGlobalContext();
         FileBasedDeclarationProviderFactory declarationProviderFactory = new FileBasedDeclarationProviderFactory(
                 globalContext.getStorageManager(),
-                files,
-                new Predicate<FqName>() {
-                    @Override
-                    public boolean apply(FqName fqName) {
-                        return classFinder.findPackage(fqName) != null || KotlinBuiltIns.BUILT_INS_PACKAGE_FQ_NAME.equals(fqName);
-                    }
-                });
+                files);
 
-        ModuleDescriptorImpl module = injector.getModule();
+        InjectorForLazyResolveWithJava resolveWithJava = new InjectorForLazyResolveWithJava(
+                project,
+                globalContext,
+                declarationProviderFactory,
+                trace);
+
+        resolveWithJava.getModule().addFragmentProvider(
+                DependencyKind.BINARIES, resolveWithJava.getJavaDescriptorResolver().getPackageFragmentProvider());
 
         if (addBuiltIns) {
-            module.addFragmentProvider(DependencyKind.BUILT_INS, KotlinBuiltIns.getInstance().getBuiltInsModule().getPackageFragmentProvider());
+            resolveWithJava.getModule().addFragmentProvider(
+                    DependencyKind.BUILT_INS,
+                    KotlinBuiltIns.getInstance().getBuiltInsModule().getPackageFragmentProvider());
         }
 
-        return new InjectorForLazyResolve(project, globalContext, module, declarationProviderFactory, trace).getResolveSession();
+        return resolveWithJava.getResolveSession();
     }
 
     @NotNull
@@ -233,9 +228,9 @@ public enum AnalyzerFacadeForJVM implements AnalyzerFacade {
         InjectorForTopDownAnalyzerForJvm injector = new InjectorForTopDownAnalyzerForJvm(project, topDownAnalysisParameters, trace, module);
         try {
             module.addFragmentProvider(DependencyKind.BINARIES, injector.getJavaDescriptorResolver().getPackageFragmentProvider());
-            injector.getTopDownAnalyzer().analyzeFiles(files, scriptParameters);
+            TopDownAnalysisContext topDownAnalysisContext = injector.getTopDownAnalyzer().analyzeFiles(topDownAnalysisParameters, files);
             BodiesResolveContext bodiesResolveContext = storeContextForBodiesResolve ?
-                                                        new CachedBodiesResolveContext(injector.getTopDownAnalysisContext()) :
+                                                        new CachedBodiesResolveContext(topDownAnalysisContext) :
                                                         null;
             return AnalyzeExhaust.success(trace.getBindingContext(), bodiesResolveContext, module);
         }

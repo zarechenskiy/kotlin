@@ -94,6 +94,9 @@ import org.jetbrains.jet.plugin.intentions.AbstractIntentionTest
 import org.jetbrains.jet.checkers.AbstractJetDiagnosticsTestWithStdLib
 import org.jetbrains.jet.plugin.codeInsight.AbstractInsertImportOnPasteTest
 import org.jetbrains.jet.resolve.AbstractReferenceToJavaWithWrongFileStructureTest
+import org.jetbrains.jet.plugin.navigation.AbstractKotlinGotoTest
+import org.jetbrains.jet.plugin.AbstractExpressionSelectionTest
+import org.jetbrains.jet.plugin.refactoring.move.AbstractJetMoveTest
 
 fun main(args: Array<String>) {
     System.setProperty("java.awt.headless", "true")
@@ -293,6 +296,11 @@ fun main(args: Array<String>) {
             model("navigation/gotoSuper", extension = "test")
         }
 
+        testClass(javaClass<AbstractKotlinGotoTest>()) {
+            model("navigation/gotoClass", testMethod = "doClassTest")
+            model("navigation/gotoSymbol", testMethod = "doSymbolTest")
+        }
+
         testClass(javaClass<AbstractQuickFixMultiFileTest>()) {
             model("quickfix", pattern = """^(\w+)\.before\.Main\.kt$""", testMethod = "doTestWithExtraFile")
         }
@@ -343,6 +351,9 @@ fun main(args: Array<String>) {
             model("intentions/reconstructedType", testMethod = "doTestReconstructType")
             model("intentions/removeUnnecessaryParentheses", testMethod = "doTestRemoveUnnecessaryParentheses")
             model("intentions/replaceWithDotQualifiedMethodCall", testMethod = "doTestReplaceWithDotQualifiedMethodCall")
+            model("intentions/replaceWithInfixFunctionCall", testMethod = "doTestReplaceWithInfixFunctionCall")
+            model("intentions/removeCurlyBracesFromTemplate", testMethod = "doTestRemoveCurlyFromTemplate")
+            model("intentions/insertCurlyBracestsToTemplate", testMethod = "doTestInsertCurlyToTemplate")
         }
 
         testClass(javaClass<AbstractHierarchyTest>()) {
@@ -418,6 +429,10 @@ fun main(args: Array<String>) {
             model("findUsages/java", pattern = """^(.+)\.0\.java$""")
         }
 
+        testClass(javaClass<AbstractJetMoveTest>()) {
+            model("refactoring/move", extension = "test", singleClass = true)
+        }
+
         testClass(javaClass<AbstractCompletionWeigherTest>()) {
             model("completion/weighers", pattern = """^([^\.]+)\.kt$""")
         }
@@ -473,6 +488,10 @@ fun main(args: Array<String>) {
 
         testClass(javaClass<AbstractSmartSelectionTest>()) {
             model("smartSelection", testMethod = "doTestSmartSelection", pattern = """^([^\.]+)\.kt$""")
+        }
+
+        testClass(javaClass<AbstractExpressionSelectionTest>()) {
+            model("expressionSelection", testMethod = "doTestExpressionSelection", pattern = """^([^\.]+)\.kt$""")
         }
     }
 

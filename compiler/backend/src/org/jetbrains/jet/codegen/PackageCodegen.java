@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2013 JetBrains s.r.o.
+ * Copyright 2010-2014 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -174,8 +174,9 @@ public class PackageCodegen extends MemberCodegen {
                 generateSrcClass = true;
             }
             else if (declaration instanceof JetClassOrObject) {
-                if (state.isGenerateDeclaredClasses()) {
-                    generateClassOrObject((JetClassOrObject) declaration);
+                JetClassOrObject classOrObject = (JetClassOrObject) declaration;
+                if (state.getGenerateDeclaredClassFilter().shouldProcess(classOrObject)) {
+                    generateClassOrObject(classOrObject);
                 }
             }
             else if (declaration instanceof JetScript) {
@@ -186,7 +187,7 @@ public class PackageCodegen extends MemberCodegen {
         if (!generateSrcClass) return null;
 
         Type packagePartType = getPackagePartType(getPackageClassFqName(name), file.getVirtualFile());
-        ClassBuilder builder = state.getFactory().forPackageFragment(packagePartType, file);
+        ClassBuilder builder = state.getFactory().forPackagePart(packagePartType, file);
 
         new PackagePartCodegen(builder, file, packagePartType, packagePartContext, state).generate();
 

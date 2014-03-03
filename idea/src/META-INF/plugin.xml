@@ -6,7 +6,7 @@
   <version>@snapshot@</version>
   <vendor url="http://www.jetbrains.com">JetBrains Inc.</vendor>
 
-  <idea-version since-build="133.0" until-build="134.0"/>
+  <idea-version since-build="134.1342" until-build="134.9999"/>
 
   <depends optional="true" config-file="junit.xml">JUnit</depends>
   <depends optional="true" config-file="gradle.xml">org.jetbrains.plugins.gradle</depends>
@@ -166,6 +166,7 @@
                              implementationClass="org.jetbrains.jet.plugin.codeInsight.surroundWith.statement.KotlinStatementSurroundDescriptor"/>
     <lang.unwrapDescriptor language="jet" implementationClass="org.jetbrains.jet.plugin.codeInsight.unwrap.KotlinUnwrapDescriptor"/>
     <quoteHandler fileType="Kotlin" className="org.jetbrains.jet.plugin.editor.KotlinQuoteHandler"/>
+    <refactoring.helper implementation="org.jetbrains.jet.plugin.codeInsight.KotlinShortenReferencesRefactoringHelper"/>
     <refactoring.moveHandler implementation="org.jetbrains.jet.plugin.refactoring.move.JetMoveFilesOrDirectoriesHandler"/>
     <refactoring.copyHandler implementation="org.jetbrains.jet.plugin.refactoring.copy.JetCopyClassHandler"/>
     <refactoring.changeSignatureUsageProcessor implementation="org.jetbrains.jet.plugin.refactoring.changeSignature.JetChangeSignatureUsageProcessor"/>
@@ -266,6 +267,8 @@
                               forClass="org.jetbrains.jet.lang.psi.JetNamedFunction"/>
     <itemPresentationProvider implementationClass="org.jetbrains.jet.plugin.presentation.JetClassPresenter"
                               forClass="org.jetbrains.jet.lang.psi.JetClass"/>
+    <itemPresentationProvider implementationClass="org.jetbrains.jet.plugin.presentation.JetObjectPresenter"
+                              forClass="org.jetbrains.jet.lang.psi.JetObjectDeclaration"/>
     <itemPresentationProvider implementationClass="org.jetbrains.jet.plugin.presentation.JetPropertyPresenter"
                               forClass="org.jetbrains.jet.lang.psi.JetProperty"/>
     <itemPresentationProvider implementationClass="org.jetbrains.jet.plugin.presentation.JetParameterPresenter"
@@ -474,6 +477,16 @@
     </intentionAction>
 
     <intentionAction>
+      <className>org.jetbrains.jet.plugin.intentions.RemoveCurlyBracesFromTemplateIntention</className>
+      <category>Kotlin</category>
+    </intentionAction>
+
+    <intentionAction>
+      <className>org.jetbrains.jet.plugin.intentions.InsertCurlyBracesToTemplateIntention</className>
+      <category>Kotlin</category>
+    </intentionAction>
+
+    <intentionAction>
       <className>org.jetbrains.jet.plugin.intentions.declarations.SplitPropertyDeclarationIntention</className>
       <category>Kotlin</category>
     </intentionAction>
@@ -490,6 +503,11 @@
 
     <intentionAction>
       <className>org.jetbrains.jet.plugin.intentions.ReplaceWithDotQualifiedMethodCallIntention</className>
+      <category>Kotlin</category>
+    </intentionAction>
+
+    <intentionAction>
+      <className>org.jetbrains.jet.plugin.intentions.ReplaceWithInfixFunctionCallIntention</className>
       <category>Kotlin</category>
     </intentionAction>
 

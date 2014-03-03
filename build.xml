@@ -18,6 +18,7 @@
     <property name="snapshot.compiler.home" value="${output}/kotlinc"/>
     <property name="snapshot.runtime" value="${snapshot.compiler.home}/lib/kotlin-runtime.jar"/>
     <property name="build.number" value="snapshot"/>
+    <property name="bootstrap.build.no.tests" value="false"/>
     <property name="output.name" value="kotlin-compiler-${build.number}"/>
     <property name="idea.sdk" value="${basedir}/ideaSDK"/>
 
@@ -285,11 +286,10 @@
 
     <target name="builtins">
       <cleandir dir="${output}/builtins"/>
-      <java classname="org.jetbrains.jet.utils.builtinsSerializer.BuiltinsSerializerPackage" failonerror="true" fork="true">
-        <classpath>
-          <path refid="bootstrap.classpath"/>
-          <pathelement location="${bootstrap.compiler.home}/lib/kotlin-compiler.jar"/>
-        </classpath>
+      <java classname="org.jetbrains.jet.utils.builtinsSerializer.BuiltinsSerializerPackage"
+            classpath="${bootstrap.compiler.home}/lib/kotlin-compiler.jar"
+            failonerror="true"
+            fork="true">
         <assertions>
           <enable/>
         </assertions>
@@ -304,9 +304,35 @@
         <attribute name="compress" default="true"/>
 
         <sequential>
-          <jar jarfile="@{jarfile}" compress="@{compress}">
+          <!--
+          For "Compiler and Plugin - Bootstrap - No Tests" configuration the compiler will contain the runtime it was built against, and
+          will NOT contain the new runtime in its "Class-Path" attribute. This is done because the new compiler is guaranteed to work
+          against the OLD runtime (because the new compiler is just a Kotlin application, compiled by the old compiler with the old
+          runtime), but _will not necessarily_ work against the new one.
+          However we don't do this on the second run of our distribution, i.e. we do not include the new runtime in the NEWEST compiler.
+          This is because there are little to no differences between the new and the newest runtime, and so we assume that our newest
+          compiler will work with any of them. Also distributing two runtimes (inside the compiler and a separate one) could cause all
+          kinds of problems and confusion for users who include both our compiler and runtime in their classpath
+          -->
+          <if>
+            <istrue value="${bootstrap.build.no.tests}"/>
+            <then>
+              <property name="compiler.manifest.class.path" value="."/>
+            </then>
+            <else>
+              <property name="compiler.manifest.class.path" value="kotlin-runtime.jar"/>
+            </else>
+          </if>
+
+          <jar jarfile="@{jarfile}" compress="@{compress}" duplicate="preserve">
+              <zipfileset src="${bootstrap.runtime}">
+                <include name="**/*.class" if="${bootstrap.build.no.tests}"/>
+              </zipfileset>
               <fileset dir="${output}/classes/compiler"/>
-              <fileset dir="${output}/builtins" includes="jet/**"/>
+              <fileset dir="${output}/builtins">
+                <include name="kotlin/**"/>
+                <exclude name="kotlin/internal/**"/>
+              </fileset>
               <fileset dir="${basedir}/compiler/frontend.java/src" includes="META-INF/services/**"/>
 
               <zipgroupfileset dir="${basedir}/lib" includes="*.jar"/>
@@ -325,7 +351,7 @@
                   <attribute name="Implementation-Title" value="${manifest.impl.title.kotlin.compiler}"/>
                   <attribute name="Implementation-Version" value="${build.number}"/>
 
-                  <attribute name="Class-Path" value="kotlin-runtime.jar"/>
+                  <attribute name="Class-Path" value="${compiler.manifest.class.path}"/>
                   <attribute name="Main-Class" value="org.jetbrains.jet.cli.jvm.K2JVMCompiler"/>
               </manifest>
           </jar>
@@ -377,6 +403,9 @@
                 <available property="rtjar" value="${java.home}/lib/rt.jar" file="${java.home}/lib/rt.jar"/>
                 <available property="rtjar" value="${java.home}/../Classes/classes.jar" file="${java.home}/../Classes/classes.jar"/>
 
+                <available property="jssejar" value="${java.home}/lib/jsse.jar" file="${java.home}/lib/jsse.jar"/>
+                <available property="jssejar" value="${java.home}/../Classes/jsse.jar" file="${java.home}/../Classes/jsse.jar"/>
+
                 <proguard><![CDATA[
                     -injars '${output}/kotlin-compiler-before-shrink.jar'(
                     !com/thoughtworks/xstream/converters/extended/ISO8601**,
@@ -414,7 +443,8 @@
                     -dontwarn org.objectweb.asm.** # this is ASM3, the old version that we do not use
 
                     -libraryjars '${rtjar}'
-                    -libraryjars '${snapshot.runtime}'
+                    -libraryjars '${jssejar}'
+                    -libraryjars '${bootstrap.runtime}'
 
                     -target 1.6
                     -dontoptimize
@@ -436,6 +466,10 @@
                     }
 
                     -keep class jet.** {
+                        public protected *;
+                    }
+
+                    -keep class kotlin.** {
                         public protected *;
                     }
 
@@ -514,15 +548,11 @@
     </target>
 
     <target name="jdkAnnotations">
-        <pack_annotations jarfile="kotlin-jdk-annotations.jar"
-                          annotationsdir="${basedir}/jdk-annotations"
-                          title="${manifest.impl.title.kotlin.compiler.annotations.jdk}"/>
+      <copy file="dependencies/annotations/kotlin-jdk-annotations.jar" todir="${kotlin-home}/lib"/>
     </target>
 
     <target name="androidSdkAnnotations">
-        <pack_annotations jarfile="kotlin-android-sdk-annotations.jar"
-                          annotationsdir="${basedir}/android-sdk-annotations"
-                          title="${manifest.impl.title.kotlin.compiler.annotations.android.sdk}"/>
+      <copy file="dependencies/annotations/kotlin-android-sdk-annotations.jar" todir="${kotlin-home}/lib"/>
     </target>
 
     <macrodef name="pack_annotations">
@@ -604,7 +634,6 @@
                      classpath="${basedir}/core/builtins/src${path.separator}${basedir}/core/runtime.jvm/src"/>
 
         <javac2 destdir="${output}/classes/runtime" debug="true" debuglevel="lines,vars,source" includeAntRuntime="false" source="${java.target}" target="${java.target}">
-            <src path="${basedir}/core/builtins/src"/>
             <src path="${basedir}/core/runtime.jvm/src"/>
             <classpath location="${output}/classes/runtime"/>
         </javac2>

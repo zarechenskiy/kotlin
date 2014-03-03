@@ -22,7 +22,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.util.PsiTreeUtil;
-import jet.Function0;
+import kotlin.Function0;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.lang.descriptors.*;
@@ -133,7 +133,7 @@ public class DescriptorResolver {
             @NotNull MutableClassDescriptor descriptor,
             BindingTrace trace
     ) {
-        for (JetType supertype : resolveSupertypes(descriptor.getScopeForSupertypeResolution(), descriptor, jetClass, trace)) {
+        for (JetType supertype : resolveSupertypes(descriptor.getScopeForClassHeaderResolution(), descriptor, jetClass, trace)) {
             descriptor.addSupertype(supertype);
         }
     }
@@ -641,7 +641,7 @@ public class DescriptorResolver {
             }
         }
         for (JetTypeConstraint constraint : declaration.getTypeConstraints()) {
-            if (constraint.isClassObjectContraint()) {
+            if (constraint.isClassObjectConstraint()) {
                 trace.report(UNSUPPORTED.on(constraint, "Class objects constraints are not supported yet"));
             }
 
@@ -656,7 +656,7 @@ public class DescriptorResolver {
             if (boundTypeReference != null) {
                 bound = typeResolver.resolveType(scope, boundTypeReference, trace, false);
                 deferredUpperBoundCheckerTasks
-                        .add(new UpperBoundCheckerTask(boundTypeReference, bound, constraint.isClassObjectContraint()));
+                        .add(new UpperBoundCheckerTask(boundTypeReference, bound, constraint.isClassObjectConstraint()));
             }
 
             if (typeParameterDescriptor == null) {
@@ -673,7 +673,7 @@ public class DescriptorResolver {
             else {
                 trace.record(BindingContext.REFERENCE_TARGET, subjectTypeParameterName, typeParameterDescriptor);
                 if (bound != null) {
-                    if (constraint.isClassObjectContraint()) {
+                    if (constraint.isClassObjectConstraint()) {
                         typeParameterDescriptor.addClassObjectBound(bound);
                     }
                     else {

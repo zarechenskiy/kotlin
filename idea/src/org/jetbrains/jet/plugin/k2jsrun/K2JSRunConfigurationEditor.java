@@ -16,7 +16,9 @@
 
 package org.jetbrains.jet.plugin.k2jsrun;
 
-import com.intellij.ide.browsers.BrowsersConfiguration;
+import com.intellij.ide.browsers.BrowserFamily;
+import com.intellij.ide.browsers.WebBrowser;
+import com.intellij.ide.browsers.WebBrowserManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.fileTypes.StdFileTypes;
@@ -67,8 +69,8 @@ public final class K2JSRunConfigurationEditor extends SettingsEditor<K2JSRunConf
         K2JSConfigurationSettings settings = configuration.settings();
         settings.setPageToOpenFilePath(toSystemIndependentName(htmlChooseFile.getText()));
         Object item = browserComboBox.getSelectedItem();
-        if (item instanceof BrowsersConfiguration.BrowserFamily) {
-            settings.setBrowserFamily((BrowsersConfiguration.BrowserFamily)item);
+        if (item instanceof BrowserFamily) {
+            settings.setBrowserFamily((BrowserFamily) item);
         }
         settings.setGeneratedFilePath(toSystemIndependentName(generatedChooseFile.getText()));
         settings.setShouldOpenInBrowserAfterTranslation(openInBrowserCheckBox.isSelected());
@@ -137,12 +139,12 @@ public final class K2JSRunConfigurationEditor extends SettingsEditor<K2JSRunConf
     }
 
     private void setUpBrowserCombobox() {
-        for (BrowsersConfiguration.BrowserFamily family : BrowsersConfiguration.getInstance().getActiveBrowsers()) {
-            browserComboBox.addItem(family);
+        for (WebBrowser browser : WebBrowserManager.getInstance().getActiveBrowsers()) {
+            browserComboBox.addItem(browser.getFamily());
         }
-        browserComboBox.setRenderer(new ListCellRendererWrapper<BrowsersConfiguration.BrowserFamily>() {
+        browserComboBox.setRenderer(new ListCellRendererWrapper<BrowserFamily>() {
             @Override
-            public void customize(JList list, BrowsersConfiguration.BrowserFamily family, int index, boolean selected, boolean hasFocus) {
+            public void customize(JList list, BrowserFamily family, int index, boolean selected, boolean hasFocus) {
                 if (family != null) {
                     setText(family.getName());
                     setIcon(family.getIcon());

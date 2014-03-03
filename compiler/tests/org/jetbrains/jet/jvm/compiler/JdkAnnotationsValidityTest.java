@@ -77,7 +77,7 @@ public class JdkAnnotationsValidityTest extends UsefulTestCase {
     // </item>
     //
     // KAnnotator produces above annotations and validation of TabularDataSupport results into:
-    // public open fun keySet(): jet.MutableSet<jet.Any> defined in javax.management.openmbean.TabularDataSupport :
+    // public open fun keySet(): kotlin.MutableSet<kotlin.Any> defined in javax.management.openmbean.TabularDataSupport :
     // [Incompatible types in superclasses: [Any?, Any, Any], Incompatible projection kinds in type arguments of super methods' return types: [out Any?, Any, Any]]
     private static final Set<String> classesToIgnore = new HashSet<String>(Arrays.asList("javax.management.openmbean.TabularDataSupport"));
 
@@ -101,7 +101,7 @@ public class JdkAnnotationsValidityTest extends UsefulTestCase {
     }
 
     public void testNoErrorsInAlternativeSignatures() {
-        List<FqName> affectedClasses = getAffectedClasses("file://jdk-annotations");
+        List<FqName> affectedClasses = getAffectedClasses("jar://dependencies/annotations/kotlin-jdk-annotations.jar!/");
 
         Map<String, List<String>> errors = Maps.newLinkedHashMap();
 

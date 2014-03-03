@@ -292,20 +292,13 @@ public class AsmUtil {
                    : sort == Type.BYTE || sort == Type.SHORT ? Type.INT_TYPE : type;
     }
 
-    public static void genThrow(MethodVisitor mv, String exception, String message) {
+    public static void genThrow(@NotNull MethodVisitor mv, @NotNull String exception, @NotNull String message) {
         InstructionAdapter iv = new InstructionAdapter(mv);
         iv.anew(Type.getObjectType(exception));
         iv.dup();
         iv.aconst(message);
         iv.invokespecial(exception, "<init>", "(Ljava/lang/String;)V");
         iv.athrow();
-    }
-
-    public static void genMethodThrow(MethodVisitor mv, String exception, String message) {
-        mv.visitCode();
-        genThrow(mv, exception, message);
-        mv.visitMaxs(-1, -1);
-        mv.visitEnd();
     }
 
     public static void genClosureFields(CalculatedClosure closure, ClassBuilder v, JetTypeMapper typeMapper) {
@@ -419,7 +412,7 @@ public class AsmUtil {
                 return StackValue.cmp(opToken, leftType);
             }
             else {
-                v.invokestatic("jet/runtime/Intrinsics", "areEqual", "(Ljava/lang/Object;Ljava/lang/Object;)Z");
+                v.invokestatic("kotlin/jvm/internal/Intrinsics", "areEqual", "(Ljava/lang/Object;Ljava/lang/Object;)Z");
 
                 if (opToken == JetTokens.EXCLEQ || opToken == JetTokens.EXCLEQEQEQ) {
                     genInvertBoolean(v);
@@ -495,7 +488,7 @@ public class AsmUtil {
             if (asmType.getSort() == Type.OBJECT || asmType.getSort() == Type.ARRAY) {
                 v.load(index, asmType);
                 v.visitLdcInsn(parameter.getName().asString());
-                v.invokestatic("jet/runtime/Intrinsics", "checkParameterIsNotNull", "(Ljava/lang/Object;Ljava/lang/String;)V");
+                v.invokestatic("kotlin/jvm/internal/Intrinsics", "checkParameterIsNotNull", "(Ljava/lang/Object;Ljava/lang/String;)V");
             }
         }
     }
@@ -537,7 +530,7 @@ public class AsmUtil {
             v.dup();
             v.visitLdcInsn(descriptor.getContainingDeclaration().getName().asString());
             v.visitLdcInsn(descriptor.getName().asString());
-            v.invokestatic("jet/runtime/Intrinsics", assertMethodToCall, "(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)V");
+            v.invokestatic("kotlin/jvm/internal/Intrinsics", assertMethodToCall, "(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)V");
         }
     }
 

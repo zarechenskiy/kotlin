@@ -47,8 +47,6 @@ public class DeclarationResolver {
     @NotNull
     private AnnotationResolver annotationResolver;
     @NotNull
-    private TopDownAnalysisContext context;
-    @NotNull
     private ImportsResolver importsResolver;
     @NotNull
     private DescriptorResolver descriptorResolver;
@@ -61,11 +59,6 @@ public class DeclarationResolver {
     @Inject
     public void setAnnotationResolver(@NotNull AnnotationResolver annotationResolver) {
         this.annotationResolver = annotationResolver;
-    }
-
-    @Inject
-    public void setContext(@NotNull TopDownAnalysisContext context) {
-        this.context = context;
     }
 
     @Inject
@@ -90,20 +83,20 @@ public class DeclarationResolver {
 
 
 
-    public void process(@NotNull JetScope rootScope) {
-        checkModifiersAndAnnotationsInPackageDirectives();
-        resolveAnnotationConstructors();
-        resolveConstructorHeaders();
-        resolveAnnotationStubsOnClassesAndConstructors();
-        resolveFunctionAndPropertyHeaders();
-        createFunctionsForDataClasses();
-        importsResolver.processMembersImports();
-        checkRedeclarationsInPackages();
-        checkRedeclarationsInInnerClassNames();
+    public void process(@NotNull TopDownAnalysisContext c) {
+        checkModifiersAndAnnotationsInPackageDirectives(c);
+        resolveAnnotationConstructors(c);
+        resolveConstructorHeaders(c);
+        resolveAnnotationStubsOnClassesAndConstructors(c);
+        resolveFunctionAndPropertyHeaders(c);
+        createFunctionsForDataClasses(c);
+        importsResolver.processMembersImports(c);
+        checkRedeclarationsInPackages(c);
+        checkRedeclarationsInInnerClassNames(c);
     }
 
-    private void checkModifiersAndAnnotationsInPackageDirectives() {
-        for (JetFile file : context.getPackageFragments().keySet()) {
+    private void checkModifiersAndAnnotationsInPackageDirectives(@NotNull TopDownAnalysisContext c) {
+        for (JetFile file : c.getPackageFragments().keySet()) {
             JetPackageDirective packageDirective = file.getPackageDirective();
             if (packageDirective == null) continue;
 
@@ -127,50 +120,50 @@ public class DeclarationResolver {
         }
     }
 
-    private void resolveAnnotationConstructors() {
-        for (Map.Entry<JetClassOrObject, MutableClassDescriptor> entry : context.getClasses().entrySet()) {
+    private void resolveAnnotationConstructors(@NotNull TopDownAnalysisContext c) {
+        for (Map.Entry<JetClassOrObject, ClassDescriptorWithResolutionScopes> entry : c.getClasses().entrySet()) {
             JetClassOrObject classOrObject = entry.getKey();
-            MutableClassDescriptor classDescriptor = entry.getValue();
+            MutableClassDescriptor classDescriptor = (MutableClassDescriptor) entry.getValue();
 
             if (classOrObject instanceof JetClass && DescriptorUtils.isAnnotationClass(classDescriptor)) {
-                processPrimaryConstructor(classDescriptor, (JetClass) classOrObject);
+                processPrimaryConstructor(c, classDescriptor, (JetClass) classOrObject);
             }
         }
     }
 
-    private void resolveConstructorHeaders() {
-        for (Map.Entry<JetClassOrObject, MutableClassDescriptor> entry : context.getClasses().entrySet()) {
+    private void resolveConstructorHeaders(@NotNull TopDownAnalysisContext c) {
+        for (Map.Entry<JetClassOrObject, ClassDescriptorWithResolutionScopes> entry : c.getClasses().entrySet()) {
             JetClassOrObject classOrObject = entry.getKey();
-            MutableClassDescriptor classDescriptor = entry.getValue();
+            MutableClassDescriptor classDescriptor = (MutableClassDescriptor) entry.getValue();
 
             if (classOrObject instanceof JetClass && !DescriptorUtils.isAnnotationClass(classDescriptor)) {
-                processPrimaryConstructor(classDescriptor, (JetClass) classOrObject);
+                processPrimaryConstructor(c, classDescriptor, (JetClass) classOrObject);
             }
         }
     }
 
-    private void resolveAnnotationStubsOnClassesAndConstructors() {
-        for (Map.Entry<JetClassOrObject, MutableClassDescriptor> entry : context.getClasses().entrySet()) {
+    private void resolveAnnotationStubsOnClassesAndConstructors(@NotNull TopDownAnalysisContext c) {
+        for (Map.Entry<JetClassOrObject, ClassDescriptorWithResolutionScopes> entry : c.getClasses().entrySet()) {
             JetModifierList modifierList = entry.getKey().getModifierList();
             if (modifierList != null) {
-                MutableClassDescriptor descriptor = entry.getValue();
+                MutableClassDescriptor descriptor = (MutableClassDescriptor) entry.getValue();
                 descriptor.addAnnotations(annotationResolver.resolveAnnotationsWithoutArguments(
-                        descriptor.getScopeForSupertypeResolution(), modifierList, trace));
+                        descriptor.getScopeForClassHeaderResolution(), modifierList, trace));
             }
         }
     }
 
-    private void resolveFunctionAndPropertyHeaders() {
-        for (Map.Entry<JetFile, WritableScope> entry : context.getFileScopes().entrySet()) {
+    private void resolveFunctionAndPropertyHeaders(@NotNull TopDownAnalysisContext c) {
+        for (Map.Entry<JetFile, WritableScope> entry : c.getFileScopes().entrySet()) {
             JetFile file = entry.getKey();
             WritableScope fileScope = entry.getValue();
-            PackageLikeBuilder packageBuilder = context.getPackageFragments().get(file).getBuilder();
+            PackageLikeBuilder packageBuilder = c.getPackageFragments().get(file).getBuilder();
 
-            resolveFunctionAndPropertyHeaders(file.getDeclarations(), fileScope, fileScope, fileScope, packageBuilder);
+            resolveFunctionAndPropertyHeaders(c, file.getDeclarations(), fileScope, fileScope, fileScope, packageBuilder);
         }
-        for (Map.Entry<JetClassOrObject, MutableClassDescriptor> entry : context.getClasses().entrySet()) {
+        for (Map.Entry<JetClassOrObject, ClassDescriptorWithResolutionScopes> entry : c.getClasses().entrySet()) {
             JetClassOrObject classOrObject = entry.getKey();
-            MutableClassDescriptor classDescriptor = entry.getValue();
+            MutableClassDescriptor classDescriptor = (MutableClassDescriptor) entry.getValue();
 
             JetClassBody jetClassBody = classOrObject.getBody();
             if (classDescriptor.getKind() == ClassKind.ANNOTATION_CLASS && jetClassBody != null) {
@@ -178,17 +171,19 @@ public class DeclarationResolver {
             }
 
             resolveFunctionAndPropertyHeaders(
-                    classOrObject.getDeclarations(), classDescriptor.getScopeForMemberResolution(),
-                    classDescriptor.getScopeForInitializers(), classDescriptor.getScopeForMemberResolution(),
+                    c,
+                    classOrObject.getDeclarations(), classDescriptor.getScopeForMemberDeclarationResolution(),
+                    classDescriptor.getScopeForInitializerResolution(), classDescriptor.getScopeForMemberDeclarationResolution(),
                     classDescriptor.getBuilder());
         }
 
-        scriptHeaderResolver.resolveScriptDeclarations();
+        scriptHeaderResolver.resolveScriptDeclarations(c);
 
         // TODO : Extensions
     }
 
     private void resolveFunctionAndPropertyHeaders(
+            @NotNull final TopDownAnalysisContext c,
             @NotNull List<JetDeclaration> declarations,
             @NotNull final JetScope scopeForFunctions,
             @NotNull final JetScope scopeForPropertyInitializers,
@@ -204,11 +199,11 @@ public class DeclarationResolver {
                             scopeForFunctions,
                             function,
                             trace,
-                            context.getOuterDataFlowInfo()
+                            c.getOuterDataFlowInfo()
                     );
                     packageLike.addFunctionDescriptor(functionDescriptor);
-                    context.getFunctions().put(function, functionDescriptor);
-                    context.registerDeclaringScope(function, scopeForFunctions);
+                    c.getFunctions().put(function, functionDescriptor);
+                    c.registerDeclaringScope(function, scopeForFunctions);
                 }
 
                 @Override
@@ -218,27 +213,27 @@ public class DeclarationResolver {
                             scopeForPropertyInitializers,
                             property,
                             trace,
-                            context.getOuterDataFlowInfo());
+                            c.getOuterDataFlowInfo());
                     packageLike.addPropertyDescriptor(propertyDescriptor);
-                    context.getProperties().put(property, propertyDescriptor);
-                    context.registerDeclaringScope(property, scopeForPropertyInitializers);
+                    c.getProperties().put(property, propertyDescriptor);
+                    c.registerDeclaringScope(property, scopeForPropertyInitializers);
                     JetPropertyAccessor getter = property.getGetter();
                     if (getter != null) {
-                        context.registerDeclaringScope(getter, scopeForPropertyAccessors);
+                        c.registerDeclaringScope(getter, scopeForPropertyAccessors);
                     }
                     JetPropertyAccessor setter = property.getSetter();
                     if (setter != null) {
-                        context.registerDeclaringScope(setter, scopeForPropertyAccessors);
+                        c.registerDeclaringScope(setter, scopeForPropertyAccessors);
                     }
                 }
             });
         }
     }
 
-    private void createFunctionsForDataClasses() {
-        for (Map.Entry<JetClassOrObject, MutableClassDescriptor> entry : context.getClasses().entrySet()) {
+    private void createFunctionsForDataClasses(@NotNull TopDownAnalysisContext c) {
+        for (Map.Entry<JetClassOrObject, ClassDescriptorWithResolutionScopes> entry : c.getClasses().entrySet()) {
             JetClassOrObject klass = entry.getKey();
-            MutableClassDescriptor classDescriptor = entry.getValue();
+            MutableClassDescriptor classDescriptor = (MutableClassDescriptor) entry.getValue();
 
             if (klass instanceof JetClass && klass.hasPrimaryConstructor() && KotlinBuiltIns.getInstance().isData(classDescriptor)) {
                 ConstructorDescriptor constructor = DescriptorUtils.getConstructorOfDataClass(classDescriptor);
@@ -272,7 +267,11 @@ public class DeclarationResolver {
         classDescriptor.getBuilder().addFunctionDescriptor(functionDescriptor);
     }
 
-    private void processPrimaryConstructor(MutableClassDescriptor classDescriptor, JetClass klass) {
+    private void processPrimaryConstructor(
+            @NotNull TopDownAnalysisContext c,
+            @NotNull MutableClassDescriptor classDescriptor,
+            @NotNull JetClass klass
+    ) {
         if (classDescriptor.getKind() == ClassKind.TRAIT) {
             JetParameterList primaryConstructorParameterList = klass.getPrimaryConstructorParameterList();
             if (primaryConstructorParameterList != null) {
@@ -283,7 +282,7 @@ public class DeclarationResolver {
         boolean isAnnotationClass = DescriptorUtils.isAnnotationClass(classDescriptor);
 
         // TODO : not all the parameters are real properties
-        JetScope memberScope = classDescriptor.getScopeForSupertypeResolution();
+        JetScope memberScope = classDescriptor.getScopeForClassHeaderResolution();
         ConstructorDescriptor constructorDescriptor = descriptorResolver.resolvePrimaryConstructorDescriptor(memberScope, classDescriptor, klass, trace);
         if (constructorDescriptor != null) {
             List<ValueParameterDescriptor> valueParameterDescriptors = constructorDescriptor.getValueParameters();
@@ -300,7 +299,7 @@ public class DeclarationResolver {
                             parameter, trace
                     );
                     classDescriptor.getBuilder().addPropertyDescriptor(propertyDescriptor);
-                    context.getPrimaryConstructorParameterProperties().put(parameter, propertyDescriptor);
+                    c.getPrimaryConstructorParameterProperties().put(parameter, propertyDescriptor);
                 }
                 else {
                     if (isAnnotationClass) {
@@ -317,8 +316,8 @@ public class DeclarationResolver {
         }
     }
 
-    private void checkRedeclarationsInPackages() {
-        for (MutablePackageFragmentDescriptor packageFragment : Sets.newHashSet(context.getPackageFragments().values())) {
+    private void checkRedeclarationsInPackages(@NotNull TopDownAnalysisContext c) {
+        for (MutablePackageFragmentDescriptor packageFragment : Sets.newHashSet(c.getPackageFragments().values())) {
             PackageViewDescriptor packageView = packageFragment.getContainingDeclaration().getPackage(packageFragment.getFqName());
             JetScope packageViewScope = packageView.getMemberScope();
             Multimap<Name, DeclarationDescriptor> simpleNameDescriptors = packageFragment.getMemberScope().getDeclaredDescriptorsAccessibleBySimpleName();
@@ -374,16 +373,17 @@ public class DeclarationResolver {
         return declarations;
     }
 
-    private void checkRedeclarationsInInnerClassNames() {
-        for (MutableClassDescriptor classDescriptor : context.getClasses().values()) {
+    private void checkRedeclarationsInInnerClassNames(@NotNull TopDownAnalysisContext c) {
+        for (ClassDescriptorWithResolutionScopes classDescriptor : c.getClasses().values()) {
+            MutableClassDescriptor mutableClassDescriptor = (MutableClassDescriptor) classDescriptor;
             if (classDescriptor.getKind() == ClassKind.CLASS_OBJECT) {
                 // Class objects should be considered during analysing redeclarations in classes
                 continue;
             }
 
-            Collection<DeclarationDescriptor> allDescriptors = classDescriptor.getScopeForMemberLookup().getOwnDeclaredDescriptors();
+            Collection<DeclarationDescriptor> allDescriptors = mutableClassDescriptor.getScopeForMemberLookup().getOwnDeclaredDescriptors();
 
-            MutableClassDescriptorLite classObj = classDescriptor.getClassObjectDescriptor();
+            MutableClassDescriptorLite classObj = mutableClassDescriptor.getClassObjectDescriptor();
             if (classObj != null) {
                 Collection<DeclarationDescriptor> classObjDescriptors = classObj.getScopeForMemberLookup().getOwnDeclaredDescriptors();
                 if (!classObjDescriptors.isEmpty()) {
@@ -399,7 +399,7 @@ public class DeclarationResolver {
                 }
             }
 
-           reportRedeclarations(descriptorMap);
+            reportRedeclarations(descriptorMap);
         }
     }
 

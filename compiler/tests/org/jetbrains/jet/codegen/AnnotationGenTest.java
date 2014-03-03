@@ -16,7 +16,7 @@
 
 package org.jetbrains.jet.codegen;
 
-import jet.JetObject;
+import com.google.common.collect.Sets;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.ConfigurationKind;
@@ -24,9 +24,7 @@ import org.jetbrains.jet.lang.psi.JetPsiUtil;
 import org.jetbrains.jet.lang.resolve.java.PackageClassUtils;
 
 import java.lang.annotation.*;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
 
 public class AnnotationGenTest extends CodegenTestCase {
 
@@ -47,6 +45,13 @@ public class AnnotationGenTest extends CodegenTestCase {
 
     private Class<?> getPackageSrcClass(@NotNull ClassLoader loader) throws ClassNotFoundException {
         return loader.loadClass(PackageCodegen.getPackagePartInternalName(myFiles.getPsiFile()));
+    }
+
+    public void testVolatileProperty() throws Exception {
+        loadText("abstract class Foo { public volatile var x: String = \"\"; }");
+        Class<?> aClass = generateClass("Foo");
+        Field x = aClass.getDeclaredField("x");
+        assertTrue((x.getModifiers() & Modifier.VOLATILE) != 0);
     }
 
     public void testPropField() throws Exception {
@@ -222,17 +227,17 @@ public class AnnotationGenTest extends CodegenTestCase {
         assertNotNull(annotation);
     }
 
-    public void testSimplestAnnotationClass() throws NoSuchFieldException, NoSuchMethodException {
+    public void testSimplestAnnotationClass() {
         loadText("annotation class A");
-        Class aClass = generateClass("A");
+        Class<?> aClass = generateClass("A");
         Class[] interfaces = aClass.getInterfaces();
-        assertEquals(2, interfaces.length);
         assertEquals(0, aClass.getDeclaredMethods().length);
-        Class annotationClass = getCorrespondingClass(Annotation.class);
-        Class jetObjectClass = getCorrespondingClass(JetObject.class);
-        assertTrue(annotationClass == interfaces[0] || annotationClass == interfaces[1]);
-        assertTrue(jetObjectClass == interfaces[0] || jetObjectClass == interfaces[1]);
         assertTrue(aClass.isAnnotation());
+        assertEquals(2, interfaces.length);
+        assertEquals(
+                Sets.newHashSet("java.lang.annotation.Annotation", "kotlin.jvm.internal.KObject"),
+                Sets.newHashSet(interfaces[0].getName(), interfaces[1].getName())
+        );
     }
 
     public void testAnnotationClassWithStringProperty()

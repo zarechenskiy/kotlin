@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2013 JetBrains s.r.o.
+ * Copyright 2010-2014 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,7 @@ import org.jetbrains.jet.lang.resolve.BindingContextUtils
 import org.jetbrains.jet.lang.descriptors.ClassDescriptor
 import org.jetbrains.jet.lang.descriptors.DeclarationDescriptor
 import org.jetbrains.jet.lang.resolve.name.FqNameUnsafe
+import org.jetbrains.jet.lang.resolve.name.isSubpackageOf
 
 private enum class RenameType {
     JAVA_CLASS
@@ -51,6 +52,7 @@ private enum class RenameType {
     KOTLIN_CLASS
     KOTLIN_FUNCTION
     KOTLIN_PROPERTY
+    KOTLIN_PACKAGE
 }
 
 fun JsonObject.getString(name: String): String {
@@ -89,6 +91,7 @@ public abstract class AbstractRenameTest : MultiFileTestCase() {
                 RenameType.KOTLIN_CLASS -> renameKotlinClassTest(renameObject, context)
                 RenameType.KOTLIN_FUNCTION -> renameKotlinFunctionTest(renameObject, context)
                 RenameType.KOTLIN_PROPERTY -> renameKotlinPropertyTest(renameObject, context)
+                RenameType.KOTLIN_PACKAGE -> renameKotlinPackageTest(renameObject, context)
             }
 
             if (hintDirective != null) {
@@ -115,9 +118,6 @@ public abstract class AbstractRenameTest : MultiFileTestCase() {
             val substitution = RenamePsiElementProcessor.forElement(aClass).substituteElementToRename(aClass, null)
 
             RenameProcessor(context.project, substitution, newName, true, true).run()
-
-            PsiDocumentManager.getInstance(context.project).commitAllDocuments()
-            FileDocumentManager.getInstance()?.saveAllDocuments()
         }
     }
 
@@ -135,11 +135,7 @@ public abstract class AbstractRenameTest : MultiFileTestCase() {
             if (method == null) throw IllegalStateException("Method with signature '$methodSignature' wasn't found in class $classFQN")
 
             val substitution = RenamePsiElementProcessor.forElement(method).substituteElementToRename(method, null)
-
             RenameProcessor(context.project, substitution, newName, false, false).run()
-
-            PsiDocumentManager.getInstance(context.project).commitAllDocuments()
-            FileDocumentManager.getInstance()?.saveAllDocuments()
         }
     }
 
@@ -165,6 +161,29 @@ public abstract class AbstractRenameTest : MultiFileTestCase() {
         doRenameInKotlinClass(renameParamsObject, context) { classDescriptor -> classDescriptor }
     }
 
+    private fun renameKotlinPackageTest(renameParamsObject: JsonObject, context: TestContext) {
+        val fqn = FqNameUnsafe(renameParamsObject.getString("fqn")).toSafe()
+        val newName = renameParamsObject.getString("newName")
+        val mainFilePath = renameParamsObject.getNullableString("mainFile") ?: "${getTestDirName(false)}.kt"
+
+        doTest { rootDir, rootAfter ->
+            val mainFile = rootDir.findChild(mainFilePath)!!
+            val document = FileDocumentManager.getInstance()!!.getDocument(mainFile)!!
+            val jetFile = PsiDocumentManager.getInstance(context.project).getPsiFile(document) as JetFile
+
+            val fileFqn = jetFile.getPackageDirective()!!.getFqName()
+            Assert.assertTrue("File '${mainFilePath}' should have package containing ${fqn}", fileFqn.isSubpackageOf(fqn))
+
+            val packageSegment = jetFile.getPackageDirective()!!.getPackageNames()[fqn.pathSegments().size - 1]
+            val segmentReference = packageSegment.getReference()!!
+
+            val psiElement = segmentReference.resolve()!!
+
+            val substitution = RenamePsiElementProcessor.forElement(psiElement).substituteElementToRename(psiElement, null)
+            RenameProcessor(context.project, substitution, newName, true, true).run()
+        }
+    }
+
     private fun doRenameInKotlinClass(renameParamsObject: JsonObject, context: TestContext,
                                       findDescriptorToRename: (ClassDescriptor) -> DeclarationDescriptor
     ) {
@@ -185,9 +204,6 @@ public abstract class AbstractRenameTest : MultiFileTestCase() {
             val substitution = RenamePsiElementProcessor.forElement(psiElement).substituteElementToRename(psiElement, null)
 
             RenameProcessor(context.project, substitution, newName, true, true).run()
-
-            PsiDocumentManager.getInstance(context.project).commitAllDocuments()
-            FileDocumentManager.getInstance()?.saveAllDocuments()
         }
     }
 
@@ -197,7 +213,14 @@ public abstract class AbstractRenameTest : MultiFileTestCase() {
     }
 
     protected fun doTest(action : (VirtualFile, VirtualFile?) -> Unit) {
-        super.doTest(action, getTestDirName(true))
+        super.doTest(
+                { rootDir, rootAfter ->
+                    action(rootDir, rootAfter)
+
+                    PsiDocumentManager.getInstance(getProject()!!).commitAllDocuments()
+                    FileDocumentManager.getInstance()?.saveAllDocuments()
+                },
+                getTestDirName(true))
     }
 
     protected override fun getTestRoot() : String {

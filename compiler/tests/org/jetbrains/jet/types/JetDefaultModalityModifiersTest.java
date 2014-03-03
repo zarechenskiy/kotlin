@@ -67,9 +67,8 @@ public class JetDefaultModalityModifiersTest extends JetLiteFixture {
 
         public void setUp() throws Exception {
             InjectorForTests injector = new InjectorForTests(getProject(), root);
-            KotlinBuiltIns builtIns = injector.getKotlinBuiltIns();
             descriptorResolver = injector.getDescriptorResolver();
-            scope = createScope(builtIns.getBuiltInsPackageScope());
+            scope = createScope(KotlinBuiltIns.getInstance().getBuiltInsPackageScope());
         }
 
         public void tearDown() throws Exception {
@@ -93,7 +92,7 @@ public class JetDefaultModalityModifiersTest extends JetLiteFixture {
             return scope;
         }
 
-        private MutableClassDescriptor createClassDescriptor(ClassKind kind, JetClass aClass) {
+        private ClassDescriptorWithResolutionScopes createClassDescriptor(ClassKind kind, JetClass aClass) {
             MutableClassDescriptor classDescriptor = new MutableClassDescriptor(root, scope, kind, false, Name.identifier(aClass.getName()));
             descriptorResolver.resolveMutableClassDescriptor(aClass, classDescriptor, JetTestUtils.DUMMY_TRACE);
             return classDescriptor;
@@ -101,7 +100,7 @@ public class JetDefaultModalityModifiersTest extends JetLiteFixture {
 
         private void testClassModality(String classDeclaration, ClassKind kind, Modality expectedModality) {
             JetClass aClass = JetPsiFactory.createClass(getProject(), classDeclaration);
-            MutableClassDescriptor classDescriptor = createClassDescriptor(kind, aClass);
+            ClassDescriptorWithResolutionScopes classDescriptor = createClassDescriptor(kind, aClass);
 
             assertEquals(expectedModality, classDescriptor.getModality());
         }
@@ -109,7 +108,7 @@ public class JetDefaultModalityModifiersTest extends JetLiteFixture {
 
         private void testFunctionModality(String classWithFunction, ClassKind kind, Modality expectedFunctionModality) {
             JetClass aClass = JetPsiFactory.createClass(getProject(), classWithFunction);
-            MutableClassDescriptor classDescriptor = createClassDescriptor(kind, aClass);
+            ClassDescriptorWithResolutionScopes classDescriptor = createClassDescriptor(kind, aClass);
 
             List<JetDeclaration> declarations = aClass.getDeclarations();
             JetNamedFunction function = (JetNamedFunction) declarations.get(0);
@@ -122,7 +121,7 @@ public class JetDefaultModalityModifiersTest extends JetLiteFixture {
 
         private void testPropertyModality(String classWithProperty, ClassKind kind, Modality expectedPropertyModality) {
             JetClass aClass = JetPsiFactory.createClass(getProject(), classWithProperty);
-            MutableClassDescriptor classDescriptor = createClassDescriptor(kind, aClass);
+            ClassDescriptorWithResolutionScopes classDescriptor = createClassDescriptor(kind, aClass);
 
             List<JetDeclaration> declarations = aClass.getDeclarations();
             JetProperty property = (JetProperty) declarations.get(0);
@@ -135,7 +134,7 @@ public class JetDefaultModalityModifiersTest extends JetLiteFixture {
 
         private void testPropertyAccessorModality(String classWithPropertyWithAccessor, ClassKind kind, Modality expectedPropertyAccessorModality, boolean isGetter) {
             JetClass aClass = JetPsiFactory.createClass(getProject(), classWithPropertyWithAccessor);
-            MutableClassDescriptor classDescriptor = createClassDescriptor(kind, aClass);
+            ClassDescriptorWithResolutionScopes classDescriptor = createClassDescriptor(kind, aClass);
 
             List<JetDeclaration> declarations = aClass.getDeclarations();
             JetProperty property = (JetProperty) declarations.get(0);

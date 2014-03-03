@@ -20,9 +20,10 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.intellij.psi.PsiElement;
-import jet.Function0;
-import jet.Function1;
-import jet.Unit;
+import kotlin.Function0;
+import kotlin.Function1;
+import kotlin.Unit;
+import kotlin.KotlinPackage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.lang.descriptors.*;
@@ -56,7 +57,7 @@ import static org.jetbrains.jet.lang.resolve.DescriptorUtils.isSyntheticClassObj
 import static org.jetbrains.jet.lang.resolve.ModifiersChecker.*;
 import static org.jetbrains.jet.lang.resolve.name.SpecialNames.getClassObjectName;
 
-public class LazyClassDescriptor extends ClassDescriptorBase implements LazyEntity, ClassDescriptor {
+public class LazyClassDescriptor extends ClassDescriptorBase implements LazyEntity, ClassDescriptorWithResolutionScopes {
     private static final Predicate<JetType> VALID_SUPERTYPE = new Predicate<JetType>() {
         @Override
         public boolean apply(JetType type) {
@@ -83,6 +84,8 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements LazyEnti
     private final NotNullLazyValue<JetScope> scopeForMemberDeclarationResolution;
     private final NotNullLazyValue<JetScope> scopeForPropertyInitializerResolution;
 
+    private final NullableLazyValue<Void> forceResolveAllContents;
+
     public LazyClassDescriptor(
             @NotNull ResolveSession resolveSession,
             @NotNull DeclarationDescriptor containingDeclaration,
@@ -95,6 +98,7 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements LazyEnti
         if (classLikeInfo.getCorrespondingClassOrObject() != null) {
             this.resolveSession.getTrace().record(BindingContext.CLASS, classLikeInfo.getCorrespondingClassOrObject(), this);
         }
+        this.resolveSession.getTrace().record(BindingContext.FQNAME_TO_CLASS_DESCRIPTOR, DescriptorUtils.getFqName(this), this);
 
         this.originalClassInfo = classLikeInfo;
         this.declarationProvider = resolveSession.getDeclarationProviderFactory().getClassMemberDeclarationProvider(classLikeInfo);
@@ -149,6 +153,13 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements LazyEnti
                 return computeScopeForPropertyInitializerResolution();
             }
         });
+        this.forceResolveAllContents = storageManager.createRecursionTolerantNullableLazyValue(new Function0<Void>() {
+            @Override
+            public Void invoke() {
+                doForceResolveAllContents();
+                return null;
+            }
+        }, null);
     }
 
     @NotNull
@@ -157,6 +168,7 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements LazyEnti
         return unsubstitutedMemberScope;
     }
 
+    @Override
     @NotNull
     public JetScope getScopeForClassHeaderResolution() {
         return scopeForClassHeaderResolution.invoke();
@@ -177,6 +189,7 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements LazyEnti
                 getScopeProvider().getResolutionScopeForDeclaration(scopeAnchor));
     }
 
+    @Override
     @NotNull
     public JetScope getScopeForMemberDeclarationResolution() {
         return scopeForMemberDeclarationResolution.invoke();
@@ -200,9 +213,26 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements LazyEnti
                 classObjectAdapterScope);
     }
 
+    @Override
     @NotNull
-    public JetScope getScopeForPropertyInitializerResolution() {
+    public JetScope getScopeForInitializerResolution() {
         return scopeForPropertyInitializerResolution.invoke();
+    }
+
+    @NotNull
+    @Override
+    public Collection<CallableMemberDescriptor> getDeclaredCallableMembers() {
+        //noinspection unchecked
+        return (Collection) KotlinPackage.filter(
+                unsubstitutedMemberScope.getDescriptorsFromDeclaredElements(),
+                new Function1<DeclarationDescriptor, Boolean>() {
+                    @Override
+                    public Boolean invoke(DeclarationDescriptor descriptor) {
+                        return descriptor instanceof CallableMemberDescriptor
+                               && ((CallableMemberDescriptor) descriptor).getKind() != CallableMemberDescriptor.Kind.FAKE_OVERRIDE;
+                    }
+                }
+        );
     }
 
     @NotNull
@@ -319,10 +349,19 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements LazyEnti
 
     @Override
     public void forceResolveAllContents() {
+        forceResolveAllContents.invoke();
+    }
+
+    private void doForceResolveAllContents() {
         ForceResolveUtil.forceResolveAllContents(getAnnotations());
-        getClassObjectDescriptor();
+
+        ClassDescriptor classObjectDescriptor = getClassObjectDescriptor();
+        if (classObjectDescriptor != null) {
+            ForceResolveUtil.forceResolveAllContents(classObjectDescriptor);
+        }
+
         getClassObjectType();
-        getConstructors();
+        ForceResolveUtil.forceResolveAllContents(getConstructors());
         getContainingDeclaration();
         getThisAsReceiverParameter();
         getKind();
@@ -332,7 +371,7 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements LazyEnti
         getScopeForClassHeaderResolution();
         getScopeForMemberDeclarationResolution();
         ForceResolveUtil.forceResolveAllContents(getScopeForMemberLookup());
-        getScopeForPropertyInitializerResolution();
+        getScopeForInitializerResolution();
         getUnsubstitutedInnerClassesScope();
         ForceResolveUtil.forceResolveAllContents(getTypeConstructor());
         getUnsubstitutedPrimaryConstructor();
@@ -344,7 +383,7 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements LazyEnti
                 new Function0<Collection<JetType>>() {
                     @Override
                     public Collection<JetType> invoke() {
-                        if (resolveSession.isClassSpecial(DescriptorUtils.getFqName(LazyClassDescriptor.this))) {
+                        if (KotlinBuiltIns.isSpecialClassWithNoSupertypes(LazyClassDescriptor.this)) {
                             return Collections.emptyList();
                         }
 
@@ -380,7 +419,8 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements LazyEnti
                         findAndDisconnectLoopsInTypeHierarchy(supertypes);
                         return Unit.VALUE;
                     }
-                });
+                }
+        );
 
         private final NotNullLazyValue<List<TypeParameterDescriptor>> parameters = resolveSession.getStorageManager().createLazyValue(new Function0<List<TypeParameterDescriptor>>() {
             @Override
@@ -396,6 +436,15 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements LazyEnti
                 return parameters;
             }
         });
+
+        private final NullableLazyValue<Void> forceResolveAllContents =
+                resolveSession.getStorageManager().createRecursionTolerantNullableLazyValue(new Function0<Void>() {
+                    @Override
+                    public Void invoke() {
+                        doForceResolveAllContents();
+                        return null;
+                    }
+                }, null);
 
         @NotNull
         @Override
@@ -460,9 +509,13 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements LazyEnti
 
         @Override
         public void forceResolveAllContents() {
+            forceResolveAllContents.invoke();
+        }
+
+        private void doForceResolveAllContents() {
             ForceResolveUtil.forceResolveAllContents(getAnnotations());
-            getSupertypes();
-            getParameters();
+            ForceResolveUtil.forceResolveAllContents(getSupertypes());
+            ForceResolveUtil.forceResolveAllContents(getParameters());
         }
     }
 

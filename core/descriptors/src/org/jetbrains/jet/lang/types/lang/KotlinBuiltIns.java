@@ -27,6 +27,7 @@ import org.jetbrains.jet.lang.descriptors.impl.ValueParameterDescriptorImpl;
 import org.jetbrains.jet.lang.resolve.DescriptorUtils;
 import org.jetbrains.jet.lang.resolve.ImportPath;
 import org.jetbrains.jet.lang.resolve.name.FqName;
+import org.jetbrains.jet.lang.resolve.name.FqNameUnsafe;
 import org.jetbrains.jet.lang.resolve.name.Name;
 import org.jetbrains.jet.lang.resolve.scopes.JetScope;
 import org.jetbrains.jet.lang.types.*;
@@ -39,7 +40,7 @@ import static org.jetbrains.jet.lang.types.lang.PrimitiveType.*;
 public class KotlinBuiltIns {
     public static final JetScope STUB = JetScope.EMPTY;
 
-    public static final String BUILT_INS_PACKAGE_NAME_STRING = "jet";
+    public static final String BUILT_INS_PACKAGE_NAME_STRING = "kotlin";
     public static final Name BUILT_INS_PACKAGE_NAME = Name.identifier(BUILT_INS_PACKAGE_NAME_STRING);
     public static final FqName BUILT_INS_PACKAGE_FQ_NAME = FqName.topLevel(BUILT_INS_PACKAGE_NAME);
 
@@ -304,11 +305,6 @@ public class KotlinBuiltIns {
     }
 
     @NotNull
-    public ClassDescriptor getHashable() {
-        return getBuiltInClassByName("Hashable");
-    }
-
-    @NotNull
     public ClassDescriptor getUnit() {
         return getBuiltInClassByName("Unit");
     }
@@ -360,11 +356,6 @@ public class KotlinBuiltIns {
     @NotNull
     public ClassDescriptor getSuppressAnnotationClass() {
         return getBuiltInClassByName("suppress");
-    }
-
-    @NotNull
-    public ClassDescriptor getVolatileAnnotationClass() {
-        return getBuiltInClassByName("volatile");
     }
 
     @NotNull
@@ -507,7 +498,6 @@ public class KotlinBuiltIns {
                 getString(),
                 getCharSequence(),
                 getThrowable(),
-                getBuiltInClassByName("Hashable"),
 
                 getIterator(),
                 getIterable(),
@@ -527,7 +517,6 @@ public class KotlinBuiltIns {
                 getMutableMap(),
                 getMutableMapEntry(),
 
-                getVolatileAnnotationClass(),
                 getDataClassAnnotation(),
                 getAnnotation(),
                 getComparable(),
@@ -893,6 +882,12 @@ public class KotlinBuiltIns {
 
     // Recognized & special
 
+    public static boolean isSpecialClassWithNoSupertypes(@NotNull ClassDescriptor descriptor) {
+        FqNameUnsafe fqName = DescriptorUtils.getFqName(descriptor);
+        return BUILT_INS_PACKAGE_FQ_NAME.child(Name.identifier("Any")).toUnsafe().equals(fqName) ||
+               BUILT_INS_PACKAGE_FQ_NAME.child(Name.identifier("Nothing")).toUnsafe().equals(fqName);
+    }
+
     public boolean isNothing(@NotNull JetType type) {
         return isNothingOrNullableNothing(type)
                && !type.isNullable();
@@ -932,10 +927,6 @@ public class KotlinBuiltIns {
     static boolean containsAnnotation(DeclarationDescriptor descriptor, ClassDescriptor annotationClass) {
         FqName fqName = DescriptorUtils.getFqName(annotationClass).toSafe();
         return descriptor.getOriginal().getAnnotations().findAnnotation(fqName) != null;
-    }
-
-    public boolean isVolatile(@NotNull PropertyDescriptor descriptor) {
-        return containsAnnotation(descriptor, getVolatileAnnotationClass());
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

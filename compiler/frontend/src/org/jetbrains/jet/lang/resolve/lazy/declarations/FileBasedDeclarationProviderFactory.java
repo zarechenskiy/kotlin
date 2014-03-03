@@ -17,13 +17,12 @@
 package org.jetbrains.jet.lang.resolve.lazy.declarations;
 
 import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 import com.google.common.collect.*;
 import com.intellij.psi.NavigatablePsiElement;
 import com.intellij.util.Function;
 import com.intellij.util.containers.ContainerUtil;
-import jet.Function0;
-import jet.Function1;
+import kotlin.Function0;
+import kotlin.Function1;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.lang.psi.JetFile;
@@ -34,7 +33,7 @@ import org.jetbrains.jet.lang.resolve.name.FqName;
 import org.jetbrains.jet.storage.MemoizedFunctionToNullable;
 import org.jetbrains.jet.storage.NotNullLazyValue;
 import org.jetbrains.jet.storage.StorageManager;
-import org.jetbrains.jet.util.QualifiedNamesUtil;
+import org.jetbrains.jet.lang.resolve.name.NamePackage;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -47,24 +46,13 @@ public class FileBasedDeclarationProviderFactory implements DeclarationProviderF
         private final Set<FqName> declaredPackages = Sets.newHashSet();
     }
 
-    private final Predicate<FqName> isPackageDeclaredExternally;
-
     private final StorageManager storageManager;
     private final NotNullLazyValue<Index> index;
 
     private final MemoizedFunctionToNullable<FqName, PackageMemberDeclarationProvider> packageDeclarationProviders;
 
-    public FileBasedDeclarationProviderFactory(@NotNull StorageManager storageManager, @NotNull Collection<JetFile> files) {
-        this(storageManager, files, Predicates.<FqName>alwaysFalse());
-    }
-
-    public FileBasedDeclarationProviderFactory(
-            @NotNull StorageManager storageManager,
-            @NotNull final Collection<JetFile> files,
-            @NotNull Predicate<FqName> isPackageDeclaredExternally
-    ) {
+    public FileBasedDeclarationProviderFactory(@NotNull StorageManager storageManager, @NotNull final Collection<JetFile> files) {
         this.storageManager = storageManager;
-        this.isPackageDeclaredExternally = isPackageDeclaredExternally;
         this.index = storageManager.createLazyValue(new Function0<Index>() {
             @Override
             public Index invoke() {
@@ -122,12 +110,12 @@ public class FileBasedDeclarationProviderFactory implements DeclarationProviderF
 
         Collection<NavigatablePsiElement> resultElements = Lists.newArrayList();
         for (FqName declaredPackage : index.invoke().filesByPackage.keys()) {
-            if (QualifiedNamesUtil.isSubpackageOf(declaredPackage, fqName)) {
+            if (NamePackage.isSubpackageOf(declaredPackage, fqName)) {
                 Collection<JetFile> files = index.invoke().filesByPackage.get(declaredPackage);
                 resultElements.addAll(ContainerUtil.map(files, new Function<JetFile, NavigatablePsiElement>() {
                     @Override
                     public NavigatablePsiElement fun(JetFile file) {
-                        return JetPsiUtil.getPackageReference(file, QualifiedNamesUtil.numberOfSegments(fqName) - 1);
+                        return JetPsiUtil.getPackageReference(file, NamePackage.numberOfSegments(fqName) - 1);
                     }
                 }));
             }
@@ -143,14 +131,12 @@ public class FileBasedDeclarationProviderFactory implements DeclarationProviderF
 
     @Nullable
     public PackageMemberDeclarationProvider createPackageMemberDeclarationProvider(@NotNull FqName packageFqName) {
-        if (!isPackageDeclaredExplicitly(packageFqName)) {
-            if (isPackageDeclaredExternally.apply(packageFqName)) {
-                return EmptyPackageMemberDeclarationProvider.INSTANCE;
-            }
-            return null;
+        if (isPackageDeclaredExplicitly(packageFqName)) {
+            return new FileBasedPackageMemberDeclarationProvider(
+                    storageManager, packageFqName, this, index.invoke().filesByPackage.get(packageFqName));
         }
 
-        return new FileBasedPackageMemberDeclarationProvider(storageManager, packageFqName, this, index.invoke().filesByPackage.get(packageFqName));
+        return null;
     }
 
     @NotNull
