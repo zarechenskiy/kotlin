@@ -6,27 +6,17 @@ import java.util.*
 public fun setOf<T>(vararg values: T): Set<T> = values.toCollection(LinkedHashSet<T>())
 
 /** Returns a new LinkedList with a variable number of initial elements */
-public fun linkedListOf<T>(vararg values: T) : LinkedList<T>  = values.toCollection(LinkedList<T>())
-
-deprecated("Use listOf(...) or linkedListOf(...) instead")
-public fun linkedList<T>(vararg values: T) : LinkedList<T>  = linkedListOf(*values)
+public fun linkedListOf<T>(vararg values: T): LinkedList<T> = values.toCollection(LinkedList<T>())
 
 /**
  * Returns a new [[SortedSet]] with the initial elements
  */
-public fun sortedSetOf<T>(vararg values: T) : TreeSet<T> = values.toCollection(TreeSet<T>())
-
-deprecated("Use sortedSetOf(...) instead")
-public fun sortedSet<T>(vararg values: T) : TreeSet<T> = sortedSetOf(*values)
+public fun sortedSetOf<T>(vararg values: T): TreeSet<T> = values.toCollection(TreeSet<T>())
 
 /**
  * Returns a new [[SortedSet]] with the given *comparator* and the initial elements
  */
-public fun sortedSetOf<T>(comparator: Comparator<T>, vararg values: T) : TreeSet<T> = values.toCollection(TreeSet<T>(comparator))
-
-deprecated("Use sortedSetOf(...) instead")
-public fun sortedSet<T>(comparator: Comparator<T>, vararg values: T) : TreeSet<T> = sortedSetOf(comparator, *values)
-
+public fun sortedSetOf<T>(comparator: Comparator<T>, vararg values: T): TreeSet<T> = values.toCollection(TreeSet<T>(comparator))
 
 /**
  * Returns a new [[SortedMap]] populated with the given pairs where the first value in each pair
@@ -34,20 +24,17 @@ public fun sortedSet<T>(comparator: Comparator<T>, vararg values: T) : TreeSet<T
  *
  * @includeFunctionBody ../../test/MapTest.kt createSortedMap
  */
-public fun <K,V> sortedMapOf(vararg values: Pair<K, V>): SortedMap<K,V> {
-    val answer = TreeMap<K,V>()
+public fun <K, V> sortedMapOf(vararg values: Pair<K, V>): SortedMap<K, V> {
+    val answer = TreeMap<K, V>()
     /**
-        TODO replace by this simpler call when we can pass vararg values into other methods
-        answer.putAll(values)
-    */
+    TODO replace by this simpler call when we can pass vararg values into other methods
+    answer.putAll(values)
+     */
     for (v in values) {
         answer.put(v.first, v.second)
     }
     return answer
 }
-
-deprecated("Use sortedMapOf(...) instead")
-public fun <K,V> sortedMap(vararg values: Pair<K, V>): SortedMap<K,V> = sortedMapOf(*values)
 
 /**
  * Returns a new [[LinkedHashMap]] populated with the given pairs where the first value in each pair
@@ -56,21 +43,18 @@ public fun <K,V> sortedMap(vararg values: Pair<K, V>): SortedMap<K,V> = sortedMa
  *
  * @includeFunctionBody ../../test/MapTest.kt createLinkedMap
  */
-public fun <K,V> linkedMapOf(vararg values: Pair<K, V>): LinkedHashMap<K,V> {
-    val answer = LinkedHashMap<K,V>(values.size)
+public fun <K, V> linkedMapOf(vararg values: Pair<K, V>): LinkedHashMap<K, V> {
+    val answer = LinkedHashMap<K, V>(values.size)
     /**
-        TODO replace by this simpler call when we can pass vararg values into other methods
-        answer.putAll(values)
-    */
+    TODO replace by this simpler call when we can pass vararg values into other methods
+    answer.putAll(values)
+     */
     for (v in values) {
         answer.put(v.first, v.second)
     }
     return answer
 }
 
-deprecated("Use linkedMapOf(...) instead")
-public fun <K,V> linkedMap(vararg values: Pair<K, V>): LinkedHashMap<K,V> = linkedMapOf(*values)
-
 /** Returns the Set if its not null otherwise returns the empty set */
-public fun <T> Set<T>?.orEmpty() : Set<T>
-    = if (this != null) this else Collections.EMPTY_SET as Set<T>
+public fun <T> Set<T>?.orEmpty(): Set<T>
+        = if (this != null) this else Collections.EMPTY_SET as Set<T>
