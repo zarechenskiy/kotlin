@@ -26,7 +26,7 @@ class MemberComments(elements: List<Element>) : WhiteSpaceSeparatedElementList(e
 
 abstract class Member(val comments: MemberComments, val modifiers: Set<Modifier>) : Element {
     fun accessModifier(): Modifier? {
-        return modifiers.firstOrNull { m -> m == Modifier.PUBLIC || m == Modifier.PROTECTED || m == Modifier.PRIVATE }
+        return modifiers.find { m -> m == Modifier.PUBLIC || m == Modifier.PROTECTED || m == Modifier.PRIVATE }
     }
 
     fun isAbstract(): Boolean = modifiers.contains(Modifier.ABSTRACT)
@@ -54,7 +54,7 @@ class ClassMembers(
 fun parseClassMembers(elements: List<Element>): ClassMembers {
     val groups = splitInGroups(elements)
     val constructors = groups.filter { it.member is Constructor }
-    val primaryConstructor = constructors.map { it.member }.firstOrNull { (it as Constructor).isPrimary }
+    val primaryConstructor = constructors.map { it.member }.find { (it as Constructor).isPrimary }
     val secondaryConstructors = constructors.filter { !(it.member as Constructor).isPrimary }
     val nonConstructors = groups.filter { it.member !is Constructor }
     val staticMembers = nonConstructors.filter { it.member.isStatic() }

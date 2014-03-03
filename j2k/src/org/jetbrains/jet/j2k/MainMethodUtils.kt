@@ -65,7 +65,7 @@ private fun isMainClass(psiClass: PsiClass): Boolean {
 }
 
 private fun findMainMethod(mainMethods: Array<PsiMethod>): PsiMethod? {
-    return mainMethods.firstOrNull { isMainMethod(it) }
+    return mainMethods.find { isMainMethod(it) }
 }
 
 fun isMainMethod(method: PsiMethod): Boolean {
