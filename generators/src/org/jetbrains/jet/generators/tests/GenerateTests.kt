@@ -328,6 +328,7 @@ fun main(args: Array<String>) {
         }
 
         testClass(javaClass<AbstractCodeTransformationTest>()) {
+            model("intentions/branched/elvisToIfThen", testMethod = "doTestElvisToIfThen")
             model("intentions/branched/folding/ifToAssignment", testMethod = "doTestFoldIfToAssignment")
             model("intentions/branched/folding/ifToReturn", testMethod = "doTestFoldIfToReturn")
             model("intentions/branched/folding/ifToReturnAsymmetrically", testMethod = "doTestFoldIfToReturnAsymmetrically")
