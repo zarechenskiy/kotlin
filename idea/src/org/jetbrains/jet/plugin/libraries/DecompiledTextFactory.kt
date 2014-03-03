@@ -41,19 +41,17 @@ public fun buildDecompiledText(
     val kind = classFileHeader!!.getKind()
     val packageFqName = classFqName.parent()
 
-    return if (kind == KotlinClassHeader.Kind.PACKAGE_FACADE) {
-        buildDecompiledText(packageFqName, ArrayList(resolver.resolveDeclarationsInPackage(packageFqName)))
-    }
-    else if (kind == KotlinClassHeader.Kind.CLASS) {
-        buildDecompiledText(packageFqName, listOf(resolver.resolveClass(classFqName)).filterNotNull())
-    }
-    else {
-        // TODO: support other header kinds: for trait-impl show the trait, for package fragment - the whole package
-        throw UnsupportedOperationException("Unknown header kind: " + kind)
+    return when (kind) {
+        KotlinClassHeader.Kind.PACKAGE_FACADE ->
+            buildDecompiledText(packageFqName, ArrayList(resolver.resolveDeclarationsInPackage(packageFqName)))
+        KotlinClassHeader.Kind.CLASS ->
+            buildDecompiledText(packageFqName, listOf(resolver.resolveClass(classFqName)).filterNotNull())
+        KotlinClassHeader.Kind.INCOMPATIBLE_ABI_VERSION ->
+            buildDecompiledText(packageFqName, Collections.emptyList(), headerComment = INCOMPATIBLE_VERSION)
+        else -> throw UnsupportedOperationException("Unknown header kind: " + kind)
     }
 }
 
-private val DECOMPILED_COMMENT = "/* compiled code */"
 public val descriptorRendererForDecompiler: DescriptorRenderer = DescriptorRendererBuilder()
         .setWithDefinedIn(false)
         .setClassWithPrimaryConstructor(true)
@@ -64,17 +62,27 @@ public fun descriptorToKey(descriptor: DeclarationDescriptor): String {
     return descriptorRendererForDecompiler.render(descriptor)
 }
 
+
+private val DECOMPILED_COMMENT = "/* compiled code */"
+private val FILE_HEADER = "// IntelliJ API Decompiler stub source generated from a class file\n"
+private val IMPLEMENTATIONS_NOT_AVAILABLE = "// Implementation of methods is not available"
+private val INCOMPATIBLE_VERSION = "// This file has incompatible ABI version and can not be displayed"
+
 private data class DecompiledText(val text: String, val renderedDescriptorsToRange: Map<String, TextRange>)
 
-private fun buildDecompiledText(packageFqName: FqName, descriptors: List<DeclarationDescriptor>): DecompiledText {
+private fun buildDecompiledText(
+        packageFqName: FqName,
+        descriptors: List<DeclarationDescriptor>,
+        headerComment: String = IMPLEMENTATIONS_NOT_AVAILABLE
+): DecompiledText {
     val builder = StringBuilder()
     val renderedDescriptorsToRange = HashMap<String, TextRange>()
 
     fun appendDecompiledTextAndPackageName() {
-        builder.append("// IntelliJ API Decompiler stub source generated from a class file\n" + "// Implementation of methods is not available")
+        builder.append(FILE_HEADER + headerComment)
         builder.append("\n\n")
         if (!packageFqName.isRoot()) {
-            builder.append("package ").append(packageFqName).append("\n\n")
+            builder.append("package $packageFqName\n\n")
         }
     }
 
