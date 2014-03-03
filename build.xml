@@ -13,6 +13,8 @@
   <property name="bootstrap.compiler.home" value="${bootstrap.home}/Kotlin/kotlinc"/>
   <property name="bootstrap.runtime" value="${bootstrap.compiler.home}/lib/kotlin-runtime.jar"/>
 
+  <echo message="Bootstrap kotlin from ${bootstrap.home} (compiler = ${bootstrap.compiler.home}, runtime = ${bootstrap.runtime})"/>
+
   <property name="output.relative" value="dist"/>
   <property name="output" value="${basedir}/${output.relative}"/>
   <property name="kotlin-home" value="${output}/kotlinc"/>
