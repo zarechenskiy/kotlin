@@ -54,7 +54,7 @@ fun PsiElement.removeOverrideModifier() {
             (this as JetModifierListOwner).getModifierList()?.getModifier(JetTokens.OVERRIDE_KEYWORD)?.delete()
         }
         is PsiMethod -> {
-            getModifierList().getAnnotations().firstOrNull {
+            getModifierList().getAnnotations().find {
                 annotation -> annotation.getQualifiedName() == "java.lang.Override"
             }?.delete()
         }
