@@ -192,7 +192,7 @@ class GenericFunction(val signature: String) : Comparable<GenericFunction> {
             if (primitive == null) {
                 val implicitTypeParameters = receiver.dropWhile { it != '<' }.drop(1).takeWhile { it != '>' }.split(",")
                 for (implicit in implicitTypeParameters.reverse()) {
-                    if (types.none { it.startsWith(implicit) }) {
+                    if (!types.any { it.startsWith(implicit) }) {
                         types.add(0, implicit)
                     }
                 }
