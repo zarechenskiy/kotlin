@@ -409,3 +409,13 @@ private fun <T> MutableCollection<T>.addAll(iterator: Iterator<T>) {
 }
 
 private fun String?.isNullOrEmpty() = this == null || this.isEmpty()
+
+// TODO: Remove after migrating to new runtime
+public inline fun <K, V> Map<K,V>.filter(predicate: (Map.Entry<K,V>)->Boolean) : List<Map.Entry<K,V>> {
+    return filterTo(ArrayList<Map.Entry<K,V>>(), predicate)
+}
+
+public inline fun <K, V, C: MutableCollection<in Map.Entry<K,V>>> Map<K,V>.filterTo(collection: C, predicate: (Map.Entry<K,V>) -> Boolean) : C {
+    for (element in this) if (predicate(element)) collection.add(element)
+    return collection
+}

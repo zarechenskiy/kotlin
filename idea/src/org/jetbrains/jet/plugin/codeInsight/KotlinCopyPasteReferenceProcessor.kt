@@ -360,9 +360,9 @@ public class KotlinCopyPasteReferenceProcessor() : CopyPastePostProcessor<Refere
 private val ReferenceData.fqName: FqName
     get() = FqName(qClassName!!)
 
-private fun zip(first: IntArray, second: IntArray): List<Pair<Int, Int>> {
+private fun zip(first: IntArray, second: IntArray): Iterable<Pair<Int, Int>> {
     assert(first.size == second.size)
-    return first.zip(second.toList())
+    return first.toList().zip_tmp(second.toList())
 }
 
 private fun PsiElement.isInCopiedArea(fileCopiedFrom: JetFile, startOffsets: IntArray, endOffsets: IntArray): Boolean {
