@@ -25,11 +25,11 @@ public class StdLibTestToJSTest extends StdLibTestBase {
                           "dom/DomTest.kt",
                           "js/MapJsTest.kt",
                           "js/JsDomTest.kt",
-                          "collections/FunctionIteratorTest.kt",
+                          "collections/StreamTest.kt",
                           "collections/IteratorsTest.kt",
                           "GetOrElseTest.kt",
-                          "collections/ListTest.kt",
-                          "collections/SetTest.kt",
+                          "collections/ListSpecificTest.kt",
+                          "collections/IterableTests.kt",
                           "text/StringTest.kt");
     }
 }

@@ -2,50 +2,33 @@ package test.collections
 
 import org.junit.Test
 import kotlin.test.*
+import java.util.*
 
-class SetTest : IterableBaseTests<Set<String>>(setOf("foo", "bar"), setOf<String>())
-class ListTest : IterableBaseTests<List<String>>(listOf("foo", "bar"), listOf<String>())
+class SetTest : IterableTests<Set<String>>(hashSetOf("foo", "bar"), hashSetOf<String>())
+class ListTest : OrderedIterableTests<List<String>>(listOf("foo", "bar"), listOf<String>())
+class ArrayListTest : OrderedIterableTests<ArrayList<String>>(arrayListOf("foo", "bar"), arrayListOf<String>())
 
-abstract class IterableBaseTests<T : Iterable<String>>(val data: T, val empty: T) {
-    Test fun any() {
-        expect(true) { data.any { it.startsWith("f") } }
-        expect(false) { data.any { it.startsWith("x") } }
-        expect(false) { empty.any { it.startsWith("x") } }
+abstract class OrderedIterableTests<T : Iterable<String>>(data: T, empty: T) : IterableTests<T>(data, empty) {
+    Test fun indexOf() {
+        expect(0) { data.indexOf("foo") }
+        expect(-1) { empty.indexOf("foo") }
+        expect(1) { data.indexOf("bar") }
+        expect(-1) { data.indexOf("zap") }
     }
 
-    Test fun all() {
-        expect(true) { data.all { it.length == 3 } }
-        expect(false) { data.all { it.startsWith("b") } }
-        expect(true) { empty.all { it.startsWith("b") } }
+    Test fun lastIndexOf() {
+        expect(0) { data.lastIndexOf("foo") }
+        expect(-1) { empty.lastIndexOf("foo") }
+        expect(1) { data.lastIndexOf("bar") }
+        expect(-1) { data.lastIndexOf("zap") }
     }
 
-    Test fun none() {
-        expect(false) { data.none { it.length == 3 } }
-        expect(false) { data.none { it.startsWith("b") } }
-        expect(true) { data.none { it.startsWith("x") } }
-        expect(true) { empty.none { it.startsWith("b") } }
-    }
-
-    Test fun filter() {
-        val foo = data.filter { it.startsWith("f") }
-        expect(true) { foo is List<String> }
-        expect(true) { foo.all { it.startsWith("f") } }
-        expect(1) { foo.size }
-        assertEquals(setOf("foo"), foo.toSet())
-    }
-
-    Test fun filterNot() {
-        val notFoo = data.filterNot { it.startsWith("f") }
-        expect(true) { notFoo is List<String> }
-        expect(true) { notFoo.none { it.startsWith("f") } }
-        expect(1) { notFoo.size }
-        assertEquals(setOf("bar"), notFoo.toSet())
-    }
-
-    Test fun forEach() {
-        var count = 0
-        data.forEach { count += it.length }
-        assertEquals(6, count)
+    Test fun elementAt() {
+        expect("foo") { data.elementAt(0) }
+        expect("bar") { data.elementAt(1) }
+        fails { data.elementAt(2) }
+        fails { data.elementAt(-1) }
+        fails { empty.elementAt(0) }
     }
 
     Test fun first() {
@@ -83,28 +66,48 @@ abstract class IterableBaseTests<T : Iterable<String>>(val data: T, val empty: T
         expect(null) { empty.lastOrNull() }
         expect("foo") { data.lastOrNull { it.startsWith("f") } }
     }
+}
 
-    Test fun elementAt() {
-        expect("foo") { data.elementAt(0) }
-        expect("bar") { data.elementAt(1) }
-        fails { data.elementAt(2) }
-        fails { data.elementAt(-1) }
-        fails { empty.elementAt(0) }
-
+abstract class IterableTests<T : Iterable<String>>(val data: T, val empty: T) {
+    Test fun any() {
+        expect(true) { data.any { it.startsWith("f") } }
+        expect(false) { data.any { it.startsWith("x") } }
+        expect(false) { empty.any { it.startsWith("x") } }
     }
 
-    Test fun indexOf() {
-        expect(0) { data.indexOf("foo") }
-        expect(-1) { empty.indexOf("foo") }
-        expect(1) { data.indexOf("bar") }
-        expect(-1) { data.indexOf("zap") }
+    Test fun all() {
+        expect(true) { data.all { it.length == 3 } }
+        expect(false) { data.all { it.startsWith("b") } }
+        expect(true) { empty.all { it.startsWith("b") } }
     }
 
-    Test fun lastIndexOf() {
-        expect(0) { data.lastIndexOf("foo") }
-        expect(-1) { empty.lastIndexOf("foo") }
-        expect(1) { data.lastIndexOf("bar") }
-        expect(-1) { data.lastIndexOf("zap") }
+    Test fun none() {
+        expect(false) { data.none { it.length == 3 } }
+        expect(false) { data.none { it.startsWith("b") } }
+        expect(true) { data.none { it.startsWith("x") } }
+        expect(true) { empty.none { it.startsWith("b") } }
+    }
+
+    Test fun filter() {
+        val foo = data.filter { it.startsWith("f") }
+        expect(true) { foo is List<String> }
+        expect(true) { foo.all { it.startsWith("f") } }
+        expect(1) { foo.size }
+        assertEquals(listOf("foo"), foo.toList())
+    }
+
+    Test fun filterNot() {
+        val notFoo = data.filterNot { it.startsWith("f") }
+        expect(true) { notFoo is List<String> }
+        expect(true) { notFoo.none { it.startsWith("f") } }
+        expect(1) { notFoo.size }
+        assertEquals(listOf("bar"), notFoo.toList())
+    }
+
+    Test fun forEach() {
+        var count = 0
+        data.forEach { count += it.length }
+        assertEquals(6, count)
     }
 
     Test fun contains() {
