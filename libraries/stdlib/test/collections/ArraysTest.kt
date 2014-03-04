@@ -170,6 +170,16 @@ class ArraysTest {
         assertEquals(listOf("1","2","3","4"), listOf("1", "2") + array("3", "4"))
     }
 
+    test fun first() {
+        expect(1) { array(1,2,3).first() }
+        expect(2) { array(1,2,3).first { it % 2 == 0 } }
+    }
+
+    test fun last() {
+        expect(3) { array(1,2,3).last() }
+        expect(2) { array(1,2,3).last { it % 2 == 0 } }
+    }
+
     test fun contains() {
         assertTrue(array("1","2","3","4").contains("2"))
         assertTrue("3" in array("1","2","3","4"))
