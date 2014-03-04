@@ -18,6 +18,20 @@ public fun <T, S> Iterable<T>.zip_tmp(second: Iterable<S>): Iterable<Pair<T, S>>
     return list
 }
 
+public fun <T, R> Iterator<T>.map_tmp(transform : (T) -> R) : Iterator<R> {
+    return MapIterator_tmp<T, R>(this, transform)
+}
+
+class MapIterator_tmp<T, R>(val iterator : Iterator<T>, val transform: (T) -> R) : AbstractIterator<R>() {
+    override protected fun computeNext() : Unit {
+        if (iterator.hasNext()) {
+            setNext((transform)(iterator.next()))
+        } else {
+            done()
+        }
+    }
+}
+
 public fun <T> Iterable<T>.withIndices_tmp() : Iterator<Pair<Int, T>> {
     return IndexIterator_tmp(iterator())
 }

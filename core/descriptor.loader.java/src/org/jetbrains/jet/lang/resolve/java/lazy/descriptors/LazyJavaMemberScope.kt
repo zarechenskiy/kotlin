@@ -166,7 +166,7 @@ public abstract class LazyJavaMemberScope(
             function: FunctionDescriptor,
             jValueParameters: List<JavaValueParameter>
     ): List<ValueParameterDescriptor> {
-        return jValueParameters.withIndices_tmp().map {
+        return jValueParameters.withIndices_tmp().map_tmp {
             pair ->
             val (index, javaParameter) = pair
 
