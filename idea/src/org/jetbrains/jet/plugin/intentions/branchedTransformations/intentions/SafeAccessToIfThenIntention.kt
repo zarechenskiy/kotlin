@@ -39,7 +39,7 @@ public class SafeAccessToIfThenIntention : JetSelfTargetingIntention<JetSafeQual
         val selector = JetPsiUtil.deparenthesize(element.getSelectorExpression())
 
         val dotQualifiedExpression = if (receiver is JetBinaryExpression)
-            JetPsiFactory.createExpression(element.getProject(), "(${receiver!!.getText()}).${selector!!.getText()}")
+            JetPsiFactory.createExpression(element.getProject(), "(${receiver.getText()}).${selector!!.getText()}")
         else
             JetPsiFactory.createExpression(element.getProject(), "${receiver!!.getText()}.${selector!!.getText()}")
 

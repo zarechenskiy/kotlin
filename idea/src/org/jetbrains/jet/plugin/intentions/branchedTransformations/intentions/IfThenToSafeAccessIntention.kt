@@ -23,12 +23,12 @@ import org.jetbrains.jet.lang.psi.JetExpression
 import org.jetbrains.jet.lang.psi.JetIfExpression
 import org.jetbrains.jet.lang.psi.JetBinaryExpression
 import org.jetbrains.jet.lang.psi.JetDotQualifiedExpression
-import org.jetbrains.jet.lang.psi.JetElement
 import org.jetbrains.jet.lexer.JetTokens
 import org.jetbrains.jet.plugin.intentions.branchedTransformations.getExpressionFromClause
 import org.jetbrains.jet.plugin.intentions.branchedTransformations.comparesNonNullToNull
 import org.jetbrains.jet.plugin.intentions.branchedTransformations.getNonNullExpression
 import org.jetbrains.jet.plugin.intentions.branchedTransformations.isNullOrEmpty
+import org.jetbrains.jet.plugin.intentions.branchedTransformations.replace
 
 public class IfThenToSafeAccessIntention : JetSelfTargetingIntention<JetIfExpression>("if.then.to.safe.access", javaClass()) {
 
@@ -42,17 +42,17 @@ public class IfThenToSafeAccessIntention : JetSelfTargetingIntention<JetIfExpres
         if (receiverExpression == null) return false
 
         return when (condition.getOperationToken()) {
-            JetTokens.EQEQ ->
-                thenClause?.isNullOrEmpty() ?: true &&
-                elseClause != null && clauseHasDotQualifiedExpressionForReceiver(elseClause, receiverExpression)
+                   JetTokens.EQEQ ->
+                       thenClause?.isNullOrEmpty() ?: true &&
+                       elseClause != null && clauseHasDotQualifiedExpressionForReceiver(elseClause, receiverExpression)
 
-            JetTokens.EXCLEQ ->
-                thenClause != null && clauseHasDotQualifiedExpressionForReceiver(thenClause, receiverExpression)
-                && elseClause?.isNullOrEmpty() ?: true
+                   JetTokens.EXCLEQ ->
+                       elseClause?.isNullOrEmpty() ?: true &&
+                       thenClause != null && clauseHasDotQualifiedExpressionForReceiver(thenClause, receiverExpression)
 
-            else -> false
-
-        }
+                   else ->
+                       false
+               }
     }
 
     override fun applyTo(element: JetIfExpression, editor: Editor) {
@@ -72,25 +72,23 @@ public class IfThenToSafeAccessIntention : JetSelfTargetingIntention<JetIfExpres
                         findSelectorExpressionFromClause(thenClause, receiverExpression)
                     }
 
-                    else -> throw IllegalStateException("Operation token must be either null or not null")
+                    else ->
+                        throw IllegalStateException("Operation token must be either null or not null")
                 }
 
         val resultingExprString = "${receiverExpression.getText()}?.${selectorExpression?.getText()}"
-        element.replace(JetPsiFactory.createExpression(element.getProject(), resultingExprString))
+        element.replace(resultingExprString)
     }
 
-    fun clauseHasDotQualifiedExpressionForReceiver(clause: JetElement, receiverExpression: JetExpression): Boolean =
-            findSelectorExpressionFromClause(clause as JetExpression, receiverExpression) != null
+    // TODO: rename?
+    fun clauseHasDotQualifiedExpressionForReceiver(clause: JetExpression, receiverExpression: JetExpression): Boolean =
+            findSelectorExpressionFromClause(clause, receiverExpression) != null
 
     fun findSelectorExpressionFromClause(clause: JetExpression, receiverExpression: JetExpression): JetExpression? {
         val expression = clause.getExpressionFromClause() as? JetDotQualifiedExpression
-        return if (expression?.getReceiverExpression()?.getText() == receiverExpression.getText()) {
-            expression?.getSelectorExpression()
-        }
-        else {
-            null
-        }
+
+        if (expression?.getReceiverExpression()?.getText() != receiverExpression.getText()) return null
+
+        return expression?.getSelectorExpression()
     }
-
-
 }

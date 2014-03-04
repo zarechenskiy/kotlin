@@ -35,6 +35,7 @@ public class ElvisToIfThenIntention : JetSelfTargetingIntention<JetBinaryExpress
     override fun applyTo(element: JetBinaryExpression, editor: Editor) {
         val lhs = checkNotNull(JetPsiUtil.deparenthesize(element.getLeft()), "Left hand side of elvis expression cannot be null")
         val rhs = checkNotNull(JetPsiUtil.deparenthesize(element.getRight()), "Right hand side of elvis expression cannot be null")
+
         val context = AnalyzerFacadeWithCache.getContextForElement(lhs)
         val descriptor = BindingContextUtils.extractVariableDescriptorIfAny(context, lhs, false)
 

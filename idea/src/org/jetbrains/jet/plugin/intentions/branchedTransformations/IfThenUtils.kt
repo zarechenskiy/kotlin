@@ -31,6 +31,7 @@ import org.jetbrains.jet.lang.resolve.BindingContext
 import org.jetbrains.jet.lang.resolve.BindingContext.EXPECTED_EXPRESSION_TYPE
 import org.jetbrains.jet.plugin.project.AnalyzerFacadeWithCache
 import org.jetbrains.jet.lang.types.lang.KotlinBuiltIns
+import com.intellij.psi.PsiElement
 
 fun JetBinaryExpression.comparesNonNullToNull(): Boolean {
     val operationToken = this.getOperationToken()
@@ -49,11 +50,14 @@ fun JetExpression.getExpressionFromClause(): JetExpression? {
         is JetBlockExpression ->
             if (innerExpression.getStatements().size() == 1)
                 return JetPsiUtil.deparenthesize(innerExpression.getStatements().first as? JetExpression)
-            else null
+            else
+                null
 
-        null -> null
+        null ->
+            null
 
-        else -> innerExpression
+        else ->
+            innerExpression
     }
 
 }
@@ -67,16 +71,13 @@ fun JetSafeQualifiedExpression.returnValueIsChecked(context: BindingContext): Bo
     return !isUnit && !isStatement
 }
 
-fun JetSafeQualifiedExpression.isStatement(): Boolean {
-    val context = AnalyzerFacadeWithCache.getContextForElement(this)
-    val isStatement = context.get(BindingContext.STATEMENT, this) ?: false
-    return isStatement
-}
-
 fun JetBinaryExpression.getNonNullExpression(): JetExpression? = when {
-    this.getLeft()?.evaluatesToNull() == false -> this.getLeft()
-    this.getRight()?.evaluatesToNull() == false -> this.getRight()
-    else -> null
+    this.getLeft()?.evaluatesToNull() == false ->
+        this.getLeft()
+    this.getRight()?.evaluatesToNull() == false ->
+        this.getRight()
+    else ->
+        null
 }
 
 fun JetExpression.evaluatesToNull(): Boolean = this.getExpressionFromClause()?.getText() == "null"
@@ -97,8 +98,7 @@ fun JetExpression.convertToIfStatement(conditionLhs: JetExpression, thenClause: 
     val elseBranch = if (elseClause == null) "" else " else ${elseClause.getText()}"
     val conditionalString = "if (${conditionLhs.getText()} != null) ${thenClause.getText()}$elseBranch"
 
-    val resultingExpression = JetPsiFactory.createExpression(this.getProject(), conditionalString)
-    val st = this.replace(resultingExpression) as JetExpression
+    val st = this.replace(conditionalString) as JetExpression
     return JetPsiUtil.deparenthesize(st) as JetIfExpression
 }
 
@@ -107,3 +107,5 @@ fun JetIfExpression.introduceValueForCondition(occurrenceInThenClause: JetExpres
     JetIntroduceVariableHandler.doRefactoring(project, editor, occurrenceInConditional, listOf(occurrenceInConditional, occurrenceInThenClause))
 }
 
+fun PsiElement.replace(expressionAsString: String): PsiElement =
+        this.replace(JetPsiFactory.createExpression(this.getProject(), expressionAsString))

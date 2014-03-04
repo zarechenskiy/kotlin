@@ -28,6 +28,7 @@ import org.jetbrains.jet.plugin.intentions.branchedTransformations.evaluatesTo
 import org.jetbrains.jet.plugin.intentions.branchedTransformations.comparesNonNullToNull
 import org.jetbrains.jet.plugin.intentions.branchedTransformations.getNonNullExpression
 import org.jetbrains.jet.plugin.intentions.branchedTransformations.doesNotEvaluateToNullOrUnit
+import org.jetbrains.jet.plugin.intentions.branchedTransformations.replace
 
 public class IfThenToElvisIntention : JetSelfTargetingIntention<JetIfExpression>("if.then.to.elvis", javaClass()) {
 
@@ -35,20 +36,20 @@ public class IfThenToElvisIntention : JetSelfTargetingIntention<JetIfExpression>
         val condition = element.getCondition()
         val thenClause = element.getThen()
         val elseClause = element.getElse()
-        if (thenClause == null || elseClause == null || condition !is JetBinaryExpression ||
-        !condition.comparesNonNullToNull()) return false
+        if (thenClause == null || elseClause == null || condition !is JetBinaryExpression || !condition.comparesNonNullToNull()) return false
 
         val expression = condition.getNonNullExpression()
         if (expression == null) return false
 
         return when (condition.getOperationToken()) {
-            JetTokens.EQEQ -> thenClause.doesNotEvaluateToNullOrUnit() && elseClause.evaluatesTo(expression)
-            JetTokens.EXCLEQ -> elseClause.doesNotEvaluateToNullOrUnit() && thenClause.evaluatesTo(expression)
-            else -> false
-        }
+                   JetTokens.EQEQ -> thenClause.doesNotEvaluateToNullOrUnit() && elseClause.evaluatesTo(expression)
+                   JetTokens.EXCLEQ -> elseClause.doesNotEvaluateToNullOrUnit() && thenClause.evaluatesTo(expression)
+                   else -> false
+               }
     }
 
     private data class Elvis(val lhs: JetExpression, val rhs: JetExpression)
+
     override fun applyTo(element: JetIfExpression, editor: Editor) {
         val condition = element.getCondition() as JetBinaryExpression
 
@@ -57,15 +58,14 @@ public class IfThenToElvisIntention : JetSelfTargetingIntention<JetIfExpression>
         val thenExpression = checkNotNull(thenClause.getExpressionFromClause(), "Then clause must contain expression")
         val elseExpression = checkNotNull(elseClause.getExpressionFromClause(), "Else clause must contain expression")
 
-        val (lhs, rhs) = when(condition.getOperationToken()) {
-            JetTokens.EQEQ -> Elvis(elseExpression, thenExpression)
-            JetTokens.EXCLEQ -> Elvis(thenExpression, elseExpression)
-            else -> throw IllegalStateException("Operation token must be either null or not null")
-        }
+        val (lhs, rhs) =
+                when(condition.getOperationToken()) {
+                    JetTokens.EQEQ -> Elvis(elseExpression, thenExpression)
+                    JetTokens.EXCLEQ -> Elvis(thenExpression, elseExpression)
+                    else -> throw IllegalStateException("Operation token must be either null or not null")
+                }
 
         val resultingExprString = "${lhs.getText()} ?: ${rhs.getText()}"
-        element.replace(JetPsiFactory.createExpression(element.getProject(), resultingExprString))
+        element.replace(resultingExprString)
     }
-
-
 }
