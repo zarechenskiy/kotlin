@@ -100,6 +100,13 @@ abstract class IterableBaseTests<T : Iterable<String>>(val data: T, val empty: T
         expect(-1) { data.indexOf("zap") }
     }
 
+    Test fun lastIndexOf() {
+        expect(0) { data.lastIndexOf("foo") }
+        expect(-1) { empty.lastIndexOf("foo") }
+        expect(1) { data.lastIndexOf("bar") }
+        expect(-1) { data.lastIndexOf("zap") }
+    }
+
     Test fun contains() {
         assertTrue(data.contains("foo"))
         assertTrue("bar" in data)

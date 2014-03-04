@@ -58,6 +58,53 @@ fun elements(): List<GenericFunction> {
         }
     }
 
+    templates add f("lastIndexOf(element: T)") {
+        doc { "Returns last index of *element*, or -1 if the collection does not contain element" }
+        returns("Int")
+        body {
+            """
+            var lastIndex = -1
+            var index = 0
+            for (item in this) {
+                if (element == item)
+                    lastIndex = index
+                index++
+            }
+            return lastIndex
+            """
+        }
+
+        include(Lists)
+        body(Lists, ArraysOfObjects) {
+            """
+            if (element == null) {
+                for (index in indices.reverse()) {
+                    if (this[index] == null) {
+                        return index
+                    }
+                }
+            } else {
+                for (index in indices.reverse()) {
+                    if (element == this[index]) {
+                        return index
+                    }
+                }
+            }
+            return -1
+           """
+        }
+        body(ArraysOfPrimitives) {
+            """
+            for (index in indices.reverse()) {
+                if (element == this[index]) {
+                    return index
+                }
+            }
+            return -1
+           """
+        }
+    }
+
     templates add f("elementAt(index : Int)") {
         doc { "Returns element at given *index*" }
         returns("T")

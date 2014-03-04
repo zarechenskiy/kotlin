@@ -1099,6 +1099,182 @@ public fun <T> Stream<T>.last(predicate: (T) -> Boolean) : T {
 }
 
 /**
+ * Returns last index of *element*, or -1 if the collection does not contain element
+ */
+public fun <T> Array<out T>.lastIndexOf(element: T) : Int {
+    if (element == null) {
+        for (index in indices.reverse()) {
+            if (this[index] == null) {
+                return index
+            }
+        }
+    } else {
+        for (index in indices.reverse()) {
+            if (element == this[index]) {
+                return index
+            }
+        }
+    }
+    return -1
+    
+}
+
+/**
+ * Returns last index of *element*, or -1 if the collection does not contain element
+ */
+public fun BooleanArray.lastIndexOf(element: Boolean) : Int {
+    for (index in indices.reverse()) {
+        if (element == this[index]) {
+            return index
+        }
+    }
+    return -1
+    
+}
+
+/**
+ * Returns last index of *element*, or -1 if the collection does not contain element
+ */
+public fun ByteArray.lastIndexOf(element: Byte) : Int {
+    for (index in indices.reverse()) {
+        if (element == this[index]) {
+            return index
+        }
+    }
+    return -1
+    
+}
+
+/**
+ * Returns last index of *element*, or -1 if the collection does not contain element
+ */
+public fun CharArray.lastIndexOf(element: Char) : Int {
+    for (index in indices.reverse()) {
+        if (element == this[index]) {
+            return index
+        }
+    }
+    return -1
+    
+}
+
+/**
+ * Returns last index of *element*, or -1 if the collection does not contain element
+ */
+public fun DoubleArray.lastIndexOf(element: Double) : Int {
+    for (index in indices.reverse()) {
+        if (element == this[index]) {
+            return index
+        }
+    }
+    return -1
+    
+}
+
+/**
+ * Returns last index of *element*, or -1 if the collection does not contain element
+ */
+public fun FloatArray.lastIndexOf(element: Float) : Int {
+    for (index in indices.reverse()) {
+        if (element == this[index]) {
+            return index
+        }
+    }
+    return -1
+    
+}
+
+/**
+ * Returns last index of *element*, or -1 if the collection does not contain element
+ */
+public fun IntArray.lastIndexOf(element: Int) : Int {
+    for (index in indices.reverse()) {
+        if (element == this[index]) {
+            return index
+        }
+    }
+    return -1
+    
+}
+
+/**
+ * Returns last index of *element*, or -1 if the collection does not contain element
+ */
+public fun LongArray.lastIndexOf(element: Long) : Int {
+    for (index in indices.reverse()) {
+        if (element == this[index]) {
+            return index
+        }
+    }
+    return -1
+    
+}
+
+/**
+ * Returns last index of *element*, or -1 if the collection does not contain element
+ */
+public fun ShortArray.lastIndexOf(element: Short) : Int {
+    for (index in indices.reverse()) {
+        if (element == this[index]) {
+            return index
+        }
+    }
+    return -1
+    
+}
+
+/**
+ * Returns last index of *element*, or -1 if the collection does not contain element
+ */
+public fun <T> Iterable<T>.lastIndexOf(element: T) : Int {
+    var lastIndex = -1
+    var index = 0
+    for (item in this) {
+        if (element == item)
+            lastIndex = index
+        index++
+    }
+    return lastIndex
+    
+}
+
+/**
+ * Returns last index of *element*, or -1 if the collection does not contain element
+ */
+public fun <T> List<T>.lastIndexOf(element: T) : Int {
+    if (element == null) {
+        for (index in indices.reverse()) {
+            if (this[index] == null) {
+                return index
+            }
+        }
+    } else {
+        for (index in indices.reverse()) {
+            if (element == this[index]) {
+                return index
+            }
+        }
+    }
+    return -1
+    
+}
+
+/**
+ * Returns last index of *element*, or -1 if the collection does not contain element
+ */
+public fun <T> Stream<T>.lastIndexOf(element: T) : Int {
+    var lastIndex = -1
+    var index = 0
+    for (item in this) {
+        if (element == item)
+            lastIndex = index
+        index++
+    }
+    return lastIndex
+    
+}
+
+/**
  * Returns last element, or null if collection is empty
  */
 public fun <T> Array<out T>.lastOrNull() : T? {
