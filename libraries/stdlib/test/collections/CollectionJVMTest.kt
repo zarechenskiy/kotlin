@@ -73,8 +73,7 @@ class CollectionJVMTest {
         }
     }
 
-    //todo after KT-1873 the name might be returned to 'last'
-    test fun lastElement() {
+    test fun last() {
         val data = arrayListOf("foo", "bar")
         assertEquals("bar", data.last())
         assertEquals(25, arrayListOf(15, 19, 20, 25).last())
