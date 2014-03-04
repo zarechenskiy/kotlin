@@ -1278,7 +1278,7 @@ public fun <T> Stream<T>.lastIndexOf(element: T) : Int {
  * Returns last element, or null if collection is empty
  */
 public fun <T> Array<out T>.lastOrNull() : T? {
-    return return if (size > 0) this[size - 1] else null
+    return if (size > 0) this[size - 1] else null
     
 }
 
@@ -1286,7 +1286,7 @@ public fun <T> Array<out T>.lastOrNull() : T? {
  * Returns last element, or null if collection is empty
  */
 public fun BooleanArray.lastOrNull() : Boolean? {
-    return return if (size > 0) this[size - 1] else null
+    return if (size > 0) this[size - 1] else null
     
 }
 
@@ -1294,7 +1294,7 @@ public fun BooleanArray.lastOrNull() : Boolean? {
  * Returns last element, or null if collection is empty
  */
 public fun ByteArray.lastOrNull() : Byte? {
-    return return if (size > 0) this[size - 1] else null
+    return if (size > 0) this[size - 1] else null
     
 }
 
@@ -1302,7 +1302,7 @@ public fun ByteArray.lastOrNull() : Byte? {
  * Returns last element, or null if collection is empty
  */
 public fun CharArray.lastOrNull() : Char? {
-    return return if (size > 0) this[size - 1] else null
+    return if (size > 0) this[size - 1] else null
     
 }
 
@@ -1310,7 +1310,7 @@ public fun CharArray.lastOrNull() : Char? {
  * Returns last element, or null if collection is empty
  */
 public fun DoubleArray.lastOrNull() : Double? {
-    return return if (size > 0) this[size - 1] else null
+    return if (size > 0) this[size - 1] else null
     
 }
 
@@ -1318,7 +1318,7 @@ public fun DoubleArray.lastOrNull() : Double? {
  * Returns last element, or null if collection is empty
  */
 public fun FloatArray.lastOrNull() : Float? {
-    return return if (size > 0) this[size - 1] else null
+    return if (size > 0) this[size - 1] else null
     
 }
 
@@ -1326,7 +1326,7 @@ public fun FloatArray.lastOrNull() : Float? {
  * Returns last element, or null if collection is empty
  */
 public fun IntArray.lastOrNull() : Int? {
-    return return if (size > 0) this[size - 1] else null
+    return if (size > 0) this[size - 1] else null
     
 }
 
@@ -1334,7 +1334,7 @@ public fun IntArray.lastOrNull() : Int? {
  * Returns last element, or null if collection is empty
  */
 public fun LongArray.lastOrNull() : Long? {
-    return return if (size > 0) this[size - 1] else null
+    return if (size > 0) this[size - 1] else null
     
 }
 
@@ -1342,7 +1342,7 @@ public fun LongArray.lastOrNull() : Long? {
  * Returns last element, or null if collection is empty
  */
 public fun ShortArray.lastOrNull() : Short? {
-    return return if (size > 0) this[size - 1] else null
+    return if (size > 0) this[size - 1] else null
     
 }
 
@@ -1369,7 +1369,7 @@ public fun <T> Iterable<T>.lastOrNull() : T? {
  * Returns last element, or null if collection is empty
  */
 public fun <T> List<T>.lastOrNull() : T? {
-    return return if (size > 0) this[size - 1] else null
+    return if (size > 0) this[size - 1] else null
     
 }
 

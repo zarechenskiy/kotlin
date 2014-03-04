@@ -249,9 +249,10 @@ fun elements(): List<GenericFunction> {
             }
             """
         }
+        include(Lists)
         body(Lists, ArraysOfObjects, ArraysOfPrimitives) {
             """
-            return return if (size > 0) this[size - 1] else null
+            return if (size > 0) this[size - 1] else null
             """
         }
     }
