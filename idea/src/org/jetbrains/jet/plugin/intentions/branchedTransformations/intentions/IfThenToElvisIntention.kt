@@ -23,11 +23,11 @@ import org.jetbrains.jet.lang.psi.JetExpression
 import org.jetbrains.jet.lang.psi.JetIfExpression
 import org.jetbrains.jet.lang.psi.JetBinaryExpression
 import org.jetbrains.jet.lexer.JetTokens
-import org.jetbrains.jet.plugin.intentions.branchedTransformations.getExpressionFromClause
+import org.jetbrains.jet.plugin.intentions.branchedTransformations.extractExpressionIfSingle
 import org.jetbrains.jet.plugin.intentions.branchedTransformations.evaluatesTo
 import org.jetbrains.jet.plugin.intentions.branchedTransformations.comparesNonNullToNull
 import org.jetbrains.jet.plugin.intentions.branchedTransformations.getNonNullExpression
-import org.jetbrains.jet.plugin.intentions.branchedTransformations.doesNotEvaluateToNullOrUnit
+import org.jetbrains.jet.plugin.intentions.branchedTransformations.isNotNullExpression
 import org.jetbrains.jet.plugin.intentions.branchedTransformations.replace
 
 public class IfThenToElvisIntention : JetSelfTargetingIntention<JetIfExpression>("if.then.to.elvis", javaClass()) {
@@ -42,8 +42,8 @@ public class IfThenToElvisIntention : JetSelfTargetingIntention<JetIfExpression>
         if (expression == null) return false
 
         return when (condition.getOperationToken()) {
-                   JetTokens.EQEQ -> thenClause.doesNotEvaluateToNullOrUnit() && elseClause.evaluatesTo(expression)
-                   JetTokens.EXCLEQ -> elseClause.doesNotEvaluateToNullOrUnit() && thenClause.evaluatesTo(expression)
+                   JetTokens.EQEQ -> thenClause.isNotNullExpression() && elseClause.evaluatesTo(expression)
+                   JetTokens.EXCLEQ -> elseClause.isNotNullExpression() && thenClause.evaluatesTo(expression)
                    else -> false
                }
     }
@@ -55,8 +55,8 @@ public class IfThenToElvisIntention : JetSelfTargetingIntention<JetIfExpression>
 
         val thenClause = checkNotNull(element.getThen(), "The then clause cannot be null")
         val elseClause = checkNotNull(element.getElse(), "The else clause cannot be null")
-        val thenExpression = checkNotNull(thenClause.getExpressionFromClause(), "Then clause must contain expression")
-        val elseExpression = checkNotNull(elseClause.getExpressionFromClause(), "Else clause must contain expression")
+        val thenExpression = checkNotNull(thenClause.extractExpressionIfSingle(), "Then clause must contain expression")
+        val elseExpression = checkNotNull(elseClause.extractExpressionIfSingle(), "Else clause must contain expression")
 
         val (lhs, rhs) =
                 when(condition.getOperationToken()) {

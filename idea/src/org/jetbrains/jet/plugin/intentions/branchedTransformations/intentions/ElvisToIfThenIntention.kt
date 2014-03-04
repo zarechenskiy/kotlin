@@ -21,7 +21,7 @@ import org.jetbrains.jet.plugin.intentions.JetSelfTargetingIntention
 import com.intellij.openapi.editor.Editor
 import org.jetbrains.jet.lexer.JetTokens
 import org.jetbrains.jet.lang.psi.JetPsiUtil
-import org.jetbrains.jet.plugin.intentions.branchedTransformations.convertToIfStatement
+import org.jetbrains.jet.plugin.intentions.branchedTransformations.convertToIfNotNullExpression
 import org.jetbrains.jet.plugin.intentions.branchedTransformations.introduceValueForCondition
 import org.jetbrains.jet.lang.resolve.calls.autocasts.DataFlowValueFactory
 import org.jetbrains.jet.plugin.project.AnalyzerFacadeWithCache
@@ -39,9 +39,9 @@ public class ElvisToIfThenIntention : JetSelfTargetingIntention<JetBinaryExpress
         val context = AnalyzerFacadeWithCache.getContextForElement(lhs)
         val descriptor = BindingContextUtils.extractVariableDescriptorIfAny(context, lhs, false)
 
-        val ifStatement = element.convertToIfStatement(lhs, lhs, rhs)
+        val ifStatement = element.convertToIfNotNullExpression(lhs, lhs, rhs)
         if (!(descriptor is VariableDescriptor && DataFlowValueFactory.isStableVariable(descriptor))) {
-            ifStatement.introduceValueForCondition(ifStatement.getThen()!!, element.getProject(), editor)
+            ifStatement.introduceValueForCondition(ifStatement.getThen()!!, editor)
         }
     }
 

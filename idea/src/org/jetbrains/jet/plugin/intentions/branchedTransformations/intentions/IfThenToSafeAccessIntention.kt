@@ -24,10 +24,10 @@ import org.jetbrains.jet.lang.psi.JetIfExpression
 import org.jetbrains.jet.lang.psi.JetBinaryExpression
 import org.jetbrains.jet.lang.psi.JetDotQualifiedExpression
 import org.jetbrains.jet.lexer.JetTokens
-import org.jetbrains.jet.plugin.intentions.branchedTransformations.getExpressionFromClause
+import org.jetbrains.jet.plugin.intentions.branchedTransformations.extractExpressionIfSingle
 import org.jetbrains.jet.plugin.intentions.branchedTransformations.comparesNonNullToNull
 import org.jetbrains.jet.plugin.intentions.branchedTransformations.getNonNullExpression
-import org.jetbrains.jet.plugin.intentions.branchedTransformations.isNullOrEmpty
+import org.jetbrains.jet.plugin.intentions.branchedTransformations.isNullExpressionOrEmptyBlock
 import org.jetbrains.jet.plugin.intentions.branchedTransformations.replace
 
 public class IfThenToSafeAccessIntention : JetSelfTargetingIntention<JetIfExpression>("if.then.to.safe.access", javaClass()) {
@@ -43,11 +43,11 @@ public class IfThenToSafeAccessIntention : JetSelfTargetingIntention<JetIfExpres
 
         return when (condition.getOperationToken()) {
                    JetTokens.EQEQ ->
-                       thenClause?.isNullOrEmpty() ?: true &&
+                       thenClause?.isNullExpressionOrEmptyBlock() ?: true &&
                        elseClause != null && clauseHasDotQualifiedExpressionForReceiver(elseClause, receiverExpression)
 
                    JetTokens.EXCLEQ ->
-                       elseClause?.isNullOrEmpty() ?: true &&
+                       elseClause?.isNullExpressionOrEmptyBlock() ?: true &&
                        thenClause != null && clauseHasDotQualifiedExpressionForReceiver(thenClause, receiverExpression)
 
                    else ->
@@ -85,7 +85,7 @@ public class IfThenToSafeAccessIntention : JetSelfTargetingIntention<JetIfExpres
             findSelectorExpressionFromClause(clause, receiverExpression) != null
 
     fun findSelectorExpressionFromClause(clause: JetExpression, receiverExpression: JetExpression): JetExpression? {
-        val expression = clause.getExpressionFromClause() as? JetDotQualifiedExpression
+        val expression = clause.extractExpressionIfSingle() as? JetDotQualifiedExpression
 
         if (expression?.getReceiverExpression()?.getText() != receiverExpression.getText()) return null
 

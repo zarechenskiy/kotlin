@@ -39,12 +39,12 @@ fun JetBinaryExpression.comparesNonNullToNull(): Boolean {
     val lhs = this.getLeft()
     if (rhs == null || lhs == null) return false
 
-    val rightIsNull = rhs.evaluatesToNull()
-    val leftIsNull = lhs.evaluatesToNull()
+    val rightIsNull = rhs.isNullExpression()
+    val leftIsNull = lhs.isNullExpression()
     return leftIsNull != rightIsNull && (operationToken == JetTokens.EQEQ || operationToken == JetTokens.EXCLEQ)
 }
 
-fun JetExpression.getExpressionFromClause(): JetExpression? {
+fun JetExpression.extractExpressionIfSingle(): JetExpression? {
     val innerExpression = JetPsiUtil.deparenthesize(this)
     return when (innerExpression) {
         is JetBlockExpression ->
@@ -62,39 +62,41 @@ fun JetExpression.getExpressionFromClause(): JetExpression? {
 
 }
 
-fun JetSafeQualifiedExpression.returnValueIsChecked(context: BindingContext): Boolean {
+fun JetSafeQualifiedExpression.isStatement(): Boolean {
+    val context = AnalyzerFacadeWithCache.getContextForElement(this)
+
     val expectedType = context.get(BindingContext.EXPECTED_EXPRESSION_TYPE, this);
     val isUnit = expectedType != null && KotlinBuiltIns.getInstance().isUnit(expectedType);
+
     // Some "statements" are actually expressions returned from lambdas, their expected types are non-null
     val isStatement = context.get(BindingContext.STATEMENT, this) == true && expectedType == null;
 
-    return !isUnit && !isStatement
+    return isStatement || isUnit
 }
 
 fun JetBinaryExpression.getNonNullExpression(): JetExpression? = when {
-    this.getLeft()?.evaluatesToNull() == false ->
+    this.getLeft()?.isNullExpression() == false ->
         this.getLeft()
-    this.getRight()?.evaluatesToNull() == false ->
+    this.getRight()?.isNullExpression() == false ->
         this.getRight()
     else ->
         null
 }
 
-fun JetExpression.evaluatesToNull(): Boolean = this.getExpressionFromClause()?.getText() == "null"
+fun JetExpression.isNullExpression(): Boolean = this.extractExpressionIfSingle()?.getText() == "null"
 
-fun JetExpression.isNullOrEmpty(): Boolean = this.evaluatesToNull() || this is JetBlockExpression && this.getStatements().empty
+fun JetExpression.isNullExpressionOrEmptyBlock(): Boolean = this.isNullExpression() || this is JetBlockExpression && this.getStatements().empty
 
-fun JetExpression.doesNotEvaluateToNullOrUnit(): Boolean {
-    val innerExpression = this.getExpressionFromClause()
+fun JetExpression.isNotNullExpression(): Boolean {
+    val innerExpression = this.extractExpressionIfSingle()
     return innerExpression != null && innerExpression.getText() != "null"
 }
 
 fun JetExpression.evaluatesTo(other: JetExpression): Boolean {
-    return this.getExpressionFromClause()?.getText() == other.getText()
+    return this.extractExpressionIfSingle()?.getText() == other.getText()
 }
 
-fun JetExpression.convertToIfStatement(conditionLhs: JetExpression, thenClause: JetExpression, elseClause: JetExpression?): JetIfExpression {
-
+fun JetExpression.convertToIfNotNullExpression(conditionLhs: JetExpression, thenClause: JetExpression, elseClause: JetExpression?): JetIfExpression {
     val elseBranch = if (elseClause == null) "" else " else ${elseClause.getText()}"
     val conditionalString = "if (${conditionLhs.getText()} != null) ${thenClause.getText()}$elseBranch"
 
@@ -102,7 +104,8 @@ fun JetExpression.convertToIfStatement(conditionLhs: JetExpression, thenClause: 
     return JetPsiUtil.deparenthesize(st) as JetIfExpression
 }
 
-fun JetIfExpression.introduceValueForCondition(occurrenceInThenClause: JetExpression, project: Project, editor: Editor) {
+fun JetIfExpression.introduceValueForCondition(occurrenceInThenClause: JetExpression, editor: Editor) {
+    val project = this.getProject()
     val occurrenceInConditional = (this.getCondition() as JetBinaryExpression).getLeft()!!
     JetIntroduceVariableHandler.doRefactoring(project, editor, occurrenceInConditional, listOf(occurrenceInConditional, occurrenceInThenClause))
 }
