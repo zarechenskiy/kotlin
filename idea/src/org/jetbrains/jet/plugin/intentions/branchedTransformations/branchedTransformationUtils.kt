@@ -27,7 +27,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.PsiWhiteSpace
 import java.util.Collections
 import com.intellij.util.containers.ContainerUtil
-import org.jetbrains.jet.plugin.codeInsight.zip_tmp
+import org.jetbrains.jet.utils.*
 
 public val TRANSFORM_WITHOUT_CHECK: String = "Expression must be checked before applying transformation"
 

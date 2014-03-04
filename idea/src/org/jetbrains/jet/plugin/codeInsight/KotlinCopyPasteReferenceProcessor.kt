@@ -64,6 +64,7 @@ import org.jetbrains.jet.lang.psi.JetTypeReference
 import com.intellij.util.containers.ContainerUtil
 import org.jetbrains.jet.lang.diagnostics.DiagnosticUtils
 import org.jetbrains.jet.lang.descriptors.PackageViewDescriptor
+import org.jetbrains.jet.utils.*
 
 //NOTE: this class is based on CopyPasteReferenceProcessor and JavaCopyPasteReferenceProcessor
 public class KotlinCopyPasteReferenceProcessor() : CopyPastePostProcessor<ReferenceTransferableData?> {
