@@ -1,4 +1,4 @@
-package test.collections
+package test.io
 
 import kotlin.test.*
 

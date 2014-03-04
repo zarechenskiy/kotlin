@@ -1,4 +1,4 @@
-package test.string
+package test.text
 
 import kotlin.*
 import kotlin.test.*

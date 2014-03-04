@@ -164,6 +164,12 @@ class ArraysTest {
         expect(2) { array("cat", "dog", "bird").indexOf("bird") }
         expect(0) { array(null, "dog", null).indexOf(null)}
     }
+
+    test fun plus() {
+        assertEquals(listOf("1","2","3","4"), array("1", "2") + array("3", "4"))
+        assertEquals(listOf("1","2","3","4"), listOf("1", "2") + array("3", "4"))
+    }
+
     /*
 
     TODO FIXME ASAP: These currently fail on JS due to missing upto() method on numbers

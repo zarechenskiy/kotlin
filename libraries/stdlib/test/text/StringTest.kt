@@ -1,4 +1,4 @@
-package test
+package test.text
 
 import kotlin.test.*
 import org.junit.Test as test
