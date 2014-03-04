@@ -116,6 +116,114 @@ public inline fun <T> Stream<T>.all(predicate: (T) -> Boolean) : Boolean {
 }
 
 /**
+ * Returns *true* if collection has at least one element
+ */
+public fun <T> Array<out T>.any() : Boolean {
+    for (element in this) return true
+    return false
+    
+}
+
+/**
+ * Returns *true* if collection has at least one element
+ */
+public fun BooleanArray.any() : Boolean {
+    for (element in this) return true
+    return false
+    
+}
+
+/**
+ * Returns *true* if collection has at least one element
+ */
+public fun ByteArray.any() : Boolean {
+    for (element in this) return true
+    return false
+    
+}
+
+/**
+ * Returns *true* if collection has at least one element
+ */
+public fun CharArray.any() : Boolean {
+    for (element in this) return true
+    return false
+    
+}
+
+/**
+ * Returns *true* if collection has at least one element
+ */
+public fun DoubleArray.any() : Boolean {
+    for (element in this) return true
+    return false
+    
+}
+
+/**
+ * Returns *true* if collection has at least one element
+ */
+public fun FloatArray.any() : Boolean {
+    for (element in this) return true
+    return false
+    
+}
+
+/**
+ * Returns *true* if collection has at least one element
+ */
+public fun IntArray.any() : Boolean {
+    for (element in this) return true
+    return false
+    
+}
+
+/**
+ * Returns *true* if collection has at least one element
+ */
+public fun LongArray.any() : Boolean {
+    for (element in this) return true
+    return false
+    
+}
+
+/**
+ * Returns *true* if collection has at least one element
+ */
+public fun ShortArray.any() : Boolean {
+    for (element in this) return true
+    return false
+    
+}
+
+/**
+ * Returns *true* if collection has at least one element
+ */
+public fun <T> Iterable<T>.any() : Boolean {
+    for (element in this) return true
+    return false
+    
+}
+
+/**
+ * Returns *true* if collection has at least one element
+ */
+public fun <K, V> Map<K,V>.any() : Boolean {
+    for (element in this) return true
+    return false
+    
+}
+
+/**
+ * Returns *true* if collection has at least one element
+ */
+public fun <T> Stream<T>.any() : Boolean {
+    for (element in this) return true
+    return false
+    
+}
+
+/**
  * Returns *true* if any element matches the given *predicate*
  */
 public inline fun <T> Array<out T>.any(predicate: (T) -> Boolean) : Boolean {
@@ -1555,6 +1663,114 @@ public inline fun <K, V, R: Comparable<R>> Map<K,V>.minBy(f: (Map.Entry<K,V>) ->
         }
     }
     return minElem
+    
+}
+
+/**
+ * Returns *true* if collection has no elements
+ */
+public fun <T> Array<out T>.none() : Boolean {
+    for (element in this) return false
+    return true
+    
+}
+
+/**
+ * Returns *true* if collection has no elements
+ */
+public fun BooleanArray.none() : Boolean {
+    for (element in this) return false
+    return true
+    
+}
+
+/**
+ * Returns *true* if collection has no elements
+ */
+public fun ByteArray.none() : Boolean {
+    for (element in this) return false
+    return true
+    
+}
+
+/**
+ * Returns *true* if collection has no elements
+ */
+public fun CharArray.none() : Boolean {
+    for (element in this) return false
+    return true
+    
+}
+
+/**
+ * Returns *true* if collection has no elements
+ */
+public fun DoubleArray.none() : Boolean {
+    for (element in this) return false
+    return true
+    
+}
+
+/**
+ * Returns *true* if collection has no elements
+ */
+public fun FloatArray.none() : Boolean {
+    for (element in this) return false
+    return true
+    
+}
+
+/**
+ * Returns *true* if collection has no elements
+ */
+public fun IntArray.none() : Boolean {
+    for (element in this) return false
+    return true
+    
+}
+
+/**
+ * Returns *true* if collection has no elements
+ */
+public fun LongArray.none() : Boolean {
+    for (element in this) return false
+    return true
+    
+}
+
+/**
+ * Returns *true* if collection has no elements
+ */
+public fun ShortArray.none() : Boolean {
+    for (element in this) return false
+    return true
+    
+}
+
+/**
+ * Returns *true* if collection has no elements
+ */
+public fun <T> Iterable<T>.none() : Boolean {
+    for (element in this) return false
+    return true
+    
+}
+
+/**
+ * Returns *true* if collection has no elements
+ */
+public fun <K, V> Map<K,V>.none() : Boolean {
+    for (element in this) return false
+    return true
+    
+}
+
+/**
+ * Returns *true* if collection has no elements
+ */
+public fun <T> Stream<T>.none() : Boolean {
+    for (element in this) return false
+    return true
     
 }
 

@@ -32,6 +32,18 @@ fun aggregates(): List<GenericFunction> {
         include(Maps)
     }
 
+    templates add f("none()") {
+        doc { "Returns *true* if collection has no elements" }
+        returns("Boolean")
+        body {
+            """
+            for (element in this) return false
+            return true
+            """
+        }
+        include(Maps)
+    }
+
     templates add f("any(predicate: (T) -> Boolean)") {
         inline(true)
 
@@ -40,6 +52,18 @@ fun aggregates(): List<GenericFunction> {
         body {
             """
             for (element in this) if (predicate(element)) return true
+            return false
+            """
+        }
+        include(Maps)
+    }
+
+    templates add f("any()") {
+        doc { "Returns *true* if collection has at least one element" }
+        returns("Boolean")
+        body {
+            """
+            for (element in this) return true
             return false
             """
         }

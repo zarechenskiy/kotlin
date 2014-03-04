@@ -70,6 +70,8 @@ abstract class OrderedIterableTests<T : Iterable<String>>(data: T, empty: T) : I
 
 abstract class IterableTests<T : Iterable<String>>(val data: T, val empty: T) {
     Test fun any() {
+        expect(true) { data.any() }
+        expect(false) { empty.any() }
         expect(true) { data.any { it.startsWith("f") } }
         expect(false) { data.any { it.startsWith("x") } }
         expect(false) { empty.any { it.startsWith("x") } }
@@ -82,6 +84,8 @@ abstract class IterableTests<T : Iterable<String>>(val data: T, val empty: T) {
     }
 
     Test fun none() {
+        expect(false) { data.none() }
+        expect(true) { empty.none() }
         expect(false) { data.none { it.length == 3 } }
         expect(false) { data.none { it.startsWith("b") } }
         expect(true) { data.none { it.startsWith("x") } }
