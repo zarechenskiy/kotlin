@@ -162,12 +162,16 @@ class CollectionTest {
         assertEquals(2, l3.size)
     }
 
-
     test fun plusRanges() {
         val range1 = 1..3
         val range2 = 4..7
         val combined = range1 + range2
         assertEquals((1..7).toList(), combined)
+    }
+
+    test fun mapRanges() {
+        val range = 1..3 map { it * 2}
+        assertEquals(listOf(2,4,6), range)
     }
 
     test fun plus() {
