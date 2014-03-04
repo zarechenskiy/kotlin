@@ -22,7 +22,7 @@ public fun sortedSetOf<T>(comparator: Comparator<T>, vararg values: T): TreeSet<
  * Returns a new [[SortedMap]] populated with the given pairs where the first value in each pair
  * is the key and the second value is the value
  *
- * @includeFunctionBody ../../test/MapTest.kt createSortedMap
+ * @includeFunctionBody ../../test/collections/MapTest.kt createSortedMap
  */
 public fun <K, V> sortedMapOf(vararg values: Pair<K, V>): SortedMap<K, V> {
     val answer = TreeMap<K, V>()
@@ -41,7 +41,7 @@ public fun <K, V> sortedMapOf(vararg values: Pair<K, V>): SortedMap<K, V> {
  * is the key and the second value is the value. This map preserves insertion order so iterating through
  * the map's entries will be in the same order
  *
- * @includeFunctionBody ../../test/MapTest.kt createLinkedMap
+ * @includeFunctionBody ../../test/collections/MapTest.kt createLinkedMap
  */
 public fun <K, V> linkedMapOf(vararg values: Pair<K, V>): LinkedHashMap<K, V> {
     val answer = LinkedHashMap<K, V>(values.size)

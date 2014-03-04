@@ -176,7 +176,7 @@ get() = length()
 /**
  * Returns a copy of this string capitalised if it is not empty or already starting with an uppper case letter, otherwise returns this
  *
- * @includeFunctionBody ../../test/StringTest.kt capitalize
+ * @includeFunctionBody ../../test/text/StringTest.kt capitalize
  */
 public fun String.capitalize(): String {
     return if (isNotEmpty() && charAt(0).isLowerCase()) substring(0, 1).toUpperCase() + substring(1) else this
@@ -185,7 +185,7 @@ public fun String.capitalize(): String {
 /**
  * Returns a copy of this string with the first letter lower case if it is not empty or already starting with a lower case letter, otherwise returns this
  *
- * @includeFunctionBody ../../test/StringTest.kt decapitalize
+ * @includeFunctionBody ../../test/text/StringTest.kt decapitalize
  */
 public fun String.decapitalize(): String {
     return if (isNotEmpty() && charAt(0).isUpperCase()) substring(0, 1).toLowerCase() + substring(1) else this
@@ -194,7 +194,7 @@ public fun String.decapitalize(): String {
 /**
  * Repeats a given string n times.
  * When n < 0, IllegalArgumentException is thrown.
- * @includeFunctionBody ../../test/StringTest.kt repeat
+ * @includeFunctionBody ../../test/text/StringTest.kt repeat
  */
 public fun String.repeat(n: Int): String {
     require(n >= 0, { "Cannot repeat string $n times" })
@@ -209,14 +209,14 @@ public fun String.repeat(n: Int): String {
 /**
  * Filters characters which match the given predicate into new String object
  *
- * @includeFunctionBody ../../test/StringTest.kt filter
+ * @includeFunctionBody ../../test/text/StringTest.kt filter
  */
 public inline fun String.filter(predicate: (Char) -> Boolean): String = filterTo(StringBuilder(), predicate).toString()
 
 /**
  * Returns an Appendable containing all characters which match the given *predicate*
  *
- * @includeFunctionBody ../../test/StringTest.kt filter
+ * @includeFunctionBody ../../test/text/StringTest.kt filter
  */
 public inline fun <T: Appendable> String.filterTo(result: T, predicate: (Char) -> Boolean): T
 {
@@ -227,14 +227,14 @@ public inline fun <T: Appendable> String.filterTo(result: T, predicate: (Char) -
 /**
  * Filters characters which match the given predicate into new String object
  *
- * @includeFunctionBody ../../test/StringTest.kt filterNot
+ * @includeFunctionBody ../../test/text/StringTest.kt filterNot
  */
 public inline fun String.filterNot(predicate: (Char) -> Boolean): String = filterNotTo(StringBuilder(), predicate).toString()
 
 /**
  * Returns an Appendable containing all characters which do not match the given *predicate*
  *
- * @includeFunctionBody ../../test/StringTest.kt filterNot
+ * @includeFunctionBody ../../test/text/StringTest.kt filterNot
  */
 public inline fun <T: Appendable> String.filterNotTo(result: T, predicate: (Char) -> Boolean): T {
     for (element in this) if (!predicate(element)) result.append(element)
@@ -244,21 +244,21 @@ public inline fun <T: Appendable> String.filterNotTo(result: T, predicate: (Char
 /**
   * Reverses order of characters in a string
   *
-  * @includeFunctionBody ../../test/StringTest.kt reverse
+  * @includeFunctionBody ../../test/text/StringTest.kt reverse
   */
 public fun String.reverse(): String = StringBuilder(this).reverse().toString()
 
 /**
  * Performs the given *operation* on each character
  *
- * @includeFunctionBody ../../test/StringTest.kt forEach
+ * @includeFunctionBody ../../test/text/StringTest.kt forEach
  */
 public inline fun String.forEach(operation: (Char) -> Unit) { for(c in this) operation(c) }
 
 /**
  * Returns *true* if all characters match the given *predicate*
  *
- * @includeFunctionBody ../../test/StringTest.kt all
+ * @includeFunctionBody ../../test/text/StringTest.kt all
  */
 public inline fun String.all(predicate: (Char) -> Boolean): Boolean {
     for(c in this) if(!predicate(c)) return false
@@ -268,7 +268,7 @@ public inline fun String.all(predicate: (Char) -> Boolean): Boolean {
 /**
  * Returns *true* if any character matches the given *predicate*
  *
- * @includeFunctionBody ../../test/StringTest.kt any
+ * @includeFunctionBody ../../test/text/StringTest.kt any
  */
 public inline fun String.any(predicate: (Char) -> Boolean): Boolean {
     for (c in this) if (predicate(c)) return true
@@ -281,7 +281,7 @@ public inline fun String.any(predicate: (Char) -> Boolean): Boolean {
  * If a string could be huge you can specify a non-negative value of *limit* which will only show substring then it will
  * a special *truncated* separator (which defaults to "..."
  *
- * @includeFunctionBody ../../test/StringTest.kt appendString
+ * @includeFunctionBody ../../test/text/StringTest.kt appendString
  */
 public fun String.appendString(buffer: Appendable, separator: String = ", ", prefix: String = "", postfix: String = "", limit: Int = -1, truncated: String = "..."): Unit {
     buffer.append(prefix)
@@ -297,7 +297,7 @@ public fun String.appendString(buffer: Appendable, separator: String = ", ", pre
 /**
  * Returns the first character which matches the given *predicate* or *null* if none matched
  *
- * @includeFunctionBody ../../test/StringTest.kt find
+ * @includeFunctionBody ../../test/text/StringTest.kt find
  */
 public inline fun String.find(predicate: (Char) -> Boolean): Char? {
     for (c in this) if (predicate(c)) return c
@@ -307,7 +307,7 @@ public inline fun String.find(predicate: (Char) -> Boolean): Char? {
 /**
  * Returns the first character which does not match the given *predicate* or *null* if none matched
  *
- * @includeFunctionBody ../../test/StringTest.kt findNot
+ * @includeFunctionBody ../../test/text/StringTest.kt findNot
  */
 public inline fun String.findNot(predicate: (Char) -> Boolean): Char? {
     for (c in this) if (!predicate(c)) return c
@@ -317,7 +317,7 @@ public inline fun String.findNot(predicate: (Char) -> Boolean): Char? {
 /**
 * Partitions this string into a pair of string
 *
-* @includeFunctionBody ../../test/StringTest.kt partition
+* @includeFunctionBody ../../test/text/StringTest.kt partition
 */
 public inline fun String.partition(predicate: (Char) -> Boolean): Pair<String, String> {
     val first = StringBuilder()
@@ -351,14 +351,14 @@ public inline fun <R, C: MutableCollection<in R>> String.mapTo(result: C, transf
 /**
  * Returns the result of transforming each character to one or more values which are concatenated together into a single list
  *
- * @includeFunctionBody ../../test/StringTest.kt flatMap
+ * @includeFunctionBody ../../test/text/StringTest.kt flatMap
  */
 public inline fun <R> String.flatMap(transform: (Char) -> Collection<R>): Collection<R> = flatMapTo(ArrayList<R>(), transform)
 
 /**
  * Returns the result of transforming each character to one or more values which are concatenated together into a passed list
  *
- * @includeFunctionBody ../../test/StringTest.kt flatMap
+ * @includeFunctionBody ../../test/text/StringTest.kt flatMap
  */
 public inline fun <R> String.flatMapTo(result: MutableCollection<R>, transform: (Char) -> Collection<R>): Collection<R> {
     for (c in this) result.addAll(transform(c))
@@ -368,7 +368,7 @@ public inline fun <R> String.flatMapTo(result: MutableCollection<R>, transform: 
 /**
  * Folds all characters from left to right with the *initial* value to perform the operation on sequential pairs of characters
  *
- * @includeFunctionBody ../../test/StringTest.kt fold
+ * @includeFunctionBody ../../test/text/StringTest.kt fold
  */
 public inline fun <R> String.fold(initial: R, operation: (R, Char) -> R): R {
     var answer = initial
@@ -379,7 +379,7 @@ public inline fun <R> String.fold(initial: R, operation: (R, Char) -> R): R {
 /**
  * Folds all characters from right to left with the *initial* value to perform the operation on sequential pairs of characters
  *
- * @includeFunctionBody ../../test/StringTest.kt foldRight
+ * @includeFunctionBody ../../test/text/StringTest.kt foldRight
  */
 public inline fun <R> String.foldRight(initial: R, operation: (Char, R) -> R): R = reverse().fold(initial, { x, y -> operation(y, x) })
 
@@ -387,7 +387,7 @@ public inline fun <R> String.foldRight(initial: R, operation: (Char, R) -> R): R
  * Applies binary operation to all characters in a string, going from left to right.
  * Similar to fold function, but uses the first character as initial value
  *
- * @includeFunctionBody ../../test/StringTest.kt reduce
+ * @includeFunctionBody ../../test/text/StringTest.kt reduce
  */
 public inline fun String.reduce(operation: (Char, Char) -> Char): Char {
     val iterator = this.iterator()
@@ -407,7 +407,7 @@ public inline fun String.reduce(operation: (Char, Char) -> Char): Char {
  * Applies binary operation to all characters in a string, going from right to left.
  * Similar to foldRight function, but uses the last character as initial value
  *
- * @includeFunctionBody ../../test/StringTest.kt reduceRight
+ * @includeFunctionBody ../../test/text/StringTest.kt reduceRight
  */
 public inline fun String.reduceRight(operation: (Char, Char) -> Char): Char = reverse().reduce { x, y -> operation(y, x) }
 
@@ -415,14 +415,14 @@ public inline fun String.reduceRight(operation: (Char, Char) -> Char): Char = re
 /**
  * Groups the characters in the string into a new [[Map]] using the supplied *toKey* function to calculate the key to group the characters by
  *
- * @includeFunctionBody ../../test/StringTest.kt groupBy
+ * @includeFunctionBody ../../test/text/StringTest.kt groupBy
  */
 public inline fun <K> String.groupBy(toKey: (Char) -> K): Map<K, String> = groupByTo<K>(HashMap<K, String>(), toKey)
 
 /**
  * Groups the characters in the string into the given [[Map]] using the supplied *toKey* function to calculate the key to group the characters by
  *
- * @includeFunctionBody ../../test/StringTest.kt groupBy
+ * @includeFunctionBody ../../test/text/StringTest.kt groupBy
  */
 public inline fun <K> String.groupByTo(result: MutableMap<K, String>, toKey: (Char) -> K): Map<K, String> {
     for (c in this) {
@@ -439,7 +439,7 @@ public inline fun <K> String.groupByTo(result: MutableMap<K, String>, toKey: (Ch
  * If a string could be huge you can specify a non-negative value of *limit* which will only show a substring then it will
  * a special *truncated* separator (which defaults to "..."
  *
- * @includeFunctionBody ../../test/StringTest.kt makeString
+ * @includeFunctionBody ../../test/text/StringTest.kt makeString
  */
 public fun String.makeString(separator: String = ", ", prefix: String = "", postfix: String = "", limit: Int = -1, truncated: String = "..."): String {
     val buffer = StringBuilder()
@@ -450,7 +450,7 @@ public fun String.makeString(separator: String = ", ", prefix: String = "", post
 /**
  * Returns an Appendable containing the everything but the first characters that satisfy the given *predicate*
  *
- * @includeFunctionBody ../../test/StringTest.kt dropWhile
+ * @includeFunctionBody ../../test/text/StringTest.kt dropWhile
  */
 public inline fun <T: Appendable> String.dropWhileTo(result: T, predicate: (Char) -> Boolean): T {
     var start = true
@@ -468,21 +468,21 @@ public inline fun <T: Appendable> String.dropWhileTo(result: T, predicate: (Char
 /**
  * Returns a new String containing the everything but the first characters that satisfy the given *predicate*
  *
- * @includeFunctionBody ../../test/StringTest.kt dropWhile
+ * @includeFunctionBody ../../test/text/StringTest.kt dropWhile
  */
 public inline fun String.dropWhile(predicate: (Char) -> Boolean): String = dropWhileTo(StringBuilder(), predicate).toString()
 
 /**
  * Returns a string containing everything but the first *n* characters
  *
- * @includeFunctionBody ../../test/StringTest.kt drop
+ * @includeFunctionBody ../../test/text/StringTest.kt drop
  */
 public fun String.drop(n: Int): String = substring(Math.min(length, n))
 
 /**
  * Returns an Appendable containing the first characters that satisfy the given *predicate*
   *
- * @includeFunctionBody ../../test/StringTest.kt takeWhile
+ * @includeFunctionBody ../../test/text/StringTest.kt takeWhile
  */
 public inline fun <T: Appendable> String.takeWhileTo(result: T, predicate: (Char) -> Boolean): T {
     for (c in this) if (predicate(c)) result.append(c) else break
@@ -492,14 +492,14 @@ public inline fun <T: Appendable> String.takeWhileTo(result: T, predicate: (Char
 /**
  * Returns a new String containing the first characters that satisfy the given *predicate*
   *
- * @includeFunctionBody ../../test/StringTest.kt takeWhile
+ * @includeFunctionBody ../../test/text/StringTest.kt takeWhile
  */
 public inline fun String.takeWhile(predicate: (Char) -> Boolean): String = takeWhileTo(StringBuilder(), predicate).toString()
 
 /**
  * Returns a string containing the first *n* characters
  *
- * @includeFunctionBody ../../test/StringTest.kt take
+ * @includeFunctionBody ../../test/text/StringTest.kt take
  */
 public fun String.take(n: Int): String = substring(0, Math.min(length, n))
 

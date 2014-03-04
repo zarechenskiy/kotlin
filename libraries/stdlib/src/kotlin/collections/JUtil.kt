@@ -18,7 +18,7 @@ public fun hashSetOf<T>(vararg values: T): HashSet<T> = values.toCollection(Hash
  * Returns a new [[HashMap]] populated with the given pairs where the first value in each pair
  * is the key and the second value is the value
  *
- * @includeFunctionBody ../../test/MapTest.kt createUsingPairs
+ * @includeFunctionBody ../../test/collections/MapTest.kt createUsingPairs
  */
 public fun <K, V> hashMapOf(vararg values: Pair<K, V>): HashMap<K, V> {
     val answer = HashMap<K, V>(values.size)
@@ -76,7 +76,7 @@ answer.sort(comparator)
 /**
  * Returns the first item in the list or null if the list is empty
  *
- * @includeFunctionBody ../../test/ListTest.kt first
+ * @includeFunctionBody ../../test/collections/ListSpecificTest.kt first
  */
 val <T> List<T>.first: T?
     get() = this.head
@@ -85,7 +85,7 @@ val <T> List<T>.first: T?
 /**
  * Returns the last item in the list or null if the list is empty
  *
- * @includeFunctionBody ../../test/ListTest.kt last
+ * @includeFunctionBody ../../test/collections/ListSpecificTest.kt last
  */
 val <T> List<T>.last: T?
     get() {
@@ -96,7 +96,7 @@ val <T> List<T>.last: T?
 /**
  * Returns the index of the last item in the list or -1 if the list is empty
  *
- * @includeFunctionBody ../../test/ListTest.kt lastIndex
+ * @includeFunctionBody ../../test/collections/ListSpecificTest.kt lastIndex
  */
 val <T> List<T>.lastIndex: Int
     get() = this.size - 1
@@ -104,7 +104,7 @@ val <T> List<T>.lastIndex: Int
 /**
  * Returns the first item in the list or null if the list is empty
  *
- * @includeFunctionBody ../../test/ListTest.kt head
+ * @includeFunctionBody ../../test/collections/ListSpecificTest.kt head
  */
 val <T> List<T>.head: T?
     get() = if (this.isNotEmpty()) this.get(0) else null
@@ -112,7 +112,7 @@ val <T> List<T>.head: T?
 /**
  * Returns all elements in this collection apart from the first one
  *
- * @includeFunctionBody ../../test/ListTest.kt tail
+ * @includeFunctionBody ../../test/collections/ListSpecificTest.kt tail
  */
 val <T> List<T>.tail: List<T>
     get() {

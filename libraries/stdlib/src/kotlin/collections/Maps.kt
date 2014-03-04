@@ -42,7 +42,7 @@ fun <K,V> Map.Entry<K,V>.component2() : V {
 /**
  * Returns the value for the given key or returns the result of the defaultValue function if there was no entry for the given key
  *
- * @includeFunctionBody ../../test/MapTest.kt getOrElse
+ * @includeFunctionBody ../../test/collections/MapTest.kt getOrElse
  */
 public inline fun <K,V> Map<K,V>.getOrElse(key: K, defaultValue: ()-> V) : V {
     if (this.containsKey(key)) {
@@ -55,7 +55,7 @@ public inline fun <K,V> Map<K,V>.getOrElse(key: K, defaultValue: ()-> V) : V {
 /**
  * Returns the value for the given key or the result of the defaultValue function is put into the map for the given value and returned
  *
- * @includeFunctionBody ../../test/MapTest.kt getOrElse
+ * @includeFunctionBody ../../test/collections/MapTest.kt getOrPut
  */
 public inline fun <K,V> MutableMap<K,V>.getOrPut(key: K, defaultValue: ()-> V) : V {
     if (this.containsKey(key)) {
@@ -71,7 +71,7 @@ public inline fun <K,V> MutableMap<K,V>.getOrPut(key: K, defaultValue: ()-> V) :
 /**
  * Returns an [[Iterator]] over the entries in the [[Map]]
  *
- * @includeFunctionBody ../../test/MapTest.kt iterateWithProperties
+ * @includeFunctionBody ../../test/collections/MapTest.kt iterateWithProperties
  */
 public fun <K,V> Map<K,V>.iterator(): Iterator<Map.Entry<K,V>> {
     val entrySet = this.entrySet()
@@ -109,7 +109,7 @@ public fun <K,V> Map<K,V>.toMap(map: MutableMap<K,V>): Map<K,V> {
 /**
  * Returns a new Map containing the results of applying the given *transform* function to each [[Map.Entry]] in this [[Map]]
  *
- * @includeFunctionBody ../../test/MapTest.kt mapValues
+ * @includeFunctionBody ../../test/collections/MapTest.kt mapValues
  */
 public inline fun <K,V,R> Map<K,V>.mapValues(transform : (Map.Entry<K,V>) -> R): Map<K,R> {
     return mapValuesTo(java.util.HashMap<K,R>(this.size), transform)

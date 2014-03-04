@@ -61,7 +61,7 @@ get() = this.length
 /**
  * Counts the number of characters which match the given predicate
  *
- * @includeFunctionBody ../../test/StringTest.kt count
+ * @includeFunctionBody ../../test/text/StringTest.kt count
  */
 public inline fun String.count(predicate: (Char) -> Boolean): Int {
     var answer = 0

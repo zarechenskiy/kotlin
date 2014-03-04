@@ -21,7 +21,7 @@ public fun Char.isJavaLetterOrDigit(): Boolean = Character.isJavaLetterOrDigit(t
 /**
  * Returns true if the character is whitespace
  *
- * @includeFunctionBody ../../test/StringTest.kt count
+ * @includeFunctionBody ../../test/text/StringTest.kt count
  */
 public fun Char.isWhitespace(): Boolean = Character.isWhitespace(this)
 
