@@ -31,6 +31,16 @@ public class StreamTest {
         }
     }
 
+    test fun mapNotNull() {
+        val data = arrayListOf(null, "foo", null, "bar").stream()
+        val foo = data.mapNotNull { it.length }
+        assertEquals(arrayListOf(3, 3), foo.toList())
+
+        assertTrue {
+            foo is Stream<Int>
+        }
+    }
+
     Test fun filterAndTakeWhileExtractTheElementsWithinRange() {
         assertEquals(arrayListOf(144, 233, 377, 610, 987), fibonacci().filter { it > 100 }.takeWhile { it < 1000 }.toList())
     }

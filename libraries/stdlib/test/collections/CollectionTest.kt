@@ -37,6 +37,17 @@ class CollectionTest {
         }
     }
 
+    test fun mapNotNull() {
+        val data = arrayListOf(null, "foo", null, "bar")
+        val foo = data.mapNotNull { it.length }
+        assertEquals(2, foo.size)
+        assertEquals(arrayListOf(3, 3), foo)
+
+        assertTrue {
+            foo is List<Int>
+        }
+    }
+
     // TODO would be nice to avoid the <String>
     test fun filterIntoSet() {
         val data = arrayListOf("foo", "bar")
@@ -252,7 +263,7 @@ class CollectionTest {
     test fun simpleCount() {
         val data = arrayListOf("foo", "bar")
         assertEquals(2, data.count())
-        assertEquals(3, hashSet(12, 14, 15).count())
+        assertEquals(3, hashSetOf(12, 14, 15).count())
         assertEquals(0, ArrayList<Double>().count())
     }
 

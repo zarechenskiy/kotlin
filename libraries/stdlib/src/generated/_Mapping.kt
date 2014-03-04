@@ -560,6 +560,72 @@ public fun <T, R> Stream<T>.map(transform : (T) -> R) : Stream<R> {
 }
 
 /**
+ * Returns a list containing the results of applying the given *transform* function to each non-null element of the original collection
+ */
+public fun <T: Any, R> Array<T?>.mapNotNull(transform : (T) -> R) : List<R> {
+    return mapNotNullTo(ArrayList<R>(), transform)
+    
+}
+
+/**
+ * Returns a list containing the results of applying the given *transform* function to each non-null element of the original collection
+ */
+public fun <T: Any, R> Iterable<T?>.mapNotNull(transform : (T) -> R) : List<R> {
+    return mapNotNullTo(ArrayList<R>(), transform)
+    
+}
+
+/**
+ * Returns a stream containing the results of applying the given *transform* function to each non-null element of the original stream
+ */
+public fun <T: Any, R> Stream<T?>.mapNotNull(transform : (T) -> R) : Stream<R> {
+    return TransformingStream(FilteringStream(this, false, { it != null }) as Stream<T>, transform)
+    
+}
+
+/**
+ * Appends transformed non-null elements of original collection using the given *transform* function
+ * to the given *collection*
+ */
+public inline fun <T: Any, R, C: MutableCollection<in R>> Array<T?>.mapNotNullTo(collection: C, transform : (T) -> R) : C {
+    for (element in this) {
+        if (element != null) {
+            collection.add(transform(element))
+         }
+    }
+    return collection
+    
+}
+
+/**
+ * Appends transformed non-null elements of original collection using the given *transform* function
+ * to the given *collection*
+ */
+public inline fun <T: Any, R, C: MutableCollection<in R>> Iterable<T?>.mapNotNullTo(collection: C, transform : (T) -> R) : C {
+    for (element in this) {
+        if (element != null) {
+            collection.add(transform(element))
+         }
+    }
+    return collection
+    
+}
+
+/**
+ * Appends transformed non-null elements of original collection using the given *transform* function
+ * to the given *collection*
+ */
+public inline fun <T: Any, R, C: MutableCollection<in R>> Stream<T?>.mapNotNullTo(collection: C, transform : (T) -> R) : C {
+    for (element in this) {
+        if (element != null) {
+            collection.add(transform(element))
+         }
+    }
+    return collection
+    
+}
+
+/**
  * Appends transformed elements of original collection using the given *transform* function
  * to the given *collection*
  */

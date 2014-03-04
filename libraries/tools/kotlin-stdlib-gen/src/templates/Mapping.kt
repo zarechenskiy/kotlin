@@ -44,6 +44,28 @@ fun mapping(): List<GenericFunction> {
         include(Maps)
     }
 
+    templates add f("mapNotNull(transform : (T) -> R)") {
+        exclude(ArraysOfPrimitives)
+        doc { "Returns a list containing the results of applying the given *transform* function to each non-null element of the original collection" }
+        typeParam("T: Any")
+        typeParam("R")
+        returns("List<R>")
+        toNullableT = true
+        body {
+            """
+            return mapNotNullTo(ArrayList<R>(), transform)
+            """
+        }
+
+        doc(Streams) { "Returns a stream containing the results of applying the given *transform* function to each non-null element of the original stream" }
+        returns(Streams) { "Stream<R>" }
+        body(Streams) {
+            """
+            return TransformingStream(FilteringStream(this, false, { it != null }) as Stream<T>, transform)
+            """
+        }
+    }
+
     templates add f("mapTo(collection: C, transform : (T) -> R)") {
         inline(true)
 
@@ -65,6 +87,32 @@ fun mapping(): List<GenericFunction> {
             """
         }
         include(Maps)
+    }
+
+    templates add f("mapNotNullTo(collection: C, transform : (T) -> R)") {
+        inline(true)
+        exclude(ArraysOfPrimitives)
+        doc {
+            """
+            Appends transformed non-null elements of original collection using the given *transform* function
+            to the given *collection*
+            """
+        }
+        typeParam("T: Any")
+        typeParam("R")
+        typeParam("C: MutableCollection<in R>")
+        returns("C")
+        toNullableT = true
+        body {
+            """
+            for (element in this) {
+                if (element != null) {
+                    collection.add(transform(element))
+                 }
+            }
+            return collection
+            """
+        }
     }
 
     templates add f("flatMap(transform: (T)-> Iterable<R>)") {
