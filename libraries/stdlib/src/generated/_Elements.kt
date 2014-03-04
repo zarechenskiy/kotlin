@@ -321,6 +321,108 @@ public inline fun <T> Stream<T>.first(predicate: (T) -> Boolean) : T {
 }
 
 /**
+ * Returns first elementm, or null if collection is empty
+ */
+public fun <T> Array<out T>.firstOrNull() : T? {
+    return if (size > 0) this[0] else null
+    
+}
+
+/**
+ * Returns first elementm, or null if collection is empty
+ */
+public fun BooleanArray.firstOrNull() : Boolean? {
+    return if (size > 0) this[0] else null
+    
+}
+
+/**
+ * Returns first elementm, or null if collection is empty
+ */
+public fun ByteArray.firstOrNull() : Byte? {
+    return if (size > 0) this[0] else null
+    
+}
+
+/**
+ * Returns first elementm, or null if collection is empty
+ */
+public fun CharArray.firstOrNull() : Char? {
+    return if (size > 0) this[0] else null
+    
+}
+
+/**
+ * Returns first elementm, or null if collection is empty
+ */
+public fun DoubleArray.firstOrNull() : Double? {
+    return if (size > 0) this[0] else null
+    
+}
+
+/**
+ * Returns first elementm, or null if collection is empty
+ */
+public fun FloatArray.firstOrNull() : Float? {
+    return if (size > 0) this[0] else null
+    
+}
+
+/**
+ * Returns first elementm, or null if collection is empty
+ */
+public fun IntArray.firstOrNull() : Int? {
+    return if (size > 0) this[0] else null
+    
+}
+
+/**
+ * Returns first elementm, or null if collection is empty
+ */
+public fun LongArray.firstOrNull() : Long? {
+    return if (size > 0) this[0] else null
+    
+}
+
+/**
+ * Returns first elementm, or null if collection is empty
+ */
+public fun ShortArray.firstOrNull() : Short? {
+    return if (size > 0) this[0] else null
+    
+}
+
+/**
+ * Returns first elementm, or null if collection is empty
+ */
+public fun <T> Iterable<T>.firstOrNull() : T? {
+    val iterator = iterator()
+    if (!iterator.hasNext())
+        return null
+    return iterator.next()
+    
+}
+
+/**
+ * Returns first elementm, or null if collection is empty
+ */
+public fun <T> List<T>.firstOrNull() : T? {
+    return if (size > 0) this[0] else null
+    
+}
+
+/**
+ * Returns first elementm, or null if collection is empty
+ */
+public fun <T> Stream<T>.firstOrNull() : T? {
+    val iterator = iterator()
+    if (!iterator.hasNext())
+        return null
+    return iterator.next()
+    
+}
+
+/**
  * Returns first element matching the given *predicate*, or *null* if element was not found
  */
 public inline fun <T> Array<out T>.firstOrNull(predicate: (T) -> Boolean) : T? {
@@ -920,6 +1022,124 @@ public fun <T> Stream<T>.last(predicate: (T) -> Boolean) : T {
 }
 
 /**
+ * Returns last element, or null if collection is empty
+ */
+public fun <T> Array<out T>.lastOrNull() : T? {
+    return return if (size > 0) this[size - 1] else null
+    
+}
+
+/**
+ * Returns last element, or null if collection is empty
+ */
+public fun BooleanArray.lastOrNull() : Boolean? {
+    return return if (size > 0) this[size - 1] else null
+    
+}
+
+/**
+ * Returns last element, or null if collection is empty
+ */
+public fun ByteArray.lastOrNull() : Byte? {
+    return return if (size > 0) this[size - 1] else null
+    
+}
+
+/**
+ * Returns last element, or null if collection is empty
+ */
+public fun CharArray.lastOrNull() : Char? {
+    return return if (size > 0) this[size - 1] else null
+    
+}
+
+/**
+ * Returns last element, or null if collection is empty
+ */
+public fun DoubleArray.lastOrNull() : Double? {
+    return return if (size > 0) this[size - 1] else null
+    
+}
+
+/**
+ * Returns last element, or null if collection is empty
+ */
+public fun FloatArray.lastOrNull() : Float? {
+    return return if (size > 0) this[size - 1] else null
+    
+}
+
+/**
+ * Returns last element, or null if collection is empty
+ */
+public fun IntArray.lastOrNull() : Int? {
+    return return if (size > 0) this[size - 1] else null
+    
+}
+
+/**
+ * Returns last element, or null if collection is empty
+ */
+public fun LongArray.lastOrNull() : Long? {
+    return return if (size > 0) this[size - 1] else null
+    
+}
+
+/**
+ * Returns last element, or null if collection is empty
+ */
+public fun ShortArray.lastOrNull() : Short? {
+    return return if (size > 0) this[size - 1] else null
+    
+}
+
+/**
+ * Returns last element, or null if collection is empty
+ */
+public fun <T> Iterable<T>.lastOrNull() : T? {
+    when (this) {
+        is List<*> -> return if (size > 0) this[size - 1] as T else null
+        else -> {
+            val iterator = iterator()
+            if (!iterator.hasNext())
+                return null
+            var last = iterator.next()
+            while (iterator.hasNext())
+                last = iterator.next()
+            return last
+        }
+    }
+    
+}
+
+/**
+ * Returns last element, or null if collection is empty
+ */
+public fun <T> List<T>.lastOrNull() : T? {
+    return return if (size > 0) this[size - 1] else null
+    
+}
+
+/**
+ * Returns last element, or null if collection is empty
+ */
+public fun <T> Stream<T>.lastOrNull() : T? {
+    when (this) {
+        is List<*> -> return if (size > 0) this[size - 1] as T else null
+        else -> {
+            val iterator = iterator()
+            if (!iterator.hasNext())
+                return null
+            var last = iterator.next()
+            while (iterator.hasNext())
+                last = iterator.next()
+            return last
+        }
+    }
+    
+}
+
+/**
  * Returns last element matching the given *predicate*, or null if element was not found
  */
 public fun <T> Array<out T>.lastOrNull(predicate: (T) -> Boolean) : T? {
@@ -1484,6 +1704,152 @@ public fun <T> Stream<T>.single(predicate: (T) -> Boolean) : T {
             throw IllegalArgumentException("Collection has more than one matching element")
     }
     return single
+    
+}
+
+/**
+ * Returns single element, or null if collection is empty, or throws exception if there is more than one element
+ */
+public fun <T> Array<out T>.singleOrNull() : T? {
+    if (size == 0)
+        return null
+    if (size != 1)
+        throw IllegalArgumentException("Collection has $size elements")
+    return this[0]
+    
+}
+
+/**
+ * Returns single element, or null if collection is empty, or throws exception if there is more than one element
+ */
+public fun BooleanArray.singleOrNull() : Boolean? {
+    if (size == 0)
+        return null
+    if (size != 1)
+        throw IllegalArgumentException("Collection has $size elements")
+    return this[0]
+    
+}
+
+/**
+ * Returns single element, or null if collection is empty, or throws exception if there is more than one element
+ */
+public fun ByteArray.singleOrNull() : Byte? {
+    if (size == 0)
+        return null
+    if (size != 1)
+        throw IllegalArgumentException("Collection has $size elements")
+    return this[0]
+    
+}
+
+/**
+ * Returns single element, or null if collection is empty, or throws exception if there is more than one element
+ */
+public fun CharArray.singleOrNull() : Char? {
+    if (size == 0)
+        return null
+    if (size != 1)
+        throw IllegalArgumentException("Collection has $size elements")
+    return this[0]
+    
+}
+
+/**
+ * Returns single element, or null if collection is empty, or throws exception if there is more than one element
+ */
+public fun DoubleArray.singleOrNull() : Double? {
+    if (size == 0)
+        return null
+    if (size != 1)
+        throw IllegalArgumentException("Collection has $size elements")
+    return this[0]
+    
+}
+
+/**
+ * Returns single element, or null if collection is empty, or throws exception if there is more than one element
+ */
+public fun FloatArray.singleOrNull() : Float? {
+    if (size == 0)
+        return null
+    if (size != 1)
+        throw IllegalArgumentException("Collection has $size elements")
+    return this[0]
+    
+}
+
+/**
+ * Returns single element, or null if collection is empty, or throws exception if there is more than one element
+ */
+public fun IntArray.singleOrNull() : Int? {
+    if (size == 0)
+        return null
+    if (size != 1)
+        throw IllegalArgumentException("Collection has $size elements")
+    return this[0]
+    
+}
+
+/**
+ * Returns single element, or null if collection is empty, or throws exception if there is more than one element
+ */
+public fun LongArray.singleOrNull() : Long? {
+    if (size == 0)
+        return null
+    if (size != 1)
+        throw IllegalArgumentException("Collection has $size elements")
+    return this[0]
+    
+}
+
+/**
+ * Returns single element, or null if collection is empty, or throws exception if there is more than one element
+ */
+public fun ShortArray.singleOrNull() : Short? {
+    if (size == 0)
+        return null
+    if (size != 1)
+        throw IllegalArgumentException("Collection has $size elements")
+    return this[0]
+    
+}
+
+/**
+ * Returns single element, or null if collection is empty, or throws exception if there is more than one element
+ */
+public fun <T> Iterable<T>.singleOrNull() : T? {
+    when (this) {
+        is List<*> -> return if (size == 1) this[0] as T else if (size == 0) null else throw IllegalArgumentException("Collection has $size elements")
+        else -> {
+            val iterator = iterator()
+            if (!iterator.hasNext())
+                return null
+            var single = iterator.next()
+            if (iterator.hasNext())
+                throw IllegalArgumentException("Collection has more than one element")
+            return single
+        }
+    }
+    
+}
+
+/**
+ * Returns single element, or null if collection is empty, or throws exception if there is more than one element
+ */
+public fun <T> Stream<T>.singleOrNull() : T? {
+    when (this) {
+        is List<*> -> return if (size == 1) this[0] as T else if (size == 0) null else throw IllegalArgumentException("Collection has $size elements")
+        else -> {
+            val iterator = iterator()
+            if (!iterator.hasNext())
+                return null
+            var single = iterator.next()
+            if (iterator.hasNext())
+                throw IllegalArgumentException("Collection has more than one element")
+            return single
+        }
+    }
     
 }
 

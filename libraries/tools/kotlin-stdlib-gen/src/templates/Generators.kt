@@ -56,6 +56,21 @@ fun generators(): List<GenericFunction> {
         }
     }
 
+    templates add f("plus(collection: Iterable<T>)") {
+        only(Streams)
+        doc { "Returns a stream containing all elements of original stream and then all elements of the given *collection*" }
+        returns("Stream<T>")
+
+        // TODO: Implement lazy behavior
+        body {
+            """
+                val answer = toArrayList()
+                answer.addAll(collection)
+                return answer.stream()
+            """
+        }
+    }
+
     templates add f("plus(stream: Stream<T>)") {
         only(Streams)
         doc { "Returns a stream containing all elements of original stream and then all elements of the given *stream*" }

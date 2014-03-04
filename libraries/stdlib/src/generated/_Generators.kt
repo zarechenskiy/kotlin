@@ -417,6 +417,16 @@ public fun <T> Iterable<T>.plus(collection: Iterable<T>) : List<T> {
 }
 
 /**
+ * Returns a stream containing all elements of original stream and then all elements of the given *collection*
+ */
+public fun <T> Stream<T>.plus(collection: Iterable<T>) : Stream<T> {
+    val answer = toArrayList()
+    answer.addAll(collection)
+    return answer.stream()
+    
+}
+
+/**
  * Returns a list containing all elements of original collection and then the given element
  */
 public fun <T> Array<out T>.plus(element: T) : List<T> {

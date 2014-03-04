@@ -8,27 +8,6 @@ import org.junit.Test as test
 
 class CollectionTest {
 
-    test fun all() {
-        val data = arrayListOf("foo", "bar")
-        assertTrue {
-            data.all { it.length == 3 }
-        }
-        assertNot {
-            data.all { s -> s.startsWith("b") }
-        }
-    }
-
-    test fun any() {
-        val data = arrayListOf("foo", "bar")
-        assertTrue {
-            data.any { it.startsWith("f") }
-        }
-        assertNot {
-            data.any { it.startsWith("x") }
-        }
-    }
-
-
     test fun appendString() {
         val data = arrayListOf("foo", "bar")
         val buffer = StringBuilder()
@@ -36,39 +15,14 @@ class CollectionTest {
         assertEquals("{foo-bar}", buffer.toString())
     }
 
-    test fun count() {
+    test fun makeString() {
         val data = arrayListOf("foo", "bar")
-        assertEquals(1, data.count { it.startsWith("b") })
-        assertEquals(2, data.count { it.size == 3 })
-    }
+        val text = data.makeString("-", "<", ">")
+        assertEquals("<foo-bar>", text)
 
-    test fun filter() {
-        val data = arrayListOf("foo", "bar")
-        val foo = data.filter { it.startsWith("f") }
-        assertTrue {
-            foo.all { it.startsWith("f") }
-        }
-        assertEquals(1, foo.size)
-        assertEquals(arrayListOf("foo"), foo)
-    }
-
-    test fun filterReturnsList() {
-        val data = arrayListOf("foo", "bar")
-        val foo = data.filter { it.startsWith("f") }
-        assertTrue {
-            foo is List<String>
-        }
-    }
-
-    test fun filterNot() {
-        val data = arrayListOf("foo", "bar")
-        val foo = data.filterNot { it.startsWith("b") }
-
-        assertTrue {
-            foo.all { it.startsWith("f") }
-        }
-        assertEquals(1, foo.size)
-        assertEquals(arrayListOf("foo"), foo)
+        val big = arrayListOf("a", "b", "c", "d", "e", "f")
+        val text2 = big.makeString(limit = 3, truncated = "*")
+        assertEquals("a, b, c, *", text2)
     }
 
     test fun filterNotNull() {
@@ -86,34 +40,17 @@ class CollectionTest {
     // TODO would be nice to avoid the <String>
     test fun filterIntoSet() {
         val data = arrayListOf("foo", "bar")
-        val foo = data.filterTo(hashSet<String>()) { it.startsWith("f") }
+        val foo = data.filterTo(hashSetOf<String>()) { it.startsWith("f") }
 
         assertTrue {
             foo.all { it.startsWith("f") }
         }
         assertEquals(1, foo.size)
-        assertEquals(hashSet("foo"), foo)
+        assertEquals(hashSetOf("foo"), foo)
 
         assertTrue {
             foo is HashSet<String>
         }
-    }
-
-    test fun find() {
-        val data = arrayListOf("foo", "bar")
-        val x = data.firstOrNull { it.startsWith("x") }
-        assertNull(x)
-
-        val f = data.first { it.startsWith("f") }
-        f!!
-        assertEquals("foo", f)
-    }
-
-    test fun forEach() {
-        val data = arrayListOf("foo", "bar")
-        var count = 0
-        data.forEach { count += it.length }
-        assertEquals(6, count)
     }
 
     test fun fold() {
@@ -214,25 +151,6 @@ class CollectionTest {
         assertEquals(2, l3.size)
     }
 
-    test fun makeString() {
-        val data = arrayListOf("foo", "bar")
-        val text = data.makeString("-", "<", ">")
-        assertEquals("<foo-bar>", text)
-
-        val big = arrayListOf("a", "b", "c", "d", "e", "f")
-        val text2 = big.makeString(limit = 3, truncated = "*")
-        assertEquals("a, b, c, *", text2)
-    }
-
-    test fun map() {
-        val data = arrayListOf("foo", "bar")
-        val lengths = data.map { it.length }
-        assertTrue {
-            lengths.all { it == 3 }
-        }
-        assertEquals(2, lengths.size)
-        assertEquals(arrayListOf(3, 3), lengths)
-    }
 
     test fun plus() {
         val list = arrayListOf("foo", "bar")
@@ -266,7 +184,7 @@ class CollectionTest {
     }
 
     test fun requireNoNulls() {
-        val data = arrayList<String?>("foo", "bar")
+        val data = arrayListOf<String?>("foo", "bar")
         val notNull = data.requireNoNulls()
         assertEquals(arrayListOf("foo", "bar"), notNull)
 
@@ -395,7 +313,7 @@ class CollectionTest {
         //    assertTrue(IterableWrapper(data).contains("bar"))
         //    assertFalse(IterableWrapper(data).contains("some"))
 
-        assertFalse(hashSet<Int>().contains(12))
+        assertFalse(hashSetOf<Int>().contains(12))
         assertTrue(arrayListOf(15, 19, 20).contains(15))
 
         //    assertTrue(IterableWrapper(hashSet(45, 14, 13)).contains(14))

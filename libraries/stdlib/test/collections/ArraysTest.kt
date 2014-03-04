@@ -1,4 +1,4 @@
-package test.arrays
+package test.collections
 
 import kotlin.test.*
 import org.junit.Test as test

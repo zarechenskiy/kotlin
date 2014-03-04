@@ -103,6 +103,23 @@ fun elements(): List<GenericFunction> {
             """
         }
     }
+    templates add f("firstOrNull()") {
+        doc { "Returns first elementm, or null if collection is empty" }
+        returns("T?")
+        body {
+            """
+            val iterator = iterator()
+            if (!iterator.hasNext())
+                return null
+            return iterator.next()
+            """
+        }
+        body(Lists, ArraysOfObjects, ArraysOfPrimitives) {
+            """
+            return if (size > 0) this[0] else null
+            """
+        }
+    }
 
     templates add f("first(predicate: (T) -> Boolean)") {
         inline(true)
@@ -154,6 +171,32 @@ fun elements(): List<GenericFunction> {
             if (size == 0)
                 throw IllegalArgumentException("Collection is empty")
             return this[size - 1]
+            """
+        }
+    }
+
+    templates add f("lastOrNull()") {
+        doc { "Returns last element, or null if collection is empty" }
+        returns("T?")
+        body {
+            """
+            when (this) {
+                is List<*> -> return if (size > 0) this[size - 1] as T else null
+                else -> {
+                    val iterator = iterator()
+                    if (!iterator.hasNext())
+                        return null
+                    var last = iterator.next()
+                    while (iterator.hasNext())
+                        last = iterator.next()
+                    return last
+                }
+            }
+            """
+        }
+        body(Lists, ArraysOfObjects, ArraysOfPrimitives) {
+            """
+            return return if (size > 0) this[size - 1] else null
             """
         }
     }
@@ -224,6 +267,36 @@ fun elements(): List<GenericFunction> {
         }
         body(ArraysOfObjects, ArraysOfPrimitives) {
             """
+            if (size != 1)
+                throw IllegalArgumentException("Collection has ${bucks}size elements")
+            return this[0]
+            """
+        }
+    }
+
+    templates add f("singleOrNull()") {
+        doc { "Returns single element, or null if collection is empty, or throws exception if there is more than one element" }
+        returns("T?")
+        body {
+            """
+            when (this) {
+                is List<*> -> return if (size == 1) this[0] as T else if (size == 0) null else throw IllegalArgumentException("Collection has ${bucks}size elements")
+                else -> {
+                    val iterator = iterator()
+                    if (!iterator.hasNext())
+                        return null
+                    var single = iterator.next()
+                    if (iterator.hasNext())
+                        throw IllegalArgumentException("Collection has more than one element")
+                    return single
+                }
+            }
+            """
+        }
+        body(ArraysOfObjects, ArraysOfPrimitives) {
+            """
+            if (size == 0)
+                return null
             if (size != 1)
                 throw IllegalArgumentException("Collection has ${bucks}size elements")
             return this[0]

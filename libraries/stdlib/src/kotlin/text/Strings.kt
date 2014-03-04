@@ -8,6 +8,12 @@ import java.util.LinkedList
 /** Returns the string with leading and trailing text matching the given string removed */
 public fun String.trim(text: String) : String = trimLeading(text).trimTrailing(text)
 
+/** Returns the first character  */
+public fun String.first() : Char = this[0]
+
+/** Returns the last character  */
+public fun String.last() : Char = this[length - 1]
+
 /** Returns the string with the prefix and postfix text trimmed */
 public fun String.trim(prefix: String, postfix: String) : String = trimLeading(prefix).trimTrailing(postfix)
 
