@@ -170,6 +170,12 @@ class ArraysTest {
         assertEquals(listOf("1","2","3","4"), listOf("1", "2") + array("3", "4"))
     }
 
+    test fun contains() {
+        assertTrue(array("1","2","3","4").contains("2"))
+        assertTrue("3" in array("1","2","3","4"))
+        assertTrue("0" !in array("1","2","3","4"))
+    }
+
     /*
 
     TODO FIXME ASAP: These currently fail on JS due to missing upto() method on numbers
