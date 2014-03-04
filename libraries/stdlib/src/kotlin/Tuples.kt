@@ -51,3 +51,12 @@ public data class Triple<out A, out B, out C> (
                third == t.third;
     }
 }
+
+
+/**
+ * Creates a tuple of type [[Pair<A,B>]] from this and *that* which can be useful for creating [[Map]] literals
+ * with less noise, for example
+
+ * @includeFunctionBody ../../test/MapTest.kt createUsingTo
+ */
+public fun <A,B> A.to(that: B): Pair<A, B> = Pair(this, that)
