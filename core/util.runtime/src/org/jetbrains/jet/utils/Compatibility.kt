@@ -4,9 +4,18 @@ import java.util.ArrayList
 import kotlin.support.AbstractIterator
 
 //TODO: Remove after updating to new stdlib
-fun <T: Any> Iterable<T>.firstOrNull() : T? {
+fun <T: Any> Iterable<T>.firstOrNull_tmp() : T? {
     val iterator = this.iterator()
     return if (iterator.hasNext()) iterator.next() else null
+}
+
+public inline fun <K, V> Map<K,V>.filter_tmp(predicate: (Map.Entry<K,V>)->Boolean) : List<Map.Entry<K,V>> {
+    return filterTo_tmp(ArrayList<Map.Entry<K,V>>(), predicate)
+}
+
+public inline fun <K, V, C: MutableCollection<in Map.Entry<K,V>>> Map<K,V>.filterTo_tmp(collection: C, predicate: (Map.Entry<K,V>) -> Boolean) : C {
+    for (element in this) if (predicate(element)) collection.add(element)
+    return collection
 }
 
 public fun <T, S> Iterator<T>.zip_tmp(iterator: Iterator<S>): Iterator<Pair<T, S>> = PairIterator_tmp(this, iterator)

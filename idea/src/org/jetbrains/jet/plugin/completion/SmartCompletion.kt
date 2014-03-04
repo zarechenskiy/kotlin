@@ -32,6 +32,7 @@ import com.intellij.psi.PsiDocumentManager
 import com.intellij.openapi.application.ApplicationManager
 import org.jetbrains.jet.plugin.project.AnalyzerFacadeWithCache
 import org.jetbrains.jet.plugin.codeInsight.ShortenReferences
+import org.jetbrains.jet.utils.*
 
 trait SmartCompletionData{
     fun accepts(descriptor: DeclarationDescriptor): Boolean
@@ -288,7 +289,7 @@ private fun processDataFlowInfo(dataFlowInfo: DataFlowInfo?, receiver: JetExpres
 
         val nullabilityInfo: Map<DataFlowValue, Nullability> = dataFlowInfo.getCompleteNullabilityInfo()
         val notNullVariables = nullabilityInfo
-                .filter { it.getValue() == Nullability.NOT_NULL }
+                .filter_tmp { it.getValue() == Nullability.NOT_NULL }
                 .map { dataFlowValueToVariable(it.getKey()) }
                 .filterNotNullTo(HashSet<VariableDescriptor>())
 
@@ -409,13 +410,3 @@ private fun <T> MutableCollection<T>.addAll(iterator: Iterator<T>) {
 }
 
 private fun String?.isNullOrEmpty() = this == null || this.isEmpty()
-
-// TODO: Remove after migrating to new runtime
-public inline fun <K, V> Map<K,V>.filter(predicate: (Map.Entry<K,V>)->Boolean) : List<Map.Entry<K,V>> {
-    return filterTo(ArrayList<Map.Entry<K,V>>(), predicate)
-}
-
-public inline fun <K, V, C: MutableCollection<in Map.Entry<K,V>>> Map<K,V>.filterTo(collection: C, predicate: (Map.Entry<K,V>) -> Boolean) : C {
-    for (element in this) if (predicate(element)) collection.add(element)
-    return collection
-}
