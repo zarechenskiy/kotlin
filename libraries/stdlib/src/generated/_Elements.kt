@@ -8,6 +8,83 @@ package kotlin
 import java.util.*
 
 /**
+ * Returns true if *element* is found in the collection
+ */
+public fun <T> Array<out T>.contains(element: T) : Boolean {
+    return indexOf(element) >= 0
+}
+
+/**
+ * Returns true if *element* is found in the collection
+ */
+public fun BooleanArray.contains(element: Boolean) : Boolean {
+    return indexOf(element) >= 0
+}
+
+/**
+ * Returns true if *element* is found in the collection
+ */
+public fun ByteArray.contains(element: Byte) : Boolean {
+    return indexOf(element) >= 0
+}
+
+/**
+ * Returns true if *element* is found in the collection
+ */
+public fun CharArray.contains(element: Char) : Boolean {
+    return indexOf(element) >= 0
+}
+
+/**
+ * Returns true if *element* is found in the collection
+ */
+public fun DoubleArray.contains(element: Double) : Boolean {
+    return indexOf(element) >= 0
+}
+
+/**
+ * Returns true if *element* is found in the collection
+ */
+public fun FloatArray.contains(element: Float) : Boolean {
+    return indexOf(element) >= 0
+}
+
+/**
+ * Returns true if *element* is found in the collection
+ */
+public fun IntArray.contains(element: Int) : Boolean {
+    return indexOf(element) >= 0
+}
+
+/**
+ * Returns true if *element* is found in the collection
+ */
+public fun LongArray.contains(element: Long) : Boolean {
+    return indexOf(element) >= 0
+}
+
+/**
+ * Returns true if *element* is found in the collection
+ */
+public fun ShortArray.contains(element: Short) : Boolean {
+    return indexOf(element) >= 0
+}
+
+/**
+ * Returns true if *element* is found in the collection
+ */
+public fun <T> Iterable<T>.contains(element: T) : Boolean {
+    return indexOf(element) >= 0
+}
+
+/**
+ * Returns true if *element* is found in the collection
+ */
+public fun <T> Stream<T>.contains(element: T) : Boolean {
+    return indexOf(element) >= 0
+}
+
+/**
  * Returns element at given *index*
  */
 public fun <T> Array<out T>.elementAt(index : Int) : T {

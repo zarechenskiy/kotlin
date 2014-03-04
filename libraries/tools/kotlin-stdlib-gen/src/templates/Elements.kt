@@ -5,6 +5,14 @@ import templates.Family.*
 fun elements(): List<GenericFunction> {
     val templates = arrayListOf<GenericFunction>()
 
+    templates add f("contains(element: T)") {
+        doc { "Returns true if *element* is found in the collection" }
+        returns("Boolean")
+        body {
+            "return indexOf(element) >= 0"
+        }
+    }
+
     templates add f("indexOf(element: T)") {
         doc { "Returns first index of *element*, or -1 if the collection does not contain element" }
         returns("Int")

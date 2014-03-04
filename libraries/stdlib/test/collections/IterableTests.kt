@@ -100,6 +100,13 @@ abstract class IterableBaseTests<T : Iterable<String>>(val data: T, val empty: T
         expect(-1) { data.indexOf("zap") }
     }
 
+    Test fun contains() {
+        assertTrue(data.contains("foo"))
+        assertTrue("bar" in data)
+        assertTrue("baz" !in data)
+        assertFalse("baz" in empty)
+    }
+
     Test fun single() {
         fails { data.single() }
         fails { empty.single() }

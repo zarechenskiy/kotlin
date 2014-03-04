@@ -14,15 +14,6 @@ fun arrays(): List<GenericFunction> {
         }
     }
 
-    templates add f("contains(element : T)") {
-        only(ArraysOfObjects, ArraysOfPrimitives)
-        doc { "Returns true if the array contains specified element" }
-        returns("Boolean")
-        body {
-            "return indexOf(element) != -1"
-        }
-    }
-
     templates add f("isNotEmpty()") {
         only(ArraysOfObjects, ArraysOfPrimitives)
         doc { "Returns true if the array is not empty" }

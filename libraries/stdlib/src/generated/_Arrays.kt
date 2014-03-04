@@ -8,69 +8,6 @@ package kotlin
 import java.util.*
 
 /**
- * Returns true if the array contains specified element
- */
-public fun <T> Array<out T>.contains(element : T) : Boolean {
-    return indexOf(element) != -1
-}
-
-/**
- * Returns true if the array contains specified element
- */
-public fun BooleanArray.contains(element : Boolean) : Boolean {
-    return indexOf(element) != -1
-}
-
-/**
- * Returns true if the array contains specified element
- */
-public fun ByteArray.contains(element : Byte) : Boolean {
-    return indexOf(element) != -1
-}
-
-/**
- * Returns true if the array contains specified element
- */
-public fun CharArray.contains(element : Char) : Boolean {
-    return indexOf(element) != -1
-}
-
-/**
- * Returns true if the array contains specified element
- */
-public fun DoubleArray.contains(element : Double) : Boolean {
-    return indexOf(element) != -1
-}
-
-/**
- * Returns true if the array contains specified element
- */
-public fun FloatArray.contains(element : Float) : Boolean {
-    return indexOf(element) != -1
-}
-
-/**
- * Returns true if the array contains specified element
- */
-public fun IntArray.contains(element : Int) : Boolean {
-    return indexOf(element) != -1
-}
-
-/**
- * Returns true if the array contains specified element
- */
-public fun LongArray.contains(element : Long) : Boolean {
-    return indexOf(element) != -1
-}
-
-/**
- * Returns true if the array contains specified element
- */
-public fun ShortArray.contains(element : Short) : Boolean {
-    return indexOf(element) != -1
-}
-
-/**
  * Returns true if the array is empty
  */
 public fun <T> Array<out T>.isEmpty() : Boolean {
