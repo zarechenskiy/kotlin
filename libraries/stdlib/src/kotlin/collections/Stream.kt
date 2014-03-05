@@ -1,5 +1,7 @@
 package kotlin
 
+import kotlin.support.AbstractIterator
+
 public trait Stream<out T> {
     public fun iterator(): Iterator<T>
 }
