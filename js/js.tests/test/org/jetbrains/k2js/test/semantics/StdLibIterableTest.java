@@ -21,9 +21,7 @@ import junit.framework.Test;
 @SuppressWarnings("JUnitTestCaseWithNoTests")
 public final class StdLibIterableTest extends JsUnitTestBase {
     public static Test suite() throws Exception {
-        return createTestSuiteForFile("libraries/stdlib/test/collections/IterableTests.kt",
-                                      "SetTest.filter",
-                                      "SetTest.find");
+        return createTestSuiteForFile("libraries/stdlib/test/collections/IterableTests.kt");
     }
 }
 
