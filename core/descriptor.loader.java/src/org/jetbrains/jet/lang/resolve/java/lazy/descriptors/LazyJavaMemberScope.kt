@@ -34,6 +34,7 @@ import org.jetbrains.jet.lang.resolve.java.resolver.ExternalSignatureResolver
 import org.jetbrains.jet.lang.resolve.java.sam.SingleAbstractMethodUtils
 import org.jetbrains.jet.utils.Printer
 import org.jetbrains.jet.lang.resolve.java.descriptor.JavaPackageFragmentDescriptor
+import org.jetbrains.jet.utils.*
 
 public abstract class LazyJavaMemberScope(
         protected val c: LazyJavaResolverContextWithTypes,
@@ -61,7 +62,7 @@ public abstract class LazyJavaMemberScope(
         ->
         val methods = memberIndex().findMethodsByName(name)
         val functions = LinkedHashSet(
-                methods.iterator()
+                methods
                       // values() and valueOf() are added manually, see LazyJavaClassDescriptor::getClassObjectDescriptor()
                       .filter{ m -> !DescriptorResolverUtils.shouldBeInEnumClassObject(m) }
                       .flatMap {
@@ -69,10 +70,10 @@ public abstract class LazyJavaMemberScope(
                               val function = resolveMethodToFunctionDescriptor(m, true)
                               val samAdapter = resolveSamAdapter(function)
                               if (samAdapter != null)
-                                  listOf(function, samAdapter).iterator()
+                                  listOf(function, samAdapter)
                               else
-                                  listOf(function).iterator()
-                      }.toList())
+                                  listOf(function)
+                      })
 
         if (_containingDeclaration is JavaPackageFragmentDescriptor) {
             val klass = c.javaClassResolver.resolveClassByFqName(_containingDeclaration.getFqName().child(name))
@@ -165,7 +166,7 @@ public abstract class LazyJavaMemberScope(
             function: FunctionDescriptor,
             jValueParameters: List<JavaValueParameter>
     ): List<ValueParameterDescriptor> {
-        return jValueParameters.withIndices().map {
+        return jValueParameters.withIndices_tmp().map_tmp {
             pair ->
             val (index, javaParameter) = pair
 

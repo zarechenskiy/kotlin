@@ -52,13 +52,11 @@ public class KotlinSafeDeleteProcessor : JavaSafeDeleteProcessor() {
     override fun findUsages(
             element: PsiElement, allElementsToDelete: Array<out PsiElement>, usages: MutableList<UsageInfo>
     ): NonCodeUsageSearchInfo {
-        val deleteList = allElementsToDelete.toList()
-
         fun getIgnoranceCondition(): Condition<PsiElement> {
             return object : Condition<PsiElement> {
                 override fun value(t: PsiElement?): Boolean {
                     if (t is JetFile) return false
-                    return deleteList.any { element -> JavaSafeDeleteProcessor.isInside(t, element.unwrapped) }
+                    return allElementsToDelete.any { element -> JavaSafeDeleteProcessor.isInside(t, element.unwrapped) }
                 }
             }
         }
@@ -105,7 +103,7 @@ public class KotlinSafeDeleteProcessor : JavaSafeDeleteProcessor() {
             return searchInfo
         }
 
-        fun findUsagesByJavaProcessor(elements: Iterator<PsiElement>, insideDeleted: Condition<PsiElement>): Condition<PsiElement> =
+        fun findUsagesByJavaProcessor(elements: Iterable<PsiElement>, insideDeleted: Condition<PsiElement>): Condition<PsiElement> =
                 elements
                         .map { element -> findUsagesByJavaProcessor(element, true)?.getInsideDeletedCondition() }
                         .filterNotNull()
@@ -114,7 +112,7 @@ public class KotlinSafeDeleteProcessor : JavaSafeDeleteProcessor() {
         fun findUsagesByJavaProcessor(jetDeclaration: JetDeclaration): NonCodeUsageSearchInfo {
             return NonCodeUsageSearchInfo(
                     findUsagesByJavaProcessor(
-                            jetDeclaration.toLightElements().iterator(),
+                            jetDeclaration.toLightElements(),
                             getIgnoranceCondition()
                     ),
                     jetDeclaration
@@ -123,7 +121,6 @@ public class KotlinSafeDeleteProcessor : JavaSafeDeleteProcessor() {
 
         fun findKotlinDeclarationUsages(declaration: JetDeclaration): NonCodeUsageSearchInfo {
             ReferencesSearch.search(declaration, declaration.getUseScope())
-                    .iterator()
                     .filterNot { reference -> getIgnoranceCondition().value(reference.getElement()) }
                     .mapTo(usages) { reference ->
                         reference.getElement().getParentByType(javaClass<JetImportDirective>())?.let { importDirective ->
@@ -214,7 +211,6 @@ public class KotlinSafeDeleteProcessor : JavaSafeDeleteProcessor() {
             if (declarationDescriptor !is CallableMemberDescriptor) return null
 
             return declarationDescriptor.getOverriddenDescriptors()
-                    .iterator()
                     .filter { overridenDescriptor -> overridenDescriptor.getModality() == Modality.ABSTRACT }
                     .mapTo(ArrayList<String>()) { overridenDescriptor ->
                         JetBundle.message(

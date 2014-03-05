@@ -4,14 +4,11 @@ import java.io.Serializable
 
 private fun Any?.safeHashCode() : Int = if (this == null) 0 else this.hashCode()
 
-// TODO: make it a data class
-public class Pair<out A, out B> (
+/** Represents generic data structure holding three values and exposing value semantics */
+public data class Pair<out A, out B> (
         public val first: A,
         public val second: B
 ) : Serializable {
-    public fun component1(): A = first
-    public fun component2(): B = second
-
     override fun toString(): String = "($first, $second)"
 
     override fun hashCode(): Int {
@@ -29,15 +26,12 @@ public class Pair<out A, out B> (
     }
 }
 
-public class Triple<A, B, C> (
+/** Represents generic data structure holding three values and exposing value semantics */
+public data class Triple<out A, out B, out C> (
         public val first: A,
         public val second: B,
         public val third: C
 ) : Serializable {
-    public fun component1(): A = first
-    public fun component2(): B = second
-    public fun component3(): C = third
-
     override fun toString(): String = "($first, $second, $third)"
 
     override fun hashCode(): Int {

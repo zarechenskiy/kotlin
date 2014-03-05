@@ -105,8 +105,8 @@ public fun JetClass.isAbstract(): Boolean = isTrait() || hasModifier(JetTokens.A
 [suppress("UNCHECKED_CAST")]
 public fun <T: PsiElement> PsiElement.replaced(newElement: T): T = replace(newElement) as T
 
-public fun JetElement.blockExpressionsOrSingle(): Iterator<JetElement> =
-        if (this is JetBlockExpression) getStatements().iterator() else SingleIterator(this)
+public fun JetElement.blockExpressionsOrSingle(): Iterable<JetElement> =
+        if (this is JetBlockExpression) getStatements() else listOf(this)
 
 public fun JetElement.outermostLastBlockElement(predicate: (JetElement) -> Boolean = { true }): JetElement? {
     return JetPsiUtil.getOutermostLastBlockElement(this) { e -> e != null && predicate(e) }

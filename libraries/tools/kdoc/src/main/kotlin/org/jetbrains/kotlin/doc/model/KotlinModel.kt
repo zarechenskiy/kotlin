@@ -333,7 +333,7 @@ class KModel(val context: BindingContext, val config: KDocConfig, val sourceDirs
                 val srcFile = File(srcPath)
                 val dir = if (srcFile.isDirectory()) srcFile else srcFile.getParentFile()
                 if (dir != null && readMeDirsScanned.add(dir.getPath()!!)) {
-                    val f = packageDescriptionFiles.map{ File(dir, it) }.find{ it.exists() }
+                    val f = packageDescriptionFiles.map{ File(dir, it) }.find { it.exists() }
                     if (f != null) {
                         val file = f.getCanonicalPath()
                         loadWikiDescription(pkg, file)

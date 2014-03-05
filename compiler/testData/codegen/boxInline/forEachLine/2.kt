@@ -11,7 +11,7 @@ public inline fun <T, R> T.use(block: (T)-> R) : R {
 }
 
 public inline fun Input.forEachLine(block: (String) -> Unit): Unit {
-    useLines { lines -> lines.forEach(block) }
+    useLines { lines -> lines.toList().forEach(block) }
 }
 
 public inline fun Input.useLines(block2: (Iterator<String>) -> Unit): Unit {
