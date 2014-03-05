@@ -72,3 +72,6 @@ public fun <T> countTo(n: Int): (T) -> Boolean {
     var count = 0
     return { ++count; count <= n }
 }
+
+deprecated("Use sortBy() instead")
+public fun <T> Iterable<T>.sort(comparator: java.util.Comparator<T>) : List<T> = sortBy(comparator)
