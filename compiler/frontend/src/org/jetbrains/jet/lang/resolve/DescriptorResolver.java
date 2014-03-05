@@ -646,9 +646,7 @@ public class DescriptorResolver {
             }
         }
         for (JetTypeConstraint constraint : declaration.getTypeConstraints()) {
-            if (constraint.isClassObjectConstraint()) {
-                trace.report(UNSUPPORTED.on(constraint, "Class objects constraints are not supported yet"));
-            }
+            reportUnsupportedClassObjectConstraint(trace, constraint);
 
             JetSimpleNameExpression subjectTypeParameterName = constraint.getSubjectTypeParameterName();
             if (subjectTypeParameterName == null) {
@@ -711,6 +709,12 @@ public class DescriptorResolver {
 
         for (UpperBoundCheckerTask checkerTask : deferredUpperBoundCheckerTasks) {
             checkUpperBoundType(checkerTask.upperBound, checkerTask.upperBoundType, checkerTask.isClassObjectConstraint, trace);
+        }
+    }
+
+    public static void reportUnsupportedClassObjectConstraint(BindingTrace trace, JetTypeConstraint constraint) {
+        if (constraint.isClassObjectConstraint()) {
+            trace.report(UNSUPPORTED.on(constraint, "Class objects constraints are not supported yet"));
         }
     }
 
