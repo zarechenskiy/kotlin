@@ -134,6 +134,7 @@ public abstract class Config {
             "/generated/_Ordering.kt",
             "/generated/_Snapshots.kt",
             "/generated/_Strings.kt",
+            "/generated/_Streams.kt",
             "/kotlin/Standard.kt",
             "/kotlin/text/Strings.kt",
             "/kotlin/dom/Dom.kt",
