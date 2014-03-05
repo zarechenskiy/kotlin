@@ -105,6 +105,9 @@
     <applicationService serviceInterface="org.jetbrains.jet.OperationModeProvider"
                         serviceImplementation="org.jetbrains.jet.plugin.IdeModeProvider"/>
 
+    <applicationService serviceInterface="org.jetbrains.jet.lang.resolve.kotlin.KotlinBinaryClassCache"
+                        serviceImplementation="org.jetbrains.jet.lang.resolve.kotlin.KotlinBinaryClassCache"/>
+
     <projectService serviceInterface="org.jetbrains.jet.lang.resolve.java.JetFilesProvider"
                     serviceImplementation="org.jetbrains.jet.plugin.project.PluginJetFilesProvider"/>
 
@@ -326,12 +329,11 @@
     <stubIndex implementation="org.jetbrains.jet.plugin.stubindex.JetAnnotationsIndex"/>
     <stubIndex implementation="org.jetbrains.jet.plugin.stubindex.JetTopLevelShortObjectNameIndex"/>
 
-    <clsStubBuilderFactory implementation="org.jetbrains.jet.plugin.stubindex.builder.EmptyPackageFragmentClsStubBuilderFactory"/>
+    <psi.classFileDecompiler implementation="org.jetbrains.jet.plugin.libraries.JetClassFileDecompiler"/>
+    <psi.classFileDecompiler implementation="org.jetbrains.jet.plugin.libraries.JetDecompilerForWrongAbiVersion"/>
 
     <fileBasedIndex implementation="org.jetbrains.jet.plugin.versions.KotlinAbiVersionIndex"/>
     <fileBasedIndex implementation="org.jetbrains.jet.plugin.vfilefinder.KotlinClassFileIndex"/>
-
-    <contentBasedClassFileProcessor implementation="org.jetbrains.jet.plugin.libraries.JetContentBasedFileSubstitutor"/>
 
     <editorNotificationProvider implementation="org.jetbrains.jet.plugin.quickfix.IncorrectSourceRootNameNotification"/>
     <editorNotificationProvider implementation="org.jetbrains.jet.plugin.versions.UnsupportedAbiVersionNotificationPanelProvider"/>
@@ -378,6 +380,11 @@
 
     <intentionAction>
       <className>org.jetbrains.jet.plugin.intentions.ConvertToExpressionBodyAction</className>
+      <category>Kotlin</category>
+    </intentionAction>
+
+    <intentionAction>
+      <className>org.jetbrains.jet.plugin.intentions.ConvertToBlockBodyAction</className>
       <category>Kotlin</category>
     </intentionAction>
 
@@ -486,6 +493,16 @@
       <category>Kotlin</category>
     </intentionAction>
 
+    <intentionAction>
+      <className>org.jetbrains.jet.plugin.intentions.MoveLambdaInsideParenthesesIntention</className>
+      <category>Kotlin</category>
+    </intentionAction>
+
+    <intentionAction>
+      <className>org.jetbrains.jet.plugin.intentions.MoveLambdaOutsideParenthesesIntention</className>
+      <category>Kotlin</category>
+    </intentionAction>
+    
     <intentionAction>
       <className>org.jetbrains.jet.plugin.intentions.declarations.SplitPropertyDeclarationIntention</className>
       <category>Kotlin</category>

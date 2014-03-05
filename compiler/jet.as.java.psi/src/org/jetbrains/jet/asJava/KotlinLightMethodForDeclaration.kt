@@ -40,6 +40,7 @@ import org.jetbrains.jet.lang.psi.JetProperty
 import com.intellij.psi.PsiTypeParameter
 import org.jetbrains.jet.lang.psi.JetClassOrObject
 import com.intellij.psi.impl.light.LightTypeParameterListBuilder
+import com.intellij.psi.search.SearchScope
 import org.jetbrains.jet.utils.*
 
 public class KotlinLightMethodForDeclaration(
@@ -107,4 +108,6 @@ public class KotlinLightMethodForDeclaration(
     override fun copy(): PsiElement {
         return KotlinLightMethodForDeclaration(getManager()!!, delegate, origin.copy() as JetDeclaration, getContainingClass()!!)
     }
+
+    override fun getUseScope(): SearchScope = origin.getUseScope()
 }

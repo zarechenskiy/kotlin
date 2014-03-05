@@ -97,6 +97,7 @@ import org.jetbrains.jet.resolve.AbstractReferenceToJavaWithWrongFileStructureTe
 import org.jetbrains.jet.plugin.navigation.AbstractKotlinGotoTest
 import org.jetbrains.jet.plugin.AbstractExpressionSelectionTest
 import org.jetbrains.jet.plugin.refactoring.move.AbstractJetMoveTest
+import org.jetbrains.jet.plugin.libraries.AbstractDecompiledTextTest
 
 fun main(args: Array<String>) {
     System.setProperty("java.awt.headless", "true")
@@ -274,6 +275,10 @@ fun main(args: Array<String>) {
             model("intentions/convertToExpressionBody", pattern = "^before(\\w+)\\.kt$")
         }
 
+        testClass(javaClass<AbstractIntentionTest>(), "ConvertToBlockBodyTestGenerated") {
+            model("intentions/convertToBlockBody", pattern = "^before(\\w+)\\.kt$")
+        }
+
         testClass(javaClass<AbstractJSBasicCompletionTest>()) {
             model("completion/basic/common")
             model("completion/basic/js")
@@ -362,6 +367,8 @@ fun main(args: Array<String>) {
             model("intentions/replaceWithInfixFunctionCall", testMethod = "doTestReplaceWithInfixFunctionCall")
             model("intentions/removeCurlyBracesFromTemplate", testMethod = "doTestRemoveCurlyFromTemplate")
             model("intentions/insertCurlyBracestsToTemplate", testMethod = "doTestInsertCurlyToTemplate")
+            model("intentions/moveLambdaInsideParentheses", testMethod = "doTestMoveLambdaInsideParentheses")
+            model("intentions/moveLambdaOutsideParentheses", testMethod = "doTestMoveLambdaOutsideParentheses")
         }
 
         testClass(javaClass<AbstractHierarchyTest>()) {
@@ -500,6 +507,10 @@ fun main(args: Array<String>) {
 
         testClass(javaClass<AbstractExpressionSelectionTest>()) {
             model("expressionSelection", testMethod = "doTestExpressionSelection", pattern = """^([^\.]+)\.kt$""")
+        }
+
+        testClass(javaClass<AbstractDecompiledTextTest>()) {
+            model("libraries/decompiledText", pattern = """^([^\.]+)$""")
         }
     }
 
