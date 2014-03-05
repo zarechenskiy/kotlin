@@ -52,7 +52,7 @@ public class NavigateToStdlibSourceRegressionTest extends NavigateToLibraryRegre
     }
 
     public void testClassWithJavaAnalog() throws IOException {
-        doNavigationInSourcesTest("libraries/stdlib/src/kotlin/support/AbstractIterator.kt", "Iterator", "kotlin.Iterator");
+        doNavigationInSourcesTest("libraries/stdlib/src/kotlin/collections/AbstractIterator.kt", "Iterator", "kotlin.Iterator");
     }
 
     public void testNavigationInKotlinBuiltIns() throws IOException {

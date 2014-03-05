@@ -121,7 +121,7 @@ public abstract class Config {
             "/kotlin/collections/Exceptions.kt",
             "/kotlin/collections/MutableCollections.kt",
             "/kotlin/collections/Stream.kt",
-            "/kotlin/support/AbstractIterator.kt",
+            "/kotlin/collections/AbstractIterator.kt",
             "/generated/_Aggregates.kt",
             "/generated/_Arrays.kt",
             "/generated/_DownTo.kt",

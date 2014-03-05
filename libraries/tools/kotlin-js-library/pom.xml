@@ -59,9 +59,9 @@
                                     </fileset>
                                     <fileset dir="${basedir}/../../stdlib/src/kotlin">
                                         <include name="Preconditions.kt"/>
-                                        <include name="support/AbstractIterator.kt"/>
                                         <include name="Functions.kt"/>
                                         <include name="Integers.kt"/>
+                                        <include name="collections/AbstractIterator.kt"/>
                                         <include name="collections/Iterators.kt"/>
                                         <include name="collections/Arrays.kt"/>
                                         <include name="collections/JUtil.kt"/>
