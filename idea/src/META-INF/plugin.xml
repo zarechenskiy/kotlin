@@ -294,6 +294,7 @@
     <codeInsight.implementMethod language="jet" implementationClass="org.jetbrains.jet.plugin.codeInsight.ImplementMethodsHandler"/>
     <codeInsight.overrideMethod language="jet" implementationClass="org.jetbrains.jet.plugin.codeInsight.OverrideMethodsHandler"/>
 
+    <frameworkSupport implementation="org.jetbrains.jet.plugin.framework.KotlinFrameworkSupportProvider"/>
     <framework.type implementation="org.jetbrains.jet.plugin.framework.JavaFrameworkType"/>
     <framework.type implementation="org.jetbrains.jet.plugin.framework.JSFrameworkType"/>
     <library.presentationProvider implementation="org.jetbrains.jet.plugin.framework.JavaRuntimePresentationProvider"/>
