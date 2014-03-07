@@ -55,7 +55,7 @@ public class LambdaTransformer {
 
     private final MethodNode bridge;
 
-    private final InliningContext info;
+    private final InliningContext inliningContext;
 
     private final Type oldLambdaType;
 
@@ -67,11 +67,11 @@ public class LambdaTransformer {
     private String[] interfaces;
     private final boolean isSameModule;
 
-    public LambdaTransformer(String lambdaInternalName, InliningContext info, boolean isSameModule, Type newLambdaType) {
+    public LambdaTransformer(String lambdaInternalName, InliningContext inliningContext, boolean isSameModule, Type newLambdaType) {
         this.isSameModule = isSameModule;
-        this.state = info.state;
+        this.state = inliningContext.state;
         this.typeMapper = state.getTypeMapper();
-        this.info = info;
+        this.inliningContext = inliningContext;
         this.oldLambdaType = Type.getObjectType(lambdaInternalName);
         this.newLambdaType = newLambdaType;
 
@@ -108,7 +108,7 @@ public class LambdaTransformer {
         }
     }
 
-    public InlineResult doTransform(ConstructorInvocation invocation) {
+    public InlineResult doTransform(ConstructorInvocation invocation, LambdaFieldRemapper parentRemapper) {
         ClassBuilder classBuilder = createClassBuilder();
 
         //TODO: public visibility for inline function
@@ -129,8 +129,9 @@ public class LambdaTransformer {
 
         MethodVisitor invokeVisitor = newMethod(classBuilder, invoke);
         RegeneratedLambdaFieldRemapper
-                remapper = new RegeneratedLambdaFieldRemapper(oldLambdaType.getInternalName(), newLambdaType.getInternalName(), parameters, invocation.getCapturedLambdasToInline());
-        MethodInliner inliner = new MethodInliner(invoke, parameters, info.subInline(info.nameGenerator.subGenerator("lambda")), oldLambdaType,
+                remapper = new RegeneratedLambdaFieldRemapper(oldLambdaType.getInternalName(), newLambdaType.getInternalName(), parameters, invocation.getCapturedLambdasToInline(),
+                                                              parentRemapper);
+        MethodInliner inliner = new MethodInliner(invoke, parameters, inliningContext.subInline(inliningContext.nameGenerator.subGenerator("lambda")), oldLambdaType,
                                                   remapper, isSameModule);
         InlineResult result = inliner.doInline(invokeVisitor, new VarRemapper.ParamRemapper(parameters, 0), remapper, false);
         invokeVisitor.visitMaxs(-1, -1);
@@ -182,8 +183,8 @@ public class LambdaTransformer {
     }
 
     private ClassBuilder createClassBuilder() {
-        return new RemappingClassBuilder(state.getFactory().forLambdaInlining(newLambdaType, info.call.getCallElement().getContainingFile()),
-                     new TypeRemapper(info.typeMapping));
+        return new RemappingClassBuilder(state.getFactory().forLambdaInlining(newLambdaType, inliningContext.call.getCallElement().getContainingFile()),
+                     new TypeRemapper(inliningContext.typeMapping));
     }
 
     private static MethodVisitor newMethod(ClassBuilder builder, MethodNode original) {
