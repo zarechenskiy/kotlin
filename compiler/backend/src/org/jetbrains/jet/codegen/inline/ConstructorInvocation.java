@@ -95,4 +95,7 @@ public class ConstructorInvocation {
         this.capturedLambdasToInline = capturedLambdasToInline;
     }
 
+    public boolean isCapturedOuterRegenerated() {
+        return capturedOuterRegenerated;
+    }
 }
