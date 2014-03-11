@@ -97,6 +97,7 @@ import org.jetbrains.jet.resolve.AbstractReferenceToJavaWithWrongFileStructureTe
 import org.jetbrains.jet.plugin.navigation.AbstractKotlinGotoTest
 import org.jetbrains.jet.plugin.AbstractExpressionSelectionTest
 import org.jetbrains.jet.plugin.refactoring.move.AbstractJetMoveTest
+import org.jetbrains.jet.cfg.AbstractDataFlowTest
 import org.jetbrains.jet.plugin.libraries.AbstractDecompiledTextTest
 import org.jetbrains.jet.plugin.imports.AbstractOptimizeImportsTest
 
@@ -237,6 +238,10 @@ fun main(args: Array<String>) {
             model("cfg")
         }
 
+        testClass(javaClass<AbstractDataFlowTest>()) {
+            model("cfg-variables")
+        }
+
         testClass(javaClass<AbstractAnnotationParameterTest>()) {
             model("resolveAnnotations/parameters")
         }
@@ -374,6 +379,11 @@ fun main(args: Array<String>) {
             model("intentions/replaceItWithExplicitFunctionLiteralParam", testMethod = "doTestReplaceItWithExplicitFunctionLiteralParam")
             model("intentions/removeBraces", testMethod = "doTestRemoveBraces")
             model("intentions/addBraces", testMethod = "doTestAddBraces")
+            model("intentions/attributeCallReplacements/replaceGetIntention", testMethod = "doTestReplaceGetIntention")
+            model("intentions/attributeCallReplacements/replaceContainsIntention", testMethod = "doTestReplaceContainsIntention")
+            model("intentions/attributeCallReplacements/replaceBinaryInfixIntention", testMethod = "doTestReplaceBinaryInfixIntention")
+            model("intentions/attributeCallReplacements/replaceUnaryPrefixIntention", testMethod = "doTestReplaceUnaryPrefixIntention")
+            model("intentions/attributeCallReplacements/replaceInvokeIntention", testMethod = "doTestReplaceInvokeIntention")
         }
 
         testClass(javaClass<AbstractHierarchyTest>()) {
