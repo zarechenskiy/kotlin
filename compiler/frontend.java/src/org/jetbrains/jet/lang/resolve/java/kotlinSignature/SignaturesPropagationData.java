@@ -205,6 +205,7 @@ public class SignaturesPropagationData {
                         shouldBeExtension ? originalIndex - 1 : originalIndex,
                         originalParam.getAnnotations(),
                         originalParam.getName(),
+                        originalParam.hasPhysicalName(),
                         altType,
                         originalParam.declaresDefaultValue(),
                         varargCheckResult.isVararg ? KotlinBuiltIns.getInstance().getArrayElementType(altType) : null

@@ -34,6 +34,7 @@ public class ValueParameterDescriptorImpl extends VariableDescriptorImpl impleme
 
     private final JetType varargElementType;
     private final int index;
+    private final boolean hasPhysicalName;
     private final ValueParameterDescriptor original;
 
     private final Set<ValueParameterDescriptor> overriddenDescriptors = Sets.newLinkedHashSet(); // Linked is essential
@@ -45,6 +46,7 @@ public class ValueParameterDescriptorImpl extends VariableDescriptorImpl impleme
             int index,
             @NotNull Annotations annotations,
             @NotNull Name name,
+            boolean hasPhysicalName,
             @NotNull JetType outType,
             boolean declaresDefaultValue,
             @Nullable JetType varargElementType
@@ -52,6 +54,7 @@ public class ValueParameterDescriptorImpl extends VariableDescriptorImpl impleme
         super(containingDeclaration, annotations, name, outType);
         this.original = this;
         this.index = index;
+        this.hasPhysicalName = hasPhysicalName;
         this.declaresDefaultValue = declaresDefaultValue;
         this.varargElementType = varargElementType;
     }
@@ -59,13 +62,13 @@ public class ValueParameterDescriptorImpl extends VariableDescriptorImpl impleme
     public ValueParameterDescriptorImpl(
             @NotNull DeclarationDescriptor containingDeclaration,
             @NotNull ValueParameterDescriptor original,
-            @NotNull Annotations annotations,
             @NotNull JetType outType,
             @Nullable JetType varargElementType
     ) {
-        super(containingDeclaration, annotations, original.getName(), outType);
+        super(containingDeclaration, original.getAnnotations(), original.getName(), outType);
         this.original = original;
         this.index = original.getIndex();
+        this.hasPhysicalName = original.hasPhysicalName();
         this.declaresDefaultValue = original.declaresDefaultValue();
         this.varargElementType = varargElementType;
     }
@@ -88,6 +91,11 @@ public class ValueParameterDescriptorImpl extends VariableDescriptorImpl impleme
     @Override
     public boolean declaresDefaultValue() {
         return declaresDefaultValue && ((CallableMemberDescriptor) getContainingDeclaration()).getKind().isReal();
+    }
+
+    @Override
+    public boolean hasPhysicalName() {
+        return hasPhysicalName;
     }
 
     private void computeDefaultValuePresence() {
@@ -138,7 +146,8 @@ public class ValueParameterDescriptorImpl extends VariableDescriptorImpl impleme
     @NotNull
     @Override
     public ValueParameterDescriptor copy(@NotNull DeclarationDescriptor newOwner, @NotNull Name newName) {
-        return new ValueParameterDescriptorImpl(newOwner, index, getAnnotations(), newName, getType(), declaresDefaultValue(), varargElementType);
+        return new ValueParameterDescriptorImpl(newOwner, index, getAnnotations(), newName, hasPhysicalName, getType(),
+                                                declaresDefaultValue(), varargElementType);
     }
 
     @NotNull

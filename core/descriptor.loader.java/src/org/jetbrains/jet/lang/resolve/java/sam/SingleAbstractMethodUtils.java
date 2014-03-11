@@ -147,7 +147,7 @@ public class SingleAbstractMethodUtils {
         assert parameterType != null : "couldn't substitute type: " + parameterTypeUnsubstituted +
                                        ", substitutor = " + typeParameters.substitutor;
         ValueParameterDescriptor parameter = new ValueParameterDescriptorImpl(
-                result, 0, Annotations.EMPTY, Name.identifier("function"), parameterType, false, null);
+                result, 0, Annotations.EMPTY, Name.identifier("function"), false, parameterType, false, null);
 
         JetType returnType = typeParameters.substitutor.substitute(samInterface.getDefaultType(), Variance.OUT_VARIANCE);
         assert returnType != null : "couldn't substitute type: " + samInterface.getDefaultType() +
@@ -244,15 +244,14 @@ public class SingleAbstractMethodUtils {
         List<ValueParameterDescriptor> originalValueParameters = original.getValueParameters();
         List<ValueParameterDescriptor> valueParameters = new ArrayList<ValueParameterDescriptor>(originalValueParameters.size());
         for (ValueParameterDescriptor originalParam : originalValueParameters) {
+            // TODO: ValueParameterDescriptor.substitute
             JetType originalType = originalParam.getType();
             JetType functionType = getFunctionTypeForSamType(originalType);
             JetType newTypeUnsubstituted = functionType != null ? functionType : originalType;
             JetType newType = typeParameters.substitutor.substitute(newTypeUnsubstituted, Variance.IN_VARIANCE);
             assert newType != null : "couldn't substitute type: " + newTypeUnsubstituted + ", substitutor = " + typeParameters.substitutor;
 
-            ValueParameterDescriptor newParam = new ValueParameterDescriptorImpl(
-                    adapter, originalParam.getIndex(), originalParam.getAnnotations(), originalParam.getName(), newType, false, null);
-            valueParameters.add(newParam);
+            valueParameters.add(new ValueParameterDescriptorImpl(adapter, originalParam, newType, null));
         }
 
         initializer.initialize(typeParameters.descriptors, valueParameters, returnType);

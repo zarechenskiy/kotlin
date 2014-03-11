@@ -126,15 +126,13 @@ public class FunctionDescriptorUtil {
         List<ValueParameterDescriptor> parameters = new ArrayList<ValueParameterDescriptor>(newParameters.size());
         int idx = 0;
         for (ValueParameterDescriptor parameter : newParameters) {
-            JetType returnType = parameter.getReturnType();
-            assert returnType != null;
-
             parameters.add(new ValueParameterDescriptorImpl(
                     descriptor,
                     idx,
                     parameter.getAnnotations(),
                     parameter.getName(),
-                    returnType,
+                    parameter.hasPhysicalName(),
+                    parameter.getType(),
                     parameter.declaresDefaultValue(),
                     parameter.getVarargElementType())
             );

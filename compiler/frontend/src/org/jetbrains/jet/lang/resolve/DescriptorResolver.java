@@ -416,9 +416,8 @@ public class DescriptorResolver {
             boolean declaresDefaultValue = propertyDescriptor != null;
             ValueParameterDescriptorImpl parameterDescriptor =
                     new ValueParameterDescriptorImpl(functionDescriptor, parameter.getIndex(), parameter.getAnnotations(),
-                                                     parameter.getName(), parameter.getType(),
-                                                     declaresDefaultValue,
-                                                     parameter.getVarargElementType());
+                                                     parameter.getName(), parameter.hasPhysicalName(), parameter.getType(),
+                                                     declaresDefaultValue, parameter.getVarargElementType());
             parameterDescriptors.add(parameterDescriptor);
             if (declaresDefaultValue) {
                 trace.record(BindingContext.VALUE_PARAMETER_AS_PROPERTY, parameterDescriptor, propertyDescriptor);
@@ -541,6 +540,7 @@ public class DescriptorResolver {
                 index,
                 annotations,
                 JetPsiUtil.safeName(valueParameter.getName()),
+                /* hasPhysicalName = */ true,
                 variableType,
                 valueParameter.getDefaultValue() != null,
                 varargElementType

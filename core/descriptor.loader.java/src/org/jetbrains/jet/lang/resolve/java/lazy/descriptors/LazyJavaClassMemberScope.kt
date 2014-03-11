@@ -148,6 +148,7 @@ public class LazyJavaClassMemberScope(
                     index,
                     Annotations.EMPTY,
                     method.getName(),
+                    /* hasPhysicalName = */ true,
                     // Parameters of annotation constructors in Java are never nullable
                     TypeUtils.makeNotNullable(returnType),
                     method.hasAnnotationParameterDefaultValue(),

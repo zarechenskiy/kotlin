@@ -1,3 +1,19 @@
+/*
+ * Copyright 2010-2014 JetBrains s.r.o.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.jetbrains.jet.lang.resolve.java.lazy.descriptors
 
 import org.jetbrains.jet.lang.descriptors.*
@@ -188,18 +204,22 @@ public abstract class LazyJavaMemberScope(
                     else Pair(jetType, null)
                 }
 
-            val name = if (function.getName().asString() == "equals" &&
+            val (name, hasPhysicalName) = if (function.getName().asString() == "equals" &&
                            jValueParameters.size() == 1 &&
                            KotlinBuiltIns.getInstance().getNullableAnyType() == outType) {
                 // This is a hack to prevent numerous warnings on Kotlin classes that inherit Java classes: if you override "equals" in such
                 // class without this hack, you'll be warned that in the superclass the name is "p0" (regardless of the fact that it's
                 // "other" in Any)
                 // TODO: fix Java parameter name loading logic somehow (don't always load "p0", "p1", etc.)
-                Name.identifier("other")
+                Pair(Name.identifier("other"), true)
             }
             else {
                 // TODO: parameter names may be drawn from attached sources, which is slow; it's better to make them lazy
-                javaParameter.getName() ?: Name.identifier("p$index")
+                val javaName = javaParameter.getName()
+                if (javaName != null)
+                    Pair(javaName, true)
+                else
+                    Pair(Name.identifier("p$index"), false)
             }
 
             ValueParameterDescriptorImpl(
@@ -207,6 +227,7 @@ public abstract class LazyJavaMemberScope(
                     index,
                     c.resolveAnnotations(javaParameter),
                     name,
+                    hasPhysicalName,
                     outType,
                     false,
                     varargElementType

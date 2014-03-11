@@ -22,9 +22,7 @@ import org.jetbrains.jet.descriptors.serialization.descriptors.AnnotationDeseria
 import org.jetbrains.jet.descriptors.serialization.descriptors.DeserializedSimpleFunctionDescriptor;
 import org.jetbrains.jet.descriptors.serialization.descriptors.DeserializedTypeParameterDescriptor;
 import org.jetbrains.jet.lang.descriptors.*;
-import org.jetbrains.jet.lang.descriptors.annotations.AnnotationDescriptor;
 import org.jetbrains.jet.lang.descriptors.annotations.Annotations;
-import org.jetbrains.jet.lang.descriptors.annotations.AnnotationsImpl;
 import org.jetbrains.jet.lang.descriptors.impl.*;
 import org.jetbrains.jet.lang.resolve.DescriptorFactory;
 import org.jetbrains.jet.lang.resolve.DescriptorUtils;
@@ -386,6 +384,8 @@ public class DescriptorDeserializer {
                     i,
                     getAnnotations(classOrPackage, callable, kind, proto),
                     nameResolver.getName(proto.getName()),
+                    // TODO: serialize hasPhysicalName to binary data
+                    /* hasPhysicalName = */ true,
                     typeDeserializer.type(proto.getType()),
                     Flags.DECLARES_DEFAULT_VALUE.get(proto.getFlags()),
                     typeDeserializer.typeOrNull(proto.hasVarargElementType() ? proto.getVarargElementType() : null))

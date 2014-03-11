@@ -19,7 +19,6 @@ package org.jetbrains.jet.lang.descriptors.impl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.lang.descriptors.*;
-import org.jetbrains.jet.lang.descriptors.annotations.AnnotationDescriptor;
 import org.jetbrains.jet.lang.descriptors.annotations.Annotations;
 import org.jetbrains.jet.lang.resolve.name.Name;
 import org.jetbrains.jet.lang.types.JetType;
@@ -76,7 +75,7 @@ public class PropertySetterDescriptorImpl extends PropertyAccessorDescriptorImpl
             @NotNull JetType type
     ) {
         return new ValueParameterDescriptorImpl(
-                setterDescriptor, 0, Annotations.EMPTY, Name.special("<set-?>"), type, false, null
+                setterDescriptor, 0, Annotations.EMPTY, Name.special("<set-?>"), true, type, false, null
         );
     }
 

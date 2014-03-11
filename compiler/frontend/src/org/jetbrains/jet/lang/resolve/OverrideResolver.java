@@ -671,7 +671,9 @@ public class OverrideResolver {
                     }
                 }
 
-                if (!parameterFromSuperclass.getName().equals(parameterFromSubclass.getName())) {
+                if (parameterFromSubclass.hasPhysicalName() &&
+                    parameterFromSuperclass.hasPhysicalName() &&
+                    !parameterFromSuperclass.getName().equals(parameterFromSubclass.getName())) {
                     if (noDeclaration) {
                         trace.report(DIFFERENT_NAMES_FOR_THE_SAME_PARAMETER_IN_SUPERTYPES.on(classElement, declared.getOverriddenDescriptors(), parameterFromSuperclass.getIndex() + 1));
                     }

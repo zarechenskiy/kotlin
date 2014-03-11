@@ -46,6 +46,8 @@ public interface ValueParameterDescriptor extends VariableDescriptor {
      */
     boolean declaresDefaultValue();
 
+    boolean hasPhysicalName();
+
     @Nullable JetType getVarargElementType();
 
     @Override

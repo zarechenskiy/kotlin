@@ -258,7 +258,6 @@ public abstract class FunctionDescriptorImpl extends DeclarationDescriptorNonRoo
             result.add(new ValueParameterDescriptorImpl(
                     substitutedDescriptor,
                     unsubstitutedValueParameter,
-                    unsubstitutedValueParameter.getAnnotations(),
                     substitutedType,
                     substituteVarargElementType
             ));

@@ -106,13 +106,9 @@ public class DescriptorFactory {
                 new SimpleFunctionDescriptorImpl(classObject, Annotations.EMPTY, VALUE_OF_METHOD_NAME,
                                                  CallableMemberDescriptor.Kind.SYNTHESIZED);
         ValueParameterDescriptor parameterDescriptor = new ValueParameterDescriptorImpl(
-                values,
-                0,
-                Annotations.EMPTY,
-                Name.identifier("value"),
-                KotlinBuiltIns.getInstance().getStringType(),
-                false,
-                null);
+                values, 0, Annotations.EMPTY, Name.identifier("value"), false, KotlinBuiltIns.getInstance().getStringType(), false, null
+        );
+
         return values.initialize(null, classObject.getThisAsReceiverParameter(),
                                  Collections.<TypeParameterDescriptor>emptyList(),
                                  Collections.singletonList(parameterDescriptor),

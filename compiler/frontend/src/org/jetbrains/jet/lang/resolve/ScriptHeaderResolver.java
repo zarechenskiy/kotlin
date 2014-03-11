@@ -99,7 +99,7 @@ public class ScriptHeaderResolver {
             int index,
             @NotNull ScriptDescriptor script) {
         JetType type = resolveTypeName(scriptParameter.getType());
-        return new ValueParameterDescriptorImpl(script, index, Annotations.EMPTY, scriptParameter.getName(), type, false, null);
+        return new ValueParameterDescriptorImpl(script, index, Annotations.EMPTY, scriptParameter.getName(), true, type, false, null);
     }
 
     public void processScriptHierarchy(@NotNull TopDownAnalysisContext c, @NotNull JetScript script, @NotNull JetScope outerScope) {
