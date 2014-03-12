@@ -16,6 +16,7 @@
 
 package org.jetbrains.jet.lang.resolve.kotlin;
 
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -23,23 +24,34 @@ import com.intellij.util.containers.SLRUCache;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public final class KotlinBinaryClassCache {
+public final class KotlinBinaryClassCache implements Disposable {
 
     // This cache must be small: we only query the same file a few times in a row (from different places)
+    // It's local to each thread: we don't want a single instance to synchronize access on, because VirtualFileKotlinClass.create involves
+    // reading files from disk and may take some time.
     // Since it is on application level we should be careful about this cache. Consider profiling multiple projects indexing simultaneously.
-    private final SLRUCache<VirtualFile, Ref<VirtualFileKotlinClass>> cache = new SLRUCache<VirtualFile, Ref<VirtualFileKotlinClass>>(2, 2) {
-        @NotNull
-        @Override
-        public Ref<VirtualFileKotlinClass> createValue(VirtualFile virtualFile) {
-            return Ref.create(VirtualFileKotlinClass.create(virtualFile));
-        }
-    };
+    private final ThreadLocal<SLRUCache<VirtualFile, Ref<VirtualFileKotlinClass>>> cache =
+            new ThreadLocal<SLRUCache<VirtualFile, Ref<VirtualFileKotlinClass>>>() {
+                @Override
+                protected SLRUCache<VirtualFile, Ref<VirtualFileKotlinClass>> initialValue() {
+                    return new SLRUCache<VirtualFile, Ref<VirtualFileKotlinClass>>(2, 2) {
+                        @NotNull
+                        @Override
+                        public Ref<VirtualFileKotlinClass> createValue(VirtualFile virtualFile) {
+                            return Ref.create(VirtualFileKotlinClass.create(virtualFile));
+                        }
+                    };
+                }
+            };
 
     @Nullable
     public static KotlinJvmBinaryClass getKotlinBinaryClass(@NotNull VirtualFile file) {
         KotlinBinaryClassCache service = ServiceManager.getService(KotlinBinaryClassCache.class);
-        synchronized (service.cache) {
-            return service.cache.get(file).get();
-        }
+        return service.cache.get().get(file).get();
+    }
+
+    @Override
+    public void dispose() {
+        cache.remove();
     }
 }
