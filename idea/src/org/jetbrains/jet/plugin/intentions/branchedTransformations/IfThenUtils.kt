@@ -32,10 +32,12 @@ import org.jetbrains.jet.lang.types.lang.KotlinBuiltIns
 import com.intellij.psi.PsiElement
 import org.jetbrains.jet.plugin.refactoring.inline.KotlinInlineValHandler
 import org.jetbrains.jet.lang.psi.JetSimpleNameExpression
-import org.jetbrains.jet.lang.psi.JetProperty
 import org.jetbrains.jet.lang.resolve.calls.autocasts.DataFlowValueFactory
 import org.jetbrains.jet.lang.resolve.BindingContextUtils
 import org.jetbrains.jet.lang.descriptors.VariableDescriptor
+import com.intellij.psi.search.searches.ReferencesSearch
+import com.intellij.psi.search.LocalSearchScope
+import org.jetbrains.jet.lang.psi.JetDeclaration
 
 fun JetBinaryExpression.comparesNonNullToNull(): Boolean {
     val operationToken = this.getOperationToken()
@@ -50,20 +52,14 @@ fun JetBinaryExpression.comparesNonNullToNull(): Boolean {
 
 fun JetExpression.extractExpressionIfSingle(): JetExpression? {
     val innerExpression = JetPsiUtil.deparenthesize(this)
-    return when (innerExpression) {
-        is JetBlockExpression ->
-            if (innerExpression.getStatements().size() == 1)
-                return JetPsiUtil.deparenthesize(innerExpression.getStatements().first as? JetExpression)
-            else
-                null
-
-        null ->
-            null
-
-        else ->
-            innerExpression
+    if (innerExpression is JetBlockExpression) {
+        return if (innerExpression.getStatements().size() == 1)
+                   JetPsiUtil.deparenthesize(innerExpression.getStatements().first as? JetExpression)
+               else
+                   null
     }
 
+    return innerExpression
 }
 
 fun JetSafeQualifiedExpression.isStatement(): Boolean {
@@ -117,34 +113,27 @@ fun JetIfExpression.introduceValueForCondition(occurrenceInThenClause: JetExpres
 fun PsiElement.replace(expressionAsString: String): PsiElement =
         this.replace(JetPsiFactory.createExpression(this.getProject(), expressionAsString))
 
-fun PsiElement.getEnclosingBlock(): JetBlockExpression? {
-    val parent = this.getParent()
-    return when (parent) {
-        null -> null
-        is JetBlockExpression -> parent
-        else -> parent.getEnclosingBlock()
+fun JetSimpleNameExpression.inlineIfDeclaredLocallyAndOnlyUsedOnceWithPrompt(editor: Editor) {
+    val declaration = this.getReference()?.resolve() as JetDeclaration
+
+    val enclosingElement = JetPsiUtil.getEnclosingElementForLocalDeclaration(declaration)
+    val isLocal = enclosingElement != null
+    if (!isLocal) return
+
+    val scope = LocalSearchScope(enclosingElement!!)
+
+    val references = ReferencesSearch.search(declaration, scope).findAll()
+    if (references.size() == 1) {
+        KotlinInlineValHandler().inlineElement(this.getProject(), editor, declaration)
     }
 }
 
-fun JetSimpleNameExpression.promptUserToInlineIfDeclaredLocallyAndOnlyUsedOnce(editor: Editor) {
-    val container = this.getEnclosingBlock()
-    if (container is JetBlockExpression) {
-        val declaration = JetPsiUtil.findVariableDeclarationInBlock(container, this.getText()!!)
-        if (declaration is JetProperty) {
-            val references = KotlinInlineValHandler.findReferenceExpressions(declaration)
-            if (references?.size() == 1)
-                KotlinInlineValHandler().inlineElement(this.getProject(), editor, declaration)
-        }
-    }
-
+fun JetSafeQualifiedExpression.inlineReceiverIfApplicableWithPrompt(editor: Editor) {
+    (this.getReceiverExpression() as? JetSimpleNameExpression)?.inlineIfDeclaredLocallyAndOnlyUsedOnceWithPrompt(editor)
 }
 
-fun JetSafeQualifiedExpression.promptUserToInlineReceiverIfApplicable(editor: Editor) {
-    (this.getReceiverExpression() as? JetSimpleNameExpression)?.promptUserToInlineIfDeclaredLocallyAndOnlyUsedOnce(editor)
-}
-
-fun JetBinaryExpression.promptUserToInlineLeftSideIfApplicable(editor: Editor) {
-    (this.getLeft() as? JetSimpleNameExpression)?.promptUserToInlineIfDeclaredLocallyAndOnlyUsedOnce(editor)
+fun JetBinaryExpression.inlineLeftSideIfApplicableWithPrompt(editor: Editor) {
+    (this.getLeft() as? JetSimpleNameExpression)?.inlineIfDeclaredLocallyAndOnlyUsedOnceWithPrompt(editor)
 }
 
 fun JetExpression.isStableVariable(): Boolean {
