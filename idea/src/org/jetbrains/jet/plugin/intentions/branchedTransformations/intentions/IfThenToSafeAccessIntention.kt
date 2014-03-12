@@ -30,7 +30,7 @@ import org.jetbrains.jet.plugin.intentions.branchedTransformations.isNullExpress
 import org.jetbrains.jet.plugin.intentions.branchedTransformations.replace
 import org.jetbrains.jet.lang.psi.JetSafeQualifiedExpression
 import org.jetbrains.jet.plugin.intentions.branchedTransformations.isStableVariable
-import org.jetbrains.jet.plugin.intentions.branchedTransformations.promptUserToInlineReceiverIfApplicable
+import org.jetbrains.jet.plugin.intentions.branchedTransformations.inlineReceiverIfApplicableWithPrompt
 
 public class IfThenToSafeAccessIntention : JetSelfTargetingIntention<JetIfExpression>("if.then.to.safe.access", javaClass()) {
 
@@ -80,7 +80,7 @@ public class IfThenToSafeAccessIntention : JetSelfTargetingIntention<JetIfExpres
 
         val resultingExprString = "${receiverExpression.getText()}?.${selectorExpression?.getText()}"
         val safeAccessExpr = element.replace(resultingExprString) as JetSafeQualifiedExpression
-        safeAccessExpr.promptUserToInlineReceiverIfApplicable(editor)
+        safeAccessExpr.inlineReceiverIfApplicableWithPrompt(editor)
     }
 
     fun clauseContainsAppropriateDotQualifiedExpression(clause: JetExpression, receiverExpression: JetExpression): Boolean =
