@@ -27,7 +27,7 @@ import org.jetbrains.jet.plugin.intentions.branchedTransformations.comparesNonNu
 import org.jetbrains.jet.plugin.intentions.branchedTransformations.getNonNullExpression
 import org.jetbrains.jet.plugin.intentions.branchedTransformations.isNotNullExpression
 import org.jetbrains.jet.plugin.intentions.branchedTransformations.replace
-import org.jetbrains.jet.plugin.intentions.branchedTransformations.promptUserToInlineLeftSideIfApplicable
+import org.jetbrains.jet.plugin.intentions.branchedTransformations.inlineLeftSideIfApplicableWithPrompt
 import org.jetbrains.jet.plugin.intentions.branchedTransformations.isStableVariable
 
 public class IfThenToElvisIntention : JetSelfTargetingIntention<JetIfExpression>("if.then.to.elvis", javaClass()) {
@@ -41,14 +41,12 @@ public class IfThenToElvisIntention : JetSelfTargetingIntention<JetIfExpression>
         val expression = condition.getNonNullExpression()
         if (expression == null || !expression.isStableVariable()) return false
 
-
         return when (condition.getOperationToken()) {
             JetTokens.EQEQ -> thenClause.isNotNullExpression() && elseClause.evaluatesTo(expression)
             JetTokens.EXCLEQ -> elseClause.isNotNullExpression() && thenClause.evaluatesTo(expression)
             else -> false
         }
     }
-
 
     override fun applyTo(element: JetIfExpression, editor: Editor) {
         val condition = element.getCondition() as JetBinaryExpression
@@ -59,14 +57,14 @@ public class IfThenToElvisIntention : JetSelfTargetingIntention<JetIfExpression>
         val elseExpression = checkNotNull(elseClause.extractExpressionIfSingle(), "Else clause must contain expression")
 
         val (left, right) =
-        when(condition.getOperationToken()) {
-            JetTokens.EQEQ -> Pair(elseExpression, thenExpression)
-            JetTokens.EXCLEQ -> Pair(thenExpression, elseExpression)
-            else -> throw IllegalStateException("Operation token must be either null or not null")
-        }
+                when(condition.getOperationToken()) {
+                    JetTokens.EQEQ -> Pair(elseExpression, thenExpression)
+                    JetTokens.EXCLEQ -> Pair(thenExpression, elseExpression)
+                    else -> throw IllegalStateException("Operation token must be either null or not null")
+                }
 
         val resultingExprString = "${left.getText()} ?: ${right.getText()}"
         val elvis = element.replace(resultingExprString) as JetBinaryExpression
-        elvis.promptUserToInlineLeftSideIfApplicable(editor)
+        elvis.inlineLeftSideIfApplicableWithPrompt(editor)
     }
 }
