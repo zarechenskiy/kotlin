@@ -161,6 +161,7 @@ public class InjectorForLazyResolveWithJava {
         javaClassFinder.setProject(project);
 
         traceBasedExternalSignatureResolver.setExternalAnnotationResolver(psiBasedExternalAnnotationResolver);
+        traceBasedExternalSignatureResolver.setProject(project);
         traceBasedExternalSignatureResolver.setTrace(bindingTrace);
 
         lazyResolveBasedCache.setSession(resolveSession);
