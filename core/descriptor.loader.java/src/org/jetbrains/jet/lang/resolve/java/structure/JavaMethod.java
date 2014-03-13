@@ -33,4 +33,6 @@ public interface JavaMethod extends JavaMember, JavaTypeParameterListOwner {
     boolean isVararg();
 
     boolean isConstructor();
+
+    boolean isKotlinLightMethod();
 }

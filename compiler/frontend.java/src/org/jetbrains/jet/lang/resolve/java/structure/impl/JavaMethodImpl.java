@@ -17,10 +17,12 @@
 package org.jetbrains.jet.lang.resolve.java.structure.impl;
 
 import com.intellij.psi.PsiAnnotationMethod;
+import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.jet.lang.resolve.java.jetAsJava.KotlinLightMethod;
 import org.jetbrains.jet.lang.resolve.java.structure.JavaMethod;
 import org.jetbrains.jet.lang.resolve.java.structure.JavaType;
 import org.jetbrains.jet.lang.resolve.java.structure.JavaTypeParameter;
@@ -77,5 +79,15 @@ public class JavaMethodImpl extends JavaMemberImpl<PsiMethod> implements JavaMet
     public boolean isConstructor() {
         // TODO: class JavaConstructor extends JavaMethod
         return getPsi().isConstructor();
+    }
+
+    @Override
+    public boolean isKotlinLightMethod() {
+        return getPsi() instanceof KotlinLightMethod;
+    }
+
+    public boolean isEquivalentTo(@NotNull JavaMethod method) {
+        PsiManager psiManager = PsiManager.getInstance(getPsi().getProject());
+        return psiManager.areElementsEquivalent(getPsi(), ((JavaMethodImpl) method).getPsi());
     }
 }

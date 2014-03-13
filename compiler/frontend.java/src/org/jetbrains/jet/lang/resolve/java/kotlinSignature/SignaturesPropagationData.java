@@ -21,7 +21,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiMethod;
 import com.intellij.util.Function;
 import com.intellij.util.containers.ContainerUtil;
@@ -227,7 +226,7 @@ public class SignaturesPropagationData {
         Multimap<FqName, Pair<FunctionDescriptor, JavaMethodImpl>> superclassToFunctions =
                 getSuperclassToFunctionsMultimap(method, trace.getBindingContext(), containingClass);
 
-        for (JavaMethodImpl superMethod : PropagationHeuristics.getSuperMethods(method)) {
+        for (JavaMethod superMethod : PropagationHeuristics.getSuperMethods(method)) {
             JavaClass javaClass = superMethod.getContainingClass();
             FqName classFqName = javaClass.getFqName();
             assert classFqName != null : "Class FQ name should not be null: " + javaClass;
@@ -239,8 +238,9 @@ public class SignaturesPropagationData {
                 continue;
             }
 
-            DeclarationDescriptor superFun = superMethod.getPsi() instanceof KotlinLightMethod
-                                             ? trace.get(BindingContext.DECLARATION_TO_DESCRIPTOR, ((KotlinLightMethod) superMethod.getPsi()).getOrigin())
+            DeclarationDescriptor superFun = superMethod.isKotlinLightMethod()
+                                             ? trace.get(BindingContext.DECLARATION_TO_DESCRIPTOR,
+                                                         ((KotlinLightMethod) ((JavaMethodImpl) superMethod).getPsi()).getOrigin())
                                              : findSuperFunction(superclassToFunctions.get(classFqName), superMethod);
             if (superFun == null) {
                 // Super methods which are Object methods in interfaces are not loaded by JDR.
@@ -301,11 +301,10 @@ public class SignaturesPropagationData {
     @Nullable
     private static DeclarationDescriptor findSuperFunction(
             @NotNull Collection<Pair<FunctionDescriptor, JavaMethodImpl>> superFunctionCandidates,
-            @NotNull JavaMethodImpl superMethod
+            @NotNull JavaMethod superMethod
     ) {
-        PsiManager psiManager = PsiManager.getInstance(superMethod.getPsi().getProject());
         for (Pair<FunctionDescriptor, JavaMethodImpl> candidate : superFunctionCandidates) {
-            if (psiManager.areElementsEquivalent(candidate.second.getPsi(), superMethod.getPsi())) {
+            if (candidate.second.isEquivalentTo(superMethod)) {
                 return candidate.first;
             }
         }
