@@ -55,6 +55,8 @@ import org.jetbrains.jet.lang.parsing.JetParserDefinition;
 import org.jetbrains.jet.lang.parsing.JetScriptDefinitionProvider;
 import org.jetbrains.jet.lang.psi.JetFile;
 import org.jetbrains.jet.lang.resolve.java.JetFilesProvider;
+import org.jetbrains.jet.lang.resolve.java.structure.JavaSignatureFormatter;
+import org.jetbrains.jet.lang.resolve.java.structure.impl.JavaSignatureFormatterImpl;
 import org.jetbrains.jet.lang.resolve.kotlin.KotlinBinaryClassCache;
 import org.jetbrains.jet.lang.resolve.kotlin.VirtualFileFinder;
 import org.jetbrains.jet.plugin.JetFileType;
@@ -146,6 +148,8 @@ public class JetCoreEnvironment {
 
         applicationEnvironment.getApplication().registerService(OperationModeProvider.class, new CompilerModeProvider());
         applicationEnvironment.getApplication().registerService(KotlinBinaryClassCache.class, new KotlinBinaryClassCache());
+
+        applicationEnvironment.getApplication().registerService(JavaSignatureFormatter.class, new JavaSignatureFormatterImpl());
 
         return applicationEnvironment;
     }

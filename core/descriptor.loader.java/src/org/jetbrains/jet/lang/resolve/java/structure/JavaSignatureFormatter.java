@@ -16,10 +16,8 @@
 
 package org.jetbrains.jet.lang.resolve.java.structure;
 
+import com.intellij.openapi.components.ServiceManager;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Iterator;
-import java.util.ServiceLoader;
 
 public abstract class JavaSignatureFormatter {
     private static JavaSignatureFormatter instance;
@@ -27,10 +25,8 @@ public abstract class JavaSignatureFormatter {
     @NotNull
     public static JavaSignatureFormatter getInstance() {
         if (instance == null) {
-            Iterator<JavaSignatureFormatter> iterator =
-                    ServiceLoader.load(JavaSignatureFormatter.class, JavaSignatureFormatter.class.getClassLoader()).iterator();
-            assert iterator.hasNext() : "No service found: " + JavaSignatureFormatter.class.getName();
-            instance = iterator.next();
+            instance = ServiceManager.getService(JavaSignatureFormatter.class);
+            assert instance != null : "No service found: " + JavaSignatureFormatter.class.getName();
         }
         return instance;
     }
