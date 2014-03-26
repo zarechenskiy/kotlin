@@ -33,10 +33,10 @@ class LazyJavaTypeParameterDescriptor(
 ) : AbstractLazyTypeParameterDescriptor(
         c.storageManager,
         containingDeclaration,
-        name = javaTypeParameter.getName(),
-        variance = Variance.INVARIANT,
-        isReified = false,
-        index = javaTypeParameter.getIndex()
+        javaTypeParameter.getName(),
+        Variance.INVARIANT,
+        false,
+        javaTypeParameter.getIndex()
 ) {
 
     override fun resolveUpperBounds(): Set<JetType> {

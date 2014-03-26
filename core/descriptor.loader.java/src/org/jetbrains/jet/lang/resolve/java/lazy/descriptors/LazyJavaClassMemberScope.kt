@@ -73,7 +73,7 @@ public class LazyJavaClassMemberScope(
     }
 
     private fun resolveConstructor(constructor: JavaMethod, classDescriptor: ClassDescriptor, isStaticClass: Boolean): ConstructorDescriptor {
-        val constructorDescriptor = ConstructorDescriptorImpl(classDescriptor, Annotations.EMPTY, isPrimary = false)
+        val constructorDescriptor = ConstructorDescriptorImpl(classDescriptor, Annotations.EMPTY, false)
 
         val valueParameters = resolveValueParameters(c, constructorDescriptor, constructor.getValueParameters())
         val effectiveSignature = c.externalSignatureResolver.resolveAlternativeMethodSignature(
@@ -104,7 +104,7 @@ public class LazyJavaClassMemberScope(
             return null
 
         val classDescriptor = getContainingDeclaration()
-        val constructorDescriptor = ConstructorDescriptorImpl(classDescriptor, Annotations.EMPTY, isPrimary = true)
+        val constructorDescriptor = ConstructorDescriptorImpl(classDescriptor, Annotations.EMPTY, true)
         val typeParameters = classDescriptor.getTypeConstructor().getParameters()
         val valueParameters = if (isAnnotation) createAnnotationConstructorParameters(constructorDescriptor)
                               else Collections.emptyList<ValueParameterDescriptor>()
