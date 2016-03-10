@@ -30,6 +30,7 @@ import com.intellij.psi.formatter.FormattingDocumentModelImpl;
 import com.intellij.psi.formatter.PsiBasedFormattingModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.kotlin.idea.KotlinLanguage;
+import org.jetbrains.kotlin.idea.common.formatter.KotlinSpacingRulesKt;
 
 public class KotlinFormattingModelBuilder implements FormattingModelBuilder {
     @NotNull

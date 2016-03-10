@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-package org.jetbrains.kotlin.idea.formatter
+package org.jetbrains.kotlin.idea.common.formatter
 
 import com.intellij.formatting.ASTBlock
 import com.intellij.formatting.Spacing
 import com.intellij.formatting.SpacingBuilder
 import com.intellij.formatting.SpacingBuilder.RuleBuilder
 import com.intellij.lang.ASTNode
+import com.intellij.psi.TokenType
 import com.intellij.psi.codeStyle.CodeStyleSettings
-import com.intellij.psi.formatter.FormatterUtil
+import com.intellij.psi.impl.source.tree.TreeUtil
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
 import org.jetbrains.kotlin.KtNodeTypes.*
 import org.jetbrains.kotlin.idea.KotlinLanguage
 import org.jetbrains.kotlin.idea.core.formatter.KotlinCodeStyleSettings
-import org.jetbrains.kotlin.idea.formatter.KotlinSpacingBuilder.CustomSpacingBuilder
-import org.jetbrains.kotlin.lexer.KtTokens
+import org.jetbrains.kotlin.idea.common.formatter.KotlinSpacingBuilder.CustomSpacingBuilder
 import org.jetbrains.kotlin.lexer.KtTokens.*
 import org.jetbrains.kotlin.psi.KtClass
 
@@ -67,12 +67,13 @@ fun createSpacingBuilder(settings: CodeStyleSettings): KotlinSpacingBuilder {
                 val klass = parent.node.treeParent.psi as? KtClass ?: return@customRule null
                 if (klass.isEnum() && right.node.elementType in DECLARATIONS) {
                     Spacing.createSpacing(0, 0, 2, settings.KEEP_LINE_BREAKS, settings.KEEP_BLANK_LINES_IN_DECLARATIONS)
-                } else null
+                }
+                else null
             }
 
             val parameterWithDocCommentRule = {
                 parent: ASTBlock, left: ASTBlock, right: ASTBlock ->
-                if (right.node.firstChildNode.elementType == KtTokens.DOC_COMMENT) {
+                if (right.node.firstChildNode.elementType == DOC_COMMENT) {
                     Spacing.createSpacing(0, 0, 1, true, settings.KEEP_BLANK_LINES_IN_DECLARATIONS)
                 }
                 else {
@@ -240,13 +241,14 @@ fun createSpacingBuilder(settings: CodeStyleSettings): KotlinSpacingBuilder {
                     inPosition(parent = parent, right = keyword).customRule {
                         parent, left, right ->
 
-                        val previousLeaf = FormatterUtil.getPreviousNonWhitespaceLeaf(right.node)
+                        val previousLeaf = getPreviousNonWhitespaceLeaf(right.node)
                         val leftBlock = if (
-                                previousLeaf != null &&
-                                previousLeaf.elementType == RBRACE &&
-                                previousLeaf.treeParent?.elementType == BLOCK) {
-                                previousLeaf.treeParent!!
-                        } else null
+                        previousLeaf != null &&
+                        previousLeaf.elementType == RBRACE &&
+                        previousLeaf.treeParent?.elementType == BLOCK) {
+                            previousLeaf.treeParent!!
+                        }
+                        else null
 
                         val removeLineBreaks = leftBlock != null && afterBlockFilter(right.node?.treeParent!!, leftBlock)
                         Spacing.createSpacing(1, 1, 0, !removeLineBreaks, 0)
@@ -268,7 +270,7 @@ fun createSpacingBuilder(settings: CodeStyleSettings): KotlinSpacingBuilder {
                 if (block != null && block.elementType == blockType) {
                     val leftBrace = block.findChildByType(LBRACE)
                     if (leftBrace != null) {
-                        val previousLeaf = FormatterUtil.getPreviousNonWhitespaceLeaf(leftBrace)
+                        val previousLeaf = getPreviousNonWhitespaceLeaf(leftBrace)
                         val isAfterEolComment = previousLeaf != null && (previousLeaf.elementType == EOL_COMMENT)
                         val keepLineBreaks = kotlinSettings.LBRACE_ON_NEXT_LINE || isAfterEolComment
                         val minimumLF = if (kotlinSettings.LBRACE_ON_NEXT_LINE) 1 else 0
@@ -335,20 +337,20 @@ fun createSpacingBuilder(settings: CodeStyleSettings): KotlinSpacingBuilder {
             inPosition(parent = FUNCTION_LITERAL,
                        left = LBRACE)
                     .customRule {
-                parent, left, right ->
-                val rightNode = right.node!!
-                val rightType = rightNode.elementType
-                var numSpaces = spacesInSimpleFunction
-                if (rightType == VALUE_PARAMETER_LIST) {
-                    val firstParamListNode = rightNode.firstChildNode
-                    if (firstParamListNode != null && firstParamListNode.elementType == LPAR) {
-                        // Don't put space for situation {<here>(a: Int) -> a }
-                        numSpaces = 0
-                    }
-                }
+                        parent, left, right ->
+                        val rightNode = right.node!!
+                        val rightType = rightNode.elementType
+                        var numSpaces = spacesInSimpleFunction
+                        if (rightType == VALUE_PARAMETER_LIST) {
+                            val firstParamListNode = rightNode.firstChildNode
+                            if (firstParamListNode != null && firstParamListNode.elementType == LPAR) {
+                                // Don't put space for situation {<here>(a: Int) -> a }
+                                numSpaces = 0
+                            }
+                        }
 
-                Spacing.createSpacing(numSpaces, numSpaces, 0, settings.KEEP_LINE_BREAKS, settings.KEEP_BLANK_LINES_IN_CODE)
-            }
+                        Spacing.createSpacing(numSpaces, numSpaces, 0, settings.KEEP_LINE_BREAKS, settings.KEEP_BLANK_LINES_IN_CODE)
+                    }
 
             inPosition(parent = CLASS_BODY, right = RBRACE).lineBreakIfLineBreakInParent(numSpacesOtherwise = 1)
         }
@@ -365,4 +367,33 @@ fun createSpacingBuilder(settings: CodeStyleSettings): KotlinSpacingBuilder {
             after(EOL_COMMENT).lineBreakInCode()
         }
     }
+}
+
+// TODO: Abstract this two functions
+fun getPreviousNonWhitespaceLeaf(node: ASTNode?): ASTNode? {
+    if (node == null) return null
+    val treePrev = node.treePrev
+    if (treePrev != null) {
+        val candidate = TreeUtil.getLastChild(treePrev)
+        if (candidate != null && !isWhitespaceOrEmpty(candidate)) {
+            return candidate
+        }
+        else {
+            return getPreviousNonWhitespaceLeaf(candidate)
+        }
+    }
+    val treeParent = node.treeParent
+
+    if (treeParent == null || treeParent.treeParent == null) {
+        return null
+    }
+    else {
+        return getPreviousNonWhitespaceLeaf(treeParent)
+    }
+}
+
+fun isWhitespaceOrEmpty(node: ASTNode?): Boolean {
+    if (node == null) return false
+    val type = node.elementType
+    return type === TokenType.WHITE_SPACE || type !== TokenType.ERROR_ELEMENT && node.textLength == 0
 }

@@ -21,8 +21,9 @@ import com.intellij.formatting.alignment.AlignmentStrategy;
 import com.intellij.lang.ASTNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.kotlin.idea.common.formatter.CommonAlignmentStrategy;
 
-public abstract class NodeAlignmentStrategy {
+public abstract class NodeAlignmentStrategy extends CommonAlignmentStrategy {
 
     private static final NodeAlignmentStrategy NULL_STRATEGY = fromTypes(AlignmentStrategy.wrap(null));
 
