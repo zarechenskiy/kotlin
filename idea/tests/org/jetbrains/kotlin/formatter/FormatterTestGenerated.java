@@ -379,6 +379,18 @@ public class FormatterTestGenerated extends AbstractFormatterTest {
             doTest(fileName);
         }
 
+        @TestMetadata("NewLineWhenLeftEntryHasLineBreak.after.kt")
+        public void testNewLineWhenLeftEntryHasLineBreak() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("idea/testData/formatter/NewLineWhenLeftEntryHasLineBreak.after.kt");
+            doTest(fileName);
+        }
+
+        @TestMetadata("NoNewLineBetweenEnumEntries.after.kt")
+        public void testNoNewLineBetweenEnumEntries() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("idea/testData/formatter/NoNewLineBetweenEnumEntries.after.kt");
+            doTest(fileName);
+        }
+
         @TestMetadata("ObjectInBody.after.kt")
         public void testObjectInBody() throws Exception {
             String fileName = KotlinTestUtils.navigationMetadata("idea/testData/formatter/ObjectInBody.after.kt");

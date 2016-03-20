@@ -66,7 +66,7 @@ fun createSpacingBuilder(settings: CodeStyleSettings): KotlinSpacingBuilder {
             inPosition(left = FUN, right = CLASS).emptyLinesIfLineBreakInLeft(1)
 
             inPosition(left = ENUM_ENTRY, right = ENUM_ENTRY).emptyLinesIfLineBreakInLeft(
-                    emptyLines = 0, numSpacesOtherwise = 1, numberOfLineFeedsOtherwise = 0)
+                    emptyLines = 0, numSpacesOtherwise = 1)
 
             inPosition(parent = CLASS_BODY, left = SEMICOLON).customRule { parent, left, right ->
                 val klass = parent.node.treeParent.psi as? KtClass ?: return@customRule null
