@@ -19,10 +19,7 @@ package org.jetbrains.kotlin.idea.formatter
 import com.intellij.formatting.*
 import com.intellij.formatting.DependentSpacingRule.Anchor
 import com.intellij.formatting.DependentSpacingRule.Trigger
-import com.intellij.lang.ASTNode
-import com.intellij.openapi.util.TextRange
 import com.intellij.psi.codeStyle.CodeStyleSettings
-import com.intellij.psi.formatter.common.AbstractBlock
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
 import org.jetbrains.kotlin.KtNodeTypes
@@ -31,12 +28,6 @@ import org.jetbrains.kotlin.lexer.KtTokens
 import java.util.ArrayList
 
 class KotlinSpacingBuilder(val codeStyleSettings: CodeStyleSettings) {
-    class SpacingNodeBlock(node: ASTNode): AbstractBlock(node, null, null) {
-        override fun buildChildren(): MutableList<Block>? = ArrayList()
-        override fun getSpacing(child1: Block?, child2: Block): Spacing? = null
-        override fun isLeaf(): Boolean = false
-    }
-
     private val builders = ArrayList<Builder>()
 
     private interface Builder {
@@ -89,12 +80,13 @@ class KotlinSpacingBuilder(val codeStyleSettings: CodeStyleSettings) {
         fun emptyLinesIfLineBreakInLeft(emptyLines: Int, numberOfLineFeedsOtherwise: Int = 1, numSpacesOtherwise: Int = 0) {
             newRule { parent: ASTBlock, left: ASTBlock, right: ASTBlock ->
                 val dependentSpacingRule = DependentSpacingRule(Trigger.HAS_LINE_FEEDS).registerData(Anchor.MIN_LINE_FEEDS, emptyLines + 1)
-                LineFeedDependantSpacing(
-                        numSpacesOtherwise, numSpacesOtherwise,
-                        minimumLineFeeds = numberOfLineFeedsOtherwise,
-                        keepLineBreaks = codeStyleSettings.KEEP_LINE_BREAKS,
-                        keepBlankLines = codeStyleSettings.KEEP_BLANK_LINES_IN_DECLARATIONS,
-                        dependency = left.textRange, rule = dependentSpacingRule)
+                Spacing.createDependentLFSpacing(
+                        numSpacesOtherwise,
+                        numSpacesOtherwise,
+                        left.textRange,
+                        codeStyleSettings.KEEP_LINE_BREAKS,
+                        codeStyleSettings.KEEP_BLANK_LINES_IN_DECLARATIONS,
+                        dependentSpacingRule)
             }
         }
 
@@ -146,19 +138,19 @@ class KotlinSpacingBuilder(val codeStyleSettings: CodeStyleSettings) {
         builders.add(builder)
     }
 
-    private class LineFeedDependantSpacing(
-            minSpaces: Int,
-            maxSpaces: Int,
-            val minimumLineFeeds: Int,
-            keepLineBreaks: Boolean,
-            keepBlankLines: Int,
-            dependency: TextRange,
-            rule: DependentSpacingRule) : DependantSpacingImpl(minSpaces, maxSpaces, dependency, keepLineBreaks, keepBlankLines, rule) {
-        override fun getMinLineFeeds(): Int {
-            val superMin = super.getMinLineFeeds()
-            return if (superMin == 0) minimumLineFeeds else superMin
-        }
-    }
+//    private class LineFeedDependantSpacing(
+//            minSpaces: Int,
+//            maxSpaces: Int,
+//            val minimumLineFeeds: Int,
+//            keepLineBreaks: Boolean,
+//            keepBlankLines: Int,
+//            dependency: TextRange,
+//            rule: DependentSpacingRule) : DependantSpacingImpl(minSpaces, maxSpaces, dependency, keepLineBreaks, keepBlankLines, rule) {
+//        override fun getMinLineFeeds(): Int {
+//            val superMin = super.getMinLineFeeds()
+//            return if (superMin == 0) minimumLineFeeds else superMin
+//        }
+//    }
 }
 
 fun rules(codeStyleSettings: CodeStyleSettings, init: KotlinSpacingBuilder.() -> Unit): KotlinSpacingBuilder {
