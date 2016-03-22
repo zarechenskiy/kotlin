@@ -335,6 +335,11 @@ public abstract class KotlinBuiltIns {
     }
 
     @NotNull
+    public ClassDescriptor getPrimitiveValueClassDescriptor(@NotNull PrimitiveValueType type) {
+        return getBuiltInClassByName(type.getTypeName().asString());
+    }
+
+    @NotNull
     public ClassDescriptor getByte() {
         return getPrimitiveClassDescriptor(BYTE);
     }

@@ -28,6 +28,7 @@ import org.jetbrains.kotlin.name.FqNameUnsafe;
 import org.jetbrains.kotlin.name.Name;
 import org.jetbrains.kotlin.resolve.DescriptorUtils;
 import org.jetbrains.kotlin.resolve.jvm.JvmPrimitiveType;
+import org.jetbrains.kotlin.resolve.jvm.JvmPrimitiveValueType;
 import org.jetbrains.kotlin.types.KotlinType;
 import org.jetbrains.kotlin.types.TypeUtils;
 
@@ -69,6 +70,10 @@ public class JavaToKotlinClassMap implements PlatformToKotlinClassMap {
         for (JvmPrimitiveType jvmType : JvmPrimitiveType.values()) {
             add(ClassId.topLevel(jvmType.getWrapperFqName()), builtIns.getPrimitiveClassDescriptor(jvmType.getPrimitiveType()));
         }
+
+        //for (JvmPrimitiveValueType jvmType : JvmPrimitiveValueType.values()) {
+        //    addKotlinToJava(ClassId.topLevel(jvmType.getWrapperFqName()), builtIns.getPrimitiveClassDescriptor(jvmType.getPrimitiveType()));
+        //}
 
         companionObjectMapping = new CompanionObjectMapping(builtIns);
         for (ClassDescriptor descriptor : companionObjectMapping.allClassesWithIntrinsicCompanions()) {

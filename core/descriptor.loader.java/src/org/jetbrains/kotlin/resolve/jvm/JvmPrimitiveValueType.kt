@@ -16,6 +16,6 @@
 
 package org.jetbrains.kotlin.resolve.jvm
 
-enum class JvmValueType {
-
+enum class JvmPrimitiveValueType(val primitiveValueType: JvmPrimitiveValueType, val primitiveName: String, val desc: String) {
+    V_INT(JvmPrimitiveValueType.V_INT, "int", "I")
 }
