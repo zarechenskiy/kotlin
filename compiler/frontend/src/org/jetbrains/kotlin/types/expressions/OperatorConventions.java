@@ -41,6 +41,7 @@ public class OperatorConventions {
     public static final Name SHORT = Name.identifier("toShort");
     public static final Name BYTE = Name.identifier("toByte");
 
+    public static final Name PRIMITIVE_BOX = Name.identifier("boxed");
 
     public static final ImmutableSet<Name> NUMBER_CONVERSIONS = ImmutableSet.of(
             DOUBLE, FLOAT, LONG, INT, SHORT, BYTE, CHAR

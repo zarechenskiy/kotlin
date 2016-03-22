@@ -41,6 +41,7 @@ public class IntrinsicMethods {
     private static final IntrinsicMethod UNARY_MINUS = new UnaryMinus();
     private static final IntrinsicMethod UNARY_PLUS = new UnaryPlus();
     private static final IntrinsicMethod NUMBER_CAST = new NumberCast();
+    private static final IntrinsicMethod PRIMITIVE_VALUE_BOX = new PrimitiveValueBox();
     private static final IntrinsicMethod INV = new Inv();
     private static final IntrinsicMethod RANGE_TO = new RangeTo();
     private static final IntrinsicMethod INC = new Increment(1);
@@ -75,6 +76,11 @@ public class IntrinsicMethods {
             for (PrimitiveType type : PrimitiveType.NUMBER_TYPES) {
                 declareIntrinsicFunction(type.getTypeFqName(), methodName, 0, NUMBER_CAST);
             }
+        }
+
+        String primitiveToBoxMethodName = OperatorConventions.PRIMITIVE_BOX.asString();
+        for (PrimitiveType type : PrimitiveType.NUMBER_TYPES) {
+            declareIntrinsicFunction(type.getTypeFqName(), primitiveToBoxMethodName, 0, PRIMITIVE_VALUE_BOX);
         }
 
         for (PrimitiveType type : PrimitiveType.NUMBER_TYPES) {
