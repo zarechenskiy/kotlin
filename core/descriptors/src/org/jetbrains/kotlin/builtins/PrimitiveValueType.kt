@@ -18,8 +18,8 @@ package org.jetbrains.kotlin.builtins
 
 import org.jetbrains.kotlin.name.Name
 
-enum class PrimitiveValueType(myTypeName: String) {
-    V_INT("vInt");
+enum class PrimitiveValueType(myTypeName: String, val primitiveType: PrimitiveType) {
+    V_INT("vInt", PrimitiveType.INT);
 
     val typeName = Name.identifier(myTypeName)
 }

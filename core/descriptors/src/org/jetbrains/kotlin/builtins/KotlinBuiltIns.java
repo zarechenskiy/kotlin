@@ -212,6 +212,10 @@ public abstract class KotlinBuiltIns {
                 fqNameToPrimitiveType.put(fqNameUnsafe(primitiveType.getTypeName().asString()), primitiveType);
                 arrayClassFqNameToPrimitiveType.put(fqNameUnsafe(primitiveType.getArrayTypeName().asString()), primitiveType);
             }
+
+            for (PrimitiveValueType primitiveValueType : PrimitiveValueType.values()) {
+                fqNameToPrimitiveType.put(fqNameUnsafe(primitiveValueType.getTypeName().asString()), primitiveValueType.getPrimitiveType());
+            }
         }
 
         @NotNull
