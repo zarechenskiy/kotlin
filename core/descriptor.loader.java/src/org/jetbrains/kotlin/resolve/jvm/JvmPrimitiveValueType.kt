@@ -16,6 +16,11 @@
 
 package org.jetbrains.kotlin.resolve.jvm
 
-enum class JvmPrimitiveValueType(val primitiveValueType: JvmPrimitiveValueType, val primitiveName: String, val desc: String) {
-    V_INT(JvmPrimitiveValueType.V_INT, "int", "I")
+import org.jetbrains.kotlin.builtins.PrimitiveValueType
+import org.jetbrains.kotlin.name.FqName
+
+enum class JvmPrimitiveValueType(val primitiveValueType: PrimitiveValueType, val primitiveName: String, val desc: String, myBox: String) {
+    V_INT(PrimitiveValueType.V_INT, "int", "I", "java.lang.Integer");
+
+    val box = FqName(myBox)
 }

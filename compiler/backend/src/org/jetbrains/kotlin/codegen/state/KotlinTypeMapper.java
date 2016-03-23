@@ -418,7 +418,15 @@ public class KotlinTypeMapper {
         Type builtinType = mapBuiltinType(jetType);
 
         if (builtinType != null) {
-            Type asmType = mode.getNeedPrimitiveBoxing() ? boxType(builtinType) : builtinType;
+            //Type asmType = mode.getNeedPrimitiveBoxing() ? boxType(builtinType) : builtinType;
+            Type asmType;
+            if (KotlinBuiltIns.isPrimitiveValueType(jetType)) {
+                asmType = builtinType;
+            }
+            else {
+                asmType = mode.getNeedPrimitiveBoxing() ? boxType(builtinType) : builtinType;
+            }
+
             writeGenericType(jetType, asmType, signatureVisitor, mode);
             return asmType;
         }
@@ -471,7 +479,8 @@ public class KotlinTypeMapper {
                 }
             }
             else {
-                arrayElementType = boxType(mapType(memberType, mode));
+                Type asmMemberType = mapType(memberType, mode);
+                arrayElementType = KotlinBuiltIns.isPrimitiveType(memberType) ? asmMemberType : boxType(asmMemberType);
                 if (signatureVisitor != null) {
                     signatureVisitor.writeArrayType();
                     mapType(memberType, signatureVisitor, mode.toGenericArgumentMode(memberProjection.getProjectionKind()));

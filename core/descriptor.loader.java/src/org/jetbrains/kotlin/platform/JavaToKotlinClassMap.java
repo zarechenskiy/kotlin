@@ -71,9 +71,9 @@ public class JavaToKotlinClassMap implements PlatformToKotlinClassMap {
             add(ClassId.topLevel(jvmType.getWrapperFqName()), builtIns.getPrimitiveClassDescriptor(jvmType.getPrimitiveType()));
         }
 
-        //for (JvmPrimitiveValueType jvmType : JvmPrimitiveValueType.values()) {
-        //    addKotlinToJava(ClassId.topLevel(jvmType.getWrapperFqName()), builtIns.getPrimitiveClassDescriptor(jvmType.getPrimitiveType()));
-        //}
+        for (JvmPrimitiveValueType jvmType : JvmPrimitiveValueType.values()) {
+            addKotlinToJava(builtIns.getPrimitiveValueClassDescriptor(jvmType.getPrimitiveValueType()), ClassId.topLevel(jvmType.getBox()));
+        }
 
         companionObjectMapping = new CompanionObjectMapping(builtIns);
         for (ClassDescriptor descriptor : companionObjectMapping.allClassesWithIntrinsicCompanions()) {
