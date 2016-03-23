@@ -16,6 +16,7 @@
 
 package org.jetbrains.kotlin.codegen.intrinsics
 
+import org.jetbrains.kotlin.codegen.AsmUtil
 import org.jetbrains.kotlin.codegen.Callable
 import org.jetbrains.kotlin.codegen.CallableMethod
 import org.jetbrains.kotlin.codegen.StackValue
@@ -23,7 +24,7 @@ import org.jetbrains.kotlin.codegen.StackValue
 class PrimitiveValueBox : IntrinsicMethod() {
     override fun toCallable(method: CallableMethod): Callable {
         return createUnaryIntrinsicCallable(method) {
-            StackValue.coerce(calcReceiverType(), returnType, it)
+            StackValue.coerce(calcReceiverType(), AsmUtil.boxType(returnType), it)
         }
     }
 }

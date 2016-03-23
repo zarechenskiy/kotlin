@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns;
 import org.jetbrains.kotlin.builtins.PrimitiveType;
+import org.jetbrains.kotlin.builtins.PrimitiveValueType;
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor;
 import org.jetbrains.kotlin.name.FqName;
 import org.jetbrains.kotlin.name.FqNameUnsafe;
@@ -79,7 +80,7 @@ public class IntrinsicMethods {
         }
 
         String primitiveToBoxMethodName = OperatorConventions.PRIMITIVE_BOX.asString();
-        for (PrimitiveType type : PrimitiveType.NUMBER_TYPES) {
+        for (PrimitiveValueType type : PrimitiveValueType.values()) {
             declareIntrinsicFunction(type.getTypeFqName(), primitiveToBoxMethodName, 0, PRIMITIVE_VALUE_BOX);
         }
 
