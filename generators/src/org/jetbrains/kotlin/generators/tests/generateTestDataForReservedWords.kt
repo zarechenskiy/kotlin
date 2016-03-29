@@ -24,7 +24,7 @@ import java.io.File
 
 val MODIFIER_KEYWORDS = KtTokens.MODIFIER_KEYWORDS_ARRAY.map { it.value }.toSet()
 
-val commonCases: CaseBuilder.(String, String) -> Unit = { testByName, testByRef ->
+val commonCases1: CaseBuilder.(String, String) -> Unit = { testByName, testByRef ->
     case("val", "val $KEYWORD_MARKER: Int", " = 0", testByName)
     case("var", "var $KEYWORD_MARKER: Int", " = 0", testByName)
     case("fun", "fun $KEYWORD_MARKER()", " { $KEYWORD_MARKER() }", testByRef)
@@ -37,7 +37,7 @@ val commonCases: CaseBuilder.(String, String) -> Unit = { testByName, testByRef 
     case("label", "val t: Int", " = 0", "testRenamed(\"$KEYWORD_MARKER\", { $KEYWORD_MARKER@ while (false) {} })")
 }
 
-val commonCasesWithTestNotRenamed: CaseBuilder.() -> Unit = { commonCases(testNotRenamedByName, testNotRenamedByRef) }
+val commonCasesWithTestNotRenamed1: CaseBuilder.() -> Unit = { commonCases1(testNotRenamedByName, testNotRenamedByRef) }
 
 fun main(args: Array<String>) {
     generateTestDataForReservedWords()
@@ -57,7 +57,7 @@ fun box(): String {
     return "OK"
 }"""
         ) {
-            commonCasesWithTestNotRenamed()
+            commonCasesWithTestNotRenamed1()
 
             case("class", "class $KEYWORD_MARKER { companion object {} }", "", testNotRenamedByName)
             case("interface", "interface $KEYWORD_MARKER { companion object {} }", "", testNotRenamedByName)
@@ -76,7 +76,7 @@ fun box(): String {
     return "OK"
 }"""
         ) {
-            commonCases(testRenamedByName, testRenamedByRef)
+            commonCases1(testRenamedByName, testRenamedByRef)
             case("catch", "", "",
 """
     try {
@@ -90,7 +90,7 @@ fun box(): String {
 // -------------------------
 
         suite("insideClass",
-"""
+              """
 class TestClass {
     $DEFINITION_MARKER
 
@@ -103,11 +103,11 @@ fun box(): String {
     TestClass().test()
 
     return "OK"
-}""", commonCasesWithTestNotRenamed)
+}""", commonCasesWithTestNotRenamed1)
 // -------------------------
 
         suite("insideClassObject",
-"""
+              """
 class TestClass {
     companion object {
         $DEFINITION_MARKER
@@ -122,11 +122,11 @@ fun box(): String {
     TestClass.test()
 
     return "OK"
-}""", commonCasesWithTestNotRenamed)
+}""", commonCasesWithTestNotRenamed1)
 // -------------------------
 
         suite("insideObject",
-"""
+              """
 object TestObject {
     $DEFINITION_MARKER
 
@@ -139,7 +139,7 @@ fun box(): String {
     TestObject.test()
 
     return "OK"
-}""", commonCasesWithTestNotRenamed)
+}""", commonCasesWithTestNotRenamed1)
 // -------------------------
 
         suite("dataClass",
@@ -163,7 +163,7 @@ fun box(): String {
 // -------------------------
 
         suite("delegated",
-"""
+              """
 interface Trait {
     $DECLARATION_MARKER
 }
@@ -182,11 +182,11 @@ fun box(): String {
     TestDelegate().test()
 
     return "OK"
-}""", commonCasesWithTestNotRenamed)
+}""", commonCasesWithTestNotRenamed1)
 // -------------------------
 
         suite("enum",
-"""
+              """
 enum class Foo {
     BAR;
     $DEFINITION_MARKER
@@ -200,7 +200,7 @@ fun box(): String {
     Foo.BAR.test()
 
     return "OK"
-}""", commonCasesWithTestNotRenamed)
+}""", commonCasesWithTestNotRenamed1)
 // -------------------------
 
         suite("enum",
