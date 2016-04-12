@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,9 @@ import org.jetbrains.kotlin.builtins.KotlinBuiltIns;
 import org.jetbrains.kotlin.descriptors.ClassDescriptor;
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor;
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor;
+import org.jetbrains.kotlin.descriptors.annotations.AnnotationUtilKt;
 import org.jetbrains.kotlin.descriptors.annotations.Annotations;
+import org.jetbrains.kotlin.name.FqName;
 import org.jetbrains.kotlin.resolve.calls.inference.CapturedType;
 import org.jetbrains.kotlin.resolve.constants.IntegerValueTypeConstructor;
 import org.jetbrains.kotlin.resolve.scopes.MemberScope;
@@ -35,6 +37,8 @@ import java.util.*;
 public class TypeUtils {
     public static final KotlinType DONT_CARE = ErrorUtils.createErrorTypeWithCustomDebugName("DONT_CARE");
     public static final KotlinType CANT_INFER_FUNCTION_PARAM_TYPE = ErrorUtils.createErrorType("Cannot be inferred");
+
+    public static final FqName ANYFIED_ANNOTATION_FQ_NAME = new FqName("kotlin.jvm.Anyfied");
 
     public static class SpecialType implements KotlinType {
         private final String name;
@@ -505,6 +509,15 @@ public class TypeUtils {
     public static boolean isReifiedTypeParameter(@NotNull KotlinType type) {
         TypeParameterDescriptor typeParameterDescriptor = getTypeParameterDescriptorOrNull(type);
         return typeParameterDescriptor != null && typeParameterDescriptor.isReified();
+    }
+
+    public static boolean isAnyfiedTypeParameter(@NotNull KotlinType type) {
+        TypeParameterDescriptor typeParameterDescriptor = getTypeParameterDescriptorOrNull(type);
+        return typeParameterDescriptor != null && isAnyfiedTypeParameter(typeParameterDescriptor);
+    }
+
+    public static boolean isAnyfiedTypeParameter(@NotNull TypeParameterDescriptor descriptor) {
+        return descriptor.getAnnotations().findAnnotation(ANYFIED_ANNOTATION_FQ_NAME) != null;
     }
 
     @Nullable

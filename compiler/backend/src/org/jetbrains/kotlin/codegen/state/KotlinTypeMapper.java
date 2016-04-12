@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -436,7 +436,7 @@ public class KotlinTypeMapper {
             jetType = CommonSupertypes.commonSupertype(new ArrayList<KotlinType>(constructor.getSupertypes()));
 
             // interface In<in E>
-            // open class A : In<A>
+            // open class A : In<A>¢
             // open class B : In<B>
             // commonSupertype(A, B) = In<A & B>
             // So replace arguments with star-projections to prevent infinite recursive mapping
@@ -480,7 +480,7 @@ public class KotlinTypeMapper {
             }
             else {
                 Type asmMemberType = mapType(memberType, mode);
-                arrayElementType = KotlinBuiltIns.isPrimitiveType(memberType) ? asmMemberType : boxType(asmMemberType);
+                arrayElementType = KotlinBuiltIns.isPrimitiveValueType(memberType) ? asmMemberType : boxType(asmMemberType);
                 if (signatureVisitor != null) {
                     signatureVisitor.writeArrayType();
                     mapType(memberType, signatureVisitor, mode.toGenericArgumentMode(memberProjection.getProjectionKind()));

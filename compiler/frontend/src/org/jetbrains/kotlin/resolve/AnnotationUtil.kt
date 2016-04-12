@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,5 +82,14 @@ fun MemberDescriptor.hasInlineOnlyAnnotation(): Boolean {
     if (this !is FunctionDescriptor) return false
     return annotations.hasAnnotation(INLINE_ONLY_ANNOTATION_FQ_NAME) && InlineUtil.isInline(this).apply {
         assert(this) { "Function is not inline: ${this@hasInlineOnlyAnnotation}"; }
+    }
+}
+
+val ANYFIED_ANNOTATION_FQ_NAME = FqName("kotlin.jvm.Anyfied")
+
+fun MemberDescriptor.hasAnyfiedAnnotation(): Boolean {
+    if (this !is FunctionDescriptor) return false
+    return annotations.hasAnnotation(ANYFIED_ANNOTATION_FQ_NAME) && InlineUtil.isInline(this).apply {
+        assert(this) { "Function is not inline: ${this@hasAnyfiedAnnotation}"; }
     }
 }

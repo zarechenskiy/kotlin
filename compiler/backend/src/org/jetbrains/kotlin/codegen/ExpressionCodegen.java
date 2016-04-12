@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,6 +96,7 @@ import org.jetbrains.org.objectweb.asm.commons.Method;
 
 import java.util.*;
 
+import static org.jetbrains.kotlin.builtins.KotlinBuiltIns.isAny;
 import static org.jetbrains.kotlin.builtins.KotlinBuiltIns.isInt;
 import static org.jetbrains.kotlin.codegen.AsmUtil.*;
 import static org.jetbrains.kotlin.codegen.JvmCodegenUtil.*;
@@ -1702,6 +1703,7 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
                     v.aconst(null);
                     v.store(index, OBJECT_TYPE);
                 }
+
                 v.visitLocalVariable(variableDescriptor.getName().asString(), type.getDescriptor(), null, scopeStart, blockEnd, index);
                 return null;
             }
@@ -2522,6 +2524,8 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
 
             boolean isReified = key.isReified() || InlineUtil.isArrayConstructorWithLambda(resolvedCall.getResultingDescriptor());
 
+            boolean isAnyfied = TypeUtils.isAnyfiedTypeParameter(key);
+
             Pair<TypeParameterDescriptor, ReificationArgument> typeParameterAndReificationArgument = extractReificationArgument(type);
             if (typeParameterAndReificationArgument == null) {
                 KotlinType approximatedType = CapturedTypeApproximationKt.approximateCapturedTypes(entry.getValue()).getUpper();
@@ -2530,12 +2534,12 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
                 Type asmType = typeMapper.mapTypeParameter(approximatedType, signatureWriter);
 
                 mappings.addParameterMappingToType(
-                        key.getName().getIdentifier(), approximatedType, asmType, signatureWriter.toString(), isReified
+                        key.getName().getIdentifier(), approximatedType, asmType, signatureWriter.toString(), isReified, isAnyfied
                 );
             }
             else {
                 mappings.addParameterMappingForFurtherReification(
-                        key.getName().getIdentifier(), type, typeParameterAndReificationArgument.getSecond(), isReified
+                        key.getName().getIdentifier(), type, typeParameterAndReificationArgument.getSecond(), isReified, isAnyfied
                 );
             }
         }
@@ -3421,10 +3425,12 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
         StackValue storeTo = sharedVarType == null ? StackValue.local(index, varType) : StackValue.shared(index, varType);
 
         storeTo.putReceiver(v, false);
+        putAnyfiedOperationMarkerIfTypeIsAnyfiedParameter(variableDescriptor.getType(), AnyfiedTypeInliner.OperationKind.ALOAD, v);
         initializer.put(initializer.type, v);
 
         markLineNumber(variableDeclaration, false);
 
+        putAnyfiedOperationMarkerIfTypeIsAnyfiedParameter(variableDescriptor.getType(), AnyfiedTypeInliner.OperationKind.ASTORE, v);
         storeTo.storeSelector(initializer.type, v);
     }
 
@@ -3528,17 +3534,23 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
             isInt(operationDescriptor.getValueParameters().get(0).getType())) {
             assert type != null;
             Type elementType;
+            boolean isAnyfiedComponentType = false;
             if (KotlinBuiltIns.isArray(type)) {
-                KotlinType jetElementType = type.getArguments().get(0).getType();
-                elementType = boxType(asmType(jetElementType));
+                KotlinType componentType = type.getArguments().get(0).getType();
+                //putAnyfiedOperationMarkerIfTypeIsAnyfiedParameter(componentType, AnyfiedTypeInliner.OperationKind.GET, v);
+                if (TypeUtils.isAnyfiedTypeParameter(componentType)) {
+                    isAnyfiedComponentType = true;
+                }
+                elementType = boxType(asmType(componentType));
             }
             else {
                 elementType = correctElementType(arrayType);
             }
+
             StackValue arrayValue = genLazy(array, arrayType);
             StackValue index = genLazy(indices.get(0), Type.INT_TYPE);
 
-            return StackValue.arrayElement(elementType, arrayValue, index);
+            return StackValue.arrayElement(elementType, arrayValue, index, isAnyfiedComponentType);
         }
         else {
             ResolvedCall<FunctionDescriptor> resolvedSetCall = bindingContext.get(INDEXED_LVALUE_SET, expression);
@@ -3876,6 +3888,34 @@ The "returned" value of try expression with no finally is either the last expres
                     Type.getMethodDescriptor(Type.VOID_TYPE, Type.INT_TYPE, Type.getType(String.class)), false
             );
         }
+    }
+
+    public static void putAnyfiedOperationMarkerIfTypeIsAnyfiedParameter(
+            @NotNull KotlinType type, @NotNull AnyfiedTypeInliner.OperationKind operationKind, @NotNull InstructionAdapter v
+    ) {
+        Pair<TypeParameterDescriptor, ReificationArgument> typeParameterAndReificationArgument = extractReificationArgument(type);
+        if (typeParameterAndReificationArgument != null && TypeUtils.isAnyfiedTypeParameter(typeParameterAndReificationArgument.getFirst())) {
+            TypeParameterDescriptor typeParameterDescriptor = typeParameterAndReificationArgument.getFirst();
+            //if (typeParameterDescriptor.getContainingDeclaration() != context.getContextDescriptor()) {
+            //    parentCodegen.getReifiedTypeParametersUsages().
+            //            addUsedReifiedParameter(typeParameterDescriptor.getName().asString());
+            //}
+            v.iconst(operationKind.getId());
+            v.visitLdcInsn(typeParameterAndReificationArgument.getSecond().asString());
+            v.invokestatic(
+                    IntrinsicMethods.INTRINSICS_CLASS_NAME, AnyfiedTypeInliner.ANYFIED_OPERATION_MARKER_METHOD_NAME,
+                    Type.getMethodDescriptor(Type.VOID_TYPE, Type.INT_TYPE, Type.getType(String.class)), false
+            );
+        }
+    }
+
+    public static void putAnyfiedOpeartionMarker(
+            @NotNull Type anyfiedType, @NotNull AnyfiedTypeInliner.OperationKind operationKind, @NotNull InstructionAdapter v) {
+        v.iconst(operationKind.getId());
+        v.visitLdcInsn(anyfiedType.toString());
+        v.invokestatic(
+                IntrinsicMethods.INTRINSICS_CLASS_NAME, AnyfiedTypeInliner.ANYFIED_OPERATION_MARKER_METHOD_NAME,
+                Type.getMethodDescriptor(Type.VOID_TYPE, Type.INT_TYPE, Type.getType(String.class)), false);
     }
 
     public void propagateChildReifiedTypeParametersUsages(@NotNull ReifiedTypeParametersUsages usages) {

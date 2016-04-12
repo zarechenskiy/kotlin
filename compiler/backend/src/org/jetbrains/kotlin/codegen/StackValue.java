@@ -26,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns;
 import org.jetbrains.kotlin.builtins.PrimitiveType;
+import org.jetbrains.kotlin.codegen.inline.AnyfiedTypeInliner;
 import org.jetbrains.kotlin.codegen.intrinsics.IntrinsicMethods;
 import org.jetbrains.kotlin.codegen.intrinsics.JavaClassProperty;
 import org.jetbrains.kotlin.codegen.state.GenerationState;
@@ -201,7 +202,12 @@ public abstract class StackValue {
 
     @NotNull
     public static StackValue arrayElement(@NotNull Type type, StackValue array, StackValue index) {
-        return new ArrayElement(type, array, index);
+        return arrayElement(type, array, index, false);
+    }
+
+    @NotNull
+    public static StackValue arrayElement(@NotNull Type type, StackValue array, StackValue index, boolean isAnyfiedType) {
+        return new ArrayElement(type, array, index, isAnyfiedType);
     }
 
     @NotNull
@@ -742,10 +748,16 @@ public abstract class StackValue {
 
     private static class ArrayElement extends StackValueWithSimpleReceiver {
         private final Type type;
+        private final boolean isComponentAnyfiedType;
 
         public ArrayElement(Type type, StackValue array, StackValue index) {
+            this(type, array, index, false);
+        }
+
+        public ArrayElement(Type type, StackValue array, StackValue index, boolean isComponentAnyfiedType) {
             super(type, false, false, new Receiver(Type.LONG_TYPE, array, index), true);
             this.type = type;
+            this.isComponentAnyfiedType = isComponentAnyfiedType;
         }
 
         @Override

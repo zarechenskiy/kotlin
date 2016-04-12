@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -241,12 +241,24 @@ private val MethodInsnNode.operationKind: ReifiedTypeInliner.OperationKind? get(
 class TypeParameterMappings() {
     private val mappingsByName = hashMapOf<String, TypeParameterMapping>()
 
-    fun addParameterMappingToType(name: String, type: KotlinType, asmType: Type, signature: String, isReified: Boolean) {
-        mappingsByName[name] =  TypeParameterMapping(name, type, asmType, reificationArgument = null, signature = signature, isReified = isReified)
+    fun addParameterMappingToType(name: String, type: KotlinType, asmType: Type, signature: String, isReified: Boolean, isAnyfied: Boolean = false) {
+        mappingsByName[name] =  TypeParameterMapping(name,
+                                                     type,
+                                                     asmType,
+                                                     reificationArgument = null,
+                                                     signature = signature,
+                                                     isReified = isReified,
+                                                     isAnyfied = isAnyfied)
     }
 
-    fun addParameterMappingForFurtherReification(name: String, type: KotlinType, reificationArgument: ReificationArgument, isReified: Boolean) {
-        mappingsByName[name] = TypeParameterMapping(name, type, asmType = null, reificationArgument = reificationArgument, signature = null, isReified = isReified)
+    fun addParameterMappingForFurtherReification(name: String, type: KotlinType, reificationArgument: ReificationArgument, isReified: Boolean, isAnyfied: Boolean = false) {
+        mappingsByName[name] = TypeParameterMapping(name,
+                                                    type,
+                                                    asmType = null,
+                                                    reificationArgument = reificationArgument,
+                                                    signature = null,
+                                                    isReified = isReified,
+                                                    isAnyfied = isAnyfied)
     }
 
     operator fun get(name: String): TypeParameterMapping? {
@@ -265,7 +277,8 @@ class TypeParameterMapping(
         val asmType: Type?,
         val reificationArgument: ReificationArgument?,
         val signature: String?,
-        val isReified: Boolean
+        val isReified: Boolean,
+        val isAnyfied: Boolean = false
 )
 
 class ReifiedTypeParametersUsages {
