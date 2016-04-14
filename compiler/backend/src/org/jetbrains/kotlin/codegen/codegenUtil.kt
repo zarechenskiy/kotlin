@@ -90,6 +90,26 @@ fun generateAsCast(
     TypeIntrinsics.checkcast(v, kotlinType, asmType, isSafe)
 }
 
+fun generateLoad(
+        v: InstructionAdapter,
+        asmType: Type,
+        index: Int
+) {
+    with(v) {
+        load(index, asmType)
+    }
+}
+
+fun generateStore(
+        v: InstructionAdapter,
+        asmType: Type,
+        index: Int
+) {
+    with(v) {
+        store(index, asmType)
+    }
+}
+
 private fun generateNullCheckForNonSafeAs(
         v: InstructionAdapter,
         type: KotlinType

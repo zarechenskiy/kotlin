@@ -87,6 +87,7 @@ public class InlineCodegen extends CallGenerator {
     private final Map<Integer, LambdaInfo> expressionMap = new HashMap<Integer, LambdaInfo>();
 
     private final ReifiedTypeInliner reifiedTypeInliner;
+    private final AnyfiedTypeInliner anyfiedTypeInliner;
     @Nullable private final TypeParameterMappings typeParameterMappings;
 
     private LambdaInfo activeLambda;
@@ -113,6 +114,7 @@ public class InlineCodegen extends CallGenerator {
         this.typeParameterMappings = typeParameterMappings;
 
         reifiedTypeInliner = new ReifiedTypeInliner(typeParameterMappings);
+        anyfiedTypeInliner = new AnyfiedTypeInliner(typeParameterMappings);
 
         initialFrameSize = codegen.getFrameMap().getCurrentSize();
 
@@ -352,6 +354,7 @@ public class InlineCodegen extends CallGenerator {
     private InlineResult inlineCall(SMAPAndMethodNode nodeAndSmap) {
         MethodNode node = nodeAndSmap.getNode();
         ReifiedTypeParametersUsages reificationResult = reifiedTypeInliner.reifyInstructions(node);
+        anyfiedTypeInliner.reifyInstructions(node);
         generateClosuresBodies();
 
         //through generation captured parameters will be added to invocationParamBuilder

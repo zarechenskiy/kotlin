@@ -217,7 +217,7 @@ class ReifiedTypeInliner(private val parametersMapping: TypeParameterMappings?) 
 
 }
 
-private val MethodInsnNode.reificationArgument: ReificationArgument?
+val MethodInsnNode.reificationArgument: ReificationArgument?
     get() {
         val prev = previous!!
 
@@ -241,7 +241,7 @@ private val MethodInsnNode.operationKind: ReifiedTypeInliner.OperationKind? get(
 class TypeParameterMappings() {
     private val mappingsByName = hashMapOf<String, TypeParameterMapping>()
 
-    fun addParameterMappingToType(name: String, type: KotlinType, asmType: Type, signature: String, isReified: Boolean, isAnyfied: Boolean = false) {
+    fun addParameterMappingToType(name: String, type: KotlinType, asmType: Type, signature: String, isReified: Boolean, isAnyfied: Boolean) {
         mappingsByName[name] =  TypeParameterMapping(name,
                                                      type,
                                                      asmType,
@@ -251,7 +251,7 @@ class TypeParameterMappings() {
                                                      isAnyfied = isAnyfied)
     }
 
-    fun addParameterMappingForFurtherReification(name: String, type: KotlinType, reificationArgument: ReificationArgument, isReified: Boolean, isAnyfied: Boolean = false) {
+    fun addParameterMappingForFurtherReification(name: String, type: KotlinType, reificationArgument: ReificationArgument, isReified: Boolean, isAnyfied: Boolean) {
         mappingsByName[name] = TypeParameterMapping(name,
                                                     type,
                                                     asmType = null,
@@ -267,6 +267,8 @@ class TypeParameterMappings() {
 
     fun hasReifiedParameters() = mappingsByName.values.any { it.isReified }
 
+    fun hasAnyfiedParameters() = mappingsByName.values.any { it.isAnyfied }
+
     internal inline fun forEach(l: (TypeParameterMapping) -> Unit)  {
         mappingsByName.values.forEach(l)
     }
@@ -278,7 +280,7 @@ class TypeParameterMapping(
         val reificationArgument: ReificationArgument?,
         val signature: String?,
         val isReified: Boolean,
-        val isAnyfied: Boolean = false
+        val isAnyfied: Boolean
 )
 
 class ReifiedTypeParametersUsages {

@@ -16,7 +16,19 @@
 
 package org.jetbrains.kotlin.codegen.inline
 
-class AnyfiedTypeInliner {
+import org.jetbrains.kotlin.builtins.KotlinBuiltIns
+import org.jetbrains.kotlin.codegen.generateLoad
+import org.jetbrains.kotlin.codegen.generateStore
+import org.jetbrains.kotlin.codegen.intrinsics.IntrinsicMethods
+import org.jetbrains.kotlin.codegen.optimization.common.intConstant
+import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.types.TypeUtils
+import org.jetbrains.org.objectweb.asm.Opcodes
+import org.jetbrains.org.objectweb.asm.Type
+import org.jetbrains.org.objectweb.asm.commons.InstructionAdapter
+import org.jetbrains.org.objectweb.asm.tree.*
+
+class AnyfiedTypeInliner(private val parametersMapping: TypeParameterMappings?) {
     enum class OperationKind {
         GET, ALOAD, ASTORE, LOCALVARIABLE;
 
@@ -25,5 +37,105 @@ class AnyfiedTypeInliner {
 
     companion object {
         @JvmField val ANYFIED_OPERATION_MARKER_METHOD_NAME = "anyfiedOperationMarker"
+
+        private fun isOperationAnyfiedMarker(insn: AbstractInsnNode) = isAnyfiedMarker(insn) { it == ANYFIED_OPERATION_MARKER_METHOD_NAME }
+
+        private fun isAnyfiedMarker(insn: AbstractInsnNode, namePredicate: (String) -> Boolean): Boolean {
+            if (insn.opcode != Opcodes.INVOKESTATIC || insn !is MethodInsnNode) return false
+            return insn.owner == IntrinsicMethods.INTRINSICS_CLASS_NAME && namePredicate(insn.name)
+        }
+    }
+
+    private val hasAnyfiedParameters = parametersMapping?.hasAnyfiedParameters() ?: false
+
+    private var maxStackSize = 0
+
+    fun reifyInstructions(node: MethodNode) {
+        if (!hasAnyfiedParameters) return
+
+        val instructions = node.instructions
+        maxStackSize = 0
+
+        for (insn in instructions.toArray()) {
+            if (isOperationAnyfiedMarker(insn)) {
+                processAnyfiedMarker(insn as MethodInsnNode, instructions)
+            }
+        }
+
+        node.maxStack = node.maxStack + maxStackSize
+    }
+
+    fun processAnyfiedMarker(insn: MethodInsnNode, instructions: InsnList) {
+        val operationKind = insn.anyfiedOperationKind ?: return
+        val reificationArgument = insn.reificationArgument ?: return
+        val mapping = parametersMapping?.get(reificationArgument.parameterName) ?: return
+
+        if (mapping.asmType != null) {
+            val (asmType, kotlinType) = reificationArgument.reify(mapping.asmType, mapping.type)
+
+            val isValueType = KotlinBuiltIns.isPrimitiveValueType(kotlinType)
+
+            val specialized = isValueType && when (operationKind) {
+                OperationKind.ALOAD -> processLocalVariableLoad(insn, instructions, asmType, kotlinType)
+                OperationKind.ASTORE -> processLocalVariableStore(insn, instructions, asmType, kotlinType)
+                else -> false
+            }
+
+            if (specialized || !isValueType) {
+                instructions.remove(insn.previous.previous!!) // PUSH operation ID
+                instructions.remove(insn.previous!!) // PUSH type parameter
+                instructions.remove(insn) // INVOKESTATIC marker method
+            }
+        }
+    }
+
+    private fun processLocalVariableLoad(
+            insn: MethodInsnNode,
+            instructions: InsnList,
+            parameter: Type,
+            kotlinType: KotlinType): Boolean {
+        return rewriteNextTypeInsn(insn, Opcodes.ALOAD) { stubALoad ->
+            if (stubALoad !is VarInsnNode) return false
+
+            val newMethodNode = MethodNode(InlineCodegenUtil.API)
+            generateLoad(InstructionAdapter(newMethodNode), parameter, stubALoad.`var`)
+
+            instructions.insert(insn, newMethodNode.instructions)
+            instructions.remove(stubALoad)
+
+            return true
+        }
+    }
+
+    private fun processLocalVariableStore(insn: MethodInsnNode,
+                                          instructions: InsnList,
+                                          parameter: Type,
+                                          kotlinType: KotlinType): Boolean {
+        return rewriteNextTypeInsn(insn, Opcodes.ASTORE) { stubALoad ->
+            if (stubALoad !is VarInsnNode) return false
+
+            val newMethodNode = MethodNode(InlineCodegenUtil.API)
+            generateStore(InstructionAdapter(newMethodNode), parameter, stubALoad.`var`)
+
+            instructions.insert(insn, newMethodNode.instructions)
+            instructions.remove(stubALoad)
+
+            return true
+        }
+    }
+
+    inline private fun rewriteNextTypeInsn(
+            marker: MethodInsnNode,
+            expectedNextOpcode: Int,
+            rewrite: (AbstractInsnNode) -> Boolean
+    ): Boolean {
+        val next = marker.next ?: return false
+        if (next.opcode != expectedNextOpcode) return false
+        return rewrite(next)
     }
 }
+
+private val MethodInsnNode.anyfiedOperationKind: AnyfiedTypeInliner.OperationKind?
+    get() = previous?.previous?.intConstant?.let {
+        AnyfiedTypeInliner.OperationKind.values().getOrNull(it)
+    }
