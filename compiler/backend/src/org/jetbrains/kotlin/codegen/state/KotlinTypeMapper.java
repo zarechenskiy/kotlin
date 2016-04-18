@@ -30,6 +30,8 @@ import org.jetbrains.kotlin.codegen.*;
 import org.jetbrains.kotlin.codegen.binding.CodegenBinding;
 import org.jetbrains.kotlin.codegen.binding.MutableClosure;
 import org.jetbrains.kotlin.codegen.binding.PsiCodegenPredictor;
+import org.jetbrains.kotlin.codegen.inline.TypeParameterMapping;
+import org.jetbrains.kotlin.codegen.inline.TypeParameterMappings;
 import org.jetbrains.kotlin.codegen.signature.BothSignatureWriter;
 import org.jetbrains.kotlin.codegen.signature.JvmSignatureWriter;
 import org.jetbrains.kotlin.descriptors.*;
@@ -317,11 +319,14 @@ public class KotlinTypeMapper {
 
     @NotNull
     public Type mapReturnType(@NotNull CallableDescriptor descriptor) {
-        return mapReturnType(descriptor, null);
+        return mapReturnType(descriptor, null, null);
     }
 
     @NotNull
-    private Type mapReturnType(@NotNull CallableDescriptor descriptor, @Nullable JvmSignatureWriter sw) {
+    private Type mapReturnType(
+            @NotNull CallableDescriptor descriptor,
+            @Nullable JvmSignatureWriter sw,
+            @Nullable TypeParameterMappings typeParameterMappings) {
         KotlinType returnType = descriptor.getReturnType();
         assert returnType != null : "Function has no return type: " + descriptor;
 
@@ -338,30 +343,34 @@ public class KotlinTypeMapper {
         else if (descriptor instanceof FunctionDescriptor && forceBoxedReturnType((FunctionDescriptor) descriptor)) {
             // GENERIC_TYPE is a hack to automatically box the return type
             //noinspection ConstantConditions
-            return mapType(descriptor.getReturnType(), sw, TypeMappingMode.GENERIC_ARGUMENT);
+            return mapType(descriptor.getReturnType(), sw, TypeMappingMode.GENERIC_ARGUMENT, typeParameterMappings);
         }
 
-        return mapReturnType(descriptor, sw, returnType);
+        return mapReturnType(descriptor, sw, returnType, typeParameterMappings);
     }
 
     @NotNull
-    private Type mapReturnType(@NotNull CallableDescriptor descriptor, @Nullable JvmSignatureWriter sw, @NotNull KotlinType returnType) {
+    private Type mapReturnType(
+            @NotNull CallableDescriptor descriptor,
+            @Nullable JvmSignatureWriter sw,
+            @NotNull KotlinType returnType,
+            @Nullable TypeParameterMappings typeParameterMappings) {
         boolean isAnnotationMethod = DescriptorUtils.isAnnotationClass(descriptor.getContainingDeclaration());
         if (sw == null || sw.skipGenericSignature()) {
-            return mapType(returnType, sw, TypeMappingMode.getModeForReturnTypeNoGeneric(isAnnotationMethod));
+            return mapType(returnType, sw, TypeMappingMode.getModeForReturnTypeNoGeneric(isAnnotationMethod), typeParameterMappings);
         }
 
         TypeMappingMode typeMappingModeFromAnnotation =
                 TypeMappingUtil.extractTypeMappingModeFromAnnotation(descriptor, returnType, isAnnotationMethod);
         if (typeMappingModeFromAnnotation != null) {
-            return mapType(returnType, sw, typeMappingModeFromAnnotation);
+            return mapType(returnType, sw, typeMappingModeFromAnnotation, typeParameterMappings);
         }
 
         TypeMappingMode mappingMode = TypeMappingMode.getOptimalModeForReturnType(
                 returnType,
                 /* isAnnotationMethod = */ isAnnotationMethod);
 
-        return mapType(returnType, sw, mappingMode);
+        return mapType(returnType, sw, mappingMode, typeParameterMappings);
     }
 
     @NotNull
@@ -413,7 +422,16 @@ public class KotlinTypeMapper {
     private Type mapType(
             @NotNull KotlinType jetType,
             @Nullable JvmSignatureWriter signatureVisitor,
-            @NotNull TypeMappingMode mode
+            @NotNull TypeMappingMode mode) {
+        return mapType(jetType, signatureVisitor, mode, null);
+    }
+
+    @NotNull
+    private Type mapType(
+            @NotNull KotlinType jetType,
+            @Nullable JvmSignatureWriter signatureVisitor,
+            @NotNull TypeMappingMode mode,
+            @Nullable TypeParameterMappings typeParameterMappings
     ) {
         Type builtinType = mapBuiltinType(jetType);
 
@@ -483,7 +501,7 @@ public class KotlinTypeMapper {
                 arrayElementType = KotlinBuiltIns.isPrimitiveValueType(memberType) ? asmMemberType : boxType(asmMemberType);
                 if (signatureVisitor != null) {
                     signatureVisitor.writeArrayType();
-                    mapType(memberType, signatureVisitor, mode.toGenericArgumentMode(memberProjection.getProjectionKind()));
+                    mapType(memberType, signatureVisitor, mode.toGenericArgumentMode(memberProjection.getProjectionKind()), typeParameterMappings);
                     signatureVisitor.writeArrayEnd();
                 }
             }
@@ -501,6 +519,12 @@ public class KotlinTypeMapper {
 
         if (descriptor instanceof TypeParameterDescriptor) {
             Type type = mapType(getRepresentativeUpperBound((TypeParameterDescriptor) descriptor), mode);
+            if (typeParameterMappings != null) {
+                TypeParameterMapping typeParameterMapping = typeParameterMappings.get(descriptor.getName().asString());
+                if (typeParameterMapping != null) {
+                    type = mapType(typeParameterMapping.getType(), mode);
+                }
+            }
             if (signatureVisitor != null) {
                 signatureVisitor.writeTypeVariable(descriptor.getName(), type);
             }
@@ -1033,8 +1057,16 @@ public class KotlinTypeMapper {
         return mapSignature(f, kind, false);
     }
 
-    @NotNull
-    private JvmMethodGenericSignature mapSignature(@NotNull FunctionDescriptor f, @NotNull OwnerKind kind, boolean skipGenericSignature) {
+    public JvmMethodGenericSignature mapSignatureWithGeneric(
+            @NotNull FunctionDescriptor f, @NotNull OwnerKind kind, @NotNull TypeParameterMappings typeParameterMappings) {
+        return mapSignature(f, kind, false, typeParameterMappings);
+    }
+
+    private JvmMethodGenericSignature mapSignature(
+            @NotNull FunctionDescriptor f,
+            @NotNull OwnerKind kind,
+            boolean skipGenericSignature,
+            @Nullable TypeParameterMappings typeParameterMappings) {
         if (f.getInitialSignatureDescriptor() != null && f != f.getInitialSignatureDescriptor()) {
             // Overrides of special builtin in Kotlin classes always have special signature
             if (SpecialBuiltinMembers.getOverriddenBuiltinReflectingJvmDescriptor(f) == null ||
@@ -1044,10 +1076,15 @@ public class KotlinTypeMapper {
         }
 
         if (f instanceof ConstructorDescriptor) {
-            return mapSignature(f, kind, f.getOriginal().getValueParameters(), skipGenericSignature);
+            return mapSignature(f, kind, f.getOriginal().getValueParameters(), skipGenericSignature, typeParameterMappings);
         }
 
-        return mapSignature(f, kind, f.getValueParameters(), skipGenericSignature);
+        return mapSignature(f, kind, f.getValueParameters(), skipGenericSignature, typeParameterMappings);
+    }
+
+    @NotNull
+    private JvmMethodGenericSignature mapSignature(@NotNull FunctionDescriptor f, @NotNull OwnerKind kind, boolean skipGenericSignature) {
+        return mapSignature(f, kind, skipGenericSignature, null);
     }
 
     @NotNull
@@ -1055,7 +1092,8 @@ public class KotlinTypeMapper {
             @NotNull FunctionDescriptor f,
             @NotNull OwnerKind kind,
             @NotNull List<ValueParameterDescriptor> valueParameters,
-            boolean skipGenericSignature
+            boolean skipGenericSignature,
+            @Nullable TypeParameterMappings typeParameterMappings
     ) {
         if (f instanceof FunctionImportedFromObject) {
             return mapSignature(((FunctionImportedFromObject) f).getCallableFromObject(), kind, skipGenericSignature);
@@ -1086,11 +1124,14 @@ public class KotlinTypeMapper {
             KotlinType thisIfNeeded = null;
             if (OwnerKind.DEFAULT_IMPLS == kind) {
                 ReceiverTypeAndTypeParameters receiverTypeAndTypeParameters = TypeMapperUtilsKt.patchTypeParametersForDefaultImplMethod(directMember);
-                writeFormalTypeParameters(CollectionsKt.plus(receiverTypeAndTypeParameters.getTypeParameters(), directMember.getTypeParameters()), sw);
+                writeFormalTypeParameters(
+                        CollectionsKt.plus(receiverTypeAndTypeParameters.getTypeParameters(), directMember.getTypeParameters()),
+                        sw,
+                        typeParameterMappings);
                 thisIfNeeded = receiverTypeAndTypeParameters.getReceiverType();
             }
             else {
-                writeFormalTypeParameters(directMember.getTypeParameters(), sw);
+                writeFormalTypeParameters(directMember.getTypeParameters(), sw, typeParameterMappings);
                 if (isAccessor(f) && f.getDispatchReceiverParameter() != null) {
                     thisIfNeeded = ((ClassDescriptor) f.getContainingDeclaration()).getDefaultType();
                 }
@@ -1108,11 +1149,11 @@ public class KotlinTypeMapper {
 
             for (ValueParameterDescriptor parameter : valueParameters) {
                 if (writeCustomParameter(f, parameter, sw)) continue;
-                writeParameter(sw, parameter.getType(), f);
+                writeParameter(sw, parameter.getType(), f, typeParameterMappings);
             }
 
             sw.writeReturnType();
-            mapReturnType(f, sw);
+            mapReturnType(f, sw, typeParameterMappings);
             sw.writeReturnTypeEnd();
         }
 
@@ -1244,20 +1285,32 @@ public class KotlinTypeMapper {
         JvmSignatureWriter sw = new BothSignatureWriter(BothSignatureWriter.Mode.TYPE);
 
         if (!propertyDescriptor.isVar()) {
-            mapReturnType(propertyDescriptor, sw, backingFieldType);
+            mapReturnType(propertyDescriptor, sw, backingFieldType, null);
         }
         else {
-            writeParameterType(sw, backingFieldType, propertyDescriptor);
+            writeParameterType(sw, backingFieldType, propertyDescriptor, null);
         }
 
         return sw.makeJavaGenericSignature();
     }
 
-    public void writeFormalTypeParameters(@NotNull List<TypeParameterDescriptor> typeParameters, @NotNull JvmSignatureWriter sw) {
+    public void writeFormalTypeParameters(
+            @NotNull List<TypeParameterDescriptor> typeParameters, @NotNull JvmSignatureWriter sw, @Nullable TypeParameterMappings typeParameterMappings) {
         if (sw.skipGenericSignature()) return;
         for (TypeParameterDescriptor typeParameter : typeParameters) {
+            if (typeParameterMappings != null) {
+                TypeParameterMapping mapping = typeParameterMappings.get(typeParameter.getName().asString());
+                if (mapping != null && mapping.isAnyfied()) {
+                    continue;
+                }
+            }
+
             writeFormalTypeParameter(typeParameter, sw);
         }
+    }
+
+    public void writeFormalTypeParameters(@NotNull List<TypeParameterDescriptor> typeParameters, @NotNull JvmSignatureWriter sw) {
+        writeFormalTypeParameters(typeParameters, sw, null);
     }
 
     private void writeFormalTypeParameter(@NotNull TypeParameterDescriptor typeParameterDescriptor, @NotNull JvmSignatureWriter sw) {
@@ -1311,20 +1364,37 @@ public class KotlinTypeMapper {
     private void writeParameter(
             @NotNull JvmSignatureWriter sw,
             @NotNull KotlinType type,
-            @Nullable CallableDescriptor callableDescriptor
+            @Nullable CallableDescriptor callableDescriptor) {
+        writeParameter(sw, type, callableDescriptor, null);
+    }
+
+    private void writeParameter(
+            @NotNull JvmSignatureWriter sw,
+            @NotNull KotlinType type,
+            @Nullable CallableDescriptor callableDescriptor,
+            @Nullable TypeParameterMappings typeParameterMappings
     ) {
-        writeParameter(sw, JvmMethodParameterKind.VALUE, type, callableDescriptor);
+        writeParameter(sw, JvmMethodParameterKind.VALUE, type, callableDescriptor, typeParameterMappings);
     }
 
     private void writeParameter(
             @NotNull JvmSignatureWriter sw,
             @NotNull JvmMethodParameterKind kind,
             @NotNull KotlinType type,
-            @Nullable CallableDescriptor callableDescriptor
+            @Nullable CallableDescriptor callableDescriptor) {
+        writeParameter(sw, kind, type, callableDescriptor, null);
+    }
+
+    private void writeParameter(
+            @NotNull JvmSignatureWriter sw,
+            @NotNull JvmMethodParameterKind kind,
+            @NotNull KotlinType type,
+            @Nullable CallableDescriptor callableDescriptor,
+            @Nullable TypeParameterMappings typeParameterMappings
     ) {
         sw.writeParameterType(kind);
 
-        writeParameterType(sw, type, callableDescriptor);
+        writeParameterType(sw, type, callableDescriptor, typeParameterMappings);
 
         sw.writeParameterTypeEnd();
     }
@@ -1332,7 +1402,8 @@ public class KotlinTypeMapper {
     private void writeParameterType(
             @NotNull JvmSignatureWriter sw,
             @NotNull KotlinType type,
-            @Nullable CallableDescriptor callableDescriptor
+            @Nullable CallableDescriptor callableDescriptor,
+            @Nullable TypeParameterMappings typeParameterMappings
     ) {
         if (sw.skipGenericSignature()) {
             mapType(type, sw, TypeMappingMode.DEFAULT);
@@ -1354,7 +1425,7 @@ public class KotlinTypeMapper {
             typeMappingMode = TypeMappingMode.getOptimalModeForValueParameter(type);
         }
 
-        mapType(type, sw, typeMappingMode);
+        mapType(type, sw, typeMappingMode, typeParameterMappings);
     }
 
     private static void writeParameter(@NotNull JvmSignatureWriter sw, @NotNull JvmMethodParameterKind kind, @NotNull Type type) {

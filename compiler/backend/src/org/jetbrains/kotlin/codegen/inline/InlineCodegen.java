@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -120,7 +120,10 @@ public class InlineCodegen extends CallGenerator {
 
         PsiElement element = DescriptorToSourceUtils.descriptorToDeclaration(functionDescriptor);
         context = (MethodContext) getContext(functionDescriptor, state, element != null ? (KtFile) element.getContainingFile() : null);
-        jvmSignature = typeMapper.mapSignatureWithGeneric(functionDescriptor, context.getContextKind());
+        jvmSignature =
+                (typeParameterMappings != null && typeParameterMappings.hasAnyfiedParameters())
+                ? typeMapper.mapSignatureWithGeneric(functionDescriptor, context.getContextKind(), typeParameterMappings)
+                : typeMapper.mapSignatureWithGeneric(functionDescriptor, context.getContextKind());
 
         // TODO: implement AS_FUNCTION inline strategy
         this.asFunctionInline = false;
@@ -778,7 +781,9 @@ public class InlineCodegen extends CallGenerator {
         }
         else {
             StackValue value = codegen.gen(argumentExpression);
-            putValueIfNeeded(parameterType, value, valueParameterDescriptor.getIndex());
+
+            int index = valueParameterDescriptor.getIndex();
+            putValueIfNeeded(jvmSignature.getValueParameters().get(index).getAsmType(), value, index);
         }
     }
 
