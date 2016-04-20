@@ -1153,7 +1153,8 @@ public class KotlinTypeMapper {
             }
 
             sw.writeReturnType();
-            mapReturnType(f, sw, typeParameterMappings);
+            //mapReturnType(f, sw, typeParameterMappings);
+            mapReturnType(f, sw, null);
             sw.writeReturnTypeEnd();
         }
 

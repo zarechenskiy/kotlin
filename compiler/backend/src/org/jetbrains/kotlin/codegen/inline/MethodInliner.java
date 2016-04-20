@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,6 +75,10 @@ public class MethodInliner {
 
     private final InlineOnlySmapSkipper inlineOnlySmapSkipper;
 
+    private final AnyfiedLocalVarMapping anyfiedLocalVarMapping;
+
+    private final TypeParameterMappings typeParameterMappings;
+
     /*
      *
      * @param node
@@ -91,7 +95,9 @@ public class MethodInliner {
             @NotNull String errorPrefix,
             @NotNull SourceMapper sourceMapper,
             @NotNull InlineCallSiteInfo inlineCallSiteInfo,
-            @Nullable InlineOnlySmapSkipper smapSkipper //non null only for root
+            @Nullable InlineOnlySmapSkipper smapSkipper, //non null only for root
+            @Nullable AnyfiedLocalVarMapping anyfiedLocalVarMapping,
+            @Nullable TypeParameterMappings typeParameterMappings
     ) {
         this.node = node;
         this.parameters = parameters;
@@ -104,6 +110,9 @@ public class MethodInliner {
         this.typeMapper = inliningContext.state.getTypeMapper();
         this.result = InlineResult.create();
         this.inlineOnlySmapSkipper = smapSkipper;
+        this.anyfiedLocalVarMapping = anyfiedLocalVarMapping;
+        this.typeParameterMappings = typeParameterMappings;
+
     }
 
     public InlineResult doInline(
@@ -253,7 +262,7 @@ public class MethodInliner {
                                                               inliningContext.subInlineLambda(info),
                                                               newCapturedRemapper, true /*cause all calls in same module as lambda*/,
                                                               "Lambda inlining " + info.getLambdaClassType().getInternalName(),
-                                                              mapper, inlineCallSiteInfo, null);
+                                                              mapper, inlineCallSiteInfo, null, anyfiedLocalVarMapping, typeParameterMappings);
 
                     LocalVarRemapper remapper = new LocalVarRemapper(lambdaParameters, valueParamShift);
                     InlineResult lambdaResult = inliner.doInline(this.mv, remapper, true, info, invokeCall.finallyDepthShift);//TODO add skipped this and receiver
@@ -386,7 +395,18 @@ public class MethodInliner {
                                        !InlineCodegenUtil.isFakeLocalVariableForInline(name) ?
                                        INLINE_FUN_VAR_SUFFIX : "";
                     String varName = !varSuffix.isEmpty() && name.equals("this") ? name + "_" : name;
-                    super.visitLocalVariable(varName + varSuffix, desc, signature, start, end, getNewIndex(index));
+                    String mangledName = varName + varSuffix;
+
+                    String specializedDesc = desc; // TODO this is very bad, fix assignment later
+                    if (anyfiedLocalVarMapping.hasMapping(name)) {
+                        TypeParameterMapping mapping = typeParameterMappings.get(anyfiedLocalVarMapping.getMapping(name));
+                        if (mapping != null) {
+                            Type type = mapping.getAsmType();
+                            if (type != null) specializedDesc = type.getDescriptor();
+                        }
+                    }
+
+                    super.visitLocalVariable(mangledName, specializedDesc, signature, start, end, getNewIndex(index));
                 }
             }
         };

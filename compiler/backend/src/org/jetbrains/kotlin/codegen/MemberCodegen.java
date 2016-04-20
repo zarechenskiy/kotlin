@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,6 +79,7 @@ public abstract class MemberCodegen<T extends KtElement/* TODO: & JetDeclaration
     protected final JvmFileClassesProvider fileClassesProvider;
     private final MemberCodegen<?> parentCodegen;
     private final ReifiedTypeParametersUsages reifiedTypeParametersUsages = new ReifiedTypeParametersUsages();
+    private final AnyfiedLocalVarMapping anyfiedLocalVarMapping = new AnyfiedLocalVarMapping();
     protected final Collection<ClassDescriptor> innerClasses = new LinkedHashSet<ClassDescriptor>();
 
     protected ExpressionCodegen clInit;
@@ -543,6 +544,11 @@ public abstract class MemberCodegen<T extends KtElement/* TODO: & JetDeclaration
     @NotNull
     public ReifiedTypeParametersUsages getReifiedTypeParametersUsages() {
         return reifiedTypeParametersUsages;
+    }
+
+    @NotNull
+    public AnyfiedLocalVarMapping getAnyfiedLocalVarMapping() {
+        return anyfiedLocalVarMapping;
     }
 
     public MemberCodegen<?> getParentCodegen() {

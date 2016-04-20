@@ -17,6 +17,8 @@
 package org.jetbrains.kotlin.codegen.inline
 
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
+import org.jetbrains.kotlin.codegen.generateALoad
+import org.jetbrains.kotlin.codegen.generateAReturn
 import org.jetbrains.kotlin.codegen.generateLoad
 import org.jetbrains.kotlin.codegen.generateStore
 import org.jetbrains.kotlin.codegen.intrinsics.IntrinsicMethods
@@ -30,7 +32,7 @@ import org.jetbrains.org.objectweb.asm.tree.*
 
 class AnyfiedTypeInliner(private val parametersMapping: TypeParameterMappings?) {
     enum class OperationKind {
-        GET, ALOAD, ASTORE, LOCALVARIABLE;
+        GET, ALOAD, ASTORE, LOCALVARIABLE, AALOAD, ARETURN;
 
         val id: Int get() = ordinal
     }
@@ -78,6 +80,8 @@ class AnyfiedTypeInliner(private val parametersMapping: TypeParameterMappings?) 
             val specialized = isValueType && when (operationKind) {
                 OperationKind.ALOAD -> processLocalVariableLoad(insn, instructions, asmType, kotlinType)
                 OperationKind.ASTORE -> processLocalVariableStore(insn, instructions, asmType, kotlinType)
+                OperationKind.AALOAD -> processLoadValueTypeFromArray(insn, instructions, asmType, kotlinType)
+                OperationKind.ARETURN -> processReturn(insn, instructions, asmType, kotlinType)
                 else -> false
             }
 
@@ -89,16 +93,52 @@ class AnyfiedTypeInliner(private val parametersMapping: TypeParameterMappings?) 
         }
     }
 
-    private fun processLocalVariableLoad(
+    private fun processReturn(
             insn: MethodInsnNode,
             instructions: InsnList,
             parameter: Type,
+            kotlinType: KotlinType): Boolean {
+        return rewriteNextTypeInsn(insn, Opcodes.ARETURN) { stubAALoad ->
+            if (stubAALoad !is InsnNode) return false
+
+            val newMethodNode = MethodNode(InlineCodegenUtil.API)
+            generateAReturn(InstructionAdapter(newMethodNode), parameter)
+
+            instructions.insert(insn, newMethodNode.instructions)
+            instructions.remove(stubAALoad)
+
+            return true
+        }
+    }
+
+    private fun processLoadValueTypeFromArray(
+            insn: MethodInsnNode,
+            instructions: InsnList,
+            asmType: Type,
+            kotlinType: KotlinType): Boolean {
+        return rewriteNextTypeInsn(insn, Opcodes.AALOAD) { stubAALoad ->
+            if (stubAALoad !is InsnNode) return false
+
+            val newMethodNode = MethodNode(InlineCodegenUtil.API)
+            generateALoad(InstructionAdapter(newMethodNode), asmType)
+
+            instructions.insert(insn, newMethodNode.instructions)
+            instructions.remove(stubAALoad)
+
+            return true
+        }
+    }
+
+    private fun processLocalVariableLoad(
+            insn: MethodInsnNode,
+            instructions: InsnList,
+            asmType: Type,
             kotlinType: KotlinType): Boolean {
         return rewriteNextTypeInsn(insn, Opcodes.ALOAD) { stubALoad ->
             if (stubALoad !is VarInsnNode) return false
 
             val newMethodNode = MethodNode(InlineCodegenUtil.API)
-            generateLoad(InstructionAdapter(newMethodNode), parameter, stubALoad.`var`)
+            generateLoad(InstructionAdapter(newMethodNode), asmType, stubALoad.`var`)
 
             instructions.insert(insn, newMethodNode.instructions)
             instructions.remove(stubALoad)
@@ -109,13 +149,13 @@ class AnyfiedTypeInliner(private val parametersMapping: TypeParameterMappings?) 
 
     private fun processLocalVariableStore(insn: MethodInsnNode,
                                           instructions: InsnList,
-                                          parameter: Type,
+                                          asmType: Type,
                                           kotlinType: KotlinType): Boolean {
         return rewriteNextTypeInsn(insn, Opcodes.ASTORE) { stubALoad ->
             if (stubALoad !is VarInsnNode) return false
 
             val newMethodNode = MethodNode(InlineCodegenUtil.API)
-            generateStore(InstructionAdapter(newMethodNode), parameter, stubALoad.`var`)
+            generateStore(InstructionAdapter(newMethodNode), asmType, stubALoad.`var`)
 
             instructions.insert(insn, newMethodNode.instructions)
             instructions.remove(stubALoad)
@@ -133,6 +173,18 @@ class AnyfiedTypeInliner(private val parametersMapping: TypeParameterMappings?) 
         if (next.opcode != expectedNextOpcode) return false
         return rewrite(next)
     }
+}
+
+class AnyfiedLocalVarMapping {
+    val localVarMapping: MutableMap<String, String> = hashMapOf()
+
+    fun addMapping(variableName: String, anyfiedSignature: String) {
+        localVarMapping.put(variableName, anyfiedSignature)
+    }
+
+    fun getMapping(variableName: String): String? = localVarMapping[variableName]
+
+    fun hasMapping(variableName: String): Boolean = variableName in localVarMapping
 }
 
 private val MethodInsnNode.anyfiedOperationKind: AnyfiedTypeInliner.OperationKind?

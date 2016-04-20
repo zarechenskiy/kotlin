@@ -375,7 +375,8 @@ public class InlineCodegen extends CallGenerator {
                 node, parameters, info, new FieldRemapper(null, null, parameters), isSameModule,
                 "Method inlining " + callElement.getText(),
                 createNestedSourceMapper(nodeAndSmap, sourceMapper), info.getCallSiteInfo(),
-                AnnotationUtilKt.hasInlineOnlyAnnotation(functionDescriptor) ? new InlineOnlySmapSkipper(codegen) : null
+                AnnotationUtilKt.hasInlineOnlyAnnotation(functionDescriptor) ? new InlineOnlySmapSkipper(codegen) : null,
+                codegen.getParentCodegen().getAnyfiedLocalVarMapping(), typeParameterMappings
         ); //with captured
 
         LocalVarRemapper remapper = new LocalVarRemapper(parameters, initialFrameSize);

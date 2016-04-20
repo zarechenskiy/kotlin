@@ -202,12 +202,17 @@ public abstract class StackValue {
 
     @NotNull
     public static StackValue arrayElement(@NotNull Type type, StackValue array, StackValue index) {
-        return arrayElement(type, array, index, false);
+        return arrayElement(type, array, index, false, null);
     }
 
     @NotNull
-    public static StackValue arrayElement(@NotNull Type type, StackValue array, StackValue index, boolean isAnyfiedType) {
-        return new ArrayElement(type, array, index, isAnyfiedType);
+    public static StackValue arrayElement(
+            @NotNull Type type,
+            StackValue array,
+            StackValue index,
+            boolean isAnyfiedType,
+            @Nullable KotlinType kotlinType) {
+        return new ArrayElement(type, array, index, isAnyfiedType, kotlinType);
     }
 
     @NotNull
@@ -749,15 +754,21 @@ public abstract class StackValue {
     private static class ArrayElement extends StackValueWithSimpleReceiver {
         private final Type type;
         private final boolean isComponentAnyfiedType;
+        private final KotlinType kotlinType;
 
         public ArrayElement(Type type, StackValue array, StackValue index) {
             this(type, array, index, false);
         }
 
         public ArrayElement(Type type, StackValue array, StackValue index, boolean isComponentAnyfiedType) {
+            this(type, array, index, isComponentAnyfiedType, null);
+        }
+
+        public ArrayElement(Type type, StackValue array, StackValue index, boolean isComponentAnyfiedType, KotlinType kotlinType) {
             super(type, false, false, new Receiver(Type.LONG_TYPE, array, index), true);
             this.type = type;
             this.isComponentAnyfiedType = isComponentAnyfiedType;
+            this.kotlinType = kotlinType;
         }
 
         @Override
@@ -775,6 +786,9 @@ public abstract class StackValue {
         public void putSelector(
                 @NotNull Type type, @NotNull InstructionAdapter v
         ) {
+            if (isComponentAnyfiedType) {
+                ExpressionCodegen.putAnyfiedOperationMarkerIfTypeIsAnyfiedParameter(kotlinType, AnyfiedTypeInliner.OperationKind.AALOAD, v);
+            }
             v.aload(this.type);    // assumes array and index are on the stack
             coerceTo(type, v);
         }

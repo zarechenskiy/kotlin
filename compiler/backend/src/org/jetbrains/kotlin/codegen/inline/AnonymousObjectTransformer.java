@@ -239,6 +239,8 @@ public class AnonymousObjectTransformer extends ObjectTransformer<AnonymousObjec
                                 transformationInfo.getOldClassName(),
                                 sourceNode.name,
                                 isConstructor ? transformationInfo.getNewConstructorDescriptor() : sourceNode.desc),
+                        null,
+                        null,
                         null
                 );
 

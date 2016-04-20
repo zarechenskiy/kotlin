@@ -1704,7 +1704,11 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
                     v.store(index, OBJECT_TYPE);
                 }
 
-                v.visitLocalVariable(variableDescriptor.getName().asString(), type.getDescriptor(), null, scopeStart, blockEnd, index);
+                String variableName = variableDescriptor.getName().asString();
+                if (TypeUtils.isAnyfiedTypeParameter(variableDescriptor.getType())) {
+                    parentCodegen.getAnyfiedLocalVarMapping().addMapping(variableName, variableDescriptor.getType().toString());
+                }
+                v.visitLocalVariable(variableName, type.getDescriptor(), null, scopeStart, blockEnd, index);
                 return null;
             }
         });
@@ -1868,7 +1872,11 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
                 }
 
                 Type returnType = isNonLocalReturn ? nonLocalReturn.returnType : ExpressionCodegen.this.returnType;
+                KotlinType returnKotlinType = descriptor.getReturnType();
                 if (returnedExpression != null) {
+                    if (returnKotlinType != null && !AsmUtil.isPrimitive(returnType)) {
+                        putAnyfiedOperationMarkerIfTypeIsAnyfiedParameter(returnKotlinType, AnyfiedTypeInliner.OperationKind.ALOAD, v);
+                    }
                     gen(returnedExpression, returnType);
                 }
 
@@ -1877,6 +1885,10 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
 
                 if (isNonLocalReturn) {
                     InlineCodegenUtil.generateGlobalReturnFlag(v, nonLocalReturn.labelName);
+                }
+
+                if (returnKotlinType != null && !AsmUtil.isPrimitive(returnType)) {
+                    putAnyfiedOperationMarkerIfTypeIsAnyfiedParameter(returnKotlinType, AnyfiedTypeInliner.OperationKind.ARETURN, v);
                 }
                 v.visitInsn(returnType.getOpcode(Opcodes.IRETURN));
                 v.mark(afterReturnLabel);
@@ -3425,7 +3437,7 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
         StackValue storeTo = sharedVarType == null ? StackValue.local(index, varType) : StackValue.shared(index, varType);
 
         storeTo.putReceiver(v, false);
-        putAnyfiedOperationMarkerIfTypeIsAnyfiedParameter(variableDescriptor.getType(), AnyfiedTypeInliner.OperationKind.ALOAD, v);
+        //putAnyfiedOperationMarkerIfTypeIsAnyfiedParameter(variableDescriptor.getType(), AnyfiedTypeInliner.OperationKind.ALOAD, v);
         initializer.put(initializer.type, v);
 
         markLineNumber(variableDeclaration, false);
@@ -3532,25 +3544,24 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
         if (arrayType.getSort() == Type.ARRAY &&
             indices.size() == 1 &&
             isInt(operationDescriptor.getValueParameters().get(0).getType())) {
-            assert type != null;
-            Type elementType;
-            boolean isAnyfiedComponentType = false;
-            if (KotlinBuiltIns.isArray(type)) {
-                KotlinType componentType = type.getArguments().get(0).getType();
-                //putAnyfiedOperationMarkerIfTypeIsAnyfiedParameter(componentType, AnyfiedTypeInliner.OperationKind.GET, v);
-                if (TypeUtils.isAnyfiedTypeParameter(componentType)) {
-                    isAnyfiedComponentType = true;
+                assert type != null;
+                Type elementType;
+                boolean isAnyfiedComponentType = false;
+                KotlinType componentType =  KotlinBuiltIns.isArray(type) ? type.getArguments().get(0).getType() : null;
+                if (KotlinBuiltIns.isArray(type)) {
+                    if (TypeUtils.isAnyfiedTypeParameter(componentType)) {
+                        isAnyfiedComponentType = true;
+                    }
+                    elementType = boxType(asmType(componentType));
                 }
-                elementType = boxType(asmType(componentType));
-            }
-            else {
-                elementType = correctElementType(arrayType);
-            }
+                else {
+                    elementType = correctElementType(arrayType);
+                }
 
-            StackValue arrayValue = genLazy(array, arrayType);
-            StackValue index = genLazy(indices.get(0), Type.INT_TYPE);
+                StackValue arrayValue = genLazy(array, arrayType);
+                StackValue index = genLazy(indices.get(0), Type.INT_TYPE);
 
-            return StackValue.arrayElement(elementType, arrayValue, index, isAnyfiedComponentType);
+                return StackValue.arrayElement(elementType, arrayValue, index, isAnyfiedComponentType, isAnyfiedComponentType ? componentType : null);
         }
         else {
             ResolvedCall<FunctionDescriptor> resolvedSetCall = bindingContext.get(INDEXED_LVALUE_SET, expression);
