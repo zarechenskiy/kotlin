@@ -1874,7 +1874,7 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
                 Type returnType = isNonLocalReturn ? nonLocalReturn.returnType : ExpressionCodegen.this.returnType;
                 KotlinType returnKotlinType = descriptor.getReturnType();
                 if (returnedExpression != null) {
-                    if (returnKotlinType != null && !AsmUtil.isPrimitive(returnType)) {
+                    if (returnKotlinType != null && !AsmUtil.isPrimitive(returnType) && returnedExpression instanceof KtNameReferenceExpression) {
                         putAnyfiedOperationMarkerIfTypeIsAnyfiedParameter(returnKotlinType, AnyfiedTypeInliner.OperationKind.ALOAD, v);
                     }
                     gen(returnedExpression, returnType);
@@ -2487,9 +2487,12 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
             }
         }
 
+        KotlinType returnType = resolvedCall.getResultingDescriptor().getReturnType();
+        if (returnType != null) {
+            putAnyfiedOperationMarkerIfTypeIsAnyfiedParameter(returnType, AnyfiedTypeInliner.OperationKind.AALOAD, v);
+        }
         callGenerator.genCall(callableMethod, resolvedCall, defaultMaskWasGenerated, this);
 
-        KotlinType returnType = resolvedCall.getResultingDescriptor().getReturnType();
         if (returnType != null && KotlinBuiltIns.isNothing(returnType)) {
             v.aconst(null);
             v.athrow();
