@@ -26,6 +26,7 @@ import org.jetbrains.kotlin.descriptors.ClassifierDescriptor;
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor;
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor;
 import org.jetbrains.kotlin.descriptors.annotations.Annotations;
+import org.jetbrains.kotlin.name.FqName;
 import org.jetbrains.kotlin.resolve.constants.IntegerValueTypeConstructor;
 import org.jetbrains.kotlin.resolve.scopes.MemberScope;
 import org.jetbrains.kotlin.types.checker.KotlinTypeChecker;
@@ -35,6 +36,8 @@ import java.util.*;
 public class TypeUtils {
     public static final SimpleType DONT_CARE = ErrorUtils.createErrorTypeWithCustomDebugName("DONT_CARE");
     public static final SimpleType CANT_INFER_FUNCTION_PARAM_TYPE = ErrorUtils.createErrorType("Cannot be inferred");
+
+    public static final FqName ANYFIED_ANNOTATION_FQ_NAME = new FqName("kotlin.jvm.Anyfied");
 
     public static class SpecialType extends DelegatingSimpleType {
         private final String name;
@@ -468,6 +471,15 @@ public class TypeUtils {
     public static boolean isNonReifiedTypeParameter(@NotNull KotlinType type) {
         TypeParameterDescriptor typeParameterDescriptor = getTypeParameterDescriptorOrNull(type);
         return typeParameterDescriptor != null && !typeParameterDescriptor.isReified();
+    }
+
+    public static boolean isAnyfiedTypeParameter(@NotNull KotlinType type) {
+        TypeParameterDescriptor typeParameterDescriptor = getTypeParameterDescriptorOrNull(type);
+        return typeParameterDescriptor != null && isAnyfiedTypeParameter(typeParameterDescriptor);
+    }
+
+    public static boolean isAnyfiedTypeParameter(@NotNull TypeParameterDescriptor descriptor) {
+        return descriptor.getAnnotations().findAnnotation(ANYFIED_ANNOTATION_FQ_NAME) != null;
     }
 
     @Nullable
