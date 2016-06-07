@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -217,14 +217,21 @@ public abstract class KotlinBuiltIns {
         public final FqNameUnsafe kCallable = reflect("KCallable");
         public final ClassId kProperty = ClassId.topLevel(reflect("KProperty").toSafe());
 
+        public final Map<FqNameUnsafe, PrimitiveType> fqNameToPrimitiveValueType;
         public final Map<FqNameUnsafe, PrimitiveType> fqNameToPrimitiveType;
         public final Map<FqNameUnsafe, PrimitiveType> arrayClassFqNameToPrimitiveType;
         {
             fqNameToPrimitiveType = new HashMap<FqNameUnsafe, PrimitiveType>(0);
+            fqNameToPrimitiveValueType = new HashMap<FqNameUnsafe, PrimitiveType>(0);
             arrayClassFqNameToPrimitiveType = new HashMap<FqNameUnsafe, PrimitiveType>(0);
             for (PrimitiveType primitiveType : PrimitiveType.values()) {
                 fqNameToPrimitiveType.put(fqNameUnsafe(primitiveType.getTypeName().asString()), primitiveType);
                 arrayClassFqNameToPrimitiveType.put(fqNameUnsafe(primitiveType.getArrayTypeName().asString()), primitiveType);
+            }
+
+            for (PrimitiveValueType primitiveValueType : PrimitiveValueType.values()) {
+                fqNameToPrimitiveType.put(fqNameUnsafe(primitiveValueType.getTypeName().asString()), primitiveValueType.getPrimitiveType());
+                fqNameToPrimitiveValueType.put(fqNameUnsafe(primitiveValueType.getTypeName().asString()), primitiveValueType.getPrimitiveType());
             }
         }
 
@@ -722,6 +729,11 @@ public abstract class KotlinBuiltIns {
     }
 
     @Nullable
+    public static PrimitiveType getPrimitiveValueTypeByFqName(@NotNull FqNameUnsafe primitiveClassFqName) {
+        return FQ_NAMES.fqNameToPrimitiveValueType.get(primitiveClassFqName);
+    }
+
+    @Nullable
     public static PrimitiveType getPrimitiveTypeByArrayClassFqName(@NotNull FqNameUnsafe primitiveArrayClassFqName) {
         return FQ_NAMES.arrayClassFqNameToPrimitiveType.get(primitiveArrayClassFqName);
     }
@@ -774,6 +786,15 @@ public abstract class KotlinBuiltIns {
 
     public static boolean isPrimitiveClass(@NotNull ClassDescriptor descriptor) {
         return getPrimitiveTypeByFqName(getFqName(descriptor)) != null;
+    }
+
+    public static boolean isPrimitiveValueType(@NotNull KotlinType type) {
+        ClassifierDescriptor descriptor = type.getConstructor().getDeclarationDescriptor();
+        return !type.isMarkedNullable() && descriptor instanceof ClassDescriptor && isPrimitiveValue((ClassDescriptor) descriptor);
+    }
+
+    public static boolean isPrimitiveValue(@NotNull ClassDescriptor descriptor) {
+        return getPrimitiveValueTypeByFqName(getFqName(descriptor)) != null;
     }
 
     private static boolean isConstructedFromGivenClass(@NotNull KotlinType type, @NotNull FqNameUnsafe fqName) {

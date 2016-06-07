@@ -56,7 +56,11 @@ fun <T : Any> mapType(
         writeGenericType: (KotlinType, T, TypeMappingMode) -> Unit = DO_NOTHING_3
 ): T {
     mapBuiltInType(kotlinType, factory)?.let { builtInType ->
-        val jvmType = factory.boxTypeIfNeeded(builtInType, mode.needPrimitiveBoxing)
+        val jvmType = if (KotlinBuiltIns.isPrimitiveValueType(kotlinType))
+            builtInType
+        else
+            factory.boxTypeIfNeeded(builtInType, mode.needPrimitiveBoxing)
+
         writeGenericType(kotlinType, jvmType, mode)
         return jvmType
     }
