@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -129,6 +129,8 @@ class GeneratePrimitives(out: PrintWriter) : BuiltInsSourceGenerator(out) {
 
             out.println("}\n")
         }
+
+        generatePrimitiveValueTypes(listOf(PrimitiveType.INT))
     }
 
     private fun generateDoc(kind: PrimitiveType) {
@@ -215,6 +217,23 @@ class GeneratePrimitives(out: PrintWriter) : BuiltInsSourceGenerator(out) {
             val name = otherKind.capitalized
             out.println("    public override fun to$name(): $name")
         }
+    }
+
+    private fun generatePrimitiveValueTypes(numericKinds: List<PrimitiveType>) {
+        for (numericKind in numericKinds) {
+            val boxedRepresentation = numericKind.capitalized
+            val valueTypeName = "v$boxedRepresentation"
+            out.println("public class $valueTypeName private () {")
+
+            generateConversionFromValueToBoxedRepresentation(numericKind)
+            out.println("}")
+            out.println()
+        }
+    }
+
+    private fun generateConversionFromValueToBoxedRepresentation(kind: PrimitiveType) {
+        val boxedRepresentation = kind.capitalized
+        out.println("    public fun boxed(): $boxedRepresentation")
     }
 
     private fun maxByDomainCapacity(type1: PrimitiveType, type2: PrimitiveType): PrimitiveType
