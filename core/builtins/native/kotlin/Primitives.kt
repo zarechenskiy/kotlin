@@ -938,3 +938,7 @@ public class Double private () : Number, Comparable<Double> {
     public override fun toDouble(): Double
 }
 
+public class vInt private () {
+    public fun boxed(): Int
+}
+
