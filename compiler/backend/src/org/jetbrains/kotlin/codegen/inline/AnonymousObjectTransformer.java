@@ -199,6 +199,7 @@ public class AnonymousObjectTransformer extends ObjectTransformer<AnonymousObjec
         InlineResult funResult = inlineMethod(parentRemapper, deferringVisitor, next, allCapturedParamBuilder, isConstructor);
         transformationResult.addAllClassesToRemove(funResult);
         transformationResult.getReifiedTypeParametersUsages().mergeAll(funResult.getReifiedTypeParametersUsages());
+        transformationResult.getAnyfiedTypeParametersUsages().mergeAll(funResult.getAnyfiedTypeParametersUsages());
         return funResult;
     }
 
@@ -211,6 +212,8 @@ public class AnonymousObjectTransformer extends ObjectTransformer<AnonymousObjec
             boolean isConstructor
     ) {
         SpecializedTypeParametersUsages typeParametersToReify = inliningContext.reifiedTypeInliner.specializeInstructions(sourceNode);
+        SpecializedTypeParametersUsages typeParametersToAnify = inliningContext.anyfiedTypeInliner.specializeInstructions(sourceNode);
+
         Parameters parameters =
                 isConstructor ? capturedBuilder.buildParameters() : getMethodParametersWithCaptured(capturedBuilder, sourceNode);
 
@@ -237,6 +240,7 @@ public class AnonymousObjectTransformer extends ObjectTransformer<AnonymousObjec
 
         InlineResult result = inliner.doInline(deferringVisitor, new LocalVarRemapper(parameters, 0), false, LabelOwner.NOT_APPLICABLE);
         result.getReifiedTypeParametersUsages().mergeAll(typeParametersToReify);
+        result.getAnyfiedTypeParametersUsages().mergeAll(typeParametersToAnify);
         deferringVisitor.visitMaxs(-1, -1);
         return result;
     }

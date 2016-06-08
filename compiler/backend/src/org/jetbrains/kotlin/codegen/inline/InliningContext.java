@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ public class InliningContext {
     public final NameGenerator nameGenerator;
     public final TypeRemapper typeRemapper;
     public final ReifiedTypeInliner reifiedTypeInliner;
+    public final AnyfiedTypeInliner anyfiedTypeInliner;
     public final boolean isInliningLambda;
     public final boolean classRegeneration;
     public final Map<String, AnonymousObjectTransformationInfo> internalNameToAnonymousObjectTransformationInfo =
@@ -47,6 +48,7 @@ public class InliningContext {
             @NotNull NameGenerator nameGenerator,
             @NotNull TypeRemapper typeRemapper,
             @NotNull ReifiedTypeInliner reifiedTypeInliner,
+            @NotNull AnyfiedTypeInliner anyfiedTypeInliner,
             boolean isInliningLambda,
             boolean classRegeneration
     ) {
@@ -56,6 +58,7 @@ public class InliningContext {
         this.nameGenerator = nameGenerator;
         this.typeRemapper = typeRemapper;
         this.reifiedTypeInliner = reifiedTypeInliner;
+        this.anyfiedTypeInliner = anyfiedTypeInliner;
         this.isInliningLambda = isInliningLambda;
         this.classRegeneration = classRegeneration;
     }
@@ -80,7 +83,7 @@ public class InliningContext {
     ) {
         return new RegeneratedClassContext(
                 this, expressionMap, state, generator, TypeRemapper.createFrom(typeRemapper, newTypeMappings),
-                reifiedTypeInliner, isInliningLambda, callSiteInfo
+                reifiedTypeInliner, anyfiedTypeInliner, isInliningLambda, callSiteInfo
         );
     }
 
@@ -97,7 +100,7 @@ public class InliningContext {
                         //root inline lambda
                         isInliningLambda && !this.isInliningLambda
                 ),
-                reifiedTypeInliner, isInliningLambda, classRegeneration
+                reifiedTypeInliner, anyfiedTypeInliner, isInliningLambda, classRegeneration
         );
     }
 
