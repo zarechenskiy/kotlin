@@ -119,6 +119,55 @@ private fun generateNullCheckForNonSafeAs(
     }
 }
 
+fun generateLoad(
+        v: InstructionAdapter,
+        asmType: Type,
+        index: Int
+) {
+    with(v) {
+        load(index, asmType)
+    }
+}
+
+fun generateStore(
+        v: InstructionAdapter,
+        asmType: Type,
+        index: Int
+) {
+    with(v) {
+        store(index, asmType)
+    }
+}
+
+fun generateALoad(
+        v: InstructionAdapter,
+        asmType: Type
+) {
+    with(v) {
+        aload(asmType)
+    }
+}
+
+
+fun generateAReturn(
+        v: InstructionAdapter,
+        asmType: Type
+) {
+    with(v) {
+        areturn(asmType)
+    }
+}
+
+fun generateConditionJump(
+        v: InstructionAdapter,
+        asmType: Type,
+        label: Label,
+        opCode: Int) {
+    with(v) {
+        visitJumpInsn(opCode, label)
+    }
+}
+
 fun SpecialSignatureInfo.replaceValueParametersIn(sourceSignature: String?): String?
         = valueParametersSignature?.let { sourceSignature?.replace("^\\(.*\\)".toRegex(), "($it)") }
 
