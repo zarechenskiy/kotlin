@@ -210,7 +210,7 @@ public class AnonymousObjectTransformer extends ObjectTransformer<AnonymousObjec
             @NotNull ParametersBuilder capturedBuilder,
             boolean isConstructor
     ) {
-        ReifiedTypeParametersUsages typeParametersToReify = inliningContext.reifiedTypeInliner.reifyInstructions(sourceNode);
+        SpecializedTypeParametersUsages typeParametersToReify = inliningContext.reifiedTypeInliner.specializeInstructions(sourceNode);
         Parameters parameters =
                 isConstructor ? capturedBuilder.buildParameters() : getMethodParametersWithCaptured(capturedBuilder, sourceNode);
 
