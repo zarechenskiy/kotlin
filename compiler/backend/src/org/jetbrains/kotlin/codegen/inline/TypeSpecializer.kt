@@ -84,6 +84,16 @@ abstract class TypeSpecializer(val parametersMapping: TypeParameterMappings?, va
         return result
     }
 
+    inline protected fun rewriteNextTypeInsn(
+            marker: MethodInsnNode,
+            expectedNextOpcode: Int,
+            rewrite: (AbstractInsnNode) -> Boolean
+    ): Boolean {
+        val next = marker.next ?: return false
+        if (next.opcode != expectedNextOpcode) return false
+        return rewrite(next)
+    }
+
     /**
      * @return new type parameter identifier if this marker should be reified further
      * or null if it shouldn't
