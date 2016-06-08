@@ -21,6 +21,7 @@ import org.jetbrains.kotlin.codegen.generateAsCast
 import org.jetbrains.kotlin.codegen.generateIsCheck
 import org.jetbrains.kotlin.codegen.intrinsics.IntrinsicMethods
 import org.jetbrains.kotlin.codegen.optimization.common.intConstant
+import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.TypeUtils
 import org.jetbrains.kotlin.types.Variance
@@ -83,7 +84,7 @@ class ReifiedTypeInliner(private val parametersMapping: TypeParameterMappings?) 
             if (TypeSpecializer.isSpecializationOperationMarker(insn, TypeSpecializationKind.REIFICATION)) {
                 val newName: String? = processReifyMarker(insn as MethodInsnNode, instructions)
                 if (newName != null) {
-                    result.addUsedReifiedParameter(newName)
+                    result.addUsedSpecializedParameter(newName)
                 }
             }
         }
@@ -249,31 +250,4 @@ class TypeParameterMapping(
         val isReified: Boolean
 )
 
-class ReifiedTypeParametersUsages {
-    val usedTypeParameters: MutableSet<String> = hashSetOf()
-
-    fun wereUsedReifiedParameters(): Boolean = usedTypeParameters.isNotEmpty()
-
-    fun addUsedReifiedParameter(name: String) {
-        usedTypeParameters.add(name)
-    }
-
-    fun propagateChildUsagesWithinContext(child: ReifiedTypeParametersUsages, context: MethodContext) {
-        if (!child.wereUsedReifiedParameters()) return
-        // used for propagating reified TP usages from children member codegen to parent's
-        // mark enclosing object-literal/lambda as needed reification iff
-        // 1. at least one of it's method contains operations to reify
-        // 2. reified type parameter of these operations is not from current method signature
-        // i.e. from outer scope
-        child.usedTypeParameters.filterNot { name ->
-            context.contextDescriptor.typeParameters.any { typeParameter ->
-                typeParameter.isReified && typeParameter.name.asString() == name
-            }
-        }.forEach { usedTypeParameters.add(it) }
-    }
-
-    fun mergeAll(other: ReifiedTypeParametersUsages) {
-        if (!other.wereUsedReifiedParameters()) return
-        usedTypeParameters.addAll(other.usedTypeParameters)
-    }
-}
+class ReifiedTypeParametersUsages : SpecializedTypeParametersUsages(TypeSpecializationKind.REIFICATION)
