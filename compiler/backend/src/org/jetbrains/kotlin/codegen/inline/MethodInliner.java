@@ -190,6 +190,11 @@ public class MethodInliner {
                         TypeSpecializer.putNeedClassSpecializationMarker(mv, TypeSpecializationKind.REIFICATION);
                         result.getReifiedTypeParametersUsages().mergeAll(transformResult.getReifiedTypeParametersUsages());
                     }
+
+                    if (transformResult.getAnyfiedTypeParametersUsages().wereUsedSpecializedParameters()) {
+                        TypeSpecializer.putNeedClassSpecializationMarker(mv, TypeSpecializationKind.ANYFICATION);
+                        result.getAnyfiedTypeParametersUsages().mergeAll(transformResult.getAnyfiedTypeParametersUsages());
+                    }
                 }
             }
 

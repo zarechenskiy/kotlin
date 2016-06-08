@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,9 +36,10 @@ public class RootInliningContext extends InliningContext {
             @NotNull KtElement callElement,
             @NotNull InlineCallSiteInfo classNameToInline,
             @NotNull ReifiedTypeInliner inliner,
+            @NotNull AnyfiedTypeInliner anyfiedTypeInliner,
             @Nullable TypeParameterMappings typeParameterMappings
     ) {
-        super(null, map, state, nameGenerator, TypeRemapper.createRoot(typeParameterMappings), inliner, false, false);
+        super(null, map, state, nameGenerator, TypeRemapper.createRoot(typeParameterMappings), inliner, anyfiedTypeInliner, false, false);
         this.callElement = callElement;
         this.inlineCallSiteInfo = classNameToInline;
         this.typeParameterMappings = typeParameterMappings;
