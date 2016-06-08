@@ -186,7 +186,7 @@ public class MethodInliner {
                         result.addClassToRemove(oldClassName);
                     }
 
-                    if (transformResult.getReifiedTypeParametersUsages().wereUsedReifiedParameters()) {
+                    if (transformResult.getReifiedTypeParametersUsages().wereUsedSpecializedParameters()) {
                         TypeSpecializer.putNeedClassSpecializationMarker(mv, TypeSpecializationKind.REIFICATION);
                         result.getReifiedTypeParametersUsages().mergeAll(transformResult.getReifiedTypeParametersUsages());
                     }
