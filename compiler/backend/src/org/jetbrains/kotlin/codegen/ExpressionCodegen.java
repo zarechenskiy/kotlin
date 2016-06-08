@@ -2235,6 +2235,11 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
                 if (isNonLocalReturn) {
                     InlineCodegenUtil.generateGlobalReturnFlag(v, nonLocalReturn.labelName);
                 }
+
+                KotlinType returnKotlinType = descriptor.getReturnType();
+                if (returnKotlinType != null) {
+                    putAnyfiedOperationMarkerIfTypeIsReifiedParameter(returnKotlinType, AnyfiedTypeInliner.OperationKind.ARETURN);
+                }
                 v.visitInsn(returnType.getOpcode(Opcodes.IRETURN));
                 v.mark(afterReturnLabel);
                 return Unit.INSTANCE;
@@ -2913,6 +2918,12 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
         }
 
         KotlinType returnType = resolvedCall.getResultingDescriptor().getReturnType();
+        if (returnType != null) {
+            putAnyfiedOperationMarkerIfTypeIsReifiedParameter(returnType, AnyfiedTypeInliner.OperationKind.AALOAD);
+        }
+
+        callGenerator.genCall(callableMethod, resolvedCall, defaultMaskWasGenerated, this);
+
         if (returnType != null && KotlinBuiltIns.isNothing(returnType)) {
             v.aconst(null);
             v.athrow();
@@ -4016,6 +4027,7 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
 
         markLineNumber(variableDeclaration, false);
 
+        putAnyfiedOperationMarkerIfTypeIsReifiedParameter(variableDescriptor.getType(), AnyfiedTypeInliner.OperationKind.ASTORE);
         storeTo.storeSelector(initializer.type, v);
 
         if (isDelegatedLocalVariable(variableDescriptor)) {
@@ -4149,6 +4161,9 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
     public void newArrayInstruction(@NotNull KotlinType arrayType) {
         if (KotlinBuiltIns.isArray(arrayType)) {
             KotlinType elementJetType = arrayType.getArguments().get(0).getType();
+
+            putAnyfiedOperationMarkerIfTypeIsReifiedParameter(elementJetType, AnyfiedTypeInliner.OperationKind.NEW_ARRAY);
+
             putReifiedOperationMarkerIfTypeIsReifiedParameter(
                     elementJetType,
                     ReifiedTypeInliner.OperationKind.NEW_ARRAY
