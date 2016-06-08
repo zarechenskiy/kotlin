@@ -16,12 +16,9 @@
 
 package org.jetbrains.kotlin.codegen.inline
 
-import org.jetbrains.kotlin.codegen.context.MethodContext
 import org.jetbrains.kotlin.codegen.generateAsCast
 import org.jetbrains.kotlin.codegen.generateIsCheck
-import org.jetbrains.kotlin.codegen.intrinsics.IntrinsicMethods
 import org.jetbrains.kotlin.codegen.optimization.common.intConstant
-import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.TypeUtils
 import org.jetbrains.kotlin.types.Variance
@@ -58,7 +55,7 @@ class ReificationArgument(
     }
 }
 
-class ReifiedTypeInliner(private val parametersMapping: TypeParameterMappings?) {
+class ReifiedTypeInliner(parametersMapping: TypeParameterMappings?) : TypeSpecializer(parametersMapping, TypeSpecializationKind.REIFICATION) {
     enum class OperationKind {
         NEW_ARRAY, AS, SAFE_AS, IS, JAVA_CLASS, ENUM_REIFIED;
 
@@ -67,66 +64,21 @@ class ReifiedTypeInliner(private val parametersMapping: TypeParameterMappings?) 
 
     private var maxStackSize = 0
 
-    private val hasReifiedParameters = parametersMapping?.hasReifiedParameters() ?: false
+    override fun hasParametersToSpecialize(): Boolean = parametersMapping?.hasReifiedParameters() ?: false
 
-    /**
-     * @return set of type parameters' identifiers contained in markers that should be reified further
-     * e.g. when we're generating inline function containing reified T
-     * and another function containing reifiable parts is inlined into that function
-     */
-    fun reifyInstructions(node: MethodNode): ReifiedTypeParametersUsages {
-        if (!hasReifiedParameters) return ReifiedTypeParametersUsages()
-
-        val instructions = node.instructions
-        maxStackSize = 0
-        val result = ReifiedTypeParametersUsages()
-        for (insn in instructions.toArray()) {
-            if (TypeSpecializer.isSpecializationOperationMarker(insn, TypeSpecializationKind.REIFICATION)) {
-                val newName: String? = processReifyMarker(insn as MethodInsnNode, instructions)
-                if (newName != null) {
-                    result.addUsedSpecializedParameter(newName)
-                }
-            }
-        }
-
+    override fun correctNodeStack(node: MethodNode) {
         node.maxStack = node.maxStack + maxStackSize
-        return result
     }
 
-    /**
-     * @return new type parameter identifier if this marker should be reified further
-     * or null if it shouldn't
-     */
-    private fun processReifyMarker(insn: MethodInsnNode, instructions: InsnList): String? {
-        val operationKind = insn.operationKind ?: return null
-        val reificationArgument = insn.reificationArgument ?: return null
-        val mapping = parametersMapping?.get(reificationArgument.parameterName) ?: return null
-
-        if (mapping.asmType != null) {
-            // process* methods return false if marker should be reified further
-            // or it's invalid (may be emitted explicitly in code)
-            // they return true if instruction is reified and marker can be deleted
-            val (asmType, kotlinType) = reificationArgument.reify(mapping.asmType, mapping.type)
-
-            if (when (operationKind) {
-                OperationKind.NEW_ARRAY -> processNewArray(insn, asmType)
-                OperationKind.AS -> processAs(insn, instructions, kotlinType, asmType, safe = false)
-                OperationKind.SAFE_AS -> processAs(insn, instructions, kotlinType, asmType, safe = true)
-                OperationKind.IS -> processIs(insn, instructions, kotlinType, asmType)
-                OperationKind.JAVA_CLASS -> processJavaClass(insn, asmType)
-                OperationKind.ENUM_REIFIED -> processSpecialEnumFunction(insn, asmType)
-            }) {
-                instructions.remove(insn.previous.previous!!) // PUSH operation ID
-                instructions.remove(insn.previous!!) // PUSH type parameter
-                instructions.remove(insn) // INVOKESTATIC marker method
-            }
-
-            return null
-        }
-        else {
-            val newReificationArgument = reificationArgument.combine(mapping.reificationArgument!!)
-            instructions.set(insn.previous!!, LdcInsnNode(newReificationArgument.asString()))
-            return mapping.reificationArgument.parameterName
+    override fun processInstruction(insn: MethodInsnNode, instructions: InsnList, asmType: Type, kotlinType: KotlinType): Boolean {
+        val operationKind = insn.operationKind ?: return false
+        return when (operationKind) {
+            OperationKind.NEW_ARRAY -> processNewArray(insn, asmType)
+            OperationKind.AS -> processAs(insn, instructions, kotlinType, asmType, safe = false)
+            OperationKind.SAFE_AS -> processAs(insn, instructions, kotlinType, asmType, safe = true)
+            OperationKind.IS -> processIs(insn, instructions, kotlinType, asmType)
+            OperationKind.JAVA_CLASS -> processJavaClass(insn, asmType)
+            OperationKind.ENUM_REIFIED -> processSpecialEnumFunction(insn, asmType)
         }
     }
 
@@ -204,22 +156,6 @@ class ReifiedTypeInliner(private val parametersMapping: TypeParameterMappings?) 
         return true
     }
 }
-
-private val MethodInsnNode.reificationArgument: ReificationArgument?
-    get() {
-        val prev = previous!!
-
-        val reificationArgumentRaw = when (prev.opcode) {
-            Opcodes.LDC -> (prev as LdcInsnNode).cst as String
-            else -> return null
-        }
-
-        val arrayDepth = reificationArgumentRaw.indexOfFirst { it != '[' }
-        val parameterName = reificationArgumentRaw.substring(arrayDepth).removeSuffix("?")
-        val nullable = reificationArgumentRaw.endsWith('?')
-
-        return ReificationArgument(parameterName, nullable, arrayDepth)
-    }
 
 private val MethodInsnNode.operationKind: ReifiedTypeInliner.OperationKind? get() =
     previous?.previous?.intConstant?.let {
