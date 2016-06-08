@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package org.jetbrains.kotlin.codegen.inline
 
 import java.util.*
 
-class TypeParameter(val oldName: String, val newName: String?, val isReified: Boolean, val signature: String?)
+class TypeParameter(val oldName: String, val newName: String?, val isReified: Boolean, val isAnyfied: Boolean, val signature: String?)
 
 //typeMapping data could be changed outside through method processing
 class TypeRemapper private constructor(
@@ -49,12 +49,12 @@ class TypeRemapper private constructor(
         assert(typeParametersMapping[name] == null) {
             "Type parameter already registered $name"
         }
-        typeParametersMapping[name] = TypeParameter(name, name, false, null)
+        typeParametersMapping[name] = TypeParameter(name, name, false, false, null)
     }
 
     fun registerTypeParameter(mapping: TypeParameterMapping) {
         typeParametersMapping[mapping.name] = TypeParameter(
-                mapping.name, mapping.reificationArgument?.parameterName, mapping.isReified, mapping.signature
+                mapping.name, mapping.reificationArgument?.parameterName, mapping.isReified, mapping.isAnyfied, mapping.signature
         )
     }
 

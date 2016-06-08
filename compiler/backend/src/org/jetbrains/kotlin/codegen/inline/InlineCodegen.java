@@ -85,6 +85,7 @@ public class InlineCodegen extends CallGenerator {
     private final Map<Integer, LambdaInfo> expressionMap = new HashMap<Integer, LambdaInfo>();
 
     private final ReifiedTypeInliner reifiedTypeInliner;
+    private final AnyfiedTypeInliner anyfiedTypeInliner;
 
     @Nullable
     private final TypeParameterMappings typeParameterMappings;
@@ -113,6 +114,7 @@ public class InlineCodegen extends CallGenerator {
         this.typeParameterMappings = typeParameterMappings;
 
         reifiedTypeInliner = new ReifiedTypeInliner(typeParameterMappings);
+        anyfiedTypeInliner = new AnyfiedTypeInliner(typeParameterMappings);
 
         initialFrameSize = codegen.getFrameMap().getCurrentSize();
 
@@ -190,6 +192,7 @@ public class InlineCodegen extends CallGenerator {
         leaveTemps();
 
         codegen.propagateChildReifiedTypeParametersUsages(result.getReifiedTypeParametersUsages());
+        codegen.propagateChildAnyfiedTypeParametersUsages(result.getAnyfiedTypeParametersUsages());
 
         state.getFactory().removeClasses(result.getClassesToRemove());
 
@@ -355,6 +358,7 @@ public class InlineCodegen extends CallGenerator {
         defaultSourceMapper.setCallSiteMarker(new CallSiteMarker(codegen.getLastLineNumber()));
         MethodNode node = nodeAndSmap.getNode();
         SpecializedTypeParametersUsages reificationResult = reifiedTypeInliner.specializeInstructions(node);
+        SpecializedTypeParametersUsages anyficationResult = anyfiedTypeInliner.specializeInstructions(node);
         generateClosuresBodies();
 
         //through generation captured parameters will be added to invocationParamBuilder
@@ -366,7 +370,7 @@ public class InlineCodegen extends CallGenerator {
 
         InliningContext info = new RootInliningContext(
                 expressionMap, state, codegen.getInlineNameGenerator().subGenerator(jvmSignature.getAsmMethod().getName()),
-                callElement, getInlineCallSiteInfo(), reifiedTypeInliner, typeParameterMappings
+                callElement, getInlineCallSiteInfo(), reifiedTypeInliner, anyfiedTypeInliner, typeParameterMappings
         );
 
         MethodInliner inliner = new MethodInliner(
@@ -384,6 +388,7 @@ public class InlineCodegen extends CallGenerator {
 
         InlineResult result = inliner.doInline(adapter, remapper, true, LabelOwner.SKIP_ALL);
         result.getReifiedTypeParametersUsages().mergeAll(reificationResult);
+        result.getAnyfiedTypeParametersUsages().mergeAll(anyficationResult);
 
         CallableMemberDescriptor descriptor = codegen.getContext().getContextDescriptor();
         final Set<String> labels = getDeclarationLabels(DescriptorToSourceUtils.descriptorToDeclaration(descriptor), descriptor);

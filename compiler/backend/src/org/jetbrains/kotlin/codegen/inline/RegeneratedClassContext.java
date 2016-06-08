@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,10 +32,11 @@ public class RegeneratedClassContext extends InliningContext {
             @NotNull NameGenerator nameGenerator,
             @NotNull TypeRemapper typeRemapper,
             @NotNull ReifiedTypeInliner reifiedTypeInliner,
+            @NotNull AnyfiedTypeInliner anyfiedTypeInliner,
             boolean isInliningLambda,
             @NotNull InlineCallSiteInfo callSiteInfo
     ) {
-        super(parent, map, state, nameGenerator, typeRemapper, reifiedTypeInliner, isInliningLambda, true);
+        super(parent, map, state, nameGenerator, typeRemapper, reifiedTypeInliner, anyfiedTypeInliner, isInliningLambda, true);
         this.callSiteInfo = callSiteInfo;
     }
 
