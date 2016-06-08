@@ -1,0 +1,20 @@
+// WITH_RUNTIME
+
+inline fun <@Anyfied T> takeArray(arr: Array<T>): T {
+    return arr.get(0)
+}
+
+fun box(): String {
+    val k = intArrayOf(1) as Array<vInt>
+    val p = takeArray(k)
+    return "OK"
+}
+
+// 1 IASTORE
+// 0 ILOAD
+// 2 ASTORE
+// 0 AASTORE
+// 1 AALOAD
+// 1 IALOAD
+// 1 ARETURN
+// 1 ISTORE
