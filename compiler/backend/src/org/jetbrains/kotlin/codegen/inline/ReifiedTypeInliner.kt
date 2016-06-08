@@ -124,16 +124,6 @@ class ReifiedTypeInliner(parametersMapping: TypeParameterMappings?) : TypeSpecia
         return true
     }
 
-    inline private fun rewriteNextTypeInsn(
-            marker: MethodInsnNode,
-            expectedNextOpcode: Int,
-            rewrite: (AbstractInsnNode) -> Boolean
-    ): Boolean {
-        val next = marker.next ?: return false
-        if (next.opcode != expectedNextOpcode) return false
-        return rewrite(next)
-    }
-
     private fun processNextTypeInsn(insn: MethodInsnNode, parameter: Type, expectedNextOpcode: Int): Boolean {
         if (insn.next?.opcode != expectedNextOpcode) return false
         (insn.next as TypeInsnNode).desc = parameter.internalName
