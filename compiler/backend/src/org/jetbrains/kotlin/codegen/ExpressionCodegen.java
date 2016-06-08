@@ -228,21 +228,30 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
                 /* isLocal = */ true);
         literalCodegen.generate();
 
-        addReifiedParametersFromSignature(literalCodegen, classDescriptor);
+        addSpecializedParametersFromSignature(literalCodegen, classDescriptor);
         propagateChildReifiedTypeParametersUsages(literalCodegen.getReifiedTypeParametersUsages());
+        propagateChildAnyfiedTypeParametersUsages(literalCodegen.getAnyfiedTypeParametersUsages());
 
         return new ObjectLiteralResult(
                 literalCodegen.getReifiedTypeParametersUsages().wereUsedSpecializedParameters(),
+                literalCodegen.getAnyfiedTypeParametersUsages().wereUsedSpecializedParameters(),
                 classDescriptor
         );
     }
 
-    private static void addReifiedParametersFromSignature(@NotNull MemberCodegen member, @NotNull ClassDescriptor descriptor) {
+    private static void addSpecializedParametersFromSignature(@NotNull MemberCodegen member, @NotNull ClassDescriptor descriptor) {
         for (KotlinType type : descriptor.getTypeConstructor().getSupertypes()) {
             for (TypeProjection supertypeArgument : type.getArguments()) {
                 TypeParameterDescriptor parameterDescriptor = TypeUtils.getTypeParameterDescriptorOrNull(supertypeArgument.getType());
-                if (parameterDescriptor != null && parameterDescriptor.isReified()) {
-                    member.getReifiedTypeParametersUsages().addUsedSpecializedParameter(parameterDescriptor.getName().asString());
+                if (parameterDescriptor != null) {
+                    String parameterName = parameterDescriptor.getName().asString();
+                    if (parameterDescriptor.isReified()) {
+                        member.getReifiedTypeParametersUsages().addUsedSpecializedParameter(parameterName);
+                    }
+
+                    if (TypeUtils.isAnyfiedTypeParameter(parameterDescriptor)) {
+                        member.getAnyfiedTypeParametersUsages().addUsedSpecializedParameter(parameterName);
+                    }
                 }
             }
         }
@@ -250,10 +259,12 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
 
     private static class ObjectLiteralResult {
         private final boolean wereReifiedMarkers;
+        private final boolean wereAnyfiedMarkers;
         private final ClassDescriptor classDescriptor;
 
-        public ObjectLiteralResult(boolean wereReifiedMarkers, @NotNull ClassDescriptor classDescriptor) {
+        public ObjectLiteralResult(boolean wereReifiedMarkers, boolean wereAnyfiedMarkers, @NotNull ClassDescriptor classDescriptor) {
             this.wereReifiedMarkers = wereReifiedMarkers;
+            this.wereAnyfiedMarkers = wereAnyfiedMarkers;
             this.classDescriptor = classDescriptor;
         }
     }
@@ -1617,6 +1628,11 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
             propagateChildReifiedTypeParametersUsages(closureCodegen.getReifiedTypeParametersUsages());
         }
 
+        if (closureCodegen.getAnyfiedTypeParametersUsages().wereUsedSpecializedParameters()) {
+            TypeSpecializer.putNeedClassSpecializationMarker(v, TypeSpecializationKind.ANYFICATION);
+            propagateChildAnyfiedTypeParametersUsages(closureCodegen.getAnyfiedTypeParametersUsages());
+        }
+
         return closureCodegen.putInstanceOnStack(this, functionReferenceReceiver);
     }
 
@@ -1631,6 +1647,9 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
             public Unit invoke(InstructionAdapter v) {
                 if (objectLiteralResult.wereReifiedMarkers) {
                     TypeSpecializer.putNeedClassSpecializationMarker(v, TypeSpecializationKind.REIFICATION);
+                }
+                if (objectLiteralResult.wereAnyfiedMarkers) {
+                    TypeSpecializer.putNeedClassSpecializationMarker(v, TypeSpecializationKind.ANYFICATION);
                 }
                 v.anew(type);
                 v.dup();
@@ -4442,6 +4461,10 @@ The "returned" value of try expression with no finally is either the last expres
 
     public void propagateChildReifiedTypeParametersUsages(@NotNull ReifiedTypeParametersUsages usages) {
         parentCodegen.getReifiedTypeParametersUsages().propagateChildUsagesWithinContext(usages, context);
+    }
+
+    public void propagateChildAnyfiedTypeParametersUsages(@NotNull AnyfiedTypeParametersUsages usages) {
+        parentCodegen.getAnyfiedTypeParametersUsages().propagateChildUsagesWithinContext(usages, context);
     }
 
     @Override
