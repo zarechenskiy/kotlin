@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -187,7 +187,7 @@ public class MethodInliner {
                     }
 
                     if (transformResult.getReifiedTypeParametersUsages().wereUsedReifiedParameters()) {
-                        ReifiedTypeInliner.putNeedClassReificationMarker(mv);
+                        TypeSpecializer.putNeedClassSpecializationMarker(mv, TypeSpecializationKind.REIFICATION);
                         result.getReifiedTypeParametersUsages().mergeAll(transformResult.getReifiedTypeParametersUsages());
                     }
                 }
@@ -303,7 +303,9 @@ public class MethodInliner {
                     }
                 }
                 else if (!inliningContext.isInliningLambda &&
-                         ReifiedTypeInliner.isNeedClassReificationMarker(new MethodInsnNode(opcode, owner, name, desc, false))) {
+                         TypeSpecializer.isNeedClassSpecializationMarker(
+                                 new MethodInsnNode(opcode, owner, name, desc, false),
+                                 TypeSpecializationKind.REIFICATION)) {
                     //we shouldn't process here content of inlining lambda it should be reified at external level
                 }
                 else {
@@ -430,7 +432,7 @@ public class MethodInliner {
             Frame<SourceValue> frame = sources[instructions.indexOf(cur)];
 
             if (frame != null) {
-                if (ReifiedTypeInliner.isNeedClassReificationMarker(cur)) {
+                if (TypeSpecializer.isNeedClassSpecializationMarker(cur, TypeSpecializationKind.REIFICATION)) {
                     awaitClassReification = true;
                 }
                 else if (cur.getType() == AbstractInsnNode.METHOD_INSN) {
