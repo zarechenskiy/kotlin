@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,32 +64,6 @@ class ReifiedTypeInliner(private val parametersMapping: TypeParameterMappings?) 
         val id: Int get() = ordinal
     }
 
-    companion object {
-        const val REIFIED_OPERATION_MARKER_METHOD_NAME = "reifiedOperationMarker"
-        const val NEED_CLASS_REIFICATION_MARKER_METHOD_NAME = "needClassReification"
-
-        private fun isOperationReifiedMarker(insn: AbstractInsnNode) =
-                isReifiedMarker(insn) { it == REIFIED_OPERATION_MARKER_METHOD_NAME }
-
-        private fun isReifiedMarker(insn: AbstractInsnNode, namePredicate: (String) -> Boolean): Boolean {
-            if (insn.opcode != Opcodes.INVOKESTATIC || insn !is MethodInsnNode) return false
-            return insn.owner == IntrinsicMethods.INTRINSICS_CLASS_NAME && namePredicate(insn.name)
-        }
-
-        @JvmStatic
-        fun isNeedClassReificationMarker(insn: AbstractInsnNode): Boolean =
-                isReifiedMarker(insn) { s -> s == NEED_CLASS_REIFICATION_MARKER_METHOD_NAME }
-
-        @JvmStatic
-        fun putNeedClassReificationMarker(v: MethodVisitor) {
-            v.visitMethodInsn(
-                    Opcodes.INVOKESTATIC,
-                    IntrinsicMethods.INTRINSICS_CLASS_NAME, NEED_CLASS_REIFICATION_MARKER_METHOD_NAME,
-                    Type.getMethodDescriptor(Type.VOID_TYPE), false
-            )
-        }
-    }
-
     private var maxStackSize = 0
 
     private val hasReifiedParameters = parametersMapping?.hasReifiedParameters() ?: false
@@ -106,7 +80,7 @@ class ReifiedTypeInliner(private val parametersMapping: TypeParameterMappings?) 
         maxStackSize = 0
         val result = ReifiedTypeParametersUsages()
         for (insn in instructions.toArray()) {
-            if (isOperationReifiedMarker(insn)) {
+            if (TypeSpecializer.isSpecializationOperationMarker(insn, TypeSpecializationKind.REIFICATION)) {
                 val newName: String? = processReifyMarker(insn as MethodInsnNode, instructions)
                 if (newName != null) {
                     result.addUsedReifiedParameter(newName)
