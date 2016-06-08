@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.codegen.context.MethodContext
 import org.jetbrains.kotlin.codegen.intrinsics.IntrinsicMethods
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.types.TypeUtils
 import org.jetbrains.org.objectweb.asm.MethodVisitor
 import org.jetbrains.org.objectweb.asm.Opcodes
 import org.jetbrains.org.objectweb.asm.Type
@@ -117,9 +118,16 @@ enum class TypeSpecializationKind(
         val specializationMarkerOperation: String,
         val needClassSpecializationMarker: String) {
     REIFICATION("reifiedOperationMarker", "needClassReification") {
-        override fun applicableTypeParameter(typeParameter: TypeParameterDescriptor): Boolean = typeParameter.isReified
+        override fun applicableTypeParameter(typeParameter: TypeParameterDescriptor): Boolean {
+            return typeParameter.isReified
+        }
+    },
+
+    ANYFICATION("anyfiedOperationMarker", "needClassAnyfication") {
+        override fun applicableTypeParameter(typeParameter: TypeParameterDescriptor): Boolean {
+            return TypeUtils.isAnyfiedTypeParameter(typeParameter)
+        }
     };
-    // +ANYFICATION
 
     abstract fun applicableTypeParameter(typeParameter: TypeParameterDescriptor): Boolean
 }
