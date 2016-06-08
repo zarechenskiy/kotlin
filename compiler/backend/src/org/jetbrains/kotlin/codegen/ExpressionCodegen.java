@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1613,7 +1613,7 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
         closureCodegen.generate();
 
         if (closureCodegen.getReifiedTypeParametersUsages().wereUsedReifiedParameters()) {
-            ReifiedTypeInliner.putNeedClassReificationMarker(v);
+            TypeSpecializer.putNeedClassSpecializationMarker(v, TypeSpecializationKind.REIFICATION);
             propagateChildReifiedTypeParametersUsages(closureCodegen.getReifiedTypeParametersUsages());
         }
 
@@ -1630,7 +1630,7 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
             @Override
             public Unit invoke(InstructionAdapter v) {
                 if (objectLiteralResult.wereReifiedMarkers) {
-                    ReifiedTypeInliner.putNeedClassReificationMarker(v);
+                    TypeSpecializer.putNeedClassSpecializationMarker(v, TypeSpecializationKind.REIFICATION);
                 }
                 v.anew(type);
                 v.dup();
@@ -4434,7 +4434,7 @@ The "returned" value of try expression with no finally is either the last expres
             v.iconst(operationKind.getId());
             v.visitLdcInsn(typeParameterAndReificationArgument.getSecond().asString());
             v.invokestatic(
-                    IntrinsicMethods.INTRINSICS_CLASS_NAME, ReifiedTypeInliner.REIFIED_OPERATION_MARKER_METHOD_NAME,
+                    IntrinsicMethods.INTRINSICS_CLASS_NAME, TypeSpecializationKind.REIFICATION.getSpecializationMarkerOperation(),
                     Type.getMethodDescriptor(Type.VOID_TYPE, Type.INT_TYPE, Type.getType(String.class)), false
             );
         }
