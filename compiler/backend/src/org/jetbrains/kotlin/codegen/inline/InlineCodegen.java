@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -392,7 +392,7 @@ public class InlineCodegen extends CallGenerator {
         DefaultSourceMapper defaultSourceMapper = codegen.getParentCodegen().getOrCreateSourceMapper();
         defaultSourceMapper.setCallSiteMarker(new CallSiteMarker(codegen.getLastLineNumber()));
         MethodNode node = nodeAndSmap.getNode();
-        ReifiedTypeParametersUsages reificationResult = reifiedTypeInliner.reifyInstructions(node);
+        SpecializedTypeParametersUsages reificationResult = reifiedTypeInliner.specializeInstructions(node);
         generateClosuresBodies();
 
         //through generation captured parameters will be added to invocationParamBuilder
