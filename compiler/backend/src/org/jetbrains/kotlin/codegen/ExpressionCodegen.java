@@ -233,7 +233,7 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
         propagateChildReifiedTypeParametersUsages(literalCodegen.getReifiedTypeParametersUsages());
 
         return new ObjectLiteralResult(
-                literalCodegen.getReifiedTypeParametersUsages().wereUsedReifiedParameters(),
+                literalCodegen.getReifiedTypeParametersUsages().wereUsedSpecializedParameters(),
                 classDescriptor
         );
     }
@@ -243,7 +243,7 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
             for (TypeProjection supertypeArgument : type.getArguments()) {
                 TypeParameterDescriptor parameterDescriptor = TypeUtils.getTypeParameterDescriptorOrNull(supertypeArgument.getType());
                 if (parameterDescriptor != null && parameterDescriptor.isReified()) {
-                    member.getReifiedTypeParametersUsages().addUsedReifiedParameter(parameterDescriptor.getName().asString());
+                    member.getReifiedTypeParametersUsages().addUsedSpecializedParameter(parameterDescriptor.getName().asString());
                 }
             }
         }
@@ -1622,7 +1622,7 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
 
         closureCodegen.generate();
 
-        if (closureCodegen.getReifiedTypeParametersUsages().wereUsedReifiedParameters()) {
+        if (closureCodegen.getReifiedTypeParametersUsages().wereUsedSpecializedParameters()) {
             TypeSpecializer.putNeedClassSpecializationMarker(v, TypeSpecializationKind.REIFICATION);
             propagateChildReifiedTypeParametersUsages(closureCodegen.getReifiedTypeParametersUsages());
         }
@@ -4498,7 +4498,7 @@ The "returned" value of try expression with no finally is either the last expres
             TypeParameterDescriptor typeParameterDescriptor = typeParameterAndReificationArgument.getFirst();
             if (typeParameterDescriptor.getContainingDeclaration() != context.getContextDescriptor()) {
                 parentCodegen.getReifiedTypeParametersUsages().
-                        addUsedReifiedParameter(typeParameterDescriptor.getName().asString());
+                        addUsedSpecializedParameter(typeParameterDescriptor.getName().asString());
             }
             v.iconst(operationKind.getId());
             v.visitLdcInsn(typeParameterAndReificationArgument.getSecond().asString());
