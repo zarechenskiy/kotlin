@@ -161,6 +161,44 @@ open class SpecializedTypeParametersUsages(val specializationKind: TypeSpecializ
     }
 }
 
+class TypeParameterMappings() {
+    private val mappingsByName = hashMapOf<String, TypeParameterMapping>()
+
+    fun addParameterMappingToType(name: String, type: KotlinType, asmType: Type, signature: String, isReified: Boolean, isAnyfied: Boolean) {
+        mappingsByName[name] = TypeParameterMapping(
+                name, type, asmType, reificationArgument = null, signature = signature, isReified = isReified, isAnyfied = isAnyfied
+        )
+    }
+
+    fun addParameterMappingForFurtherReification(name: String, type: KotlinType,
+                                                 reificationArgument: ReificationArgument, isReified: Boolean, isAnyfied: Boolean) {
+        mappingsByName[name] = TypeParameterMapping(
+                name, type, asmType = null, reificationArgument = reificationArgument,
+                signature = null, isReified = isReified, isAnyfied = isAnyfied
+        )
+    }
+
+    operator fun get(name: String): TypeParameterMapping? = mappingsByName[name]
+
+    fun hasReifiedParameters() = mappingsByName.values.any { it.isReified }
+
+    fun hasAnyfiedParameters() = mappingsByName.values.any { it.isAnyfied }
+
+    internal inline fun forEach(l: (TypeParameterMapping) -> Unit)  {
+        mappingsByName.values.forEach(l)
+    }
+}
+
+class TypeParameterMapping(
+        val name: String,
+        val type: KotlinType,
+        val asmType: Type?,
+        val reificationArgument: ReificationArgument?,
+        val signature: String?,
+        val isReified: Boolean,
+        val isAnyfied: Boolean
+)
+
 private val MethodInsnNode.reificationArgument: ReificationArgument?
     get() {
         val prev = previous!!

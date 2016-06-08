@@ -2591,6 +2591,8 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
 
             boolean isReified = key.isReified() || InlineUtil.isArrayConstructorWithLambda(resolvedCall.getResultingDescriptor());
 
+            boolean isAnyfied = TypeUtils.isAnyfiedTypeParameter(key);
+
             Pair<TypeParameterDescriptor, ReificationArgument> typeParameterAndReificationArgument = extractReificationArgument(type);
             if (typeParameterAndReificationArgument == null) {
                 KotlinType approximatedType = CapturedTypeApproximationKt.approximateCapturedTypes(entry.getValue()).getUpper();
@@ -2599,12 +2601,12 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
                 Type asmType = typeMapper.mapTypeParameter(approximatedType, signatureWriter);
 
                 mappings.addParameterMappingToType(
-                        key.getName().getIdentifier(), approximatedType, asmType, signatureWriter.toString(), isReified
+                        key.getName().getIdentifier(), approximatedType, asmType, signatureWriter.toString(), isReified, isAnyfied
                 );
             }
             else {
                 mappings.addParameterMappingForFurtherReification(
-                        key.getName().getIdentifier(), type, typeParameterAndReificationArgument.getSecond(), isReified
+                        key.getName().getIdentifier(), type, typeParameterAndReificationArgument.getSecond(), isReified, isAnyfied
                 );
             }
         }
