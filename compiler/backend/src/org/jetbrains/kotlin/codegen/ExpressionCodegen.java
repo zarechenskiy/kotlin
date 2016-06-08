@@ -4443,17 +4443,42 @@ The "returned" value of try expression with no finally is either the last expres
     public void putReifiedOperationMarkerIfTypeIsReifiedParameter(
             @NotNull KotlinType type, @NotNull ReifiedTypeInliner.OperationKind operationKind
     ) {
+        putSpecializedOperationMarkerIfTypeIsSpecializedParameter(type, operationKind.getId(), TypeSpecializationKind.REIFICATION);
+    }
+
+    public void putAnyfiedOperationMarkerIfTypeIsReifiedParameter(
+            @NotNull KotlinType type, @NotNull AnyfiedTypeInliner.OperationKind operationKind
+    ) {
+        putSpecializedOperationMarkerIfTypeIsSpecializedParameter(type, operationKind.getId(), TypeSpecializationKind.ANYFICATION);
+    }
+
+    private void putSpecializedOperationMarkerIfTypeIsSpecializedParameter(
+            @NotNull KotlinType type, int operationId, @NotNull TypeSpecializationKind specializationKind
+    ) {
         Pair<TypeParameterDescriptor, ReificationArgument> typeParameterAndReificationArgument = extractReificationArgument(type);
-        if (typeParameterAndReificationArgument != null && typeParameterAndReificationArgument.getFirst().isReified()) {
+        if (typeParameterAndReificationArgument != null &&
+            specializationKind.applicableTypeParameter(typeParameterAndReificationArgument.getFirst())) {
+
             TypeParameterDescriptor typeParameterDescriptor = typeParameterAndReificationArgument.getFirst();
             if (typeParameterDescriptor.getContainingDeclaration() != context.getContextDescriptor()) {
-                parentCodegen.getReifiedTypeParametersUsages().
-                        addUsedSpecializedParameter(typeParameterDescriptor.getName().asString());
+                SpecializedTypeParametersUsages parametersUsages;
+                switch (specializationKind) {
+                    case REIFICATION:
+                        parametersUsages = parentCodegen.getReifiedTypeParametersUsages();
+                        break;
+                    case ANYFICATION:
+                        parametersUsages = parentCodegen.getAnyfiedTypeParametersUsages();
+                        break;
+                    default:
+                        throw new IllegalStateException("Specialization type " + specializationKind + " did not handled");
+                }
+
+                parametersUsages.addUsedSpecializedParameter(typeParameterDescriptor.getName().asString());
             }
-            v.iconst(operationKind.getId());
+            v.iconst(operationId);
             v.visitLdcInsn(typeParameterAndReificationArgument.getSecond().asString());
             v.invokestatic(
-                    IntrinsicMethods.INTRINSICS_CLASS_NAME, TypeSpecializationKind.REIFICATION.getSpecializationMarkerOperation(),
+                    IntrinsicMethods.INTRINSICS_CLASS_NAME, specializationKind.getSpecializationMarkerOperation(),
                     Type.getMethodDescriptor(Type.VOID_TYPE, Type.INT_TYPE, Type.getType(String.class)), false
             );
         }
