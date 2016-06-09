@@ -74,7 +74,7 @@ internal val ClassId.internalName: String
 private fun StringBuilder.appendErasedType(type: KotlinType) {
     append(
             JvmTypeFactoryImpl.toString(
-                    mapType(type, JvmTypeFactoryImpl, TypeMappingMode.DEFAULT, TypeMappingConfigurationImpl, descriptorTypeWriter = null)))
+                    mapType(type, JvmTypeFactoryImpl, TypeMappingMode.DEFAULT, TypeMappingConfigurationImpl, descriptorTypeWriter = null, mappings = null)))
 }
 
 private sealed class JvmType {
