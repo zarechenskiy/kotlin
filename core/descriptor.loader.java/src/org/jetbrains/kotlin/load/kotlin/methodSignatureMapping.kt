@@ -91,11 +91,13 @@ internal val ClassId.internalName: String
     }
 
 private fun StringBuilder.appendErasedType(type: KotlinType) {
-    append(type.mapToJvmType())
+    append(
+            JvmTypeFactoryImpl.toString(
+                    mapType(type, JvmTypeFactoryImpl, TypeMappingMode.DEFAULT, TypeMappingConfigurationImpl, descriptorTypeWriter = null, mappings = null)))
 }
 
 internal fun KotlinType.mapToJvmType() =
-        mapType(this, JvmTypeFactoryImpl, TypeMappingMode.DEFAULT, TypeMappingConfigurationImpl, descriptorTypeWriter = null)
+        mapType(this, JvmTypeFactoryImpl, TypeMappingMode.DEFAULT, TypeMappingConfigurationImpl, descriptorTypeWriter = null, mappings = null)
 
 sealed class JvmType {
     // null means 'void'

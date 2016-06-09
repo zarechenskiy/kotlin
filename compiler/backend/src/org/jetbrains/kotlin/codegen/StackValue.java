@@ -20,6 +20,7 @@ import com.intellij.psi.tree.IElementType;
 import kotlin.Unit;
 import kotlin.collections.ArraysKt;
 import kotlin.collections.CollectionsKt;
+import kotlin.jvm.functions.Function0;
 import kotlin.jvm.functions.Function1;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -105,10 +106,24 @@ public abstract class StackValue {
         put(type, v, false);
     }
 
+    public void put(@NotNull Type type, @NotNull InstructionAdapter v, Function0<Unit> lambda) {
+        put(type, v, false, lambda);
+    }
+
     public void put(@NotNull Type type, @NotNull InstructionAdapter v, boolean skipReceiver) {
         if (!skipReceiver) {
             putReceiver(v, true);
         }
+        putSelector(type, v);
+    }
+
+    public void put(@NotNull Type tpye, @NotNull InstructionAdapter v, boolean skipReceiver, Function0<Unit> lambda) {
+        if (!skipReceiver) {
+            putReceiver(v, true);
+        }
+
+        lambda.invoke();
+
         putSelector(type, v);
     }
 

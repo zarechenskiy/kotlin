@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -120,7 +120,7 @@ class DefaultParameterValueSubstitutor(val state: GenerationState) {
         val isStatic = AsmUtil.isStaticMethod(contextKind, functionDescriptor)
         val flags = AsmUtil.getVisibilityAccessFlag(functionDescriptor) or (if (isStatic) Opcodes.ACC_STATIC else 0)
         val remainingParameters = getRemainingParameters(functionDescriptor.original, substituteCount)
-        val signature = typeMapper.mapSignature(functionDescriptor, contextKind, remainingParameters, false)
+        val signature = typeMapper.mapSignature(functionDescriptor, contextKind, remainingParameters, false, null)
         val mv = classBuilder.newMethod(OtherOrigin(methodElement, functionDescriptor), flags,
                                         signature.asmMethod.name,
                                         signature.asmMethod.descriptor,
