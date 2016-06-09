@@ -51,6 +51,7 @@ import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodParameterSignature
 import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodSignature;
 import org.jetbrains.kotlin.resolve.scopes.MemberScope;
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedCallableMemberDescriptor;
+import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedSimpleFunctionDescriptor;
 import org.jetbrains.kotlin.types.KotlinType;
 import org.jetbrains.kotlin.types.expressions.DoubleColonLHS;
 import org.jetbrains.kotlin.types.expressions.LabelResolver;
@@ -769,12 +770,43 @@ public class InlineCodegen extends CallGenerator {
             if (param.getKind() == JvmMethodParameterKind.VALUE) {
                 break;
             }
+
+            if (param.getKind() == JvmMethodParameterKind.RECEIVER) {
+                Type mappedReceiverType = mapReceiverType();
+                if (mappedReceiverType != null) {
+                    invocationParamBuilder.addNextParameter(mappedReceiverType, false);
+                    continue;
+                }
+            }
+
             invocationParamBuilder.addNextParameter(param.getAsmType(), false);
         }
 
         invocationParamBuilder.markValueParametersStart();
         List<ParameterInfo> hiddenParameters = invocationParamBuilder.buildParameters().getParameters();
         recordParameterValueInLocalVal(hiddenParameters.toArray(new ParameterInfo[hiddenParameters.size()]));
+    }
+
+    private Type mapReceiverType() {
+        ReceiverParameterDescriptor receiver = functionDescriptor.getExtensionReceiverParameter();
+        if (receiver == null) {
+            throw new IllegalStateException("There is no corresponding descriptor for receiver parameter");
+        }
+
+        if (typeParameterMappings == null) {
+            return null;
+        }
+
+        if (!ExpressionCodegen.isExtractedTypeAnyfied(receiver.getType())) {
+            return null;
+        }
+
+        TypeParameterMapping parameterMapping = typeParameterMappings.get(receiver.getType().toString());
+        if (parameterMapping != null) {
+            return parameterMapping.getAsmType();
+        }
+
+        return null;
     }
 
     private void leaveTemps() {
