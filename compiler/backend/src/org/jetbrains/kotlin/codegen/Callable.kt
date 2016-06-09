@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,15 @@ interface Callable {
     fun isStaticCall(): Boolean
 
     fun invokeMethodWithArguments(resolvedCall: ResolvedCall<*>, receiver: StackValue, codegen: ExpressionCodegen): StackValue {
-        return StackValue.functionCall(returnType) {
+        return invokeMethodWithArgumentsAndSpecializedReturnType(resolvedCall, receiver, codegen, returnType)
+    }
+
+    fun invokeMethodWithArgumentsAndSpecializedReturnType(
+            resolvedCall: ResolvedCall<*>,
+            receiver: StackValue,
+            codegen: ExpressionCodegen,
+            specializedReturnType: Type): StackValue {
+        return StackValue.functionCall(specializedReturnType) {
             codegen.invokeMethodWithArguments(this, resolvedCall, receiver)
         }
     }
