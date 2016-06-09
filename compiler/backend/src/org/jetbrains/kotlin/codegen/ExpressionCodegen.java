@@ -2236,10 +2236,6 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
                     InlineCodegenUtil.generateGlobalReturnFlag(v, nonLocalReturn.labelName);
                 }
 
-                KotlinType returnKotlinType = descriptor.getReturnType();
-                if (returnKotlinType != null) {
-                    putAnyfiedOperationMarkerIfTypeIsReifiedParameter(returnKotlinType, AnyfiedTypeInliner.OperationKind.ARETURN);
-                }
                 v.visitInsn(returnType.getOpcode(Opcodes.IRETURN));
                 v.mark(afterReturnLabel);
                 return Unit.INSTANCE;
