@@ -2804,14 +2804,12 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
                 "Tail recursive method can't be inlined: " + descriptor;
 
         List<Type> originalParameterTypes = callableMethod.getValueParameterTypes();
-        List<Type> mappedTypes = new ArrayList<Type>(callableMethod.getValueParameterTypes().size());
+        List<Type> mappedTypes = new ArrayList<Type>(originalParameterTypes);
         if (callGenerator instanceof InlineCodegen) {
             for (int i = 0; i < descriptor.getValueParameters().size(); i++) {
                 ValueParameterDescriptor parameterDescriptor = descriptor.getValueParameters().get(i);
                 if (TypeUtils.isAnyfiedTypeParameter(parameterDescriptor.getOriginal().getType())) { // TODO: check for value type!!
-                    mappedTypes.add(typeMapper.mapType(parameterDescriptor.getType()));
-                } else {
-                    mappedTypes.add(originalParameterTypes.get(i));
+                    mappedTypes.set(i, typeMapper.mapType(parameterDescriptor.getType()));
                 }
             }
 
@@ -4045,7 +4043,13 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
                     elementJetType,
                     ReifiedTypeInliner.OperationKind.NEW_ARRAY
             );
-            v.newarray(boxType(asmType(elementJetType)));
+
+            if (KotlinBuiltIns.isPrimitiveValueType(elementJetType)) {
+                v.newarray(asmType(elementJetType));
+            }
+            else {
+                v.newarray(boxType(asmType(elementJetType)));
+            }
         }
         else {
             Type type = typeMapper.mapType(arrayType);
