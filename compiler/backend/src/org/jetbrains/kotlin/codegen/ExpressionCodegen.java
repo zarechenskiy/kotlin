@@ -2849,8 +2849,21 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
         assert callGenerator == defaultCallGenerator || !tailRecursionCodegen.isTailRecursion(resolvedCall) :
                 "Tail recursive method can't be inlined: " + descriptor;
 
+        List<Type> originalParameterTypes = callableMethod.getValueParameterTypes();
+        List<Type> mappedTypes = new ArrayList<Type>(callableMethod.getValueParameterTypes().size());
+        if (callGenerator instanceof InlineCodegen) {
+            for (int i = 0; i < descriptor.getValueParameters().size(); i++) {
+                ValueParameterDescriptor parameterDescriptor = descriptor.getValueParameters().get(i);
+                if (TypeUtils.isAnyfiedTypeParameter(parameterDescriptor.getOriginal().getType())) { // TODO: check for value type!!
+                    mappedTypes.add(typeMapper.mapType(parameterDescriptor.getType()));
+                } else {
+                    mappedTypes.add(originalParameterTypes.get(i));
+                }
+            }
+
+        }
         ArgumentGenerator argumentGenerator = new CallBasedArgumentGenerator(this, callGenerator, descriptor.getValueParameters(),
-                                                                             callableMethod.getValueParameterTypes());
+                                                                             mappedTypes);
 
         invokeMethodWithArguments(callableMethod, resolvedCall, receiver, callGenerator, argumentGenerator);
     }
@@ -4023,6 +4036,7 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
         StackValue storeTo = sharedVarType == null ? StackValue.local(index, varType) : StackValue.shared(index, varType);
 
         storeTo.putReceiver(v, false);
+        putAnyfiedOperationMarkerIfTypeIsReifiedParameter(variableDescriptor.getType(), AnyfiedTypeInliner.OperationKind.ALOAD); // TODO: if array
         initializer.put(initializer.type, v);
 
         markLineNumber(variableDeclaration, false);
