@@ -2794,6 +2794,14 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
         }
 
         Callable callable = resolveToCallable(fd, superCallTarget != null, resolvedCall);
+        KotlinType returnType = fd.getOriginal().getReturnType();
+        if (fd.isInline() && returnType != null && isExtractedTypeAnyfied(returnType)) {
+            KotlinType substitutedReturnType = fd.getReturnType();
+            if (substitutedReturnType != null) {
+                return callable.invokeMethodWithArgumentsAndSpecializedReturnType(resolvedCall, receiver, this,
+                                                                                  typeMapper.mapType(substitutedReturnType));
+            }
+        }
 
 
         StackValue result = callable.invokeMethodWithArguments(resolvedCall, receiver, this);
@@ -3038,6 +3046,19 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
         return new Pair<TypeParameterDescriptor, ReificationArgument>(
                 parameterDescriptor,
                 new ReificationArgument(parameterDescriptor.getName().asString(), isNullable, arrayDepth));
+    }
+
+    private static KotlinType extractSpecializationType(@NotNull KotlinType type) {
+        KotlinType specializationType = type;
+        while (KotlinBuiltIns.isArray(specializationType)) {
+            specializationType = specializationType.getArguments().get(0).getType();
+        }
+
+        return specializationType;
+    }
+
+    private static boolean isExtractedTypeAnyfied(@NotNull KotlinType type) {
+        return TypeUtils.isAnyfiedTypeParameter(extractSpecializationType(type));
     }
 
     @NotNull
