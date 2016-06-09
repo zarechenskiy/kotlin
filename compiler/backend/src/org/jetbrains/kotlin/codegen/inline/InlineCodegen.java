@@ -28,6 +28,7 @@ import org.jetbrains.kotlin.builtins.BuiltInsPackageFragment;
 import org.jetbrains.kotlin.codegen.*;
 import org.jetbrains.kotlin.codegen.context.*;
 import org.jetbrains.kotlin.codegen.intrinsics.IntrinsicArrayConstructorsKt;
+import org.jetbrains.kotlin.codegen.signature.JvmSignatureWriter;
 import org.jetbrains.kotlin.codegen.state.GenerationState;
 import org.jetbrains.kotlin.codegen.state.KotlinTypeMapper;
 import org.jetbrains.kotlin.descriptors.*;
@@ -672,6 +673,13 @@ public class InlineCodegen extends CallGenerator {
                 info.setRemapValue(remappedValue);
             }
             else {
+                Type mappedParameter = mapParameter(parameterIndex);
+                Type parameterType;
+                if (mappedParameter != null) {
+                    parameterType = mappedParameter;
+                } else {
+                    parameterType = type;
+                }
                 info = invocationParamBuilder.addNextValueParameter(type, false, remappedValue, parameterIndex);
             }
 
@@ -773,20 +781,28 @@ public class InlineCodegen extends CallGenerator {
             throw new IllegalStateException("There is no corresponding descriptor for receiver parameter");
         }
 
+        return mapParameter(receiver);
+    }
+
+    private Type mapParameter(int parameterIndex) {
+        ValueParameterDescriptor parameterDescriptor = functionDescriptor.getValueParameters().get(parameterIndex);
+        return mapParameter(parameterDescriptor);
+    }
+
+    private Type mapParameter(@Nullable  ParameterDescriptor parameterDescriptor) {
+        if (parameterDescriptor == null) {
+            throw new IllegalStateException("There is no corresponding descriptor for parameterDescriptor parameter");
+        }
+
         if (typeParameterMappings == null) {
             return null;
         }
 
-        if (!ExpressionCodegen.isExtractedTypeAnyfied(receiver.getType())) {
+        if (!ExpressionCodegen.isExtractedTypeAnyfied(parameterDescriptor.getType())) {
             return null;
         }
 
-        TypeParameterMapping parameterMapping = typeParameterMappings.get(receiver.getType().toString());
-        if (parameterMapping != null) {
-            return parameterMapping.getAsmType();
-        }
-
-        return null;
+        return typeMapper.mapType(parameterDescriptor.getType(), typeParameterMappings);
     }
 
     private void leaveTemps() {

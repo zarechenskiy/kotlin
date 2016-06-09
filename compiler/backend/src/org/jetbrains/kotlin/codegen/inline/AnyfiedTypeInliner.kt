@@ -29,7 +29,7 @@ class AnyfiedTypeParametersUsages : SpecializedTypeParametersUsages(TypeSpeciali
 
 class AnyfiedTypeInliner(parametersMapping: TypeParameterMappings?) : TypeSpecializer(parametersMapping, TypeSpecializationKind.ANYFICATION) {
     enum class OperationKind {
-        GET, ALOAD, ASTORE, LOCALVARIABLE, AALOAD, ARETURN, IF_ACMP, NEW_ARRAY, COERCION;
+        GET, ALOAD, ASTORE, LOCALVARIABLE, AALOAD, ARETURN, IF_ACMP, NEW_ARRAY, COERCION, IF_ICMPLE;
 
         val id: Int get() = ordinal
     }
@@ -54,6 +54,7 @@ class AnyfiedTypeInliner(parametersMapping: TypeParameterMappings?) : TypeSpecia
             OperationKind.ARETURN -> processReturn(insn, instructions, asmType, kotlinType)
             OperationKind.COERCION -> processCoercion(insn, instructions, asmType, kotlinType)
             OperationKind.IF_ACMP -> processAcmp(insn, instructions, asmType, kotlinType)
+            OperationKind.IF_ICMPLE -> true
             else -> false
         }
     }
@@ -199,6 +200,7 @@ private val MethodInsnNode.anyfiedOperationKindByNextOperation: AnyfiedTypeInlin
             Opcodes.ASTORE -> AnyfiedTypeInliner.OperationKind.ASTORE
             Opcodes.AALOAD -> AnyfiedTypeInliner.OperationKind.AALOAD
             Opcodes.ARETURN -> AnyfiedTypeInliner.OperationKind.ARETURN
+            Opcodes.IF_ICMPLE -> AnyfiedTypeInliner.OperationKind.IF_ICMPLE
             else -> null
         }
     }
