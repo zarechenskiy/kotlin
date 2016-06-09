@@ -347,7 +347,27 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
             }
         }
 
-        value.put(type, v);
+        boolean putMarker = false;
+        KotlinType expressionType = null;
+        if (expr instanceof KtExpression && !(expr instanceof KtIfExpression) && !(expr instanceof KtBlockExpression)) {
+            expressionType = expressionJetType((KtExpression) expr);
+            if (expressionType != null && TypeUtils.isAnyfiedTypeParameter(expressionType)) {
+                putMarker = true;
+            }
+        }
+
+        if (putMarker) {
+            final KotlinType finalExpressionType = expressionType;
+            value.put(type, v, new Function0<Unit>() {
+                @Override
+                public Unit invoke() {
+                    putAnyfiedOperationMarkerIfTypeIsReifiedParameter(finalExpressionType, AnyfiedTypeInliner.OperationKind.AALOAD);
+                    return null;
+                }
+            });
+        } else {
+            value.put(type, v);
+        }
     }
 
     @NotNull
@@ -4051,8 +4071,15 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
         StackValue storeTo = sharedVarType == null ? StackValue.local(index, varType) : StackValue.shared(index, varType);
 
         storeTo.putReceiver(v, false);
-        putAnyfiedOperationMarkerIfTypeIsReifiedParameter(variableDescriptor.getType(), AnyfiedTypeInliner.OperationKind.ALOAD); // TODO: if array
-        initializer.put(initializer.type, v);
+
+        initializer.put(initializer.type, v, new Function0<Unit>() {
+            @Override
+            public Unit invoke() {
+                // TODO: if array?
+                putAnyfiedOperationMarkerIfTypeIsReifiedParameter(variableDescriptor.getType(), AnyfiedTypeInliner.OperationKind.ALOAD);
+                return null;
+            }
+        });
 
         markLineNumber(variableDeclaration, false);
 

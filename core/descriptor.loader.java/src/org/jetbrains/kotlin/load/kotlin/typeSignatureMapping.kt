@@ -26,6 +26,7 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameUnsafe
 import org.jetbrains.kotlin.resolve.jvm.JvmClassName
 import org.jetbrains.kotlin.resolve.jvm.JvmPrimitiveType
 import org.jetbrains.kotlin.types.*
+import org.jetbrains.kotlin.types.typeUtil.isTypeParameter
 import org.jetbrains.kotlin.types.typeUtil.replaceArgumentsWithStarProjections
 import org.jetbrains.kotlin.utils.DO_NOTHING_3
 
@@ -55,7 +56,8 @@ fun <T : Any> mapType(
         mode: TypeMappingMode,
         typeMappingConfiguration: TypeMappingConfiguration<T>,
         descriptorTypeWriter: JvmDescriptorTypeWriter<T>?,
-        writeGenericType: (KotlinType, T, TypeMappingMode) -> Unit = DO_NOTHING_3
+        writeGenericType: (KotlinType, T, TypeMappingMode) -> Unit = DO_NOTHING_3,
+        mappings: ((String) -> KotlinType?)?
 ): T {
     mapBuiltInType(kotlinType, factory)?.let { builtInType ->
         val jvmType = factory.boxTypeIfNeeded(builtInType, mode.needPrimitiveBoxing)
@@ -74,7 +76,7 @@ fun <T : Any> mapType(
         // It's not very important because such types anyway are prohibited in declarations
         return mapType(
                 commonSupertype.replaceArgumentsWithStarProjections(),
-                factory, mode, typeMappingConfiguration, descriptorTypeWriter, writeGenericType)
+                factory, mode, typeMappingConfiguration, descriptorTypeWriter, writeGenericType, mappings)
     }
 
     val descriptor =
@@ -112,7 +114,7 @@ fun <T : Any> mapType(
                         mapType(
                                 memberType, factory,
                                 mode.toGenericArgumentMode(memberProjection.projectionKind),
-                                typeMappingConfiguration, descriptorTypeWriter, writeGenericType)
+                                typeMappingConfiguration, descriptorTypeWriter, writeGenericType, mappings)
 
                 descriptorTypeWriter?.writeArrayEnd()
             }
@@ -134,8 +136,26 @@ fun <T : Any> mapType(
         }
 
         descriptor is TypeParameterDescriptor -> {
-            val type = mapType(getRepresentativeUpperBound(descriptor),
-                            factory, mode, typeMappingConfiguration, writeGenericType = DO_NOTHING_3, descriptorTypeWriter = null)
+            var representativeType = if (mappings != null) {
+                val mappedType = mappings(descriptor.name.asString())
+                if (mappedType != null && !mappedType.isTypeParameter()) {
+                    mappedType
+                }
+                else {
+                    null
+                }
+            }
+            else {
+                null
+            }
+
+            if (representativeType == null) {
+                representativeType = getRepresentativeUpperBound(descriptor)
+            }
+
+            val type = mapType(representativeType,
+                            factory, mode, typeMappingConfiguration, writeGenericType = DO_NOTHING_3,
+                               descriptorTypeWriter = null, mappings = mappings)
             descriptorTypeWriter?.writeTypeVariable(descriptor.getName(), type)
             return type
         }
