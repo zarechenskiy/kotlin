@@ -1929,7 +1929,11 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
                 }
 
                 Type returnType = isNonLocalReturn ? nonLocalReturn.returnType : ExpressionCodegen.this.returnType;
+                KotlinType returnKotlinType = descriptor.getReturnType();
                 if (returnedExpression != null) {
+                    if (returnKotlinType != null) {
+                        putAnyfiedOperationMarkerIfTypeIsReifiedParameter(returnKotlinType, AnyfiedTypeInliner.OperationKind.ALOAD);
+                    }
                     gen(returnedExpression, returnType);
                 }
 
@@ -1940,7 +1944,6 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
                     InlineCodegenUtil.generateGlobalReturnFlag(v, nonLocalReturn.labelName);
                 }
 
-                KotlinType returnKotlinType = descriptor.getReturnType();
                 if (returnKotlinType != null) {
                     putAnyfiedOperationMarkerIfTypeIsReifiedParameter(returnKotlinType, AnyfiedTypeInliner.OperationKind.ARETURN);
                 }
