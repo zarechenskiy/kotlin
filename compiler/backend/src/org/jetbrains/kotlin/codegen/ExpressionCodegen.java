@@ -3015,7 +3015,7 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
         return specializationType;
     }
 
-    private static boolean isExtractedTypeAnyfied(@NotNull KotlinType type) {
+    public static boolean isExtractedTypeAnyfied(@NotNull KotlinType type) {
         return TypeUtils.isAnyfiedTypeParameter(extractSpecializationType(type));
     }
 

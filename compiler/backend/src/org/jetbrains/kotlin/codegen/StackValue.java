@@ -1545,6 +1545,11 @@ public abstract class StackValue {
                     return typeMapper.mapType(receiverCandidate.getType());
                 }
 
+                ReceiverParameterDescriptor receiverDescriptor = descriptor.getExtensionReceiverParameter();
+                if (receiverDescriptor != null && ExpressionCodegen.isExtractedTypeAnyfied(receiverDescriptor.getType())) {
+                    return typeMapper.mapType(extensionReceiver.getType());
+                }
+
                 return callableMethod != null ? callableMethod.getExtensionReceiverType() : typeMapper.mapType(extensionReceiver.getType());
             }
             else if (dispatchReceiver != null) {
