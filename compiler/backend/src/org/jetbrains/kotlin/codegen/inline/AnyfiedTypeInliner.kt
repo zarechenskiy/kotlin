@@ -42,7 +42,7 @@ class AnyfiedTypeInliner(parametersMapping: TypeParameterMappings?) : TypeSpecia
     }
 
     override fun processInstruction(insn: MethodInsnNode, instructions: InsnList, asmType: Type, kotlinType: KotlinType): Boolean {
-        val operationKind = insn.anyfiedOperationKind ?: return false
+        val operationKind = insn.anyfiedOperationKindByNextOperation ?: return false
 
         val isValueType = KotlinBuiltIns.isPrimitiveValueType(kotlinType)
         if (!isValueType) return true
@@ -189,4 +189,16 @@ class AnyfiedTypeInliner(parametersMapping: TypeParameterMappings?) : TypeSpecia
 private val MethodInsnNode.anyfiedOperationKind: AnyfiedTypeInliner.OperationKind?
     get() = previous?.previous?.intConstant?.let {
         AnyfiedTypeInliner.OperationKind.values().getOrNull(it)
+    }
+
+private val MethodInsnNode.anyfiedOperationKindByNextOperation: AnyfiedTypeInliner.OperationKind?
+    get() {
+        val next = this.next ?: null
+        return when (next!!.opcode) {
+            Opcodes.ALOAD -> AnyfiedTypeInliner.OperationKind.ALOAD
+            Opcodes.ASTORE -> AnyfiedTypeInliner.OperationKind.ASTORE
+            Opcodes.AALOAD -> AnyfiedTypeInliner.OperationKind.AALOAD
+            Opcodes.ARETURN -> AnyfiedTypeInliner.OperationKind.ARETURN
+            else -> null
+        }
     }
