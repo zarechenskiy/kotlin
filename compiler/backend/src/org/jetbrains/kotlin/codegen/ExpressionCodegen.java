@@ -1022,7 +1022,11 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
         protected void assignToLoopParameter() {
             Type arrayElParamType;
             if (KotlinBuiltIns.isArray(loopRangeType)) {
-                arrayElParamType = boxType(asmElementType);
+                if (KotlinBuiltIns.isPrimitiveValueType(elementType)) {
+                    arrayElParamType = asmElementType;
+                } else {
+                    arrayElParamType = boxType(asmElementType);
+                }
             }
             else {
                 arrayElParamType = asmElementType;
