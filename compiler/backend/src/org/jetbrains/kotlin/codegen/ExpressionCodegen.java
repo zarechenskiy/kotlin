@@ -349,7 +349,7 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
 
         boolean putMarker = false;
         KotlinType expressionType = null;
-        if (expr instanceof KtExpression && !(expr instanceof KtIfExpression) && !(expr instanceof KtBlockExpression)) {
+        if (expr instanceof KtExpression && !(expr instanceof KtIfExpression)) {
             expressionType = expressionJetType((KtExpression) expr);
             if (expressionType != null && TypeUtils.isAnyfiedTypeParameter(expressionType)) {
                 putMarker = true;
