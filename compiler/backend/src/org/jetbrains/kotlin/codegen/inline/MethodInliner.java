@@ -222,7 +222,7 @@ public class MethodInliner {
                     }
 
                     int valueParamShift = Math.max(getNextLocalIndex(), markerShift);//NB: don't inline cause it changes
-                    putStackValuesIntoLocals(info.getInvokeParamsWithoutCaptured(), valueParamShift, this, desc);
+                    putStackValuesIntoLocals(info.getInvokeParamsWithoutCaptured(), valueParamShift, this, desc, info.getValueParamsMask());
 
                     addInlineMarker(this, true);
                     Parameters lambdaParameters = info.addAllParameters(nodeRemapper);
@@ -305,6 +305,12 @@ public class MethodInliner {
                                  new MethodInsnNode(opcode, owner, name, desc, false),
                                  TypeSpecializationKind.REIFICATION)) {
                     //we shouldn't process here content of inlining lambda it should be reified at external level
+                }
+                else if (!inliningContext.isInliningLambda &&
+                         TypeSpecializer.isNeedClassSpecializationMarker(
+                                 new MethodInsnNode(opcode, owner, name, desc, false),
+                                 TypeSpecializationKind.ANYFICATION)) {
+
                 }
                 else {
                     super.visitMethodInsn(opcode, owner, name, desc, itf);
@@ -610,7 +616,7 @@ public class MethodInliner {
             return null;
         }
 
-        if (insnNode.getOpcode() == Opcodes.ALOAD) {
+        if (insnNode.getOpcode() == Opcodes.ALOAD || insnNode.getOpcode() == Opcodes.ILOAD) {
             int varIndex = ((VarInsnNode) insnNode).var;
             return getLambdaIfExists(varIndex);
         }
@@ -720,7 +726,11 @@ public class MethodInliner {
     }
 
     private static void putStackValuesIntoLocals(
-            @NotNull List<Type> directOrder, int shift, @NotNull InstructionAdapter iv, @NotNull String descriptor
+            @NotNull List<Type> directOrder,
+            int shift,
+            @NotNull InstructionAdapter iv,
+            @NotNull String descriptor,
+            @NotNull List<Boolean> valueParamsMask
     ) {
         Type[] actualParams = Type.getArgumentTypes(descriptor);
         assert actualParams.length == directOrder.size() : "Number of expected and actual params should be equals!";
@@ -736,7 +746,7 @@ public class MethodInliner {
         for (Type next : Lists.reverse(directOrder)) {
             shift -= next.getSize();
             Type typeOnStack = actualParams[--index];
-            if (!typeOnStack.equals(next)) {
+            if (!typeOnStack.equals(next) && !valueParamsMask.get(index)) {
                 StackValue.onStack(typeOnStack).put(next, iv);
             }
             iv.store(shift, next);

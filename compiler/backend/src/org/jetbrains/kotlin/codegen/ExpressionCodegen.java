@@ -4456,6 +4456,12 @@ The "returned" value of try expression with no finally is either the last expres
     }
 
     public void putAnyfiedOperationMarkerIfTypeIsReifiedParameter(
+            @NotNull KotlinType type
+    ) {
+        putSpecializedOperationMarkerIfTypeIsSpecializedParameter(type, 0, TypeSpecializationKind.ANYFICATION);
+    }
+
+    public void putAnyfiedOperationMarkerIfTypeIsReifiedParameter(
             @NotNull KotlinType type, @NotNull AnyfiedTypeInliner.OperationKind operationKind
     ) {
         putSpecializedOperationMarkerIfTypeIsSpecializedParameter(type, operationKind.getId(), TypeSpecializationKind.ANYFICATION);

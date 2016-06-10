@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,11 @@
 
 package org.jetbrains.kotlin.codegen
 
+import org.jetbrains.kotlin.codegen.inline.AnyfiedTypeInliner
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
+import org.jetbrains.kotlin.types.TypeUtils
 import org.jetbrains.org.objectweb.asm.Type
 
 abstract class CallGenerator {
@@ -55,6 +57,9 @@ abstract class CallGenerator {
                 parameterType: Type,
                 parameterIndex: Int) {
             val value = codegen.gen(argumentExpression)
+            if (TypeUtils.isAnyfiedTypeParameter(valueParameterDescriptor.type)) {
+                codegen.putAnyfiedOperationMarkerIfTypeIsReifiedParameter(valueParameterDescriptor.type)
+            }
             value.put(parameterType, codegen.v)
         }
 
