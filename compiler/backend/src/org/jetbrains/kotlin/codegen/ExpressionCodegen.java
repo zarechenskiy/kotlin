@@ -338,7 +338,10 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
 
         boolean putMarker = false;
         KotlinType expressionType = null;
-        if (expr instanceof KtExpression && !(expr instanceof KtIfExpression)) {
+        if (expr instanceof KtExpression &&
+            !(expr instanceof KtIfExpression) &&
+            !(expr instanceof KtCallExpression)) {
+
             expressionType = expressionJetType((KtExpression) expr);
             if (expressionType != null && TypeUtils.isAnyfiedTypeParameter(expressionType)) {
                 putMarker = true;
@@ -2594,7 +2597,7 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
         }
 
         KotlinType returnType = resolvedCall.getResultingDescriptor().getReturnType();
-        if (returnType != null) {
+        if (returnType != null && callGenerator instanceof InlineCodegen) {
             putAnyfiedOperationMarkerIfTypeIsReifiedParameter(returnType, AnyfiedTypeInliner.OperationKind.AALOAD);
         }
 
@@ -3734,10 +3737,12 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
 
             putAnyfiedOperationMarkerIfTypeIsReifiedParameter(elementJetType, AnyfiedTypeInliner.OperationKind.NEW_ARRAY);
 
-            putReifiedOperationMarkerIfTypeIsReifiedParameter(
-                    elementJetType,
-                    ReifiedTypeInliner.OperationKind.NEW_ARRAY
-            );
+            if (!isExtractedTypeAnyfied(elementJetType)) {
+                putReifiedOperationMarkerIfTypeIsReifiedParameter(
+                        elementJetType,
+                        ReifiedTypeInliner.OperationKind.NEW_ARRAY
+                );
+            }
 
             if (KotlinBuiltIns.isPrimitiveValueType(elementJetType)) {
                 v.newarray(asmType(elementJetType));
