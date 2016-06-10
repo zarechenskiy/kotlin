@@ -14127,6 +14127,24 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
                 KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/codegen/box/specialization/functions"), Pattern.compile("^(.+)\\.kt$"), true);
             }
 
+            @TestMetadata("anyfiedApply.kt")
+            public void testAnyfiedApply() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/functions/anyfiedApply.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("anyfiedMap.kt")
+            public void testAnyfiedMap() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/functions/anyfiedMap.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("anyfiedRun.kt")
+            public void testAnyfiedRun() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/functions/anyfiedRun.kt");
+                doTest(fileName);
+            }
+
             @TestMetadata("assignReturnType.kt")
             public void testAssignReturnType() throws Exception {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/functions/assignReturnType.kt");
@@ -14157,6 +14175,24 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
                 doTest(fileName);
             }
 
+            @TestMetadata("lambdaWithDifferentReturnType.kt")
+            public void testLambdaWithDifferentReturnType() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/functions/lambdaWithDifferentReturnType.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("lambdaWithReturnType.kt")
+            public void testLambdaWithReturnType() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/functions/lambdaWithReturnType.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("letAnyfied.kt")
+            public void testLetAnyfied() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/functions/letAnyfied.kt");
+                doTest(fileName);
+            }
+
             @TestMetadata("returnArgument.kt")
             public void testReturnArgument() throws Exception {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/functions/returnArgument.kt");
@@ -14184,6 +14220,12 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
             @TestMetadata("sample.kt")
             public void testSample() throws Exception {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/functions/sample.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("simpleLambdaWithoutReturnType.kt")
+            public void testSimpleLambdaWithoutReturnType() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/functions/simpleLambdaWithoutReturnType.kt");
                 doTest(fileName);
             }
         }
