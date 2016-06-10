@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package org.jetbrains.kotlin.codegen.inline;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.kotlin.builtins.KotlinBuiltIns;
 import org.jetbrains.kotlin.codegen.AsmUtil;
 import org.jetbrains.kotlin.codegen.PropertyReferenceCodegen;
 import org.jetbrains.kotlin.codegen.StackValue;
@@ -26,6 +27,9 @@ import org.jetbrains.kotlin.codegen.context.EnclosedValueDescriptor;
 import org.jetbrains.kotlin.codegen.state.KotlinTypeMapper;
 import org.jetbrains.kotlin.descriptors.*;
 import org.jetbrains.kotlin.psi.KtCallableReferenceExpression;
+import org.jetbrains.kotlin.descriptors.ClassDescriptor;
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor;
+import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor;
 import org.jetbrains.kotlin.psi.KtExpression;
 import org.jetbrains.kotlin.psi.KtLambdaExpression;
 import org.jetbrains.kotlin.resolve.BindingContext;
@@ -174,6 +178,19 @@ public class LambdaInfo implements LabelOwner {
     @NotNull
     public List<Type> getInvokeParamsWithoutCaptured() {
         return Arrays.asList(typeMapper.mapAsmMethod(functionDescriptor).getArgumentTypes());
+    }
+
+    public List<Boolean> getValueParamsMask() {
+        List<Boolean> mask = new ArrayList<Boolean>();
+        for (ValueParameterDescriptor descriptor : functionDescriptor.getValueParameters()) {
+            if (KotlinBuiltIns.isPrimitiveValueType(descriptor.getType())) {
+                mask.add(true);
+            } else {
+                mask.add(false);
+            }
+        }
+
+        return mask;
     }
 
     @NotNull
