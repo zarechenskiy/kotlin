@@ -15155,6 +15155,12 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/functions/simpleLambdaWithoutReturnType.kt");
                 doTest(fileName);
             }
+
+            @TestMetadata("withAnyfied.kt")
+            public void testWithAnyfied() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/functions/withAnyfied.kt");
+                doTest(fileName);
+            }
         }
     }
 
