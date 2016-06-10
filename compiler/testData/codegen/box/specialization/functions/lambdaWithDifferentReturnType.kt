@@ -1,3 +1,5 @@
+// WITH_RUNTIME
+
 inline fun <@Anyfied T, @Anyfied R> takeLambda(el: T, l: (T) -> R): R {
     return l(el)
 }
