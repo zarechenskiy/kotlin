@@ -16,6 +16,8 @@
 
 package org.jetbrains.kotlin.codegen.inline
 
+import org.jetbrains.kotlin.builtins.KotlinBuiltIns
+import org.jetbrains.kotlin.codegen.AsmUtil
 import org.jetbrains.kotlin.codegen.context.MethodContext
 import org.jetbrains.kotlin.codegen.intrinsics.IntrinsicMethods
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
@@ -92,6 +94,16 @@ abstract class TypeSpecializer(val parametersMapping: TypeParameterMappings?, va
         val next = marker.next ?: return false
         if (next.opcode != expectedNextOpcode) return false
         return rewrite(next)
+    }
+
+    protected fun processNextTypeInsn(insn: MethodInsnNode, parameter: Type, expectedNextOpcode: Int): Boolean {
+        if (insn.next?.opcode != expectedNextOpcode) return false
+        if (AsmUtil.isPrimitive(parameter)) {
+            return true
+        }
+
+        (insn.next as TypeInsnNode).desc = parameter.internalName
+        return true
     }
 
     /**
