@@ -54,8 +54,23 @@ class AnyfiedTypeInliner(parametersMapping: TypeParameterMappings?) : TypeSpecia
             OperationKind.ARETURN -> processReturn(insn, instructions, asmType, kotlinType)
             OperationKind.COERCION -> processCoercion(insn, instructions, asmType, kotlinType)
             OperationKind.IF_ACMP -> processAcmp(insn, instructions, asmType, kotlinType)
+            OperationKind.NEW_ARRAY -> processNewArray(insn, instructions, asmType)
             OperationKind.IF_ICMPLE -> true
             else -> false
+        }
+    }
+
+    private fun processNewArray(insn: MethodInsnNode, instructions: InsnList, parameter: Type): Boolean {
+        return rewriteNextTypeInsn(insn, Opcodes.ANEWARRAY) { stubNewArray ->
+            if (stubNewArray !is TypeInsnNode) return false
+
+            val newMethodNode = MethodNode(InlineCodegenUtil.API)
+            generateNewArray(InstructionAdapter(newMethodNode), parameter)
+
+            instructions.insert(insn, newMethodNode.instructions)
+            instructions.remove(stubNewArray)
+
+            return true
         }
     }
 
@@ -201,6 +216,7 @@ private val MethodInsnNode.anyfiedOperationKindByNextOperation: AnyfiedTypeInlin
             Opcodes.AALOAD -> AnyfiedTypeInliner.OperationKind.AALOAD
             Opcodes.ARETURN -> AnyfiedTypeInliner.OperationKind.ARETURN
             Opcodes.IF_ICMPLE -> AnyfiedTypeInliner.OperationKind.IF_ICMPLE
+            Opcodes.ANEWARRAY -> AnyfiedTypeInliner.OperationKind.NEW_ARRAY
             else -> null
         }
     }
