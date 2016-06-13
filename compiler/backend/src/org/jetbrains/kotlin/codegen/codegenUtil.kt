@@ -163,6 +163,15 @@ fun generateConditionJump(
     }
 }
 
+fun generateNewArray(
+        v: InstructionAdapter,
+        asmType: Type
+) {
+    with(v) {
+        newarray(asmType)
+    }
+}
+
 fun SpecialSignatureInfo.replaceValueParametersIn(sourceSignature: String?): String?
         = valueParametersSignature?.let { sourceSignature?.replace("^\\(.*\\)".toRegex(), "($it)") }
 

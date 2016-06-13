@@ -765,7 +765,7 @@ public class MethodInliner {
 
     @NotNull
     //process local and global returns (local substituted with goto end-label global kept unchanged)
-    public static List<PointForExternalFinallyBlocks> processReturns(
+    public static List<PointForExternalFinallyBlocks>   processReturns(
             @NotNull MethodNode node, @NotNull LabelOwner labelOwner, boolean remapReturn, @Nullable Label endLabel
     ) {
         if (!remapReturn) {
