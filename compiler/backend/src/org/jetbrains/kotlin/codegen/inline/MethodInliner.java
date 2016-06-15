@@ -20,11 +20,13 @@ import com.google.common.collect.Lists;
 import com.intellij.util.ArrayUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.kotlin.builtins.KotlinBuiltIns;
 import org.jetbrains.kotlin.codegen.ClosureCodegen;
 import org.jetbrains.kotlin.codegen.StackValue;
 import org.jetbrains.kotlin.codegen.intrinsics.IntrinsicMethods;
 import org.jetbrains.kotlin.codegen.optimization.FixStackWithLabelNormalizationMethodTransformer;
 import org.jetbrains.kotlin.codegen.state.KotlinTypeMapper;
+import org.jetbrains.kotlin.types.KotlinType;
 import org.jetbrains.kotlin.utils.SmartList;
 import org.jetbrains.kotlin.utils.SmartSet;
 import org.jetbrains.org.objectweb.asm.Label;
@@ -252,7 +254,15 @@ public class MethodInliner {
                     //return value boxing/unboxing
                     Method bridge = typeMapper.mapAsmMethod(ClosureCodegen.getErasedInvokeFunction(info.getFunctionDescriptor()));
                     Method delegate = typeMapper.mapAsmMethod(info.getFunctionDescriptor());
-                    StackValue.onStack(delegate.getReturnType()).put(bridge.getReturnType(), this);
+                    Type bridgeReturnType;
+                    KotlinType kotlinReturnType = info.getFunctionDescriptor().getReturnType();
+                    if (kotlinReturnType != null && KotlinBuiltIns.isPrimitiveValueType(kotlinReturnType)) {
+                        bridgeReturnType = typeMapper.mapType(kotlinReturnType);
+                    } else {
+                        bridgeReturnType = bridge.getReturnType();
+                    }
+
+                    StackValue.onStack(delegate.getReturnType()).put(bridgeReturnType, this);
                     setLambdaInlining(false);
                     addInlineMarker(this, false);
                     mapper.endMapping();
