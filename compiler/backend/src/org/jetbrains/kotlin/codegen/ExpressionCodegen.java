@@ -338,13 +338,15 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
 
         boolean putMarker = false;
         KotlinType expressionType = null;
-        if (expr instanceof KtExpression &&
-            !(expr instanceof KtIfExpression) &&
-            !(expr instanceof KtCallExpression)) {
+        if (!(context instanceof InlineLambdaContext)) {
+            if (expr instanceof KtExpression &&
+                !(expr instanceof KtIfExpression) &&
+                !(expr instanceof KtCallExpression)) {
 
-            expressionType = expressionJetType((KtExpression) expr);
-            if (expressionType != null && TypeUtils.isAnyfiedTypeParameter(expressionType)) {
-                putMarker = true;
+                expressionType = expressionJetType((KtExpression) expr);
+                if (expressionType != null && TypeUtils.isAnyfiedTypeParameter(expressionType)) {
+                    putMarker = true;
+                }
             }
         }
 
@@ -1971,7 +1973,7 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
                     InlineCodegenUtil.generateGlobalReturnFlag(v, nonLocalReturn.labelName);
                 }
 
-                if (returnKotlinType != null) {
+                if (returnKotlinType != null && !(context instanceof InlineLambdaContext)) {
                     putAnyfiedOperationMarkerIfTypeIsReifiedParameter(returnKotlinType, AnyfiedTypeInliner.OperationKind.ARETURN);
                 }
                 v.visitInsn(returnType.getOpcode(Opcodes.IRETURN));
