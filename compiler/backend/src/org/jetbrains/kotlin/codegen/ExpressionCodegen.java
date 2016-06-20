@@ -370,6 +370,24 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
                 }
             });
         } else {
+            DeclarationDescriptor descriptor = null;
+            if (value instanceof StackValue.Field) {
+                descriptor = ((StackValue.Field) value).descriptor;
+            }
+
+            if (value instanceof StackValueWithLeaveTask) {
+                StackValue stackValue = ((StackValueWithLeaveTask) value).getStackValue();
+                if (stackValue instanceof StackValue.Field) {
+                    descriptor = ((StackValue.Field) stackValue).descriptor;
+                }
+            }
+
+            if (descriptor instanceof VariableDescriptor) {
+                putAnyfiedOperationMarkerIfTypeIsReifiedParameter(
+                        ((VariableDescriptor) descriptor).getType(),
+                        AnyfiedTypeInliner.OperationKind.AALOAD);
+            }
+
             value.put(type, v);
         }
     }
