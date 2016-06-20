@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package org.jetbrains.kotlin.codegen.inline
 
 import org.jetbrains.kotlin.codegen.StackValue
+import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.org.objectweb.asm.Type
 import java.util.*
 
@@ -38,6 +39,10 @@ internal class ParametersBuilder private constructor() {
 
     fun addNextParameter(type: Type, skipped: Boolean): ParameterInfo {
         return addParameter(ParameterInfo(type, skipped, nextValueParameterIndex, null, valueAndHiddenParams.size))
+    }
+
+    fun addNextParameter(type: Type, skipped: Boolean, kotlinType: KotlinType?): ParameterInfo {
+        return addParameter(ParameterInfo(type, skipped, nextValueParameterIndex, null, valueAndHiddenParams.size, kotlinType))
     }
 
     fun addNextValueParameter(type: Type, skipped: Boolean, remapValue: StackValue?, parameterIndex: Int): ParameterInfo {
