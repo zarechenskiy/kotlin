@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ package org.jetbrains.kotlin.codegen.inline;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.kotlin.codegen.StackValue;
+import org.jetbrains.kotlin.descriptors.DeclarationDescriptor;
+import org.jetbrains.kotlin.types.KotlinType;
 import org.jetbrains.org.objectweb.asm.Type;
 
 class ParameterInfo {
@@ -33,16 +35,31 @@ class ParameterInfo {
     //in case when parameter could be extracted from outer context (e.g. from local var)
     private StackValue remapValue;
 
+    private final KotlinType kotlinType;
+
+    public ParameterInfo(@NotNull Type type, boolean skipped, int index, int remapValue, int declarationIndex, KotlinType kotlinType) {
+        this(type, skipped, index, remapValue == -1 ? null : StackValue.local(remapValue, type), declarationIndex, kotlinType);
+    }
+
     public ParameterInfo(@NotNull Type type, boolean skipped, int index, int remapValue, int declarationIndex) {
-        this(type, skipped, index, remapValue == -1 ? null : StackValue.local(remapValue, type), declarationIndex);
+        this(type, skipped, index, remapValue == -1 ? null : StackValue.local(remapValue, type), declarationIndex, null);
     }
 
     public ParameterInfo(@NotNull Type type, boolean skipped, int index, @Nullable StackValue remapValue, int declarationIndex) {
+        this(type, skipped, index, remapValue, declarationIndex, null);
+    }
+
+    public ParameterInfo(@NotNull Type type, boolean skipped, int index, @Nullable StackValue remapValue, int declarationIndex, KotlinType kotlinType) {
         this.type = type;
         this.isSkipped = skipped;
         this.remapValue = remapValue;
         this.index = index;
         this.declarationIndex = declarationIndex;
+        this.kotlinType = kotlinType;
+    }
+
+    public KotlinType getKotlinType() {
+        return kotlinType;
     }
 
     public boolean isSkippedOrRemapped() {
