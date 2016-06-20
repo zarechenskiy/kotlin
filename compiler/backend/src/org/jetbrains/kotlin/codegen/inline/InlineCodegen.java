@@ -20,6 +20,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.ArrayUtil;
+import kotlin.Pair;
 import kotlin.jvm.functions.Function0;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,7 +30,6 @@ import org.jetbrains.kotlin.codegen.*;
 import org.jetbrains.kotlin.codegen.binding.CodegenBinding;
 import org.jetbrains.kotlin.codegen.context.*;
 import org.jetbrains.kotlin.codegen.intrinsics.IntrinsicArrayConstructorsKt;
-import org.jetbrains.kotlin.codegen.signature.JvmSignatureWriter;
 import org.jetbrains.kotlin.codegen.state.GenerationState;
 import org.jetbrains.kotlin.codegen.state.KotlinTypeMapper;
 import org.jetbrains.kotlin.descriptors.*;
@@ -54,6 +54,7 @@ import org.jetbrains.kotlin.resolve.scopes.MemberScope;
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedCallableMemberDescriptor;
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedSimpleFunctionDescriptor;
 import org.jetbrains.kotlin.types.KotlinType;
+import org.jetbrains.kotlin.types.TypeUtils;
 import org.jetbrains.kotlin.types.expressions.DoubleColonLHS;
 import org.jetbrains.kotlin.types.expressions.LabelResolver;
 import org.jetbrains.org.objectweb.asm.Label;
@@ -693,7 +694,7 @@ public class InlineCodegen extends CallGenerator {
                 info.setRemapValue(remappedValue);
             }
             else {
-                Type mappedParameter = mapParameter(parameterIndex);
+                Type mappedParameter = mapParameter(parameterIndex).getFirst();
                 Type parameterType;
                 if (mappedParameter != null) {
                     parameterType = mappedParameter;
@@ -759,6 +760,12 @@ public class InlineCodegen extends CallGenerator {
             if (!info.isSkippedOrRemapped()) {
                 Type type = info.type;
                 StackValue.Local local = StackValue.local(index[i], type);
+
+                KotlinType kotlinType = info.getKotlinType();
+                if (kotlinType != null && !AsmUtil.isPrimitive(type) && TypeUtils.isAnyfiedTypeParameter(kotlinType)) {
+                    codegen.putAnyfiedOperationMarkerIfTypeIsReifiedParameter(kotlinType);
+                }
+
                 local.store(StackValue.onStack(type), codegen.v);
                 if (info instanceof CapturedParamInfo) {
                     info.setRemapValue(local);
@@ -780,9 +787,9 @@ public class InlineCodegen extends CallGenerator {
             }
 
             if (param.getKind() == JvmMethodParameterKind.RECEIVER) {
-                Type mappedReceiverType = mapReceiverType();
+                Pair<Type, KotlinType> mappedReceiverType = mapReceiverType();
                 if (mappedReceiverType != null) {
-                    invocationParamBuilder.addNextParameter(mappedReceiverType, false);
+                    invocationParamBuilder.addNextParameter(mappedReceiverType.getFirst(), false, mappedReceiverType.getSecond());
                     continue;
                 }
             }
@@ -795,7 +802,7 @@ public class InlineCodegen extends CallGenerator {
         recordParameterValueInLocalVal(hiddenParameters.toArray(new ParameterInfo[hiddenParameters.size()]));
     }
 
-    private Type mapReceiverType() {
+    private Pair<Type, KotlinType> mapReceiverType() {
         ReceiverParameterDescriptor receiver = functionDescriptor.getExtensionReceiverParameter();
         if (receiver == null) {
             throw new IllegalStateException("There is no corresponding descriptor for receiver parameter");
@@ -804,12 +811,12 @@ public class InlineCodegen extends CallGenerator {
         return mapParameter(receiver);
     }
 
-    private Type mapParameter(int parameterIndex) {
+    private Pair<Type, KotlinType> mapParameter(int parameterIndex) {
         ValueParameterDescriptor parameterDescriptor = functionDescriptor.getValueParameters().get(parameterIndex);
         return mapParameter(parameterDescriptor);
     }
 
-    private Type mapParameter(@Nullable  ParameterDescriptor parameterDescriptor) {
+    private Pair<Type, KotlinType> mapParameter(@Nullable  ParameterDescriptor parameterDescriptor) {
         if (parameterDescriptor == null) {
             throw new IllegalStateException("There is no corresponding descriptor for parameterDescriptor parameter");
         }
@@ -822,7 +829,7 @@ public class InlineCodegen extends CallGenerator {
             return null;
         }
 
-        return typeMapper.mapType(parameterDescriptor.getType(), typeParameterMappings);
+        return new Pair<Type, KotlinType>(typeMapper.mapType(parameterDescriptor.getType(), typeParameterMappings), parameterDescriptor.getType());
     }
 
     private void leaveTemps() {
