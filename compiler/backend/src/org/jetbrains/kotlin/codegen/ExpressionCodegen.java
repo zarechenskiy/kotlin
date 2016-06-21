@@ -352,7 +352,8 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
         if (!(context instanceof InlineLambdaContext)) {
             if (expr instanceof KtExpression &&
                 !(expr instanceof KtIfExpression) &&
-                !(expr instanceof KtCallExpression)) {
+                !(expr instanceof KtCallExpression) &&
+                !(expr instanceof KtBlockExpression)) {
 
                 expressionType = expressionJetType((KtExpression) expr);
                 if (expressionType != null && TypeUtils.isAnyfiedTypeParameter(expressionType)) {
