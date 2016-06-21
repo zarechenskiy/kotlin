@@ -2801,9 +2801,11 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
 
         Callable callable = resolveToCallable(fd, superCallTarget != null, resolvedCall);
         KotlinType returnType = fd.getOriginal().getReturnType();
-        if (fd.isInline() && returnType != null && isExtractedTypeAnyfied(returnType)) {
+        if (returnType != null &&
+            (isExtractedTypeAnyfied(returnType) &&
+             (fd.isInline() || isInvokeOnLambda(callable)))) {
             KotlinType substitutedReturnType = fd.getReturnType();
-            if (substitutedReturnType != null) {
+            if (substitutedReturnType != null && KotlinBuiltIns.isPrimitiveValueType(substitutedReturnType)) {
                 return callable.invokeMethodWithArgumentsAndSpecializedReturnType(resolvedCall, receiver, this,
                                                                                   typeMapper.mapType(substitutedReturnType));
             }
