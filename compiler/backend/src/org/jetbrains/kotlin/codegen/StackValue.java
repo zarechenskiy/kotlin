@@ -520,6 +520,16 @@ public abstract class StackValue {
             ExpressionCodegen codegen,
             @Nullable Callable callableMethod
     ) {
+        return receiverWithTask(resolvedCall, receiver, codegen, callableMethod, null);
+    }
+
+    public static StackValue receiverWithTask(
+            ResolvedCall<?> resolvedCall,
+            StackValue receiver,
+            ExpressionCodegen codegen,
+            @Nullable Callable callableMethod,
+            @Nullable Function1<KotlinType, Unit> task
+    ) {
         ReceiverValue callDispatchReceiver = resolvedCall.getDispatchReceiver();
         CallableDescriptor descriptor = resolvedCall.getResultingDescriptor();
         if (descriptor instanceof SyntheticFieldDescriptor) {
@@ -550,7 +560,13 @@ public abstract class StackValue {
             StackValue extensionReceiver = genReceiver(receiver, codegen, resolvedCall, callableMethod, callExtensionReceiver, true);
             Type type = CallReceiver.calcType(resolvedCall, dispatchReceiverParameter, extensionReceiverParameter, codegen.typeMapper, callableMethod, codegen.getState());
             assert type != null : "Could not map receiver type for " + resolvedCall;
-            return new CallReceiver(dispatchReceiver, extensionReceiver, type);
+            KotlinType extensionReceiverType;
+            if (extensionReceiverParameter != null) {
+                extensionReceiverType = extensionReceiverParameter.getType();
+            } else {
+                extensionReceiverType = null;
+            }
+            return new CallReceiver(dispatchReceiver, extensionReceiver, type, extensionReceiverType, task);
         }
         return receiver;
     }
@@ -606,7 +622,7 @@ public abstract class StackValue {
     public static StackValue receiverWithoutReceiverArgument(StackValue receiverWithParameter) {
         if (receiverWithParameter instanceof CallReceiver) {
             CallReceiver callReceiver = (CallReceiver) receiverWithParameter;
-            return new CallReceiver(callReceiver.dispatchReceiver, none(), callReceiver.type);
+            return new CallReceiver(callReceiver.dispatchReceiver, none(), callReceiver.type, null, null);
         }
         return receiverWithParameter;
     }
@@ -1528,15 +1544,21 @@ public abstract class StackValue {
     public static class CallReceiver extends StackValue {
         private final StackValue dispatchReceiver;
         private final StackValue extensionReceiver;
+        private final KotlinType extensionReceiverType;
+        private final Function1<KotlinType, Unit> putMetaDataBeforeExtension;
 
         public CallReceiver(
                 @NotNull StackValue dispatchReceiver,
                 @NotNull StackValue extensionReceiver,
-                @NotNull Type type
+                @NotNull Type type,
+                @Nullable KotlinType extensionReceiverType,
+                @Nullable Function1<KotlinType, Unit> extension
         ) {
             super(type, dispatchReceiver.canHaveSideEffects() || extensionReceiver.canHaveSideEffects());
             this.dispatchReceiver = dispatchReceiver;
             this.extensionReceiver = extensionReceiver;
+            this.extensionReceiverType = extensionReceiverType;
+            putMetaDataBeforeExtension = extension;
         }
 
         @Nullable
@@ -1605,6 +1627,9 @@ public abstract class StackValue {
 
             dispatchReceiver.put(hasExtensionReceiver ? dispatchReceiver.type : type, v);
 
+            if (extensionReceiverType != null && putMetaDataBeforeExtension != null) {
+                putMetaDataBeforeExtension.invoke(extensionReceiverType);
+            }
             currentExtensionReceiver
                     .moveToTopOfStack(hasExtensionReceiver ? type : currentExtensionReceiver.type, v, dispatchReceiver.type.getSize());
         }
