@@ -21,12 +21,16 @@ import com.intellij.util.ArrayUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns;
+import org.jetbrains.kotlin.codegen.AsmUtil;
 import org.jetbrains.kotlin.codegen.ClosureCodegen;
+import org.jetbrains.kotlin.codegen.ExpressionCodegen;
 import org.jetbrains.kotlin.codegen.StackValue;
 import org.jetbrains.kotlin.codegen.intrinsics.IntrinsicMethods;
 import org.jetbrains.kotlin.codegen.optimization.FixStackWithLabelNormalizationMethodTransformer;
 import org.jetbrains.kotlin.codegen.state.KotlinTypeMapper;
+import org.jetbrains.kotlin.descriptors.ParameterDescriptor;
 import org.jetbrains.kotlin.types.KotlinType;
+import org.jetbrains.kotlin.types.TypeUtils;
 import org.jetbrains.kotlin.utils.SmartList;
 import org.jetbrains.kotlin.utils.SmartSet;
 import org.jetbrains.org.objectweb.asm.Label;
@@ -224,7 +228,13 @@ public class MethodInliner {
                     }
 
                     int valueParamShift = Math.max(getNextLocalIndex(), markerShift);//NB: don't inline cause it changes
-                    putStackValuesIntoLocals(info.getInvokeParamsWithoutCaptured(), valueParamShift, this, desc, info.getValueParamsMask());
+                    putStackValuesIntoLocals(
+                            info.getInvokeParamsWithoutCaptured(),
+                            valueParamShift,
+                            this,
+                            desc,
+                            info.getValueParamsMask(),
+                            info.getFunctionAsmParams());
 
                     addInlineMarker(this, true);
                     Parameters lambdaParameters = info.addAllParameters(nodeRemapper);
@@ -740,7 +750,8 @@ public class MethodInliner {
             int shift,
             @NotNull InstructionAdapter iv,
             @NotNull String descriptor,
-            @NotNull List<Boolean> valueParamsMask
+            @NotNull List<Boolean> valueParamsMask,
+            @NotNull List<ParameterDescriptor> parameters
     ) {
         Type[] actualParams = Type.getArgumentTypes(descriptor);
         assert actualParams.length == directOrder.size() : "Number of expected and actual params should be equals!";
@@ -758,6 +769,11 @@ public class MethodInliner {
             Type typeOnStack = actualParams[--index];
             if (!typeOnStack.equals(next) && !valueParamsMask.get(index)) {
                 StackValue.onStack(typeOnStack).put(next, iv);
+            }
+
+            KotlinType kotlinType = parameters.get(index).getType();
+            if (!AsmUtil.isPrimitive(next) && TypeUtils.isAnyfiedTypeParameter(kotlinType)) {
+                ExpressionCodegen.putIntrinsicMarkerForSpecialization(iv, kotlinType);
             }
             iv.store(shift, next);
         }

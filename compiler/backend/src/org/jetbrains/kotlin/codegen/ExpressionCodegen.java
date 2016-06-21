@@ -4528,6 +4528,20 @@ The "returned" value of try expression with no finally is either the last expres
         }
     }
 
+    public static void putIntrinsicMarkerForSpecialization(InstructionAdapter v, KotlinType type) {
+        TypeParameterDescriptor parameterDescriptor = TypeUtils.getTypeParameterDescriptorOrNull(type);
+        if (parameterDescriptor == null) {
+            return;
+        }
+
+        v.iconst(0);
+        v.visitLdcInsn(parameterDescriptor.getName().asString());
+        v.invokestatic(
+                IntrinsicMethods.INTRINSICS_CLASS_NAME, TypeSpecializationKind.ANYFICATION.getSpecializationMarkerOperation(),
+                Type.getMethodDescriptor(Type.VOID_TYPE, Type.INT_TYPE, Type.getType(String.class)), false
+        );
+    }
+
     public void propagateChildReifiedTypeParametersUsages(@NotNull ReifiedTypeParametersUsages usages) {
         parentCodegen.getReifiedTypeParametersUsages().propagateChildUsagesWithinContext(usages, context);
     }
