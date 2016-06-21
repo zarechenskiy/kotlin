@@ -2903,10 +2903,12 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
 
         List<Type> originalParameterTypes = callableMethod.getValueParameterTypes();
         List<Type> mappedTypes = new ArrayList<Type>(originalParameterTypes);
-        if (callGenerator instanceof InlineCodegen) {
+        if (callGenerator instanceof InlineCodegen || isInvokeOnLambda(callableMethod)) {
             for (int i = 0; i < descriptor.getValueParameters().size(); i++) {
                 ValueParameterDescriptor parameterDescriptor = descriptor.getValueParameters().get(i);
-                if (TypeUtils.isAnyfiedTypeParameter(parameterDescriptor.getOriginal().getType())) { // TODO: check for value type!!
+                KotlinType kotlinType = parameterDescriptor.getOriginal().getType();
+                if (TypeUtils.isAnyfiedTypeParameter(kotlinType) ||
+                    KotlinBuiltIns.isPrimitiveValueType(parameterDescriptor.getType())) { // TODO: check for value type!!
                     mappedTypes.set(i, typeMapper.mapType(parameterDescriptor.getType()));
                 }
             }
@@ -2916,6 +2918,17 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
                                                                              mappedTypes);
 
         invokeMethodWithArguments(callableMethod, resolvedCall, receiver, callGenerator, argumentGenerator);
+    }
+
+    private static boolean isInvokeOnLambda(Callable callableMethod) {
+        if (callableMethod instanceof CallableMethod) {
+            String internalName = callableMethod.getOwner().getInternalName();
+            String name = ((CallableMethod) callableMethod).getAsmMethod().getName();
+
+            return InlineCodegenUtil.isInvokeOnLambda(internalName, name);
+        }
+
+        return false;
     }
 
     public void invokeMethodWithArguments(
