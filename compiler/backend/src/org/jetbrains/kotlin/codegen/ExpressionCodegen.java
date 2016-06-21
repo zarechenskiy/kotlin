@@ -2931,7 +2931,15 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
         }
         boolean isConstructor = resolvedCall.getResultingDescriptor() instanceof ConstructorDescriptor;
         if (!isConstructor) { // otherwise already
-            receiver = StackValue.receiver(resolvedCall, receiver, this, callableMethod);
+            receiver = StackValue.receiverWithTask(resolvedCall, receiver, this, callableMethod, new Function1<KotlinType, Unit>() {
+                @Override
+                public Unit invoke(KotlinType kotlinType) {
+                    putAnyfiedOperationMarkerIfTypeIsReifiedParameter(kotlinType);
+
+                    return Unit.INSTANCE;
+                }
+            });
+            ReceiverValue extensionReceiver = resolvedCall.getExtensionReceiver();
             receiver.put(receiver.type, v);
             callableMethod.afterReceiverGeneration(v);
         }
