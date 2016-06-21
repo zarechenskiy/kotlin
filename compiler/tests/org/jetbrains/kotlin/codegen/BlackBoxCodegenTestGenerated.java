@@ -15484,9 +15484,27 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
                 doTest(fileName);
             }
 
+            @TestMetadata("doubleArrayAssignment.kt")
+            public void testDoubleArrayAssignment() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/arrays/doubleArrayAssignment.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("extensionAsParameter.kt")
+            public void testExtensionAsParameter() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/arrays/extensionAsParameter.kt");
+                doTest(fileName);
+            }
+
             @TestMetadata("getElementFromArray.kt")
             public void testGetElementFromArray() throws Exception {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/arrays/getElementFromArray.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("getFromArrayReceiver.kt")
+            public void testGetFromArrayReceiver() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/arrays/getFromArrayReceiver.kt");
                 doTest(fileName);
             }
 
@@ -15505,6 +15523,30 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
             @TestMetadata("returnArrayElement.kt")
             public void testReturnArrayElement() throws Exception {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/arrays/returnArrayElement.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("storeIntoArray.kt")
+            public void testStoreIntoArray() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/arrays/storeIntoArray.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("storeIntoReceiverArray.kt")
+            public void testStoreIntoReceiverArray() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/arrays/storeIntoReceiverArray.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("storeTransformed.kt")
+            public void testStoreTransformed() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/arrays/storeTransformed.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("storeTransformedReceiver.kt")
+            public void testStoreTransformedReceiver() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/arrays/storeTransformedReceiver.kt");
                 doTest(fileName);
             }
         }
@@ -15532,6 +15574,12 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
             @TestMetadata("anyfiedRun.kt")
             public void testAnyfiedRun() throws Exception {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/functions/anyfiedRun.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("anyfiedToValue.kt")
+            public void testAnyfiedToValue() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/functions/anyfiedToValue.kt");
                 doTest(fileName);
             }
 
@@ -15565,6 +15613,24 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
                 doTest(fileName);
             }
 
+            @TestMetadata("boxedNullableValue.kt")
+            public void testBoxedNullableValue() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/functions/boxedNullableValue.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("explicitReturnInLambda.kt")
+            public void testExplicitReturnInLambda() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/functions/explicitReturnInLambda.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("ifExpressionInLambda.kt")
+            public void testIfExpressionInLambda() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/functions/ifExpressionInLambda.kt");
+                doTest(fileName);
+            }
+
             @TestMetadata("lambdaWithDifferentReturnType.kt")
             public void testLambdaWithDifferentReturnType() throws Exception {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/functions/lambdaWithDifferentReturnType.kt");
@@ -15580,6 +15646,18 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
             @TestMetadata("letAnyfied.kt")
             public void testLetAnyfied() throws Exception {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/functions/letAnyfied.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("localVarInLambda.kt")
+            public void testLocalVarInLambda() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/functions/localVarInLambda.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("nullableValueAfterCheck.kt")
+            public void testNullableValueAfterCheck() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/functions/nullableValueAfterCheck.kt");
                 doTest(fileName);
             }
 
@@ -15616,6 +15694,18 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
             @TestMetadata("simpleLambdaWithoutReturnType.kt")
             public void testSimpleLambdaWithoutReturnType() throws Exception {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/functions/simpleLambdaWithoutReturnType.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("valueToAnyfied.kt")
+            public void testValueToAnyfied() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/functions/valueToAnyfied.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("valueToValue.kt")
+            public void testValueToValue() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/functions/valueToValue.kt");
                 doTest(fileName);
             }
 

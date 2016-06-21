@@ -5,9 +5,11 @@ inline fun <@Anyfied T> Array<T>.takeArray(): T {
 }
 
 fun box(): String {
-    val k = intArrayOf(1) as Array<vInt>
+    val el = 1
+    val k = intArrayOf(el) as Array<vInt>
     val p = k.takeArray()
-    return "OK"
+
+    return if (p == (el as vInt)) "OK" else "Fail: $p not equals $el"
 }
 
 // 1 IASTORE
