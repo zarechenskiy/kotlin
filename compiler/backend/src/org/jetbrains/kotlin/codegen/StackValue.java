@@ -885,6 +885,9 @@ public abstract class StackValue {
         public void putSelector(
                 @NotNull Type type, @NotNull InstructionAdapter v
         ) {
+            if (putMetadata != null) {
+                putMetadata.invoke();
+            }
             v.aload(this.type);    // assumes array and index are on the stack
             coerceTo(type, v);
         }
