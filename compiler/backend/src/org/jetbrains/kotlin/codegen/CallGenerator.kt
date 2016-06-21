@@ -57,10 +57,15 @@ abstract class CallGenerator {
                 parameterType: Type,
                 parameterIndex: Int) {
             val value = codegen.gen(argumentExpression)
+
+
             if (TypeUtils.isAnyfiedTypeParameter(valueParameterDescriptor.type)) {
-                codegen.putAnyfiedOperationMarkerIfTypeIsReifiedParameter(valueParameterDescriptor.type)
+                value.put(parameterType, codegen.v) {
+                    codegen.putAnyfiedOperationMarkerIfTypeIsReifiedParameter(valueParameterDescriptor.type)
+                }
+            } else {
+                value.put(parameterType, codegen.v)
             }
-            value.put(parameterType, codegen.v)
         }
 
         override fun putCapturedValueOnStack(

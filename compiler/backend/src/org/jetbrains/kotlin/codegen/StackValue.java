@@ -227,7 +227,12 @@ public abstract class StackValue {
 
     @NotNull
     public static StackValue arrayElement(@NotNull Type type, StackValue array, StackValue index) {
-        return new ArrayElement(type, array, index);
+        return arrayElement(type, array, index, null);
+    }
+
+    @NotNull
+    public static StackValue arrayElement(@NotNull Type type, StackValue array, StackValue index, @Nullable Function0<Unit> putMetadata) {
+        return new ArrayElement(type, array, index, putMetadata);
     }
 
     @NotNull
@@ -839,15 +844,21 @@ public abstract class StackValue {
 
     private static class ArrayElement extends StackValueWithSimpleReceiver {
         private final Type type;
+        private final Function0<Unit> putMetadata;
 
-        public ArrayElement(Type type, StackValue array, StackValue index) {
+        public ArrayElement(Type type, StackValue array, StackValue index, Function0<Unit> putMetadata) {
             super(type, false, false, new Receiver(Type.LONG_TYPE, array, index), true);
             this.type = type;
+            this.putMetadata = putMetadata;
         }
 
         @Override
         public void storeSelector(@NotNull Type topOfStackType, @NotNull InstructionAdapter v) {
             coerceFrom(topOfStackType, v);
+
+            if (putMetadata != null) {
+                putMetadata.invoke();
+            }
             v.astore(this.type);
         }
 
