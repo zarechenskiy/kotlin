@@ -136,6 +136,9 @@ public abstract class StackValue {
         //if you have it inherit StackValueWithSimpleReceiver
     }
 
+    public void setReceiverMetadata(@Nullable Function0<Unit> putMetadata) {
+    }
+
     public void dup(@NotNull InstructionAdapter v, boolean withReceiver) {
         if (!Type.VOID_TYPE.equals(type)) {
             AsmUtil.dup(v, type);
@@ -677,7 +680,8 @@ public abstract class StackValue {
 
     public static class Local extends StackValue {
         public final int index;
-        private final Function0<Unit> putMetadata;
+
+        private Function0<Unit> putMetadata;
 
         private Local(int index, Type type, Function0<Unit> putMetadata) {
             super(type, false);
@@ -703,6 +707,10 @@ public abstract class StackValue {
         public void storeSelector(@NotNull Type topOfStackType, @NotNull InstructionAdapter v) {
             coerceFrom(topOfStackType, v);
             v.store(index, this.type);
+        }
+
+        public void setMetadata(@Nullable Function0<Unit> putMetadata) {
+            this.putMetadata = putMetadata;
         }
     }
 
@@ -1193,6 +1201,14 @@ public abstract class StackValue {
         public void putSelector(@NotNull Type type, @NotNull InstructionAdapter v) {
             v.visitFieldInsn(isStaticPut ? GETSTATIC : GETFIELD, owner.getInternalName(), name, this.type.getDescriptor());
             coerceTo(type, v);
+        }
+
+        @Override
+        public void setReceiverMetadata(@Nullable Function0<Unit> putMetadata) {
+            if (receiver instanceof Local) {
+                ((Local) receiver).setMetadata(putMetadata);
+            }
+            super.setReceiverMetadata(putMetadata);
         }
 
         @Override
