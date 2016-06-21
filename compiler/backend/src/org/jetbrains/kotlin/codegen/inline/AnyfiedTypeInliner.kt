@@ -42,7 +42,7 @@ class AnyfiedTypeInliner(parametersMapping: TypeParameterMappings?) : TypeSpecia
     }
 
     override fun processInstruction(insn: MethodInsnNode, instructions: InsnList, asmType: Type, kotlinType: KotlinType): Boolean {
-        val operationKind = insn.anyfiedOperationKindByNextOperation ?: return false
+        val operationKind = insn.anyfiedOperationKindByNextOperation ?: return true
 
         val isValueType = KotlinBuiltIns.isPrimitiveValueType(kotlinType)
         if (!isValueType) return true
