@@ -30,6 +30,7 @@ import org.jetbrains.kotlin.psi.KtCallableReferenceExpression;
 import org.jetbrains.kotlin.descriptors.ClassDescriptor;
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor;
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor;
+import org.jetbrains.kotlin.descriptors.*;
 import org.jetbrains.kotlin.psi.KtExpression;
 import org.jetbrains.kotlin.psi.KtLambdaExpression;
 import org.jetbrains.kotlin.resolve.BindingContext;
@@ -186,6 +187,20 @@ public class LambdaInfo implements LabelOwner {
         }
 
         return mask;
+    }
+
+    public List<ParameterDescriptor> getFunctionAsmParams() {
+        List<ParameterDescriptor> parameters = new ArrayList<ParameterDescriptor>();
+        ReceiverParameterDescriptor receiverParameter = functionDescriptor.getExtensionReceiverParameter();
+        if (receiverParameter != null) {
+            parameters.add(receiverParameter);
+        }
+
+        for (ValueParameterDescriptor descriptor : functionDescriptor.getValueParameters()) {
+            parameters.add(descriptor);
+        }
+
+        return parameters;
     }
 
     @NotNull
