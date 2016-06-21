@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,17 @@ package org.jetbrains.kotlin.codegen.intrinsics
 import org.jetbrains.kotlin.codegen.AsmUtil.correctElementType
 import org.jetbrains.kotlin.codegen.Callable
 import org.jetbrains.kotlin.codegen.CallableMethod
+import org.jetbrains.kotlin.codegen.ExpressionCodegen
+import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
 
 class ArrayGet : IntrinsicMethod() {
-    override fun toCallable(method: CallableMethod): Callable =
+    override fun toCallable(method: CallableMethod, isSuper: Boolean, resolvedCall: ResolvedCall<*>): Callable =
             createIntrinsicCallable(method) {
                 val type = correctElementType(calcReceiverType())
+                val returnKotlinType = resolvedCall.resultingDescriptor.returnType
+                if (returnKotlinType != null && ExpressionCodegen.isExtractedTypeAnyfied(returnKotlinType)) {
+                    ExpressionCodegen.putIntrinsicMarkerForSpecialization(it, returnKotlinType)
+                }
                 it.aload(type)
             }
 }
