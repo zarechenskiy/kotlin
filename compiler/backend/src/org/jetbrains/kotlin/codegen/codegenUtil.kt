@@ -138,6 +138,15 @@ fun generateALoad(
     }
 }
 
+fun generateAStore(
+        v: InstructionAdapter,
+        asmType: Type
+) {
+    with(v) {
+        astore(asmType)
+    }
+}
+
 
 fun generateAReturn(
         v: InstructionAdapter,

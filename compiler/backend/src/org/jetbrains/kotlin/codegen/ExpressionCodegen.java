@@ -2241,7 +2241,7 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
 
     private StackValue stackValueForLocal(DeclarationDescriptor descriptor, int index) {
         if (descriptor instanceof VariableDescriptor) {
-            VariableDescriptor variableDescriptor = (VariableDescriptor) descriptor;
+            final VariableDescriptor variableDescriptor = (VariableDescriptor) descriptor;
 
             Type sharedVarType = typeMapper.getSharedVarType(descriptor);
             Type varType = getVariableTypeNoSharing(variableDescriptor);
@@ -2249,7 +2249,18 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
                 return StackValue.shared(index, varType);
             }
             else {
-                return adjustVariableValue(StackValue.local(index, varType), variableDescriptor);
+                Function0<Unit> putMetadata = null;
+                final KotlinType variableDescriptorType = variableDescriptor.getType();
+                if (TypeUtils.isAnyfiedTypeParameter(variableDescriptorType)) {
+                    putMetadata = new Function0<Unit>() {
+                        @Override
+                        public Unit invoke() {
+                            putAnyfiedOperationMarkerIfTypeIsReifiedParameter(variableDescriptorType);
+                            return Unit.INSTANCE;
+                        }
+                    };
+                }
+                return adjustVariableValue(StackValue.local(index, varType, putMetadata), variableDescriptor);
             }
         }
         else {
