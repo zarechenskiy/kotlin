@@ -4115,22 +4115,27 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
 
         Type varType = getVariableTypeNoSharing(variableDescriptor);
 
+        Function0<Unit> putMetadata = null;
+        final KotlinType variableType = variableDescriptor.getType();
+        if (TypeUtils.isAnyfiedTypeParameter(variableType)) {
+            putMetadata = new Function0<Unit>() {
+                @Override
+                public Unit invoke() {
+                    putAnyfiedOperationMarkerIfTypeIsReifiedParameter(variableType);
+                    return Unit.INSTANCE;
+                }
+            };
+        }
         StackValue storeTo = sharedVarType == null ? StackValue.local(index, varType) : StackValue.shared(index, varType);
 
         storeTo.putReceiver(v, false);
 
-        initializer.put(initializer.type, v, new Function0<Unit>() {
-            @Override
-            public Unit invoke() {
-                // TODO: if array?
-                putAnyfiedOperationMarkerIfTypeIsReifiedParameter(variableDescriptor.getType(), AnyfiedTypeInliner.OperationKind.ALOAD);
-                return null;
-            }
-        });
+        initializer.setReceiverMetadata(putMetadata);
+        initializer.put(initializer.type, v);
 
         markLineNumber(variableDeclaration, false);
 
-        putAnyfiedOperationMarkerIfTypeIsReifiedParameter(variableDescriptor.getType(), AnyfiedTypeInliner.OperationKind.ASTORE);
+        putAnyfiedOperationMarkerIfTypeIsReifiedParameter(variableType, AnyfiedTypeInliner.OperationKind.ASTORE);
         storeTo.storeSelector(initializer.type, v);
 
         if (isDelegatedLocalVariable(variableDescriptor)) {
