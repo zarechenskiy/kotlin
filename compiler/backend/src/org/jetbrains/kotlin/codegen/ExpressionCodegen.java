@@ -4190,7 +4190,8 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
         if (KotlinBuiltIns.isArray(arrayType)) {
             KotlinType elementJetType = arrayType.getArguments().get(0).getType();
 
-            putAnyfiedOperationMarkerIfTypeIsReifiedParameter(elementJetType, AnyfiedTypeInliner.OperationKind.NEW_ARRAY);
+            KotlinType notNullableComponent = TypeUtils.makeNotNullable(elementJetType);
+            putAnyfiedOperationMarkerIfTypeIsReifiedParameter(notNullableComponent, AnyfiedTypeInliner.OperationKind.NEW_ARRAY);
 
             if (!isExtractedTypeAnyfied(elementJetType)) {
                 putReifiedOperationMarkerIfTypeIsReifiedParameter(
