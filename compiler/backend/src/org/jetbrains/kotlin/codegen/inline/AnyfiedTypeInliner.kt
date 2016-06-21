@@ -29,7 +29,7 @@ class AnyfiedTypeParametersUsages : SpecializedTypeParametersUsages(TypeSpeciali
 
 class AnyfiedTypeInliner(parametersMapping: TypeParameterMappings?) : TypeSpecializer(parametersMapping, TypeSpecializationKind.ANYFICATION) {
     enum class OperationKind {
-        GET, ALOAD, ASTORE, LOCALVARIABLE, AALOAD, ARETURN, IF_ACMP, NEW_ARRAY, COERCION, IF_ICMPLE;
+        GET, ALOAD, ASTORE, LOCALVARIABLE, AALOAD, AASTORE, ARETURN, IF_ACMP, NEW_ARRAY, COERCION, IF_ICMPLE;
 
         val id: Int get() = ordinal
     }
@@ -51,12 +51,27 @@ class AnyfiedTypeInliner(parametersMapping: TypeParameterMappings?) : TypeSpecia
             OperationKind.ALOAD -> processLocalVariableLoad(insn, instructions, asmType, kotlinType)
             OperationKind.ASTORE -> processLocalVariableStore(insn, instructions, asmType, kotlinType)
             OperationKind.AALOAD -> processLoadValueTypeFromArray(insn, instructions, asmType, kotlinType)
+            OperationKind.AASTORE -> processAAStore(insn, instructions, asmType)
             OperationKind.ARETURN -> processReturn(insn, instructions, asmType, kotlinType)
             OperationKind.COERCION -> processCoercion(insn, instructions, asmType, kotlinType)
             OperationKind.IF_ACMP -> processAcmp(insn, instructions, asmType, kotlinType)
             OperationKind.NEW_ARRAY -> processNewArray(insn, instructions, asmType)
             OperationKind.IF_ICMPLE -> true
             else -> false
+        }
+    }
+
+    private fun processAAStore(insn: MethodInsnNode, instructions: InsnList, asmType: Type): Boolean {
+        return rewriteNextTypeInsn(insn, Opcodes.AASTORE) { stub ->
+            if (stub !is InsnNode) return false
+
+            val newMethodNode = MethodNode(InlineCodegenUtil.API)
+            generateAStore(InstructionAdapter(newMethodNode), asmType)
+
+            instructions.insert(insn, newMethodNode.instructions)
+            instructions.remove(stub)
+
+            return true
         }
     }
 
@@ -217,6 +232,7 @@ private val MethodInsnNode.anyfiedOperationKindByNextOperation: AnyfiedTypeInlin
             Opcodes.ARETURN -> AnyfiedTypeInliner.OperationKind.ARETURN
             Opcodes.IF_ICMPLE -> AnyfiedTypeInliner.OperationKind.IF_ICMPLE
             Opcodes.ANEWARRAY -> AnyfiedTypeInliner.OperationKind.NEW_ARRAY
+            Opcodes.AASTORE -> AnyfiedTypeInliner.OperationKind.AASTORE
             else -> null
         }
     }
