@@ -166,7 +166,12 @@ public abstract class StackValue {
 
     @NotNull
     public static Local local(int index, @NotNull Type type) {
-        return new Local(index, type);
+        return local(index, type, null);
+    }
+
+    @NotNull
+    public static Local local(int index, @NotNull Type type, @Nullable Function0<Unit> putMetadata) {
+        return new Local(index, type, putMetadata);
     }
 
     @NotNull
@@ -675,10 +680,12 @@ public abstract class StackValue {
 
     public static class Local extends StackValue {
         public final int index;
+        private final Function0<Unit> putMetadata;
 
-        private Local(int index, Type type) {
+        private Local(int index, Type type, Function0<Unit> putMetadata) {
             super(type, false);
             this.index = index;
+            this.putMetadata = putMetadata;
 
             if (index < 0) {
                 throw new IllegalStateException("local variable index must be non-negative");
@@ -687,6 +694,9 @@ public abstract class StackValue {
 
         @Override
         public void putSelector(@NotNull Type type, @NotNull InstructionAdapter v) {
+            if (putMetadata != null) {
+                putMetadata.invoke();
+            }
             v.load(index, this.type);
             coerceTo(type, v);
             // TODO unbox
