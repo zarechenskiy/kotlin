@@ -674,10 +674,10 @@ public class InlineCodegen extends CallGenerator {
                 info.setRemapValue(remappedValue);
             }
             else {
-                Type mappedParameter = mapParameter(parameterIndex).getFirst();
+                Pair<Type, KotlinType> mappedParameter = mapParameter(parameterIndex);
                 Type parameterType;
                 if (mappedParameter != null) {
-                    parameterType = mappedParameter;
+                    parameterType = mappedParameter.getFirst();
                 } else {
                     parameterType = type;
                 }

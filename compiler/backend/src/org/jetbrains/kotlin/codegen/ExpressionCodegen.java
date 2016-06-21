@@ -4225,8 +4225,19 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
             isInt(operationDescriptor.getValueParameters().get(0).getType())) {
             assert type != null;
             Type elementType;
+
+            Function0<Unit> putMetadata = null;
             if (KotlinBuiltIns.isArray(type)) {
-                KotlinType jetElementType = type.getArguments().get(0).getType();
+                final KotlinType jetElementType = type.getArguments().get(0).getType();
+                if (TypeUtils.isAnyfiedTypeParameter(jetElementType)) {
+                    putMetadata = new Function0<Unit>() {
+                        @Override
+                        public Unit invoke() {
+                            putAnyfiedOperationMarkerIfTypeIsReifiedParameter(jetElementType);
+                            return Unit.INSTANCE;
+                        }
+                    };
+                }
                 elementType = boxType(asmType(jetElementType));
             }
             else {
@@ -4235,7 +4246,7 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
             StackValue arrayValue = genLazy(array, arrayType);
             StackValue index = genLazy(indices.get(0), Type.INT_TYPE);
 
-            return StackValue.arrayElement(elementType, arrayValue, index);
+            return StackValue.arrayElement(elementType, arrayValue, index, putMetadata);
         }
         else {
             ResolvedCall<FunctionDescriptor> resolvedSetCall = bindingContext.get(INDEXED_LVALUE_SET, expression);
