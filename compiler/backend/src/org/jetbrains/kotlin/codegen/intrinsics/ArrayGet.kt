@@ -16,20 +16,25 @@
 
 package org.jetbrains.kotlin.codegen.intrinsics
 
+import org.jetbrains.kotlin.builtins.KotlinBuiltIns
+import org.jetbrains.kotlin.codegen.AsmUtil
 import org.jetbrains.kotlin.codegen.AsmUtil.correctElementType
+import org.jetbrains.kotlin.codegen.AsmUtil.unboxType
 import org.jetbrains.kotlin.codegen.Callable
 import org.jetbrains.kotlin.codegen.CallableMethod
 import org.jetbrains.kotlin.codegen.ExpressionCodegen
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
+import org.jetbrains.org.objectweb.asm.Type
 
 class ArrayGet : IntrinsicMethod() {
     override fun toCallable(method: CallableMethod, isSuper: Boolean, resolvedCall: ResolvedCall<*>): Callable =
             createIntrinsicCallable(method) {
                 val type = correctElementType(calcReceiverType())
                 val returnKotlinType = resolvedCall.resultingDescriptor.returnType
-                if (returnKotlinType != null && ExpressionCodegen.isExtractedTypeAnyfied(returnKotlinType)) {
-                    ExpressionCodegen.putIntrinsicMarkerForSpecialization(it, returnKotlinType)
+                if (returnKotlinType != null && KotlinBuiltIns.isPrimitiveValueType(returnKotlinType)) {
+                    it.aload(Type.INT_TYPE)
+                } else {
+                    it.aload(type)
                 }
-                it.aload(type)
             }
 }
