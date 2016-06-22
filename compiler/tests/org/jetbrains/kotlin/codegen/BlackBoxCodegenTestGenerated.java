@@ -14271,6 +14271,12 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
                 doTest(fileName);
             }
 
+            @TestMetadata("nonAnyfiedFunFromAnyfied.kt")
+            public void testNonAnyfiedFunFromAnyfied() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/functions/nonAnyfiedFunFromAnyfied.kt");
+                doTest(fileName);
+            }
+
             @TestMetadata("nullableValueAfterCheck.kt")
             public void testNullableValueAfterCheck() throws Exception {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/functions/nullableValueAfterCheck.kt");
