@@ -4,7 +4,7 @@ interface WithOne<T> {
     fun test(): T
 }
 
-inline fun <@Anyfied T> testReified(el: T): WithOne<T> {
+inline fun <@Anyfied T> testAnyfied(el: T): WithOne<T> {
     val k = el
     return object : WithOne<T> {
         override fun test(): T {
@@ -14,7 +14,7 @@ inline fun <@Anyfied T> testReified(el: T): WithOne<T> {
 }
 
 fun test(v: vInt) {
-    val testAnyfied = testReified(v)
+    val testAnyfied = testAnyfied(v)
     testAnyfied.test()
 }
 
