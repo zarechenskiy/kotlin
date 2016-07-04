@@ -33,9 +33,13 @@ class ArrayGet : IntrinsicMethod() {
             createIntrinsicCallable(codegen.state.typeMapper.mapToCallableMethod(fd, false)) {
                 val type = correctElementType(calcReceiverType())
                 val returnKotlinType = fd.returnType
-                if (returnKotlinType != null && TypeUtils.isAnyfiedTypeParameter(returnKotlinType)) {
-                    codegen.putAnyfiedOperationMarkerIfTypeIsReifiedParameter(returnKotlinType)
+                if (returnKotlinType != null && KotlinBuiltIns.isPrimitiveValueType(returnKotlinType)) {
+                    it.aload(codegen.state.typeMapper.mapType(returnKotlinType))
+                } else {
+                    if (returnKotlinType != null && TypeUtils.isAnyfiedTypeParameter(returnKotlinType)) {
+                        codegen.putAnyfiedOperationMarkerIfTypeIsReifiedParameter(returnKotlinType)
+                    }
+                    it.aload(type)
                 }
-                it.aload(type)
             }
 }
