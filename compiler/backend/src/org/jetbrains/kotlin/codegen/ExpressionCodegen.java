@@ -4319,7 +4319,10 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
                         }
                     };
                 }
-                elementType = boxType(asmType(jetElementType));
+                elementType = asmType(jetElementType);
+                if (!KotlinBuiltIns.isPrimitiveValueType(jetElementType)) {
+                    elementType = boxType(elementType);
+                }
             }
             else {
                 elementType = correctElementType(arrayType);
