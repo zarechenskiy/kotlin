@@ -15027,6 +15027,12 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
                 doTest(fileName);
             }
 
+            @TestMetadata("createArray.kt")
+            public void testCreateArray() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/arrays/createArray.kt");
+                doTest(fileName);
+            }
+
             @TestMetadata("doubleArrayAssignment.kt")
             public void testDoubleArrayAssignment() throws Exception {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/arrays/doubleArrayAssignment.kt");
