@@ -351,7 +351,8 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
             if (expr instanceof KtExpression &&
                 !(expr instanceof KtIfExpression) &&
                 !(expr instanceof KtCallExpression) &&
-                !(expr instanceof KtBlockExpression)) {
+                !(expr instanceof KtBlockExpression) &&
+                !(expr instanceof KtDotQualifiedExpression)) {
 
                 expressionType = expressionJetType((KtExpression) expr);
                 if (expressionType != null && TypeUtils.isAnyfiedTypeParameter(expressionType)) {
@@ -2904,7 +2905,9 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
             receiver = StackValue.receiverWithTask(resolvedCall, receiver, this, callableMethod, new Function1<KotlinType, Unit>() {
                 @Override
                 public Unit invoke(KotlinType kotlinType) {
-                    putAnyfiedOperationMarkerIfTypeIsReifiedParameter(kotlinType);
+                    if (TypeUtils.isAnyfiedTypeParameter(kotlinType)) {
+                        putAnyfiedOperationMarkerIfTypeIsReifiedParameter(kotlinType);
+                    }
 
                     return Unit.INSTANCE;
                 }
