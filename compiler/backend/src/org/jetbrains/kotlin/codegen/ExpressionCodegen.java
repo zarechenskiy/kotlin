@@ -3085,6 +3085,24 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
         return specializationType;
     }
 
+    public static boolean isArrayOfAnyfiedType(@NotNull KotlinType type) {
+        if (KotlinBuiltIns.isArray(type)) {
+            KotlinType componentType = type.getArguments().get(0).getType();
+            return TypeUtils.isAnyfiedTypeParameter(componentType);
+        }
+
+        return false;
+    }
+
+    public static boolean isArrayOfValueType(@NotNull KotlinType type) {
+        if (KotlinBuiltIns.isArray(type)) {
+            KotlinType componentType = type.getArguments().get(0).getType();
+            return KotlinBuiltIns.isPrimitiveValueType(componentType);
+        }
+
+        return false;
+    }
+
     public static boolean isExtractedTypeAnyfied(@NotNull KotlinType type) {
         return TypeUtils.isAnyfiedTypeParameter(extractSpecializationType(type));
     }
@@ -4451,6 +4469,14 @@ The "returned" value of try expression with no finally is either the last expres
                     putReifiedOperationMarkerIfTypeIsReifiedParameter(rightType,
                                                                       safeAs ? ReifiedTypeInliner.OperationKind.SAFE_AS
                                                                              : ReifiedTypeInliner.OperationKind.AS);
+                    v.checkcast(type);
+                    return Unit.INSTANCE;
+                }
+
+                if (isArrayOfAnyfiedType(rightType)) {
+                    putAnyfiedOperationMarkerIfTypeIsReifiedParameter(rightType,
+                                                                      safeAs ? AnyfiedTypeInliner.OperationKind.SAFE_AS
+                                                                             : AnyfiedTypeInliner.OperationKind.AS);
                     v.checkcast(type);
                     return Unit.INSTANCE;
                 }
