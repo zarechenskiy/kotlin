@@ -774,12 +774,13 @@ public class MethodInliner {
         for (Type next : Lists.reverse(directOrder)) {
             shift -= next.getSize();
             Type typeOnStack = actualParams[--index];
-            if (!typeOnStack.equals(next) && !valueParamsMask.get(index)) {
+            KotlinType kotlinType = parameters.get(index).getType();
+            boolean isAnyfied = TypeUtils.isAnyfiedTypeParameter(kotlinType);
+            if (!typeOnStack.equals(next) && !KotlinBuiltIns.isPrimitiveValueType(kotlinType)) {
                 StackValue.onStack(typeOnStack).put(next, iv);
             }
 
-            KotlinType kotlinType = parameters.get(index).getType();
-            if (!AsmUtil.isPrimitive(next) && TypeUtils.isAnyfiedTypeParameter(kotlinType)) {
+            if (!AsmUtil.isPrimitive(next) && isAnyfied) {
                 ExpressionCodegen.putIntrinsicMarkerForSpecialization(iv, kotlinType);
             }
             iv.store(shift, next);
