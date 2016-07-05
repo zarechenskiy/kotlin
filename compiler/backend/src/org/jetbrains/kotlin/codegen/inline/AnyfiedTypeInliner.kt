@@ -20,6 +20,8 @@ import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.codegen.*
 import org.jetbrains.kotlin.codegen.optimization.common.intConstant
 import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.types.Variance
+import org.jetbrains.kotlin.types.typeUtil.builtIns
 import org.jetbrains.org.objectweb.asm.Opcodes
 import org.jetbrains.org.objectweb.asm.Type
 import org.jetbrains.org.objectweb.asm.commons.InstructionAdapter
@@ -29,23 +31,29 @@ class AnyfiedTypeParametersUsages : SpecializedTypeParametersUsages(TypeSpeciali
 
 class AnyfiedTypeInliner(parametersMapping: TypeParameterMappings?) : TypeSpecializer(parametersMapping, TypeSpecializationKind.ANYFICATION) {
     enum class OperationKind {
-        GET, ALOAD, ASTORE, LOCALVARIABLE, AALOAD, AASTORE, ARETURN, IF_ACMP, NEW_ARRAY, COERCION, IF_ICMPLE;
+        GET, ALOAD, ASTORE, LOCALVARIABLE, AALOAD, AASTORE, ARETURN, IF_ACMP, NEW_ARRAY, COERCION, IF_ICMPLE, AS, SAFE_AS;
 
         val id: Int get() = ordinal
     }
+
+    private var maxStackSize = 0
 
     override fun hasParametersToSpecialize(): Boolean {
         return parametersMapping?.hasAnyfiedParameters() ?: false
     }
 
     override fun correctNodeStack(node: MethodNode) {
+        node.maxStack = node.maxStack + maxStackSize
     }
 
     override fun processInstruction(insn: MethodInsnNode, instructions: InsnList, asmType: Type, kotlinType: KotlinType): Boolean {
-        val operationKind = insn.anyfiedOperationKindByNextOperation ?: return true
+        val operationKind = insn.anyfiedOperationKindByNextOperation ?: run {
+            val operationByPrev = insn.anyfiedOperationKind
+            if (operationByPrev == OperationKind.AS || operationByPrev == OperationKind.SAFE_AS) operationByPrev else null
+        } ?: return true
 
         val isValueType = KotlinBuiltIns.isPrimitiveValueType(kotlinType)
-        if (!isValueType) return true
+        if (!(isValueType || ExpressionCodegen.isArrayOfValueType(kotlinType))) return true
 
         return when (operationKind) {
             OperationKind.ALOAD -> processLocalVariableLoad(insn, instructions, asmType, kotlinType)
@@ -56,9 +64,35 @@ class AnyfiedTypeInliner(parametersMapping: TypeParameterMappings?) : TypeSpecia
             OperationKind.COERCION -> processCoercion(insn, instructions, asmType, kotlinType)
             OperationKind.IF_ACMP -> processAcmp(insn, instructions, asmType, kotlinType)
             OperationKind.NEW_ARRAY -> processNewArray(insn, instructions, asmType)
+            OperationKind.AS -> processAs(insn, instructions, kotlinType, asmType, safe = false)
+            OperationKind.SAFE_AS -> processAs(insn, instructions, kotlinType, asmType, safe = true)
             OperationKind.IF_ICMPLE -> true
             else -> false
         }
+    }
+
+    private fun processAs(
+            insn: MethodInsnNode,
+            instructions: InsnList,
+            kotlinType: KotlinType,
+            asmType: Type,
+            safe: Boolean
+    ) = rewriteNextTypeInsn(insn, Opcodes.CHECKCAST) { stubCheckcast: AbstractInsnNode ->
+        if (stubCheckcast !is TypeInsnNode) return false
+
+        val newMethodNode = MethodNode(InlineCodegenUtil.API)
+
+//        val arrayKotlinType = kotlinType.builtIns.getArrayType(Variance.INVARIANT, kotlinType)
+//        val arrayAsmType = Type.getType("[${asmType.internalName}")
+        generateAsCast(InstructionAdapter(newMethodNode), kotlinType, asmType, safe)
+
+        instructions.insert(insn, newMethodNode.instructions)
+        instructions.remove(stubCheckcast)
+
+        // TODO: refine max stack calculation (it's not always as big as +4)
+        maxStackSize = Math.max(maxStackSize, 4)
+
+        return true
     }
 
     private fun processAAStore(insn: MethodInsnNode, instructions: InsnList, asmType: Type): Boolean {
