@@ -60,21 +60,22 @@ abstract class TypeSpecializer(val parametersMapping: TypeParameterMappings?, va
 
     abstract fun correctNodeStack(node: MethodNode)
 
-    abstract fun processInstruction(insn: MethodInsnNode, instructions: InsnList, asmType: Type, kotlinType: KotlinType): Boolean
+    abstract fun processInstruction(insn: MethodInsnNode, instructions: InsnList, asmType: Type,
+                                    kotlinType: KotlinType, removeMarkers: Boolean = true): Boolean
 
     /**
      * @return set of type parameters' identifiers contained in markers that should be reified further
      * e.g. when we're generating inline function containing reified T
      * and another function containing reifiable parts is inlined into that function
      */
-    fun specializeInstructions(node: MethodNode): SpecializedTypeParametersUsages {
+    fun specializeInstructions(node: MethodNode, removeMarkers: Boolean = true): SpecializedTypeParametersUsages {
         if (!hasParametersToSpecialize()) return SpecializedTypeParametersUsages(specializationKind)
 
         val instructions = node.instructions
         val result = ReifiedTypeParametersUsages()
         for (insn in instructions.toArray()) {
             if (TypeSpecializer.isSpecializationOperationMarker(insn, specializationKind)) {
-                val newName: String? = processSpecializeMarker(insn as MethodInsnNode, instructions)
+                val newName: String? = processSpecializeMarker(insn as MethodInsnNode, instructions, removeMarkers)
                 if (newName != null) {
                     result.addUsedSpecializedParameter(newName)
                 }
@@ -110,7 +111,7 @@ abstract class TypeSpecializer(val parametersMapping: TypeParameterMappings?, va
      * @return new type parameter identifier if this marker should be reified further
      * or null if it shouldn't
      */
-    private fun processSpecializeMarker(insn: MethodInsnNode, instructions: InsnList): String? {
+    private fun processSpecializeMarker(insn: MethodInsnNode, instructions: InsnList, removeMarkers: Boolean = true): String? {
         val reificationArgument = insn.reificationArgument ?: return null
         val mapping = parametersMapping?.get(reificationArgument.parameterName) ?: return null
 
@@ -120,7 +121,7 @@ abstract class TypeSpecializer(val parametersMapping: TypeParameterMappings?, va
             // they return true if instruction is reified and marker can be deleted
             val (asmType, kotlinType) = reificationArgument.reify(mapping.asmType, mapping.type)
 
-            if (processInstruction(insn, instructions, asmType, kotlinType)) {
+            if (processInstruction(insn, instructions, asmType, kotlinType, removeMarkers)) {
                 instructions.remove(insn.previous.previous!!) // PUSH operation ID
                 instructions.remove(insn.previous!!) // PUSH type parameter
                 instructions.remove(insn) // INVOKESTATIC marker method

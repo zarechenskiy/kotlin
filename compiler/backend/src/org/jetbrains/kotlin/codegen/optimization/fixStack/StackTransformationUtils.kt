@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,11 @@
 
 package org.jetbrains.kotlin.codegen.optimization.fixStack
 
+import org.jetbrains.kotlin.codegen.inline.InlineCodegenUtil
+import org.jetbrains.kotlin.codegen.inline.TypeSpecializationKind
+import org.jetbrains.kotlin.codegen.optimization.common.InsnSequence
+import org.jetbrains.kotlin.codegen.pseudoInsns.PseudoInsn
+import org.jetbrains.kotlin.codegen.pseudoInsns.parsePseudoInsnOrNull
 import org.jetbrains.org.objectweb.asm.Opcodes
 import org.jetbrains.org.objectweb.asm.tree.*
 import org.jetbrains.org.objectweb.asm.tree.analysis.BasicValue
@@ -67,8 +72,25 @@ fun restoreStackWithReturnValue(
         returnValueLocalVarIndex: Int
 ) {
     with(methodNode.instructions) {
+        val marker = nodeToReplace.previous
+
         insertBefore(nodeToReplace, VarInsnNode(returnValue.type.getOpcode(Opcodes.ISTORE), returnValueLocalVarIndex))
+
         generateLoadInstructions(methodNode, nodeToReplace, savedStackDescriptor)
+
+        if (marker is MethodInsnNode && marker.name == TypeSpecializationKind.ANYFICATION.specializationMarkerOperation) {
+            val ldcInsn = marker.previous as LdcInsnNode
+            val constInsn = ldcInsn.previous as InsnNode
+            insertBefore(nodeToReplace, InsnNode(constInsn.opcode))
+            insertBefore(nodeToReplace, LdcInsnNode(ldcInsn.cst))
+            insertBefore(nodeToReplace,
+                         MethodInsnNode(marker.opcode, marker.owner, marker.name, marker.desc, marker.itf))
+
+            remove(marker)
+            remove(ldcInsn)
+            remove(constInsn)
+        }
+
         insertBefore(nodeToReplace, VarInsnNode(returnValue.type.getOpcode(Opcodes.ILOAD), returnValueLocalVarIndex))
         remove(nodeToReplace)
     }
