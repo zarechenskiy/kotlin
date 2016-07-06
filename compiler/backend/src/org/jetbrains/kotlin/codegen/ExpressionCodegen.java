@@ -976,8 +976,16 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
 
             v.load(arrayVar, OBJECT_TYPE);
             v.load(indexVar, Type.INT_TYPE);
+
+            if (TypeUtils.isAnyfiedTypeParameter(elementType)) {
+                putAnyfiedOperationMarkerIfTypeIsReifiedParameter(elementType);
+            }
             v.aload(arrayElParamType);
             StackValue.onStack(arrayElParamType).put(asmElementType, v);
+
+            if (TypeUtils.isAnyfiedTypeParameter(elementType)) {
+                putAnyfiedOperationMarkerIfTypeIsReifiedParameter(elementType);
+            }
             v.store(loopParameterVar, asmElementType);
         }
 
