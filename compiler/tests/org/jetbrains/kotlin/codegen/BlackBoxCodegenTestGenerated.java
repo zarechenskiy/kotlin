@@ -14160,6 +14160,12 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
                 doTest(fileName);
             }
 
+            @TestMetadata("storeLambdaResultToArray.kt")
+            public void testStoreLambdaResultToArray() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/arrays/storeLambdaResultToArray.kt");
+                doTest(fileName);
+            }
+
             @TestMetadata("storeTransformed.kt")
             public void testStoreTransformed() throws Exception {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/arrays/storeTransformed.kt");
@@ -14184,6 +14190,12 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
             @TestMetadata("anyfiedApply.kt")
             public void testAnyfiedApply() throws Exception {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/functions/anyfiedApply.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("anyfiedArrayConstructor.kt")
+            public void testAnyfiedArrayConstructor() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/functions/anyfiedArrayConstructor.kt");
                 doTest(fileName);
             }
 

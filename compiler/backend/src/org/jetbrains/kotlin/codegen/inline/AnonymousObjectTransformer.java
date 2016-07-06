@@ -211,8 +211,8 @@ public class AnonymousObjectTransformer extends ObjectTransformer<AnonymousObjec
             @NotNull ParametersBuilder capturedBuilder,
             boolean isConstructor
     ) {
-        SpecializedTypeParametersUsages typeParametersToReify = inliningContext.reifiedTypeInliner.specializeInstructions(sourceNode);
-        SpecializedTypeParametersUsages typeParametersToAnify = inliningContext.anyfiedTypeInliner.specializeInstructions(sourceNode);
+        SpecializedTypeParametersUsages typeParametersToReify = inliningContext.reifiedTypeInliner.specializeInstructions(sourceNode, true);
+        SpecializedTypeParametersUsages typeParametersToAnify = inliningContext.anyfiedTypeInliner.specializeInstructions(sourceNode, true);
 
         Parameters parameters =
                 isConstructor ? capturedBuilder.buildParameters() : getMethodParametersWithCaptured(capturedBuilder, sourceNode);
@@ -235,7 +235,8 @@ public class AnonymousObjectTransformer extends ObjectTransformer<AnonymousObjec
                         sourceNode.name,
                         isConstructor ? transformationInfo.getNewConstructorDescriptor() : sourceNode.desc
                 ),
-                null
+                null,
+                inliningContext.anyfiedTypeInliner
         );
 
         InlineResult result = inliner.doInline(deferringVisitor, new LocalVarRemapper(parameters, 0), false, LabelOwner.NOT_APPLICABLE);

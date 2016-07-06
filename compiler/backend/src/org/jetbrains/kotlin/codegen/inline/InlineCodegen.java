@@ -399,8 +399,8 @@ public class InlineCodegen extends CallGenerator {
         DefaultSourceMapper defaultSourceMapper = codegen.getParentCodegen().getOrCreateSourceMapper();
         defaultSourceMapper.setCallSiteMarker(new CallSiteMarker(codegen.getLastLineNumber()));
         MethodNode node = nodeAndSmap.getNode();
-        SpecializedTypeParametersUsages reificationResult = reifiedTypeInliner.specializeInstructions(node);
-        SpecializedTypeParametersUsages anyficationResult = anyfiedTypeInliner.specializeInstructions(node);
+        SpecializedTypeParametersUsages reificationResult = reifiedTypeInliner.specializeInstructions(node, true);
+        SpecializedTypeParametersUsages anyficationResult = anyfiedTypeInliner.specializeInstructions(node, false);
         generateClosuresBodies();
 
         //through generation captured parameters will be added to invocationParamBuilder
@@ -419,7 +419,7 @@ public class InlineCodegen extends CallGenerator {
                 node, parameters, info, new FieldRemapper(null, null, parameters), isSameModule,
                 "Method inlining " + callElement.getText(),
                 createNestedSourceMapper(nodeAndSmap, sourceMapper), info.getCallSiteInfo(),
-                AnnotationUtilKt.hasInlineOnlyAnnotation(functionDescriptor) ? new InlineOnlySmapSkipper(codegen) : null
+                AnnotationUtilKt.hasInlineOnlyAnnotation(functionDescriptor) ? new InlineOnlySmapSkipper(codegen) : null, anyfiedTypeInliner
         ); //with captured
 
         LocalVarRemapper remapper = new LocalVarRemapper(parameters, initialFrameSize);
