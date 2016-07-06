@@ -14997,9 +14997,33 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
                 KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/codegen/box/specialization/arrays"), Pattern.compile("^(.+)\\.kt$"), true);
             }
 
+            @TestMetadata("anyfiedAny.kt")
+            public void testAnyfiedAny() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/arrays/anyfiedAny.kt");
+                doTest(fileName);
+            }
+
             @TestMetadata("anyfiedArrayOf.kt")
             public void testAnyfiedArrayOf() throws Exception {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/arrays/anyfiedArrayOf.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("anyfiedArrayOfWithCast.kt")
+            public void testAnyfiedArrayOfWithCast() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/arrays/anyfiedArrayOfWithCast.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("anyfiedFold.kt")
+            public void testAnyfiedFold() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/arrays/anyfiedFold.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("anyfiedReduce.kt")
+            public void testAnyfiedReduce() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/arrays/anyfiedReduce.kt");
                 doTest(fileName);
             }
 
@@ -15042,6 +15066,12 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
             @TestMetadata("extensionAsParameter.kt")
             public void testExtensionAsParameter() throws Exception {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/arrays/extensionAsParameter.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("firstOrElse.kt")
+            public void testFirstOrElse() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/arrays/firstOrElse.kt");
                 doTest(fileName);
             }
 
@@ -15147,6 +15177,12 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
             @TestMetadata("anyfiedToValue.kt")
             public void testAnyfiedToValue() throws Exception {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/functions/anyfiedToValue.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("anyfiedZip.kt")
+            public void testAnyfiedZip() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/functions/anyfiedZip.kt");
                 doTest(fileName);
             }
 
