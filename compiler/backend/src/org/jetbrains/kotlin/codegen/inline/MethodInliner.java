@@ -31,6 +31,7 @@ import org.jetbrains.kotlin.codegen.state.KotlinTypeMapper;
 import org.jetbrains.kotlin.descriptors.ParameterDescriptor;
 import org.jetbrains.kotlin.types.KotlinType;
 import org.jetbrains.kotlin.types.TypeUtils;
+import org.jetbrains.kotlin.types.expressions.DoubleColonLHS;
 import org.jetbrains.kotlin.utils.SmartList;
 import org.jetbrains.kotlin.utils.SmartSet;
 import org.jetbrains.org.objectweb.asm.Label;
@@ -67,6 +68,8 @@ public class MethodInliner {
     private int lambdasFinallyBlocks;
     private final InlineOnlySmapSkipper inlineOnlySmapSkipper;
 
+    private final AnyfiedTypeInliner anyfiedTypeInliner;
+
     public MethodInliner(
             @NotNull MethodNode node,
             @NotNull Parameters parameters,
@@ -76,7 +79,8 @@ public class MethodInliner {
             @NotNull String errorPrefix,
             @NotNull SourceMapper sourceMapper,
             @NotNull InlineCallSiteInfo inlineCallSiteInfo,
-            @Nullable InlineOnlySmapSkipper smapSkipper //non null only for root
+            @Nullable InlineOnlySmapSkipper smapSkipper, //non null only for root
+            @NotNull AnyfiedTypeInliner anyfiedTypeIliner
     ) {
         this.node = node;
         this.parameters = parameters;
@@ -89,6 +93,7 @@ public class MethodInliner {
         this.typeMapper = inliningContext.state.getTypeMapper();
         this.result = InlineResult.create();
         this.inlineOnlySmapSkipper = smapSkipper;
+        this.anyfiedTypeInliner = anyfiedTypeIliner;
     }
 
     @NotNull
@@ -117,6 +122,8 @@ public class MethodInliner {
         transformedNode = doInline(transformedNode);
         removeClosureAssertions(transformedNode);
         transformedNode.instructions.resetLabels();
+
+        anyfiedTypeInliner.specializeInstructions(transformedNode, true);
 
         MethodNode resultNode = new MethodNode(
                 InlineCodegenUtil.API, transformedNode.access, transformedNode.name, transformedNode.desc,
@@ -253,7 +260,7 @@ public class MethodInliner {
                             info.getNode().getNode(), lambdaParameters, inliningContext.subInlineLambda(info),
                             newCapturedRemapper, true /*cause all calls in same module as lambda*/,
                             "Lambda inlining " + info.getLambdaClassType().getInternalName(),
-                            mapper, inlineCallSiteInfo, null
+                            mapper, inlineCallSiteInfo, null, anyfiedTypeInliner
                     );
 
                     LocalVarRemapper remapper = new LocalVarRemapper(lambdaParameters, valueParamShift);
@@ -274,6 +281,10 @@ public class MethodInliner {
 
                     StackValue.onStack(delegate.getReturnType()).put(bridgeReturnType, this);
                     setLambdaInlining(false);
+                    if (kotlinReturnType != null && TypeUtils.isAnyfiedTypeParameter(kotlinReturnType)) {
+                        ExpressionCodegen.putIntrinsicMarkerForSpecialization(this, kotlinReturnType);
+                        ExpressionCodegen.putIntrinsicMarkerForSpecialization(this, kotlinReturnType);
+                    }
                     addInlineMarker(this, false);
                     mapper.endMapping();
                     if (inlineOnlySmapSkipper != null) {

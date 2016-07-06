@@ -46,11 +46,12 @@ class AnyfiedTypeInliner(parametersMapping: TypeParameterMappings?) : TypeSpecia
         node.maxStack = node.maxStack + maxStackSize
     }
 
-    override fun processInstruction(insn: MethodInsnNode, instructions: InsnList, asmType: Type, kotlinType: KotlinType): Boolean {
+    override fun processInstruction(insn: MethodInsnNode, instructions: InsnList, asmType: Type,
+                                    kotlinType: KotlinType, removeMarkers: Boolean): Boolean {
         val operationKind = insn.anyfiedOperationKindByNextOperation ?: run {
             val operationByPrev = insn.anyfiedOperationKind
             if (operationByPrev == OperationKind.AS || operationByPrev == OperationKind.SAFE_AS) operationByPrev else null
-        } ?: return true
+        } ?: return removeMarkers
 
         val isValueType = KotlinBuiltIns.isPrimitiveValueType(kotlinType)
         if (!(isValueType || ExpressionCodegen.isArrayOfValueType(kotlinType))) return true

@@ -69,7 +69,8 @@ class ReifiedTypeInliner(parametersMapping: TypeParameterMappings?) : TypeSpecia
         node.maxStack = node.maxStack + maxStackSize
     }
 
-    override fun processInstruction(insn: MethodInsnNode, instructions: InsnList, asmType: Type, kotlinType: KotlinType): Boolean {
+    override fun processInstruction(insn: MethodInsnNode, instructions: InsnList, asmType: Type,
+                                    kotlinType: KotlinType, removeMarkers: Boolean): Boolean {
         val operationKind = insn.operationKind ?: return false
         return when (operationKind) {
             OperationKind.NEW_ARRAY -> processNewArray(insn, asmType)
