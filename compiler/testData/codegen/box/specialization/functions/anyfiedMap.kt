@@ -4,13 +4,15 @@ fun box(): String {
     val arr = intArrayOf(1, 2) as Array<vInt>
     val v = 10 as vInt
 
-    testLambda(arr, v)
+    val mapped = testLambda(arr, v)
+
+    assert(mapped[0] == v)
 
     return "OK"
 }
 
-fun testLambda(tarr: Array<vInt>, t: vInt) {
-    tarr.anyfiedMap(t) { t }
+fun testLambda(tarr: Array<vInt>, t: vInt): Array<vInt> {
+    return tarr.anyfiedMap(t) { t }
 }
 
 inline fun <@Anyfied reified T, @Anyfied reified R> Array<out T>.anyfiedMap(z: R, transform: (T) -> R): Array<R> {
