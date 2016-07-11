@@ -20,7 +20,7 @@ inline fun <@Anyfied S, @Anyfied T : S> Array<out T>.anyfiedReduce(operation: (S
     return accumulator
 }
 
-inline fun <T> Array<out T>.isEmptyAnyfied(): Boolean {
+inline fun <@Anyfied T> Array<out T>.isEmptyAnyfied(): Boolean {
     return size == 0
 }
 

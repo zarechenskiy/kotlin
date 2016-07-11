@@ -710,6 +710,9 @@ public abstract class StackValue {
         @Override
         public void storeSelector(@NotNull Type topOfStackType, @NotNull InstructionAdapter v) {
             coerceFrom(topOfStackType, v);
+            if (putMetadata != null) {
+                putMetadata.invoke();
+            }
             v.store(index, this.type);
         }
 
