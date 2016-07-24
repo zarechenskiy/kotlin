@@ -2951,7 +2951,6 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
                     return Unit.INSTANCE;
                 }
             });
-            ReceiverValue extensionReceiver = resolvedCall.getExtensionReceiver();
             receiver.put(receiver.type, v);
             callableMethod.afterReceiverGeneration(v);
         }
@@ -3003,8 +3002,6 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
         //if (returnType != null && callGenerator instanceof InlineCodegen) {
         //    putAnyfiedOperationMarkerIfTypeIsReifiedParameter(returnType, AnyfiedTypeInliner.OperationKind.AALOAD);
         //}
-
-        callGenerator.genCall(callableMethod, resolvedCall, defaultMaskWasGenerated, this);
 
         if (returnType != null && KotlinBuiltIns.isNothing(returnType)) {
             v.aconst(null);
