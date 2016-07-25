@@ -928,6 +928,12 @@ public class PsiCheckerTestGenerated extends AbstractPsiCheckerTest {
             doTestWithInfos(fileName);
         }
 
+        @TestMetadata("valueClassApplicability.kt")
+        public void testValueClassApplicability() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("idea/testData/checker/infos/valueClassApplicability.kt");
+            doTestWithInfos(fileName);
+        }
+
         @TestMetadata("WrapIntoRef.kt")
         public void testWrapIntoRef() throws Exception {
             String fileName = KotlinTestUtils.navigationMetadata("idea/testData/checker/infos/WrapIntoRef.kt");
