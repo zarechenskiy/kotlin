@@ -13,3 +13,7 @@ class InClass {
 }
 
 <info descr="null">value</info> class VClass(val v1: Int)
+
+<error descr="[INCOMPATIBLE_MODIFIERS] Modifier 'open' is incompatible with 'value'"><info descr="null">open</info></error> <error descr="[INCOMPATIBLE_MODIFIERS] Modifier 'value' is incompatible with 'open'"><info descr="null">value</info></error> class OpenValueClass(val v1: Int)
+
+<error descr="[INCOMPATIBLE_MODIFIERS] Modifier 'abstract' is incompatible with 'value'"><info descr="null">abstract</info></error> <error descr="[INCOMPATIBLE_MODIFIERS] Modifier 'value' is incompatible with 'abstract'"><info descr="null">value</info></error> class AbstractValueClass(val v1: Int)
