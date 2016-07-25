@@ -165,6 +165,9 @@ object ModifierCheckerCore {
         result += compatibilityForClassesRegister(PRIVATE_KEYWORD, ABSTRACT_KEYWORD)
 
         result += incompatibilityRegister(CROSSINLINE_KEYWORD, NOINLINE_KEYWORD)
+
+        result += incompatibilityRegister(VALUE_KEYWORD, OPEN_KEYWORD)
+        result += incompatibilityRegister(VALUE_KEYWORD, ABSTRACT_KEYWORD)
         return result
     }
 
