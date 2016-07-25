@@ -67,6 +67,7 @@ private val DEFAULT_DECLARATION_CHECKERS = listOf(
         SuspendModifierChecker,
         CoroutineModifierChecker,
         SinceKotlinAnnotationValueChecker,
+        ValueClassDeclarationChecker,
         ReifiedTypeParameterAnnotationChecker()
 )
 
