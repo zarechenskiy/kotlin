@@ -39,4 +39,5 @@ public class Test {
 // EXIST:  const
 // EXIST:  suspend
 // EXIST:  typealias
+// EXIST:  value
 // NOTHING_ELSE

@@ -39,4 +39,5 @@ class Some {
 // EXIST:  const
 // EXIST:  suspend
 // EXIST:  typealias
+// EXIST:  value
 // NOTHING_ELSE

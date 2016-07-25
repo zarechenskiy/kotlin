@@ -178,7 +178,7 @@ message Class {
     Visibility
     Modality
     ClassKind
-    isInner
+    isValue
     isData
   */
   optional int32 flags = 1 [default = 6 /* public final class, no annotations */];

@@ -95,6 +95,8 @@ class DeserializedClassDescriptor(
 
     override fun isData() = Flags.IS_DATA.get(classProto.flags)
 
+    override fun isValue() = Flags.IS_VALUE.get(classProto.flags)
+
     override fun getUnsubstitutedMemberScope(): MemberScope = memberScope
 
     override fun getStaticScope() = staticScope

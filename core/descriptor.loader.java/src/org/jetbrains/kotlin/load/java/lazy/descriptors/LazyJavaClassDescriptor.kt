@@ -95,6 +95,7 @@ class LazyJavaClassDescriptor(
 
     override fun isInner() = isInner
     override fun isData() = false
+    override fun isValue() = false
 
     private val typeConstructor = c.storageManager.createLazyValue { LazyJavaClassTypeConstructor() }
     override fun getTypeConstructor(): TypeConstructor = typeConstructor()

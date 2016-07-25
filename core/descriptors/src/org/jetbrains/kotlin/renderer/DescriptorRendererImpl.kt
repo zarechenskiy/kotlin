@@ -473,6 +473,13 @@ internal class DescriptorRendererImpl(
         builder.append(renderKeyword("data")).append(" ")
     }
 
+    private fun renderValue(isValue: Boolean, builder: StringBuilder) {
+        if (DescriptorRendererModifier.VALUE !in modifiers) return
+        if (isValue) {
+            builder.append(renderKeyword("value")).append(" ")
+        }
+    }
+
     private fun renderModalityForCallable(callable: CallableMemberDescriptor, builder: StringBuilder) {
         if (!DescriptorUtils.isTopLevelDeclaration(callable) || callable.modality != Modality.FINAL) {
             if (overridesSomething(callable) && overrideRenderingPolicy == OverrideRenderingPolicy.RENDER_OVERRIDE && callable.modality == Modality.OPEN) {
@@ -884,6 +891,8 @@ internal class DescriptorRendererImpl(
             }
             renderInner(klass.isInner, builder)
             renderData(klass.isData, builder)
+            renderValue(klass.isValue, builder)
+
             renderClassKindPrefix(klass, builder)
         }
 

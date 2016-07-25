@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,13 +89,15 @@ object ModifierCheckerCore {
             CROSSINLINE_KEYWORD to EnumSet.of(VALUE_PARAMETER),
             CONST_KEYWORD     to EnumSet.of(MEMBER_PROPERTY, TOP_LEVEL_PROPERTY),
             OPERATOR_KEYWORD  to EnumSet.of(FUNCTION),
-            INFIX_KEYWORD     to EnumSet.of(FUNCTION)
+            INFIX_KEYWORD     to EnumSet.of(FUNCTION),
+            VALUE_KEYWORD     to EnumSet.of(CLASS_ONLY)
     )
 
     val featureDependencies = mapOf(
             COROUTINE_KEYWORD to LanguageFeature.Coroutines,
             SUSPEND_KEYWORD   to LanguageFeature.Coroutines,
-            INLINE_KEYWORD   to LanguageFeature.InlineProperties
+            INLINE_KEYWORD    to LanguageFeature.InlineProperties,
+            VALUE_KEYWORD     to LanguageFeature.ValueClasses
     )
 
     val featureDependenciesTargets = mapOf(

@@ -257,7 +257,8 @@ enum class DescriptorRendererModifier(val includeByDefault: Boolean) {
     ANNOTATIONS(false),
     INNER(true),
     MEMBER_KIND(true),
-    DATA(true)
+    DATA(true),
+    VALUE(true)
 
     ;
 
