@@ -486,6 +486,7 @@ public class DefaultErrorMessages {
         MAP.put(PRIMARY_CONSTRUCTOR_DELEGATION_CALL_EXPECTED, "Primary constructor call expected");
         MAP.put(DELEGATION_SUPER_CALL_IN_ENUM_CONSTRUCTOR, "Call to super is not allowed in enum constructor");
         MAP.put(PRIMARY_CONSTRUCTOR_REQUIRED_FOR_DATA_CLASS, "Primary constructor required for data class");
+        MAP.put(PRIMARY_CONSTRUCTOR_REQUIRED_FOR_VALUE_CLASS, "Primary constructor required for value class");
         MAP.put(EXPLICIT_DELEGATION_CALL_REQUIRED,
                 "Explicit 'this' or 'super' call is required. There is no constructor in superclass that can be called without arguments");
 
@@ -757,6 +758,11 @@ public class DefaultErrorMessages {
         MAP.put(DATA_CLASS_WITHOUT_PARAMETERS, "Data class must have at least one primary constructor parameter");
         MAP.put(DATA_CLASS_VARARG_PARAMETER, "Primary constructor vararg parameters are forbidden for data classes");
         MAP.put(DATA_CLASS_NOT_PROPERTY_PARAMETER, "Data class primary constructor must have only property (val / var) parameters");
+
+        MAP.put(VALUE_CLASS_WRONG_PARAMETERS_SIZE, "Value class must have exactly one primary constructor parameter");
+        MAP.put(VALUE_CLASS_NOT_PROPERTY_PARAMETER, "Value class primary constructor must have only property (val) parameter");
+        MAP.put(VALUE_CLASS_NOT_IMMUTABLE_PARAMETER, "Value class primary constructor must have only immutable (val) parameter");
+        MAP.put(VALUE_CLASS_NOT_TOP_LEVEL_OR_OBJECT, "Value classes are only allowed on top level or in objects");
 
         MAP.put(AMBIGUOUS_ANONYMOUS_TYPE_INFERRED, "Right-hand side has anonymous type. Please specify type explicitly", TO_STRING);
 

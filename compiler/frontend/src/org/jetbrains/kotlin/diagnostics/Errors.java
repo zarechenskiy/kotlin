@@ -251,6 +251,7 @@ public interface Errors {
             DiagnosticFactory0.create(ERROR);
 
     DiagnosticFactory0<PsiElement> PRIMARY_CONSTRUCTOR_REQUIRED_FOR_DATA_CLASS = DiagnosticFactory0.create(ERROR);
+    DiagnosticFactory0<PsiElement> PRIMARY_CONSTRUCTOR_REQUIRED_FOR_VALUE_CLASS = DiagnosticFactory0.create(ERROR);
     DiagnosticFactory0<KtConstructorDelegationCall> EXPLICIT_DELEGATION_CALL_REQUIRED =
             DiagnosticFactory0.create(ERROR, PositioningStrategies.SECONDARY_CONSTRUCTOR_DELEGATION_CALL);
 
@@ -483,6 +484,11 @@ public interface Errors {
     DiagnosticFactory0<PsiElement> DATA_CLASS_WITHOUT_PARAMETERS = DiagnosticFactory0.create(ERROR);
     DiagnosticFactory0<KtParameter> DATA_CLASS_VARARG_PARAMETER = DiagnosticFactory0.create(ERROR);
     DiagnosticFactory0<KtParameter> DATA_CLASS_NOT_PROPERTY_PARAMETER = DiagnosticFactory0.create(ERROR);
+
+    DiagnosticFactory0<PsiElement> VALUE_CLASS_WRONG_PARAMETERS_SIZE = DiagnosticFactory0.create(ERROR);
+    DiagnosticFactory0<KtParameter> VALUE_CLASS_NOT_PROPERTY_PARAMETER = DiagnosticFactory0.create(ERROR);
+    DiagnosticFactory0<KtParameter> VALUE_CLASS_NOT_IMMUTABLE_PARAMETER = DiagnosticFactory0.create(ERROR);
+    DiagnosticFactory0<PsiElement> VALUE_CLASS_NOT_TOP_LEVEL_OR_OBJECT = DiagnosticFactory0.create(ERROR);
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,7 @@ open class KtClass : KtClassOrObject {
     fun isData(): Boolean = hasModifier(KtTokens.DATA_KEYWORD)
     fun isSealed(): Boolean = hasModifier(KtTokens.SEALED_KEYWORD)
     fun isInner(): Boolean = hasModifier(KtTokens.INNER_KEYWORD)
+    fun isValue(): Boolean = hasModifier(KtTokens.VALUE_KEYWORD)
 
     override fun isEquivalentTo(another: PsiElement?): Boolean {
         if (super.isEquivalentTo(another)) {
