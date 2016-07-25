@@ -35,4 +35,5 @@ class B {
 // EXIST:  annotation class
 // EXIST:  const
 // EXIST:  suspend
+// EXIST:  value
 // NOTHING_ELSE

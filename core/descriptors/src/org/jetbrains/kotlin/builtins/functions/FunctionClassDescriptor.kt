@@ -101,6 +101,8 @@ class FunctionClassDescriptor(
     override fun isCompanionObject() = false
     override fun isInner() = false
     override fun isData() = false
+    override fun isValue() = false
+
     override val annotations: Annotations get() = Annotations.EMPTY
     override fun getSource() = SourceElement.NO_SOURCE
 

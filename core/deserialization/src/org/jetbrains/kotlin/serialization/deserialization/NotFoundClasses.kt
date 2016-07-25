@@ -102,6 +102,8 @@ class NotFoundClasses(private val storageManager: StorageManager, private val mo
 
         override fun isCompanionObject() = false
         override fun isData() = false
+        override fun isValue() = false
+
         override val annotations: Annotations get() = Annotations.EMPTY
 
         override fun getUnsubstitutedMemberScope() = MemberScope.Empty

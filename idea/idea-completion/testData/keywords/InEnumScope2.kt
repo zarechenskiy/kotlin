@@ -36,5 +36,6 @@ enum class Test {
 // EXIST: object
 // EXIST: val
 // EXIST: var
+// EXIST: value
 
 // NOTHING_ELSE

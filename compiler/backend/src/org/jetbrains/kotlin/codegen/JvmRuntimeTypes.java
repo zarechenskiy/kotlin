@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,7 +85,7 @@ public class JvmRuntimeTypes {
     @NotNull
     private static ClassDescriptor createClass(@NotNull PackageFragmentDescriptor packageFragment, @NotNull String name) {
         MutableClassDescriptor descriptor = new MutableClassDescriptor(
-                packageFragment, ClassKind.CLASS, false, Name.identifier(name), SourceElement.NO_SOURCE
+                packageFragment, ClassKind.CLASS, false, false, Name.identifier(name), SourceElement.NO_SOURCE
         );
 
         descriptor.setModality(Modality.FINAL);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ public class Flags {
     public static final FlagField<ProtoBuf.Class.Kind> CLASS_KIND = FlagField.after(MODALITY, ProtoBuf.Class.Kind.values());
     public static final BooleanFlagField IS_INNER = FlagField.booleanAfter(CLASS_KIND);
     public static final BooleanFlagField IS_DATA = FlagField.booleanAfter(IS_INNER);
+    public static final BooleanFlagField IS_VALUE = FlagField.booleanAfter(IS_DATA);
 
     // Constructors
 
@@ -84,7 +85,8 @@ public class Flags {
             ClassKind kind,
             boolean inner,
             boolean isCompanionObject,
-            boolean isData
+            boolean isData,
+            boolean isValue
     ) {
         return HAS_ANNOTATIONS.toFlags(hasAnnotations)
                | MODALITY.toFlags(modality(modality))
@@ -92,6 +94,7 @@ public class Flags {
                | CLASS_KIND.toFlags(classKind(kind, isCompanionObject))
                | IS_INNER.toFlags(inner)
                | IS_DATA.toFlags(isData)
+               | IS_VALUE.toFlags(isValue)
                ;
     }
 
