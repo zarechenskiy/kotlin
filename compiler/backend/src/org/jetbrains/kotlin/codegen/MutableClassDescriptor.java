@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ import java.util.*;
 public class MutableClassDescriptor extends ClassDescriptorBase implements ClassDescriptor {
     private final ClassKind kind;
     private final boolean isInner;
+    private final boolean isValue;
 
     private Modality modality;
     private Visibility visibility;
@@ -47,6 +48,7 @@ public class MutableClassDescriptor extends ClassDescriptorBase implements Class
             @NotNull DeclarationDescriptor containingDeclaration,
             @NotNull ClassKind kind,
             boolean isInner,
+            boolean isValue,
             @NotNull Name name,
             @NotNull SourceElement source
     ) {
@@ -55,6 +57,7 @@ public class MutableClassDescriptor extends ClassDescriptorBase implements Class
 
         this.kind = kind;
         this.isInner = isInner;
+        this.isValue = isValue;
     }
 
     @Nullable
@@ -103,6 +106,11 @@ public class MutableClassDescriptor extends ClassDescriptorBase implements Class
     @Override
     public boolean isData() {
         return false;
+    }
+
+    @Override
+    public boolean isValue() {
+        return isValue;
     }
 
     @Override

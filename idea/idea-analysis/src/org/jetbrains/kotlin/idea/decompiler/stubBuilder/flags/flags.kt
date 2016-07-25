@@ -61,6 +61,7 @@ val EXTERNAL_FUN = createBooleanFlagToModifier(Flags.IS_EXTERNAL_FUNCTION, KtTok
 val INLINE = createBooleanFlagToModifier(Flags.IS_INLINE, KtTokens.INLINE_KEYWORD)
 val TAILREC = createBooleanFlagToModifier(Flags.IS_TAILREC, KtTokens.TAILREC_KEYWORD)
 val SUSPEND = createBooleanFlagToModifier(Flags.IS_SUSPEND, KtTokens.SUSPEND_KEYWORD)
+val VALUE = createBooleanFlagToModifier(Flags.IS_VALUE, KtTokens.VALUE_KEYWORD)
 
 private fun createBooleanFlagToModifier(
         flagField: Flags.BooleanFlagField, ktModifierKeywordToken: KtModifierKeywordToken

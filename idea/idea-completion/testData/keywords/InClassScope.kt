@@ -35,4 +35,5 @@ class TestClass {
 // EXIST:  typealias
 // EXIST:  platform
 // EXIST:  impl
+// EXIST:  value
 // NOTHING_ELSE

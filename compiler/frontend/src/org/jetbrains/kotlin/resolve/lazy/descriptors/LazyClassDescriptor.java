@@ -88,6 +88,7 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements ClassDes
     private final ClassKind kind;
     private final boolean isInner;
     private final boolean isData;
+    private final boolean isValue;
     private final boolean isPlatform;
     private final boolean isImpl;
 
@@ -157,8 +158,6 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements ClassDes
 
         this.isInner = isInnerClass(modifierList) && !ModifiersChecker.isIllegalInner(this);
         this.isData = modifierList != null && modifierList.hasModifier(KtTokens.DATA_KEYWORD);
-        this.isPlatform = modifierList != null && modifierList.hasModifier(KtTokens.PLATFORM_KEYWORD);
-        this.isImpl = modifierList != null && modifierList.hasModifier(KtTokens.IMPL_KEYWORD);
 
         // Annotation entries are taken from both own annotations (if any) and object literal annotations (if any)
         List<KtAnnotationEntry> annotationEntries = new ArrayList<KtAnnotationEntry>();
@@ -495,16 +494,6 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements ClassDes
         return isCompanionObject;
     }
 
-    @Override
-    public boolean isPlatform() {
-        return isPlatform;
-    }
-
-    @Override
-    public boolean isImpl() {
-        return isImpl;
-    }
-
     @NotNull
     @Override
     public Annotations getAnnotations() {
@@ -575,13 +564,22 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements ClassDes
         return parameters.invoke();
     }
 
-    private class LazyClassTypeConstructor extends AbstractClassTypeConstructor {
+    private class LazyClassTypeConstructor extends AbstractClassTypeConstructor implements LazyEntity {
         private final NotNullLazyValue<List<TypeParameterDescriptor>> parameters = c.getStorageManager().createLazyValue(new Function0<List<TypeParameterDescriptor>>() {
             @Override
             public List<TypeParameterDescriptor> invoke() {
                 return TypeParameterUtilsKt.computeConstructorTypeParameters(LazyClassDescriptor.this);
             }
         });
+
+        private final NullableLazyValue<Void> forceResolveAllContents =
+                c.getStorageManager().createRecursionTolerantNullableLazyValue(new Function0<Void>() {
+                    @Override
+                    public Void invoke() {
+                        doForceResolveAllContents();
+                        return null;
+                    }
+                }, null);
 
         public LazyClassTypeConstructor() {
             super(LazyClassDescriptor.this.c.getStorageManager());
@@ -661,9 +659,26 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements ClassDes
             return LazyClassDescriptor.this;
         }
 
+        @NotNull
+        @Override
+        public Annotations getAnnotations() {
+            return Annotations.Companion.getEMPTY(); // TODO
+        }
+
         @Override
         public String toString() {
             return LazyClassDescriptor.this.getName().toString();
+        }
+
+        @Override
+        public void forceResolveAllContents() {
+            forceResolveAllContents.invoke();
+        }
+
+        private void doForceResolveAllContents() {
+            ForceResolveUtil.forceResolveAllContents(getAnnotations());
+            ForceResolveUtil.forceResolveAllContents(getSupertypes());
+            ForceResolveUtil.forceResolveAllContents(getParameters());
         }
     }
 

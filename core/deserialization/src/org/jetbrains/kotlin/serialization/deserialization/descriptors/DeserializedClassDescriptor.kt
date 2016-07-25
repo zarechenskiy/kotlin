@@ -95,6 +95,8 @@ class DeserializedClassDescriptor(
 
     override fun isData() = Flags.IS_DATA.get(classProto.flags)
 
+    override fun isValue() = Flags.IS_VALUE.get(classProto.flags)
+
     override fun isPlatform() = false
 
     override fun isImpl() = false
@@ -165,7 +167,7 @@ class DeserializedClassDescriptor(
             if (unresolved.isNotEmpty()) {
                 c.components.errorReporter.reportIncompleteHierarchy(
                         this@DeserializedClassDescriptor,
-                        unresolved.map { it.classId?.asSingleFqName()?.asString() ?: it.name.asString() }
+                        unresolved.map { it.classId.asSingleFqName().asString() }
                 )
             }
 
@@ -179,6 +181,8 @@ class DeserializedClassDescriptor(
         override fun isDenotable() = true
 
         override fun getDeclarationDescriptor() = this@DeserializedClassDescriptor
+
+        override val annotations: Annotations get() = Annotations.EMPTY // TODO
 
         override fun toString() = name.toString()
 

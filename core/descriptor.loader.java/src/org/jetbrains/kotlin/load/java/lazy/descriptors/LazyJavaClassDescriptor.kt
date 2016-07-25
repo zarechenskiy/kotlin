@@ -95,6 +95,7 @@ class LazyJavaClassDescriptor(
 
     override fun isInner() = isInner
     override fun isData() = false
+    override fun isValue() = false
     override fun isCompanionObject() = false
     override fun isPlatform() = false
     override fun isImpl() = false
@@ -134,6 +135,8 @@ class LazyJavaClassDescriptor(
     override fun getDeclaredTypeParameters() = declaredParameters()
 
     override fun getFunctionTypeForSamInterface(): SimpleType? = functionTypeForSamInterface()
+
+    override fun isCompanionObject() = false
 
     override fun toString() = "Lazy Java class ${this.fqNameUnsafe}"
 
@@ -216,6 +219,8 @@ class LazyJavaClassDescriptor(
 
         override val supertypeLoopChecker: SupertypeLoopChecker
             get() = c.components.supertypeLoopChecker
+
+        override val annotations: Annotations get() = Annotations.EMPTY
 
         override fun isFinal(): Boolean = isFinalClass
 

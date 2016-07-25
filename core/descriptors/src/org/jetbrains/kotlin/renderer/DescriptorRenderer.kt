@@ -264,6 +264,7 @@ enum class DescriptorRendererModifier(val includeByDefault: Boolean) {
     INNER(true),
     MEMBER_KIND(true),
     DATA(true),
+    VALUE(true),
     PLATFORM(true),
     IMPL(true),
     ;
