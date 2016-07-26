@@ -272,6 +272,14 @@ fun <D : CallableDescriptor> D.overriddenTreeUniqueAsSequence(useOriginal: Boole
     return doBuildOverriddenTreeAsSequence()
 }
 
+fun ClassDescriptor.representationTypeOfValueClass(): ValueParameterDescriptor {
+    if (!isValue) {
+        throw IllegalArgumentException("Cannot get representation type of value class")
+    }
+
+    return unsubstitutedPrimaryConstructor!!.valueParameters.first()
+}
+
 fun CallableDescriptor.varargParameterPosition() =
         valueParameters.indexOfFirst { it.varargElementType != null }
 

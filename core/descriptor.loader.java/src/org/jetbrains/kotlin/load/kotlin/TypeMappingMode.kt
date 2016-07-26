@@ -25,6 +25,7 @@ class TypeMappingMode private constructor(
         // Here DeclarationSiteWildcards means wildcard generated because of declaration-site variance
         val skipDeclarationSiteWildcards: Boolean = false,
         val skipDeclarationSiteWildcardsIfPossible: Boolean = false,
+        val needValueClassWrapping: Boolean = false,
         private val genericArgumentMode: TypeMappingMode? = null,
         private val genericContravariantArgumentMode: TypeMappingMode? = genericArgumentMode,
         private val genericInvariantArgumentMode: TypeMappingMode? = genericArgumentMode
@@ -42,6 +43,12 @@ class TypeMappingMode private constructor(
         @JvmField
         val DEFAULT = TypeMappingMode(genericArgumentMode = GENERIC_ARGUMENT, needPrimitiveBoxing = false)
 
+        /**
+         * kotlin.Int is mapped to I
+         * value class VClass is mapped to LVClass
+         */
+        @JvmField
+        val CLASS_TYPE = TypeMappingMode(genericArgumentMode = GENERIC_ARGUMENT, needPrimitiveBoxing = false, needValueClassWrapping = true)
         /**
          * kotlin.Int is mapped to Ljava/lang/Integer;
          * No projections allowed in immediate arguments

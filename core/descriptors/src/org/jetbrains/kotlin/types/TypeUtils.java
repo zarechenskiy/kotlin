@@ -21,10 +21,7 @@ import kotlin.jvm.functions.Function1;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns;
-import org.jetbrains.kotlin.descriptors.ClassDescriptor;
-import org.jetbrains.kotlin.descriptors.ClassifierDescriptor;
-import org.jetbrains.kotlin.descriptors.DeclarationDescriptor;
-import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor;
+import org.jetbrains.kotlin.descriptors.*;
 import org.jetbrains.kotlin.descriptors.annotations.Annotations;
 import org.jetbrains.kotlin.name.FqName;
 import org.jetbrains.kotlin.resolve.constants.IntegerValueTypeConstructor;
@@ -480,6 +477,15 @@ public class TypeUtils {
 
     public static boolean isAnyfiedTypeParameter(@NotNull TypeParameterDescriptor descriptor) {
         return descriptor.getAnnotations().findAnnotation(ANYFIED_ANNOTATION_FQ_NAME) != null;
+    }
+
+    public static boolean isValueType(@NotNull KotlinType type) {
+        ClassifierDescriptor descriptor = type.getConstructor().getDeclarationDescriptor();
+        if (descriptor instanceof ClassDescriptor) {
+            return ((ClassDescriptor) descriptor).isValue();
+        }
+
+        return false;
     }
 
     @Nullable
