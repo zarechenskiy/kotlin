@@ -17,3 +17,5 @@ inline fun <@Anyfied T> storeInto(
 
     destination[0] = transform(el)
 }
+
+value class vInt(val v: Int)

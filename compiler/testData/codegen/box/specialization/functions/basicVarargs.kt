@@ -8,9 +8,4 @@ fun box(v1: vInt, v2: vInt): String {
     return "OK"
 }
 
-// 0 AALOAD
-// 0 AASTORE
-// 1 T_INT
-// 2 IASTORE
-// 0 ISTORE
-// 2 ILOAD
+value class vInt(val v: Int)

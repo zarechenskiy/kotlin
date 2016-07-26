@@ -12,3 +12,5 @@ fun box(): String {
 inline fun <@Anyfied T> Array<T>.test(): T {
     return this[0]
 }
+
+value class vInt(val v: Int)

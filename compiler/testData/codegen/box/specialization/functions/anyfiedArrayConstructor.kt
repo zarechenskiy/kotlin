@@ -20,3 +20,5 @@ inline fun <reified @Anyfied T> AnyfiedArray(size: Int, init: (Int) -> T): Array
 inline fun <reified @Anyfied T> createAnyfiedArray(size: Int): Array<T> {
     return arrayOfNulls<T>(size) as Array<T>
 }
+
+value class vInt(val v: Int)

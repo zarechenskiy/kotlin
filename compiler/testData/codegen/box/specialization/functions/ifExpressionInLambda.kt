@@ -12,3 +12,5 @@ inline fun <@Anyfied T> test(el1: T, el2: T): T {
 }
 
 inline fun <@Anyfied R> runAnyfied(block: () -> R): R = block()
+
+value class vInt(val v: Int)

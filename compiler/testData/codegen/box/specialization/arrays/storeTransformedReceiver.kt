@@ -17,3 +17,5 @@ inline fun <@Anyfied T> Array<T>.storeInto(
 
     destination[0] = transform(this[0])
 }
+
+value class vInt(val v: Int)

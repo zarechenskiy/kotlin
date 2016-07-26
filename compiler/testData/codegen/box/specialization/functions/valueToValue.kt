@@ -10,3 +10,5 @@ fun box(): String {
 inline fun test(el: vInt, init: (vInt) -> vInt): vInt {
     return init(el)
 }
+
+value class vInt(val v: Int)

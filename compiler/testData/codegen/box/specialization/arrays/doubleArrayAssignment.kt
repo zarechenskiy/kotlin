@@ -19,3 +19,5 @@ inline fun <@Anyfied T> Array<T>.test1(destination: Array<Array<T>>) {
 inline fun <@Anyfied T> Array<Array<T>>.test2(destination: Array<T>) {
     this[0] = destination
 }
+
+value class vInt(val v: Int)

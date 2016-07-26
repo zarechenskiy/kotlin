@@ -16,3 +16,5 @@ inline fun <@Anyfied T> Array<out T>.anyfiedAny(predicate: (T) -> Boolean): Bool
     for (element in this) if (predicate(element)) return true
     return false
 }
+
+value class vInt(val v: Int)
