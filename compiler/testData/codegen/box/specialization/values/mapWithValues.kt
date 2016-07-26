@@ -1,18 +1,19 @@
 // WITH_RUNTIME
 
-value class Meters(val m: Int)
-value class Miles(val k: Int)
+value class Meter(val v: Int)
+value class Kilometer(val v: Int)
 
 fun box(): String {
-    val meters = intArrayOf(1, 2, 3) as Array<Meters>
-    val seed = 0 as Miles
-    val newMile = 42 as Miles
+    val kilometers = anyfiedArrayOf(1.km, 2.km, 3.km)
+    val seed = 0.meter
 
-    val miles = meters.anyfiedMap(seed) { newMile }
+    val meters = kilometers.anyfiedMap(seed, Kilometer::toMeter)
 
-    assert(miles[0] == newMile)
-    assert(miles[1] == newMile)
-    assert(miles[2] == newMile)
+    assert(kilometers[0].toMeter() == meters[0])
+    assert(kilometers[1].toMeter() == meters[1])
+    assert(kilometers[2].toMeter() == meters[2])
+
+    assert(meters[2] == 3000.meter)
 
     return "OK"
 }
@@ -50,3 +51,18 @@ inline fun <@Anyfied T> Array<out T>.getIndices(): IntRange {
 inline fun <@Anyfied T> Array<out T>.getLastIndex(): Int {
     return size - 1
 }
+
+inline fun <reified @Anyfied T> anyfiedArrayOf(vararg elements: T): Array<T> {
+    return elements as Array<T>
+}
+
+fun Kilometer.toMeter(): Meter {
+    val k = this as Int * 1000
+    return k.meter
+}
+
+val Int.meter: Meter
+    get() = this as Meter
+
+val Int.km: Kilometer
+    get() = this as Kilometer
