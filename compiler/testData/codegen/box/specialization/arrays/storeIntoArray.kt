@@ -14,3 +14,5 @@ fun box(): String {
 inline fun <@Anyfied T> storeInto(destination: Array<T>, el: T) {
     destination[0] = el
 }
+
+value class vInt(val v: Int)

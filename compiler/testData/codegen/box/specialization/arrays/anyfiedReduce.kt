@@ -27,3 +27,5 @@ inline fun <@Anyfied T> Array<out T>.isEmptyAnyfied(): Boolean {
 inline fun <@Anyfied T> Array<out T>.getLastIndex(): Int {
     return size - 1
 }
+
+value class vInt(val v: Int)

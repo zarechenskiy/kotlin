@@ -13,3 +13,5 @@ fun box(): String {
 inline fun <reified @Anyfied T> createArray(size: Int): Array<T> {
     return arrayOfNulls<T>(size) as Array<T>
 }
+
+value class vInt(val v: Int)

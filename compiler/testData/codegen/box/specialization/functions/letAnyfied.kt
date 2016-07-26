@@ -12,3 +12,5 @@ inline fun <@Anyfied T> test(el: T): T {
 }
 
 public inline fun <@Anyfied T, @Anyfied R> T.letAnyfied(block: (T) -> R): R = block(this)
+
+value class vInt(val v: Int)

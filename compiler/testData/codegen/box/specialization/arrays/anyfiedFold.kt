@@ -16,3 +16,5 @@ inline fun <@Anyfied T, @Anyfied R> Array<out T>.anyfiedFold(initial: R, operati
     for (element in this) accumulator = operation(accumulator, element)
     return accumulator
 }
+
+value class vInt(val v: Int)

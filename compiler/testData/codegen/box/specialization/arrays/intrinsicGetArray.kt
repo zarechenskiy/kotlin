@@ -10,11 +10,4 @@ fun box(): String {
     return "OK"
 }
 
-// 1 IASTORE
-// 0 ILOAD
-// 2 ASTORE
-// 0 AASTORE
-// 1 AALOAD
-// 1 IALOAD
-// 1 ARETURN
-// 1 ISTORE
+value class vInt(val v: Int)

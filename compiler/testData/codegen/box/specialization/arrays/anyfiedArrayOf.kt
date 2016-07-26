@@ -11,11 +11,4 @@ inline fun <reified @Anyfied T> anyfiedArrayOf(vararg elements: T): Array<out T>
     return elements
 }
 
-// 0 AALOAD
-// 0 AASTORE
-// 1 T_INT
-// 1 IASTORE
-// 0 ISTORE
-// 1 ILOAD
-// 0 valueOf
-// 0 intValue
+value class vInt(val v: Int)

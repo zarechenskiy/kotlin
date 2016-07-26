@@ -15,3 +15,5 @@ fun box(): String {
 inline fun <@Anyfied T> takeExtArray(a: Array<T>, t: Array<T>.() -> T): T {
     return a.t()
 }
+
+value class vInt(val v: Int)

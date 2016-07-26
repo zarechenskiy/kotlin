@@ -14,8 +14,4 @@ fun test(v1: vInt, v2: vInt): vInt {
     return v3
 }
 
-// 2 ALOAD
-// 1 ARETURN
-// 0 ASTORE
-// 4 ILOAD
-// 1 IRETURN
+value class vInt(val v: Int)

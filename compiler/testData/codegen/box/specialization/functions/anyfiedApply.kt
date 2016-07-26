@@ -15,3 +15,5 @@ public inline fun <@Anyfied T> T.applyAnyfied(block: T.() -> Unit): T {
     block()
     return this
 }
+
+value class vInt(val v: Int)
