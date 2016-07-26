@@ -469,7 +469,8 @@ public class KotlinTypeMapper {
                         return Unit.INSTANCE;
                     }
                 },
-                mappings);
+                mappings,
+                false);
     }
 
     @NotNull
