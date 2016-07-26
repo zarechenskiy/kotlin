@@ -23,6 +23,7 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.name.SpecialNames
 import org.jetbrains.kotlin.platform.JavaToKotlinClassMap
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameUnsafe
+import org.jetbrains.kotlin.resolve.descriptorUtil.representationTypeOfValueClass
 import org.jetbrains.kotlin.resolve.jvm.JvmClassName
 import org.jetbrains.kotlin.resolve.jvm.JvmPrimitiveType
 import org.jetbrains.kotlin.types.*
@@ -127,6 +128,11 @@ fun <T : Any> mapType(
         }
 
         descriptor is ClassDescriptor -> {
+            if (descriptor.isValue && !mode.needValueClassWrapping) {
+                val representationType = descriptor.representationTypeOfValueClass().type
+                return mapType(representationType, factory, mode, typeMappingConfiguration, descriptorTypeWriter, writeGenericType, mappings)
+            }
+
             val jvmType =
                     if (mode.isForAnnotationParameter && KotlinBuiltIns.isKClass(descriptor))
                         factory.javaLangClassType

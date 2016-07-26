@@ -397,7 +397,7 @@ public class KotlinTypeMapper {
 
     @NotNull
     public Type mapClass(@NotNull ClassifierDescriptor classifier) {
-        return mapType(classifier.getDefaultType(), null, TypeMappingMode.DEFAULT);
+        return mapType(classifier.getDefaultType(), null, TypeMappingMode.CLASS_TYPE);
     }
 
     @NotNull
