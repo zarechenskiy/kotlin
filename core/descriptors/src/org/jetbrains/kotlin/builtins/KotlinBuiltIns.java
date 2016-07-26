@@ -736,7 +736,7 @@ public abstract class KotlinBuiltIns {
     }
 
     @Nullable
-    public static PrimitiveType getPrimitiveValueTypeByFqName(@NotNull FqNameUnsafe primitiveClassFqName) {
+    private static PrimitiveType getPrimitiveValueTypeByFqName(@NotNull FqNameUnsafe primitiveClassFqName) {
         return FQ_NAMES.fqNameToPrimitiveValueType.get(primitiveClassFqName);
     }
 
@@ -786,11 +786,15 @@ public abstract class KotlinBuiltIns {
     }
 
     public static boolean isPrimitiveValueType(@NotNull KotlinType type) {
+        if (TypeUtils.isValueType(type)) { // TODO: move and rename method
+            return true;
+        }
+
         ClassifierDescriptor descriptor = type.getConstructor().getDeclarationDescriptor();
         return !type.isMarkedNullable() && descriptor instanceof ClassDescriptor && isPrimitiveValue((ClassDescriptor) descriptor);
     }
 
-    public static boolean isPrimitiveValue(@NotNull ClassDescriptor descriptor) {
+    private static boolean isPrimitiveValue(@NotNull ClassDescriptor descriptor) {
         return getPrimitiveValueTypeByFqName(getFqName(descriptor)) != null;
     }
 
