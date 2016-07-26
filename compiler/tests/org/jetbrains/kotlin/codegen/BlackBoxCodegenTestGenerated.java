@@ -15333,6 +15333,12 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
                 KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/codegen/box/specialization/values"), Pattern.compile("^(.+)\\.kt$"), true);
             }
 
+            @TestMetadata("mapWithValues.kt")
+            public void testMapWithValues() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/values/mapWithValues.kt");
+                doTest(fileName);
+            }
+
             @TestMetadata("sample.kt")
             public void testSample() throws Exception {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/values/sample.kt");

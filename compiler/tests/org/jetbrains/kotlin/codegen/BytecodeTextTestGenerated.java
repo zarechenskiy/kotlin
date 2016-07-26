@@ -1353,9 +1353,15 @@ public class BytecodeTextTestGenerated extends AbstractBytecodeTextTest {
                 KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/codegen/bytecodeText/specialization/values"), Pattern.compile("^(.+)\\.kt$"), true);
             }
 
-            @TestMetadata("letAnyfied.kt")
-            public void testLetAnyfied() throws Exception {
-                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/bytecodeText/specialization/values/letAnyfied.kt");
+            @TestMetadata("anyfiedLet.kt")
+            public void testAnyfiedLet() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/bytecodeText/specialization/values/anyfiedLet.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("anyfiedMap.kt")
+            public void testAnyfiedMap() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/bytecodeText/specialization/values/anyfiedMap.kt");
                 doTest(fileName);
             }
 
