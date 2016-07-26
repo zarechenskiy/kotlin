@@ -15,3 +15,5 @@ inline fun <@Anyfied T> Array<out T>.firstOrElse(default: T, predicate: (T) -> B
     for (element in this) if (predicate(element)) return element
     return default
 }
+
+value class vInt(val v: Int)

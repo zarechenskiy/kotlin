@@ -10,3 +10,5 @@ fun box(): String {
 inline fun <reified @Anyfied T> anyfiedArrayOf(vararg elements: T): Array<T> {
     return elements as Array<T>
 }
+
+value class vInt(val v: Int)

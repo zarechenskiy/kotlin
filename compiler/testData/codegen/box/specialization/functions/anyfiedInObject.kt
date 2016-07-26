@@ -22,3 +22,5 @@ fun box(): String {
     test(1 as vInt)
     return "OK"
 }
+
+value class vInt(val v: Int)

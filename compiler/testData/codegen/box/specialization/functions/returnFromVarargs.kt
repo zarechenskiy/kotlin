@@ -9,11 +9,4 @@ inline fun <@Anyfied T> takeVarargs1(vararg elements: T): T {
     return elements[0]
 }
 
-// 1 AALOAD
-// 0 AASTORE
-// 1 T_INT
-// 2 IASTORE
-// 1 ISTORE
-// 2 ILOAD
-// 0 valueOf
-// 0 intValue
+value class vInt(val v: Int)

@@ -12,9 +12,4 @@ fun box(): String {
     return "OK"
 }
 
-// 0 CHECKCAST
-// 0 intValue
-// 3 ALOAD
-// 2 ISTORE
-// 1 ILOAD
-// 0 ASTORE
+value class vInt(val v: Int)

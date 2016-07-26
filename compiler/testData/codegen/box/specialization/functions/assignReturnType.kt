@@ -9,8 +9,4 @@ fun box(): String {
     return "OK"
 }
 
-// 1 ALOAD
-// 1 ILOAD
-// 2 ISTORE
-// 0 valueOf
-// 0 intValue
+value class vInt(val v: Int)

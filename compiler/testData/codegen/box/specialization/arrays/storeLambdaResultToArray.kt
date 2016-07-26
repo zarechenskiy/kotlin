@@ -20,3 +20,5 @@ fun testInit(vArr: Array<vInt>, v: vInt) {
 inline fun <@Anyfied T> sampleInit(arr: Array<T>, init: (Int) -> T) {
     arr[0] = init(3)
 }
+
+value class vInt(val v: Int)

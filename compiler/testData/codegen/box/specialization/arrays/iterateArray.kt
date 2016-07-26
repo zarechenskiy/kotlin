@@ -9,5 +9,4 @@ fun box(): String {
     return "OK"
 }
 
-// 0 CHECKCAST
-// 0 intValue
+value class vInt(val v: Int)
