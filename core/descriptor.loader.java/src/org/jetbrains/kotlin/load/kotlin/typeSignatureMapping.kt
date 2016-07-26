@@ -58,10 +58,11 @@ fun <T : Any> mapType(
         typeMappingConfiguration: TypeMappingConfiguration<T>,
         descriptorTypeWriter: JvmDescriptorTypeWriter<T>?,
         writeGenericType: (KotlinType, T, TypeMappingMode) -> Unit = DO_NOTHING_3,
-        mappings: ((String) -> KotlinType?)?
+        mappings: ((String) -> KotlinType?)?,
+        asValue: Boolean = false
 ): T {
     mapBuiltInType(kotlinType, factory)?.let { builtInType ->
-        val jvmType = if (KotlinBuiltIns.isPrimitiveValueType(kotlinType))
+        val jvmType = if (KotlinBuiltIns.isPrimitiveValueType(kotlinType) || asValue)
             builtInType
         else
             factory.boxTypeIfNeeded(builtInType, mode.needPrimitiveBoxing)
@@ -130,7 +131,8 @@ fun <T : Any> mapType(
         descriptor is ClassDescriptor -> {
             if (descriptor.isValue && !mode.needValueClassWrapping) {
                 val representationType = descriptor.representationTypeOfValueClass().type
-                return mapType(representationType, factory, mode, typeMappingConfiguration, descriptorTypeWriter, writeGenericType, mappings)
+                return mapType(representationType, factory, mode, typeMappingConfiguration,
+                               descriptorTypeWriter, writeGenericType, mappings, true)
             }
 
             val jvmType =
