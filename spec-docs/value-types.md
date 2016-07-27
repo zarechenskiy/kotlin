@@ -12,21 +12,29 @@ Discussion of this proposal is held in [this issue]()(add link).
 
 ## Goals
 
-* Support *value types*
-* Support generics over value types through *specialization*
+* Support user-defined data types with performance and memory profiles similar to JVM primitive types
+* Allow to instantiate generic type arguments with such data types without additional object allocation
 * Be consistent with [Project Valhalla](http://openjdk.java.net/projects/valhalla/)
+
+## Description
+To support user-defined data types with performance and memory profiles similar to JVM primitive types 
+we provide so called *value classes*.
+
+*Value class* is a new kind of type in Kotlin language which is borrowing most of the definition and
+encapsulation machinery from classes and at the same time is allowing to avoid allocating
+runtime objects. Compared to type aliases value classes defines new types which are not assignment-compatible. 
+
+Generic type arguments are constrained to extend ```Any?```, meaning that they are not compatible 
+with JVM primitive instantiations unless boxing is used. This restriction is also propagates on 
+value classes as they do not extend ```Any?```. This restriction could be eliminated by supporting 
+*specialization* of generics when type arguments are instantiated with value classes.
 
 ## Use cases
 
 * Unsigned arithmetic
 * Types representing units of measure
-* Achieve typesafety with zero allocation overhead
+* TODO
 
-## Description
-
-*Value type* is a new kind of type in Kotlin language which is borrowing most of the definition and
-encapsulation machinery from classes and at the same time is allowing to avoid allocating
-runtime objects.
 
 ## Limitation
 
@@ -40,6 +48,11 @@ Restrictions regarding generic specialization over value types:
 See limitation of value classes
 
 ## Value classes
+
+Value classes are declared using `value` keyword:
+``` kotlin
+value class Foo(val v: Int)
+```
 
 TODO: value classes
 
