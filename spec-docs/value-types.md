@@ -53,6 +53,47 @@ Outline:
 * Values and properties?
 * Methods from ```Any```: ```equals```, ```hashCode```, ```toString```
 
+### Limitations
+
+This section provides concrete consequences of value classes limitation. All these checks are performed statically i.e. at the compile time.
+
+* Value classes must have exactly one primary constructor parameter
+``` kotlin
+value class IntPair(val first: Int, val second: Int) // Error: Value class must have exactly one primary constructor parameter
+```
+``` kotlin
+value class Empty() // Error: Value class must have exactly one primary constructor parameter
+```
+
+* Value classes must have only read-only property
+``` kotlin
+value class Mutable(var sample: Int) // Error: Value class primary constructor must have only immutable (val) parameter
+```
+
+* Value classes must initialize property in primary constructor
+``` kotlin
+value class Sample(base: Int) // Error: Value class primary constructor must have only property (val) parameter
+```
+
+* Value classes must be top-level or a member of statically accessible object
+``` kotlin
+class Foo {
+  value class Bar(val first: Int) // Error: Value classes are only allowed on top level or in objects
+}
+```
+
+* Value classes must be final
+``` kotlin
+open value class Foo(val v: Int) // Error: Modifier 'open' is incompatible with 'vaue'
+```
+
+* Value classes could not be abstract
+``` kotlin
+abstract value class Foo(val v: Int) // Error: Modifier 'abstract' is incompatible with 'vaue'
+```
+
+* Implement only interfaces
+
 ## Syntax
 
 Existing functions could be written with the assumption that a type variable ```T``` can always be converted to ```Any?```.
