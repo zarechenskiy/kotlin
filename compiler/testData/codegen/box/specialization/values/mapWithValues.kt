@@ -62,7 +62,7 @@ fun Kilometer.toMeter(): Meter {
 }
 
 val Int.meter: Meter
-    get() = this as Meter
+    get() = Meter(this)
 
 val Int.km: Kilometer
-    get() = this as Kilometer
+    get() = Kilometer(this)

@@ -3,7 +3,7 @@
 value class vDouble(val d: Double)
 
 fun box(): String {
-    val a = 1.0 as vDouble
+    val a = vDouble(1.0)
     val t = takeAndReturn(a)
 
     assert(a == t)
