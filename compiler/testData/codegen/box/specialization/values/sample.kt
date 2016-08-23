@@ -3,7 +3,7 @@
 value class vClass(val v: Int)
 
 fun box(): String {
-    val a = 1 as vClass
+    val a = vClass(1)
     val t = takeAndReturn(a)
 
     assert(a == t)
