@@ -1366,6 +1366,12 @@ public class BytecodeTextTestGenerated extends AbstractBytecodeTextTest {
                 doTest(fileName);
             }
 
+            @TestMetadata("constructorCall.kt")
+            public void testConstructorCall() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/bytecodeText/specialization/values/constructorCall.kt");
+                doTest(fileName);
+            }
+
             @TestMetadata("sample.kt")
             public void testSample() throws Exception {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/bytecodeText/specialization/values/sample.kt");
