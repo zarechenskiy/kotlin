@@ -7,7 +7,7 @@ value class vClass(val v: Int)
 // FILE: foo.kt
 
 fun foo() {
-    val v = 1 as vClass
+    val v = vClass(1)
     takeValue(v)
 }
 

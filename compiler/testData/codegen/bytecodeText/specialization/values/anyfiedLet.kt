@@ -13,8 +13,8 @@ value class vClass(val v: Int)
 // FILE: foo.kt
 
 fun box() {
-    val v1 = 1 as vClass
-    val v2 = 2 as vClass
+    val v1 = vClass(1)
+    val v2 = vClass(2)
     val second = test(v1, v2)
 }
 
