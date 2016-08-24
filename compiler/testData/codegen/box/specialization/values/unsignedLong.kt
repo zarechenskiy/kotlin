@@ -5,9 +5,10 @@ fun box(): String {
 
     val squares = uLongs.anyfiedMap(uLong(0)) { it * it }
 
-    for (u in uLongs) {
-        assert(u.value() == u.value() * u.value())
-    }
+    assert(squares[0] == uLong(1))
+    assert(squares[1] == uLong(4))
+    assert(squares[2] == uLong(9))
+    assert(squares[3] == uLong(16))
 
     return "OK"
 }
