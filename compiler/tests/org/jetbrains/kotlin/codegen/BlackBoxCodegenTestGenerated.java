@@ -15808,6 +15808,12 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
                 doTest(fileName);
             }
 
+            @TestMetadata("unsignedLong.kt")
+            public void testUnsignedLong() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/values/unsignedLong.kt");
+                doTest(fileName);
+            }
+
             @TestMetadata("valueOfDouble.kt")
             public void testValueOfDouble() throws Exception {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/values/valueOfDouble.kt");
