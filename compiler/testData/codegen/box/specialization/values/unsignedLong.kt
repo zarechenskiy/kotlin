@@ -3,7 +3,7 @@
 fun box(): String {
     val uLongs = anyfiedArrayOf(uLong(1), uLong(2), uLong(3), uLong(4))
 
-    val squares = uLongs.anyfiedMap(uLong(0)) { it }
+    val squares = uLongs.anyfiedMap(uLong(0)) { it * it }
 
     for (u in uLongs) {
         assert(u.value() == u.value() * u.value())
