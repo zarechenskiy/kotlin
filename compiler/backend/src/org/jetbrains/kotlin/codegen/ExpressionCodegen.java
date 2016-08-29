@@ -2416,6 +2416,13 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
                 receiver = StackValue.receiverWithoutReceiverArgument(receiver);
             }
 
+            DeclarationDescriptor containingDeclaration = propertyDescriptor.getContainingDeclaration();
+            if (containingDeclaration instanceof ClassDescriptor) {
+                if (((ClassDescriptor) containingDeclaration).isValue()) {
+                    return receiver;
+                }
+            }
+
             return intermediateValueForProperty(propertyDescriptor, directToField, directToField, superCallTarget, false, receiver, resolvedCall);
         }
 
