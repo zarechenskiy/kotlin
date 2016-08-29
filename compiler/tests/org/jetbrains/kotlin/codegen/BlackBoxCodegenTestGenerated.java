@@ -15362,6 +15362,12 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/values/valueOfDouble.kt");
                 doTest(fileName);
             }
+
+            @TestMetadata("valueProperty.kt")
+            public void testValueProperty() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/values/valueProperty.kt");
+                doTest(fileName);
+            }
         }
     }
 
