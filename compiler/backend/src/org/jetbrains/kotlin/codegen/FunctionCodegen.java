@@ -170,6 +170,10 @@ public class FunctionCodegen {
             return;
         }
 
+        if (functionDescriptor instanceof PropertyAccessorDescriptor && contextKind == OwnerKind.ANYFIED_IMPLS) {
+            return;
+        }
+
         JvmMethodGenericSignature jvmSignature = typeMapper.mapSignatureWithGeneric(functionDescriptor, contextKind);
         Method asmMethod = jvmSignature.getAsmMethod();
 
@@ -228,7 +232,27 @@ public class FunctionCodegen {
             return;
         }
 
-        if (!functionDescriptor.isExternal()) {
+        DeclarationDescriptor containingDeclaration = functionDescriptor.getContainingDeclaration();
+        if (isClass(containingDeclaration) &&
+            ((ClassDescriptor) containingDeclaration).isValue() &&
+            contextKind != OwnerKind.ANYFIED_IMPLS &&
+                functionDescriptor instanceof SimpleFunctionDescriptor) {
+            mv.visitCode();
+
+            ClassDescriptor classDescriptor = (ClassDescriptor) containingDeclaration;
+
+            Type anyfiedImplType = typeMapper.mapAnyfiedImpls(classDescriptor);
+            Method anyfiedMethodImpl = typeMapper.mapAsmMethod(functionDescriptor.getOriginal(), OwnerKind.ANYFIED_IMPLS);
+
+            Type fieldOwnerType = typeMapper.mapClass(classDescriptor);
+
+            ValueParameterDescriptor valueRepresentation = classDescriptor.getUnsubstitutedPrimaryConstructor().getValueParameters().get(0);
+            Type fieldType = typeMapper.mapType(valueRepresentation);
+
+            generateDelegateToAnyfiedImpl(mv, anyfiedMethodImpl, anyfiedImplType.getInternalName(),
+                                          fieldOwnerType, valueRepresentation.getName().asString(), fieldType);
+        }
+        else if (!functionDescriptor.isExternal()) {
             generateMethodBody(mv, functionDescriptor, methodContext, jvmSignature, strategy, memberCodegen);
         }
         else if (staticInCompanionObject) {
@@ -622,6 +646,34 @@ public class FunctionCodegen {
             @NotNull MultifileClassFacadeContext context
     ) {
         generateDelegateToStaticMethodBody(true, mv, asmMethod, context.getFilePartType().getInternalName());
+    }
+
+    private static void generateDelegateToAnyfiedImpl(
+            @NotNull MethodVisitor mv,
+            @NotNull Method asmMethod,
+            @NotNull String classToDelegateTo,
+            @NotNull Type fieldOwnerType,
+            @NotNull String fieldName,
+            @NotNull Type fieldType) {
+        InstructionAdapter iv = new InstructionAdapter(mv);
+        Type[] argTypes = asmMethod.getArgumentTypes();
+
+        // The first line of some package file is written to the line number attribute of a static delegate to allow to 'step into' it
+        // This is similar to what javac does with bridge methods
+        Label label = new Label();
+        iv.visitLabel(label);
+        iv.visitLineNumber(1, label);
+
+        iv.load(0, AsmTypes.OBJECT_TYPE);
+        iv.visitFieldInsn(Opcodes.GETFIELD, fieldOwnerType.getInternalName(), fieldName, fieldType.getDescriptor());
+
+        int k = 1;
+        for (int i = 1; i < argTypes.length; ++i) {
+            iv.load(k, argTypes[i]);
+        }
+
+        iv.invokestatic(classToDelegateTo, asmMethod.getName(), asmMethod.getDescriptor(), false);
+        iv.areturn(asmMethod.getReturnType());
     }
 
     private static void generateDelegateToMethodBody(
