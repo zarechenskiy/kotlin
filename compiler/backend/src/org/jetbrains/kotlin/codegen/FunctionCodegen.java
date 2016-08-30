@@ -630,9 +630,8 @@ public class FunctionCodegen {
         iv.load(0, AsmTypes.OBJECT_TYPE);
         iv.visitFieldInsn(Opcodes.GETFIELD, fieldOwnerType.getInternalName(), fieldName, fieldType.getDescriptor());
 
-        int k = 1;
         for (int i = 1; i < argTypes.length; ++i) {
-            iv.load(k, argTypes[i]);
+            iv.load(i, argTypes[i]);
         }
 
         iv.invokestatic(classToDelegateTo, asmMethod.getName(), asmMethod.getDescriptor(), false);
