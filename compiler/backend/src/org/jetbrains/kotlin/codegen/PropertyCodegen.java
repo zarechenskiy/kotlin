@@ -252,6 +252,10 @@ public class PropertyCodegen {
             @NotNull Annotations backingFieldAnnotations,
             @NotNull Annotations delegateAnnotations
     ) {
+        if (kind == OwnerKind.ANYFIED_IMPLS) {
+            return false;
+        }
+
         if (isJvmInterface(descriptor.getContainingDeclaration()) || kind == OwnerKind.DEFAULT_IMPLS) {
             return false;
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,9 @@ public final class JvmAbi {
     public static final String DEFAULT_IMPLS_CLASS_NAME = "DefaultImpls";
     public static final String DEFAULT_IMPLS_SUFFIX = "$" + DEFAULT_IMPLS_CLASS_NAME;
     public static final String DEFAULT_IMPLS_DELEGATE_SUFFIX = "$defaultImpl";
+
+    public static final String ANYFIED_IMPLS_CLASS_NAME = "AnyfiedImpls";
+    public static final String ANYFIED_IMPLS_SUFFIX = "$" + ANYFIED_IMPLS_CLASS_NAME;
 
     public static final String DEFAULT_PARAMS_IMPL_SUFFIX = "$default";
 
