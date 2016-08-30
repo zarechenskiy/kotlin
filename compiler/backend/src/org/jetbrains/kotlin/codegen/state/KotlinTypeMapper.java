@@ -671,6 +671,16 @@ public class KotlinTypeMapper {
         return descriptor;
     }
 
+    public CallableMethod mapToAnyfiedCallableMethod(@NotNull FunctionDescriptor functionDescriptor, @NotNull ClassDescriptor classDescriptor) {
+        Type anyfiedImplType = mapAnyfiedImpls(classDescriptor);
+        Method anyfiedMethodImpl = mapAsmMethod(functionDescriptor.getOriginal(), OwnerKind.ANYFIED_IMPLS);
+        JvmMethodSignature signature = mapSignatureSkipGeneric(functionDescriptor, OwnerKind.ANYFIED_IMPLS);
+
+        return new CallableMethod(
+                anyfiedImplType, null, anyfiedMethodImpl.getDescriptor(), signature, INVOKESTATIC,
+                mapType(classDescriptor), null, null);
+    }
+
     @NotNull
     public CallableMethod mapToCallableMethod(@NotNull FunctionDescriptor descriptor, boolean superCall) {
         if (descriptor instanceof ConstructorDescriptor) {
