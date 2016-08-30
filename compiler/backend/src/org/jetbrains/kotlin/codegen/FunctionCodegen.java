@@ -237,6 +237,7 @@ public class FunctionCodegen {
             ((ClassDescriptor) containingDeclaration).isValue() &&
             contextKind != OwnerKind.ANYFIED_IMPLS &&
                 functionDescriptor instanceof SimpleFunctionDescriptor) {
+
             mv.visitCode();
 
             ClassDescriptor classDescriptor = (ClassDescriptor) containingDeclaration;

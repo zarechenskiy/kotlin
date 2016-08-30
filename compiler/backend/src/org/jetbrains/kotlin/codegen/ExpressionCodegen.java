@@ -2916,6 +2916,14 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
             return intrinsic.toCallable(fd, superCall, resolvedCall, this);
         }
 
+        DeclarationDescriptor containingDeclaration = fd.getContainingDeclaration();
+        if (containingDeclaration instanceof ClassDescriptor) {
+            ClassDescriptor classDescriptor = (ClassDescriptor) containingDeclaration;
+            if ((classDescriptor).isValue()) {
+                return typeMapper.mapToAnyfiedCallableMethod(fd, classDescriptor);
+            }
+        }
+
         return resolveToCallableMethod(fd, superCall);
     }
 
