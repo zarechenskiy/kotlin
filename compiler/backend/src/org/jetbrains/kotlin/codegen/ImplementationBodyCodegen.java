@@ -246,6 +246,23 @@ public class ImplementationBodyCodegen extends ClassBodyCodegen {
     }
 
     @Override
+    protected void generateAnyfiedImplsForValueClass() {
+        if (!isClass(descriptor) || !descriptor.isValue()) {
+            return;
+        }
+
+        Type defaultImplsType = state.getTypeMapper().mapAnyfiedImpls(descriptor);
+        ClassBuilder anyfiedImplsBuilder =
+                state.getFactory().newVisitor(JvmDeclarationOriginKt.AnyfiedImpls(myClass, descriptor), defaultImplsType, myClass.getContainingFile());
+
+        CodegenContext parentContext = context.getParentContext();
+        assert parentContext != null : "Parent context of interface declaration should not be null";
+
+        ClassContext anyfiedImplsContext = parentContext.intoAnyfiedImplsClass(descriptor, (ClassContext) context, state);
+        new AnyfiedImplBodyCodegen(myClass, anyfiedImplsContext, anyfiedImplsBuilder, state, this).generate();
+    }
+
+    @Override
     protected void generateKotlinMetadataAnnotation() {
         final DescriptorSerializer serializer =
                 DescriptorSerializer.create(descriptor, new JvmSerializerExtension(v.getSerializationBindings(), state));

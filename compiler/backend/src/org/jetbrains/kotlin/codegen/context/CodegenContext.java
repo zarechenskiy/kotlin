@@ -273,6 +273,10 @@ public abstract class CodegenContext<T extends DeclarationDescriptor> {
         return new DefaultImplsClassContext(state.getTypeMapper(), descriptor, OwnerKind.DEFAULT_IMPLS, this, null, interfaceContext);
     }
 
+    public ClassContext intoAnyfiedImplsClass(ClassDescriptor descriptor, ClassContext valueClassContext, GenerationState state) {
+        return new AnyfiedImplsClassContext(state.getTypeMapper(), descriptor, OwnerKind.ANYFIED_IMPLS, this, null, valueClassContext);
+    }
+
     @NotNull
     public ClassContext intoClass(@NotNull ClassDescriptor descriptor, @NotNull OwnerKind kind, @NotNull GenerationState state) {
         if (shouldAddChild(descriptor)) {

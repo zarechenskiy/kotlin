@@ -483,6 +483,11 @@ public class KotlinTypeMapper {
     }
 
     @NotNull
+    public Type mapAnyfiedImpls(@NotNull ClassDescriptor descriptor) {
+        return Type.getObjectType(mapType(descriptor.getDefaultType(), null, TypeMappingMode.CLASS_TYPE).getInternalName() + JvmAbi.ANYFIED_IMPLS_SUFFIX);
+    }
+
+    @NotNull
     private static String generateErrorMessageForErrorType(@NotNull KotlinType type, @NotNull DeclarationDescriptor descriptor) {
         PsiElement declarationElement = DescriptorToSourceUtils.descriptorToDeclaration(descriptor);
 
@@ -998,7 +1003,7 @@ public class KotlinTypeMapper {
         else {
             CallableMemberDescriptor directMember = getDirectMember(f);
             KotlinType thisIfNeeded = null;
-            if (OwnerKind.DEFAULT_IMPLS == kind) {
+            if (OwnerKind.DEFAULT_IMPLS == kind || OwnerKind.ANYFIED_IMPLS == kind) {
                 ReceiverTypeAndTypeParameters receiverTypeAndTypeParameters = TypeMapperUtilsKt.patchTypeParametersForDefaultImplMethod(directMember);
                 writeFormalTypeParameters(
                         CollectionsKt.plus(receiverTypeAndTypeParameters.getTypeParameters(), directMember.getTypeParameters()),

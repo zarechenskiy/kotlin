@@ -38,6 +38,7 @@ import org.jetbrains.kotlin.descriptors.annotations.AnnotationUseSiteTarget;
 import org.jetbrains.kotlin.load.java.BuiltinMethodsWithSpecialGenericSignature;
 import org.jetbrains.kotlin.load.java.JvmAbi;
 import org.jetbrains.kotlin.load.java.SpecialBuiltinMembers;
+import org.jetbrains.kotlin.load.kotlin.TypeMappingMode;
 import org.jetbrains.kotlin.name.FqName;
 import org.jetbrains.kotlin.psi.KtElement;
 import org.jetbrains.kotlin.psi.KtFunction;
@@ -50,6 +51,7 @@ import org.jetbrains.kotlin.resolve.constants.ArrayValue;
 import org.jetbrains.kotlin.resolve.constants.ConstantValue;
 import org.jetbrains.kotlin.resolve.constants.KClassValue;
 import org.jetbrains.kotlin.resolve.inline.InlineUtil;
+import org.jetbrains.kotlin.resolve.jvm.AsmTypes;
 import org.jetbrains.kotlin.resolve.jvm.RuntimeAssertionInfo;
 import org.jetbrains.kotlin.resolve.jvm.diagnostics.JvmDeclarationOrigin;
 import org.jetbrains.kotlin.resolve.jvm.diagnostics.JvmDeclarationOriginKind;
@@ -80,8 +82,7 @@ import static org.jetbrains.kotlin.codegen.serialization.JvmSerializationBinding
 import static org.jetbrains.kotlin.descriptors.CallableMemberDescriptor.Kind.DECLARATION;
 import static org.jetbrains.kotlin.descriptors.annotations.AnnotationUseSiteTarget.*;
 import static org.jetbrains.kotlin.resolve.DescriptorToSourceUtils.getSourceFromDescriptor;
-import static org.jetbrains.kotlin.resolve.DescriptorUtils.getSuperClassDescriptor;
-import static org.jetbrains.kotlin.resolve.DescriptorUtils.isInterface;
+import static org.jetbrains.kotlin.resolve.DescriptorUtils.*;
 import static org.jetbrains.kotlin.resolve.jvm.AsmTypes.OBJECT_TYPE;
 import static org.jetbrains.kotlin.types.expressions.ExpressionTypingUtils.*;
 import static org.jetbrains.org.objectweb.asm.Opcodes.*;
@@ -163,6 +164,10 @@ public class FunctionCodegen {
             return;
         }
 
+        if (functionDescriptor instanceof PropertyAccessorDescriptor && contextKind == OwnerKind.ANYFIED_IMPLS) {
+            return;
+        }
+
         JvmMethodGenericSignature jvmSignature = typeMapper.mapSignatureWithGeneric(functionDescriptor, contextKind);
         Method asmMethod = jvmSignature.getAsmMethod();
 
@@ -214,7 +219,27 @@ public class FunctionCodegen {
             return;
         }
 
-        if (!functionDescriptor.isExternal()) {
+        DeclarationDescriptor containingDeclaration = functionDescriptor.getContainingDeclaration();
+        if (isClass(containingDeclaration) &&
+            ((ClassDescriptor) containingDeclaration).isValue() &&
+            contextKind != OwnerKind.ANYFIED_IMPLS &&
+                functionDescriptor instanceof SimpleFunctionDescriptor) {
+            mv.visitCode();
+
+            ClassDescriptor classDescriptor = (ClassDescriptor) containingDeclaration;
+
+            Type anyfiedImplType = typeMapper.mapAnyfiedImpls(classDescriptor);
+            Method anyfiedMethodImpl = typeMapper.mapAsmMethod(functionDescriptor.getOriginal(), OwnerKind.ANYFIED_IMPLS);
+
+            Type fieldOwnerType = typeMapper.mapClass(classDescriptor);
+
+            ValueParameterDescriptor valueRepresentation = classDescriptor.getUnsubstitutedPrimaryConstructor().getValueParameters().get(0);
+            Type fieldType = typeMapper.mapType(valueRepresentation);
+
+            generateDelegateToAnyfiedImpl(mv, anyfiedMethodImpl, anyfiedImplType.getInternalName(),
+                                          fieldOwnerType, valueRepresentation.getName().asString(), fieldType);
+        }
+        else if (!functionDescriptor.isExternal()) {
             generateMethodBody(mv, functionDescriptor, methodContext, jvmSignature, strategy, memberCodegen);
         }
         else if (staticInCompanionObject) {
@@ -495,6 +520,34 @@ public class FunctionCodegen {
             @NotNull MultifileClassFacadeContext context
     ) {
         generateDelegateToMethodBody(true, mv, asmMethod, context.getFilePartType().getInternalName());
+    }
+
+    private static void generateDelegateToAnyfiedImpl(
+            @NotNull MethodVisitor mv,
+            @NotNull Method asmMethod,
+            @NotNull String classToDelegateTo,
+            @NotNull Type fieldOwnerType,
+            @NotNull String fieldName,
+            @NotNull Type fieldType) {
+        InstructionAdapter iv = new InstructionAdapter(mv);
+        Type[] argTypes = asmMethod.getArgumentTypes();
+
+        // The first line of some package file is written to the line number attribute of a static delegate to allow to 'step into' it
+        // This is similar to what javac does with bridge methods
+        Label label = new Label();
+        iv.visitLabel(label);
+        iv.visitLineNumber(1, label);
+
+        iv.load(0, AsmTypes.OBJECT_TYPE);
+        iv.visitFieldInsn(Opcodes.GETFIELD, fieldOwnerType.getInternalName(), fieldName, fieldType.getDescriptor());
+
+        int k = 1;
+        for (int i = 1; i < argTypes.length; ++i) {
+            iv.load(k, argTypes[i]);
+        }
+
+        iv.invokestatic(classToDelegateTo, asmMethod.getName(), asmMethod.getDescriptor(), false);
+        iv.areturn(asmMethod.getReturnType());
     }
 
     private static void generateDelegateToMethodBody(

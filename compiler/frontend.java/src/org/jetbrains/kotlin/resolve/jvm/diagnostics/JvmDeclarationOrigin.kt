@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ enum class JvmDeclarationOriginKind {
     OTHER,
     PACKAGE_PART,
     INTERFACE_DEFAULT_IMPL,
+    ANYFIED_IMPL,
     DELEGATION_TO_DEFAULT_IMPLS,
     DELEGATION,
     SAM_DELEGATION,
@@ -73,6 +74,7 @@ fun MultifileClassPart(file: KtFile, descriptor: PackageFragmentDescriptor): Jvm
         JvmDeclarationOrigin(MULTIFILE_CLASS_PART, file, descriptor)
 
 fun DefaultImpls(element: KtClassOrObject, descriptor: ClassDescriptor): JvmDeclarationOrigin = JvmDeclarationOrigin(INTERFACE_DEFAULT_IMPL, element, descriptor)
+fun AnyfiedImpls(element: KtClassOrObject, descriptor: ClassDescriptor): JvmDeclarationOrigin = JvmDeclarationOrigin(ANYFIED_IMPL, element, descriptor)
 fun DelegationToDefaultImpls(element: PsiElement?, descriptor: FunctionDescriptor): JvmDeclarationOrigin =
         JvmDeclarationOrigin(DELEGATION_TO_DEFAULT_IMPLS, element, descriptor)
 
