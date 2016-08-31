@@ -2557,7 +2557,15 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
                         }
                     };
                 }
-                return adjustVariableValue(StackValue.local(index, varType, putMetadata), variableDescriptor);
+
+                Type valueBox = null;
+                ClassifierDescriptor declarationDescriptor = variableDescriptorType.getConstructor().getDeclarationDescriptor();
+                if (declarationDescriptor instanceof ClassDescriptor) {
+                    if (((ClassDescriptor) declarationDescriptor).isValue()) {
+                        valueBox = typeMapper.mapClass(declarationDescriptor);
+                    }
+                }
+                return adjustVariableValue(StackValue.local(index, varType, putMetadata, valueBox), variableDescriptor);
             }
         }
         else {
@@ -4064,7 +4072,15 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
                 }
             };
         }
-        StackValue storeTo = sharedVarType == null ? StackValue.local(index, varType) : StackValue.shared(index, varType);
+
+        ClassifierDescriptor declarationDescriptor = variableType.getConstructor().getDeclarationDescriptor();
+        Type valueBox = null;
+        if (declarationDescriptor instanceof ClassDescriptor) {
+            if (((ClassDescriptor) declarationDescriptor).isValue()) {
+                valueBox = typeMapper.mapClass(declarationDescriptor);
+            }
+        }
+        StackValue storeTo = sharedVarType == null ? StackValue.local(index, varType, valueBox) : StackValue.shared(index, varType);
 
         storeTo.putReceiver(v, false);
 

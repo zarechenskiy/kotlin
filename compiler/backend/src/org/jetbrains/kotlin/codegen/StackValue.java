@@ -170,12 +170,17 @@ public abstract class StackValue {
 
     @NotNull
     public static Local local(int index, @NotNull Type type) {
-        return local(index, type, null);
+        return local(index, type, null, null);
     }
 
     @NotNull
-    public static Local local(int index, @NotNull Type type, @Nullable Function0<Unit> putMetadata) {
-        return new Local(index, type, putMetadata);
+    public static Local local(int index, @NotNull Type type, @Nullable Type valueBox) {
+        return local(index, type, null, valueBox);
+    }
+
+    @NotNull
+    public static Local local(int index, @NotNull Type type, @Nullable Function0<Unit> putMetadata, @Nullable Type valueBox) {
+        return new Local(index, type, putMetadata, valueBox);
     }
 
     @NotNull
@@ -686,11 +691,13 @@ public abstract class StackValue {
         public final int index;
 
         private Function0<Unit> putMetadata;
+        private final Type valueBox;
 
-        private Local(int index, Type type, Function0<Unit> putMetadata) {
+        private Local(int index, Type type, Function0<Unit> putMetadata, Type valueBox) {
             super(type, false);
             this.index = index;
             this.putMetadata = putMetadata;
+            this.valueBox = valueBox;
 
             if (index < 0) {
                 throw new IllegalStateException("local variable index must be non-negative");
@@ -703,7 +710,11 @@ public abstract class StackValue {
                 putMetadata.invoke();
             }
             v.load(index, this.type);
-            coerceTo(type, v);
+            if (valueBox != null) {
+               v.invokevirtual(valueBox.getInternalName(), "valueOf", "()" + valueBox.getDescriptor(), false);
+            } else {
+                coerceTo(type, v);
+            }
             // TODO unbox
         }
 
