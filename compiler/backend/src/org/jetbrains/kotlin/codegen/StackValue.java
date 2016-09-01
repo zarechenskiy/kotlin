@@ -710,11 +710,7 @@ public abstract class StackValue {
                 putMetadata.invoke();
             }
             v.load(index, this.type);
-            if (valueBox != null) {
-               v.invokevirtual(valueBox.getInternalName(), "valueOf", "()" + valueBox.getDescriptor(), false);
-            } else {
-                coerceTo(type, v);
-            }
+            coerceTo(type, v);
             // TODO unbox
         }
 
