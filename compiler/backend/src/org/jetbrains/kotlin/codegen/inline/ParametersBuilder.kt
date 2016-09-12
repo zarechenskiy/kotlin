@@ -40,7 +40,7 @@ internal class ParametersBuilder private constructor() {
     }
 
     fun addNextParameter(type: Type, skipped: Boolean, kotlinType: KotlinType?): ParameterInfo {
-        return addParameter(ParameterInfo(type, skipped, nextValueParameterIndex, null, valueAndHiddenParams.size, kotlinType))
+        return addParameter(ParameterInfo(type, skipped, nextParameterOffset, null, nextValueParameterIndex, kotlinType))
     }
 
     fun addNextValueParameter(type: Type, skipped: Boolean, remapValue: StackValue?, parameterIndex: Int): ParameterInfo {
