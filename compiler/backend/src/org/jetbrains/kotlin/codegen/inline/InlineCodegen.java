@@ -681,7 +681,7 @@ public class InlineCodegen extends CallGenerator {
                 } else {
                     parameterType = type;
                 }
-                info = invocationParamBuilder.addNextValueParameter(type, false, remappedValue, parameterIndex);
+                info = invocationParamBuilder.addNextValueParameter(parameterType, false, remappedValue, parameterIndex);
             }
 
             recordParameterValueInLocalVal(info);
