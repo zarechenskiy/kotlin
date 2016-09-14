@@ -1360,6 +1360,12 @@ public class BytecodeTextTestGenerated extends AbstractBytecodeTextTest {
                 doTest(fileName);
             }
 
+            @TestMetadata("boxAsInterface.kt")
+            public void testBoxAsInterface() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/bytecodeText/specialization/boxing/boxAsInterface.kt");
+                doTest(fileName);
+            }
+
             @TestMetadata("boxGenericArgument.kt")
             public void testBoxGenericArgument() throws Exception {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/bytecodeText/specialization/boxing/boxGenericArgument.kt");
