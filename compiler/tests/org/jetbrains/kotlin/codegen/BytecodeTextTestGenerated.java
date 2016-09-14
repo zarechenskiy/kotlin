@@ -1354,9 +1354,33 @@ public class BytecodeTextTestGenerated extends AbstractBytecodeTextTest {
                 KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/codegen/bytecodeText/specialization/boxing"), Pattern.compile("^(.+)\\.kt$"), true);
             }
 
+            @TestMetadata("boxArgument.kt")
+            public void testBoxArgument() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/bytecodeText/specialization/boxing/boxArgument.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("boxGenericArgument.kt")
+            public void testBoxGenericArgument() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/bytecodeText/specialization/boxing/boxGenericArgument.kt");
+                doTest(fileName);
+            }
+
             @TestMetadata("localVarBox.kt")
             public void testLocalVarBox() throws Exception {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/bytecodeText/specialization/boxing/localVarBox.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("localVarPrimitiveBox.kt")
+            public void testLocalVarPrimitiveBox() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/bytecodeText/specialization/boxing/localVarPrimitiveBox.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("unboxGeneric.kt")
+            public void testUnboxGeneric() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/bytecodeText/specialization/boxing/unboxGeneric.kt");
                 doTest(fileName);
             }
         }

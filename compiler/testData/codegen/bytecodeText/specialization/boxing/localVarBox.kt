@@ -7,8 +7,8 @@ value class Name(val s: String) {
         return s
     }
 
-    fun unbox(boxed: String): Name {
-        return Name(boxed)
+    fun unbox(boxed: Any): Name {
+        return Name(boxed as String)
     }
 
     fun greeting(): String {
@@ -28,6 +28,6 @@ fun box() {
 
 // @FooKt.class:
 // 1 INVOKESTATIC Name\$AnyfiedImpls.box \(Ljava/lang/String;\)Ljava/lang/Object;
-// 1 INVOKESTATIC Name\$AnyfiedImpls.unbox \(Ljava/lang/String;\)Ljava/lang/String;
+// 1 INVOKESTATIC Name\$AnyfiedImpls.unbox \(Ljava/lang/Object;\)Ljava/lang/String;
 // 1 INVOKESTATIC Name\$AnyfiedImpls.greeting \(Ljava/lang/String;\)Ljava/lang/String;
 // 0 INVOKESPECIAL
