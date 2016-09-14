@@ -15838,6 +15838,21 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
                 doTest(fileName);
             }
         }
+
+        @TestMetadata("compiler/testData/codegen/box/specialization/valuesBoxing")
+        @TestDataPath("$PROJECT_ROOT")
+        @RunWith(JUnit3RunnerWithInners.class)
+        public static class ValuesBoxing extends AbstractBlackBoxCodegenTest {
+            public void testAllFilesPresentInValuesBoxing() throws Exception {
+                KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/codegen/box/specialization/valuesBoxing"), Pattern.compile("^(.+)\\.kt$"), true);
+            }
+
+            @TestMetadata("localVarBox.kt")
+            public void testLocalVarBox() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/valuesBoxing/localVarBox.kt");
+                doTest(fileName);
+            }
+        }
     }
 
     @TestMetadata("compiler/testData/codegen/box/statics")
