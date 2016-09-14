@@ -18,7 +18,8 @@ value class Name(val s: String) {
 
 // FILE: foo.kt
 
-fun box(name: Name) {
+fun box() {
+    val name = Name("Kotlin")
     val ls = listOf(name)
     val t1 = ls[0]
 
