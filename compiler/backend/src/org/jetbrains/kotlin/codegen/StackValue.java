@@ -381,7 +381,7 @@ public abstract class StackValue {
         coerce(topOfStackType, this.type, v);
     }
 
-    public static void coerce(@NotNull Type fromType, @NotNull Type toType, @NotNull InstructionAdapter v) {
+    public static void coerce(@NotNull Type fromType, @NotNull Type toType, @Nullable Type valueBox, @NotNull InstructionAdapter v) {
         if (toType.equals(fromType)) return;
 
         if (toType.getSort() == Type.VOID) {
@@ -450,6 +450,10 @@ public abstract class StackValue {
         else {
             v.cast(fromType, toType);
         }
+    }
+
+    public static void coerce(@NotNull Type fromType, @NotNull Type toType, @NotNull InstructionAdapter v) {
+        coerce(fromType, toType, null, v);
     }
 
     public static void putUnitInstance(@NotNull InstructionAdapter v) {
@@ -709,13 +713,22 @@ public abstract class StackValue {
                 putMetadata.invoke();
             }
             v.load(index, this.type);
-            coerceTo(type, v);
+            if (StackValue.coerceValue(valueBox, type, this.type)) {
+                Type anyfiedImpls = KotlinTypeMapper.mapAnyfiedImpls(valueBox);
+                v.invokestatic(anyfiedImpls.getInternalName(), "box", "(" + this.type.getDescriptor() + ")Ljava/lang/Object;", false);
+            } else {
+                coerceTo(type, v);
+            }
             // TODO unbox
         }
 
         @Override
         public void storeSelector(@NotNull Type topOfStackType, @NotNull InstructionAdapter v) {
             coerceFrom(topOfStackType, v);
+            if (StackValue.coerceValue(valueBox, topOfStackType, this.type)) {
+                Type anyfiedImpls = KotlinTypeMapper.mapAnyfiedImpls(valueBox);
+                v.invokestatic(anyfiedImpls.getInternalName(), "unbox", "(" + this.type.getDescriptor() + ")" + this.type.getDescriptor(), false);
+            }
             if (putMetadata != null) {
                 putMetadata.invoke();
             }
@@ -725,6 +738,10 @@ public abstract class StackValue {
         public void setMetadata(@Nullable Function0<Unit> putMetadata) {
             this.putMetadata = putMetadata;
         }
+    }
+
+    private static boolean coerceValue(@Nullable Type valueBox, @NotNull Type type, @NotNull Type valueType) {
+        return valueBox != null && type.getSort() == Type.OBJECT && !type.equals(valueType);
     }
 
     public static class Delegate extends StackValue {

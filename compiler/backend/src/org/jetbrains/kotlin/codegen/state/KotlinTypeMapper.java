@@ -466,7 +466,12 @@ public class KotlinTypeMapper {
 
     @NotNull
     public Type mapAnyfiedImpls(@NotNull ClassDescriptor descriptor) {
-        return Type.getObjectType(mapType(descriptor.getDefaultType(), null, TypeMappingMode.CLASS_TYPE).getInternalName() + JvmAbi.ANYFIED_IMPLS_SUFFIX);
+        return mapAnyfiedImpls(mapType(descriptor.getDefaultType(), null, TypeMappingMode.CLASS_TYPE));
+    }
+
+    @NotNull
+    public static Type mapAnyfiedImpls(@NotNull Type valueClass) {
+        return Type.getObjectType(valueClass.getInternalName() + JvmAbi.ANYFIED_IMPLS_SUFFIX);
     }
 
     @NotNull
@@ -1054,12 +1059,20 @@ public class KotlinTypeMapper {
             CallableMemberDescriptor directMember = getDirectMember(f);
             KotlinType thisIfNeeded = null;
             if (OwnerKind.DEFAULT_IMPLS == kind || OwnerKind.ANYFIED_IMPLS == kind) {
-                ReceiverTypeAndTypeParameters receiverTypeAndTypeParameters = TypeMapperUtilsKt.patchTypeParametersForDefaultImplMethod(directMember);
-                writeFormalTypeParameters(
-                        CollectionsKt.plus(receiverTypeAndTypeParameters.getTypeParameters(), directMember.getTypeParameters()),
-                        sw,
-                        typeParameterMappings);
-                thisIfNeeded = receiverTypeAndTypeParameters.getReceiverType();
+                if (!f.getName().asString().equals("unbox")) {
+                    ReceiverTypeAndTypeParameters receiverTypeAndTypeParameters = TypeMapperUtilsKt.patchTypeParametersForDefaultImplMethod(directMember);
+                    writeFormalTypeParameters(
+                            CollectionsKt.plus(receiverTypeAndTypeParameters.getTypeParameters(), directMember.getTypeParameters()),
+                            sw,
+                            typeParameterMappings);
+
+                    thisIfNeeded = receiverTypeAndTypeParameters.getReceiverType();
+                } else {
+                    writeFormalTypeParameters(
+                            directMember.getTypeParameters(),
+                            sw,
+                            typeParameterMappings);
+                }
             }
             else {
                 writeFormalTypeParameters(directMember.getTypeParameters(), sw, typeParameterMappings);

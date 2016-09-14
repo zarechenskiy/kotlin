@@ -627,11 +627,14 @@ public class FunctionCodegen {
         iv.visitLabel(label);
         iv.visitLineNumber(1, label);
 
-        iv.load(0, AsmTypes.OBJECT_TYPE);
-        iv.visitFieldInsn(Opcodes.GETFIELD, fieldOwnerType.getInternalName(), fieldName, fieldType.getDescriptor());
+        boolean unboxMethod = asmMethod.getName().equals("unbox");
+        if (!unboxMethod) {
+            iv.load(0, AsmTypes.OBJECT_TYPE);
+            iv.visitFieldInsn(Opcodes.GETFIELD, fieldOwnerType.getInternalName(), fieldName, fieldType.getDescriptor());
+        }
 
         int k = 1;
-        for (int i = 1; i < argTypes.length; ++i) {
+        for (int i = unboxMethod ? 0 : 1; i < argTypes.length; ++i) {
             iv.load(k, argTypes[i]);
             k += argTypes[i].getSize();
         }
