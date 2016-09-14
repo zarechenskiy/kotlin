@@ -724,11 +724,17 @@ public abstract class StackValue {
 
         @Override
         public void storeSelector(@NotNull Type topOfStackType, @NotNull InstructionAdapter v) {
-            coerceFrom(topOfStackType, v);
             if (StackValue.coerceValue(valueBox, topOfStackType, this.type)) {
+                //if (this.type.getSort() == Type.OBJECT) {
+                //    coerceFrom(topOfStackType, v);
+                //}
+
                 Type anyfiedImpls = KotlinTypeMapper.mapAnyfiedImpls(valueBox);
-                v.invokestatic(anyfiedImpls.getInternalName(), "unbox", "(" + this.type.getDescriptor() + ")" + this.type.getDescriptor(), false);
+                v.invokestatic(anyfiedImpls.getInternalName(), "unbox", "(Ljava/lang/Object;)" + this.type.getDescriptor(), false);
+            } else {
+                coerceFrom(topOfStackType, v);
             }
+
             if (putMetadata != null) {
                 putMetadata.invoke();
             }
