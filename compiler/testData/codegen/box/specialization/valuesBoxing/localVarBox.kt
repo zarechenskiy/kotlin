@@ -1,11 +1,11 @@
 // WITH_RUNTIME
 
 value class Name(val s: String) {
-    fun box(): Any {
+    operator fun box(): String {
         return s
     }
 
-    fun unbox(boxed: String): Name {
+    operator fun unbox(boxed: String): Name {
         return Name(boxed)
     }
 
