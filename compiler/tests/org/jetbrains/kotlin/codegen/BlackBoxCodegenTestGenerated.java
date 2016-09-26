@@ -15390,9 +15390,39 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
                 KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/codegen/box/specialization/valuesBoxing"), Pattern.compile("^(.+)\\.kt$"), true);
             }
 
+            @TestMetadata("boxArgument.kt")
+            public void testBoxArgument() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/valuesBoxing/boxArgument.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("boxAsInterface.kt")
+            public void testBoxAsInterface() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/valuesBoxing/boxAsInterface.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("boxGenericArgument.kt")
+            public void testBoxGenericArgument() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/valuesBoxing/boxGenericArgument.kt");
+                doTest(fileName);
+            }
+
             @TestMetadata("localVarBox.kt")
             public void testLocalVarBox() throws Exception {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/valuesBoxing/localVarBox.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("localVarPrimitiveBox.kt")
+            public void testLocalVarPrimitiveBox() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/valuesBoxing/localVarPrimitiveBox.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("unboxGeneric.kt")
+            public void testUnboxGeneric() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/valuesBoxing/unboxGeneric.kt");
                 doTest(fileName);
             }
         }
