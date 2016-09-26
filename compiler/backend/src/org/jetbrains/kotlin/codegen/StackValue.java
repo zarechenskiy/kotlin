@@ -761,7 +761,8 @@ public abstract class StackValue {
     }
 
     private static boolean coerceValue(@Nullable ValueClassInfo valueClassInfo, @NotNull Type type, @NotNull Type valueType) {
-        return valueClassInfo != null && type.getSort() == Type.OBJECT && !type.equals(valueType);
+        return valueClassInfo != null && type.getSort() == Type.OBJECT && !type.equals(valueClassInfo.getContainer()) &&
+                !type.equals(valueType);
     }
 
     public static class Delegate extends StackValue {
