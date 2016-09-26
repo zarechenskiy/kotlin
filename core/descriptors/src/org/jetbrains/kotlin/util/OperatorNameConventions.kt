@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,6 +62,9 @@ object OperatorNameConventions {
 
 
     @JvmField val PROPERTY_DELEGATED = Name.identifier("propertyDelegated")
+
+    @JvmField val VALUE_BOX = Name.identifier("box")
+    @JvmField val VALUE_UNBOX = Name.identifier("unbox")
 
     // If you add new unary, binary or assignment operators, add it to OperatorConventions as well
 
