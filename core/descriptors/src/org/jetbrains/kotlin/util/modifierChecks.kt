@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,8 @@ import org.jetbrains.kotlin.util.OperatorNameConventions.RANGE_TO
 import org.jetbrains.kotlin.util.OperatorNameConventions.SET
 import org.jetbrains.kotlin.util.OperatorNameConventions.SET_VALUE
 import org.jetbrains.kotlin.util.OperatorNameConventions.SIMPLE_UNARY_OPERATION_NAMES
+import org.jetbrains.kotlin.util.OperatorNameConventions.VALUE_BOX
+import org.jetbrains.kotlin.util.OperatorNameConventions.VALUE_UNBOX
 import org.jetbrains.kotlin.util.ReturnsCheck.*
 import org.jetbrains.kotlin.util.ValueParameterCountCheck.NoValueParameters
 import org.jetbrains.kotlin.util.ValueParameterCountCheck.SingleValueParameter
@@ -119,6 +121,16 @@ sealed class ReturnsCheck(val name: String, val type: KotlinBuiltIns.() -> Kotli
     object ReturnsBoolean : ReturnsCheck("Boolean", { booleanType })
     object ReturnsInt : ReturnsCheck("Int", { intType })
     object ReturnsUnit : ReturnsCheck("Unit", { unitType })
+}
+
+object ReturnsReferenceNonNullableType : Check {
+    override val description: String
+        get() = "must return reference non-nullable type"
+
+    override fun check(functionDescriptor: FunctionDescriptor): Boolean {
+        val returnType = functionDescriptor.returnType ?: return false
+        return !KotlinBuiltIns.isPrimitiveType(returnType) && !returnType.isMarkedNullable
+    }
 }
 
 internal class Checks private constructor(
@@ -217,8 +229,30 @@ object OperatorChecks : AbstractModifierChecks() {
                     "First parameter should be 'Throwable'"
                 }
             },
-            Checks(PROPERTY_DELEGATED, Member, ValueParameterCountCheck.Equals(1)) //TODO: more checks required!
+            Checks(PROPERTY_DELEGATED, Member, ValueParameterCountCheck.Equals(1)), //TODO: more checks required!
+            Checks(VALUE_BOX, Member, NoValueParameters, ReturnsReferenceNonNullableType, NoDefaultAndVarargsCheck, NoTypeParametersCheck) {
+                checkIsInValueClass()
+            },
+            Checks(VALUE_UNBOX, Member, ValueParameterCountCheck.SingleValueParameter, NoDefaultAndVarargsCheck, NoTypeParametersCheck) {
+                checkIsInValueClass()
+                ?: checkUnboxReturnTypeEqualsValue()
+            }
     )
+
+    private fun FunctionDescriptor.checkUnboxReturnTypeEqualsValue(): String? {
+        val descriptorOfReturnedType = returnType?.constructor?.declarationDescriptor
+        return ensure(containingDeclaration == descriptorOfReturnedType) {
+            "Return type should be equals to value class"
+        }
+    }
+
+    private fun FunctionDescriptor.checkIsInValueClass(): String? {
+        val classDescriptor = containingDeclaration as? ClassDescriptor
+        val isValue = classDescriptor?.isValue ?: false
+        return ensure(isValue) {
+            "Method should be a member of value class"
+        }
+    }
 
     private fun FunctionDescriptor.checkHandleSecondParameter(): String? {
         val secondParameter = valueParameters[1]
