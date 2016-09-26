@@ -5,7 +5,7 @@ inline fun <@Anyfied T> test(el: T): T {
 }
 
 fun box(): String {
-    val k = 1 as vInt?
+    val k: vInt? = vInt(1)
 
     if (k is vInt) {
         test(k)

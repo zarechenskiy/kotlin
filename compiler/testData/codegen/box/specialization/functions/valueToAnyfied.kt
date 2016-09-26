@@ -1,8 +1,8 @@
 // WITH_RUNTIME
 
 fun box(): String {
-    val k = test(1 as vInt) {
-        2 as vInt
+    val k = test(vInt(1)) {
+        vInt(2)
     }
     return "OK"
 }

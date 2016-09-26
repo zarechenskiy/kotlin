@@ -3,7 +3,7 @@
 fun box(): String {
     val p = createArray<vInt>(10)
     val first = p[0]
-    val zero = 0 as vInt
+    val zero = vInt(0)
 
     assert(first == zero)
 

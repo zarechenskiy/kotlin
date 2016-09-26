@@ -3,7 +3,7 @@
 fun box(): String {
     val vArr1 = intArrayOf(1) as Array<vInt>
     val vArr2 = intArrayOf(0) as Array<vInt>
-    val el = 1 as vInt
+    val el = vInt(1)
 
     vArr1.storeInto(vArr2) {
         el

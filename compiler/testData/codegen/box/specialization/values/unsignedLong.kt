@@ -13,7 +13,7 @@ fun box(): String {
     return "OK"
 }
 
-value class uLong(private val v: Long)
+value class uLong(val v: Long)
 
 val uLong.MIN_VALUE: uLong
     get() = uLong(0)
@@ -55,7 +55,7 @@ fun uLong.toChar(): Char = unsigned().toChar()
 private val uLong.UNSIGNED_MASK: Long
     get() = 0x7fffffffffffffffL
 
-private fun uLong.value(): Long = this as Long
+private fun uLong.value(): Long = this.v
 
 private fun uLong.flip(): Long = value() xor Long.MIN_VALUE
 

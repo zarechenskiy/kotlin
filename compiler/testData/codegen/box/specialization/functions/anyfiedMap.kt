@@ -2,7 +2,7 @@
 
 fun box(): String {
     val arr = intArrayOf(1, 2) as Array<vInt>
-    val v = 10 as vInt
+    val v = vInt(10)
 
     val mapped = testLambda(arr, v)
 
