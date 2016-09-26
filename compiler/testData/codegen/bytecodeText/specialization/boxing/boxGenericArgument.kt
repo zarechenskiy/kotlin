@@ -3,11 +3,11 @@
 // FILE: library.kt
 
 value class VLong(val l: Long) {
-    fun box(): Any {
+    operator fun box(): Any {
         return java.lang.Long.valueOf(l)
     }
 
-    fun unbox(boxed: Any): VLong {
+    operator fun unbox(boxed: Any): VLong {
         return VLong(boxed as Long)
     }
 

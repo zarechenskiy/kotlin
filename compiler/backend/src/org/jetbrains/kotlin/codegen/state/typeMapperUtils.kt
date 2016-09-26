@@ -20,9 +20,13 @@ import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.descriptors.impl.TypeParameterDescriptorImpl
+import org.jetbrains.kotlin.incremental.components.LookupLocation
+import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.typeUtil.asTypeProjection
+import org.jetbrains.kotlin.util.OperatorNameConventions.VALUE_BOX
+import org.jetbrains.org.objectweb.asm.Type
 
 class ReceiverTypeAndTypeParameters(val receiverType: KotlinType, val typeParameters: List<TypeParameterDescriptor>)
 
@@ -83,4 +87,12 @@ fun CallableMemberDescriptor.createTypeParameterWithNewName(descriptor: TypePara
 fun KotlinType.removeExternalProjections(): KotlinType {
     val newArguments = arguments.map { TypeProjectionImpl(Variance.INVARIANT, it.type) }
     return replace(newArguments)
+}
+
+fun KotlinTypeMapper.mapToBoxedRepresentation(valueClass: ClassDescriptor): Type {
+    val boxMethod = valueClass.defaultType.memberScope.getContributedFunctions(VALUE_BOX, NoLookupLocation.FROM_BACKEND).firstOrNull {
+        it.isOperator
+    } ?: return mapClass(valueClass)
+
+    return mapType(boxMethod.returnType!!)
 }

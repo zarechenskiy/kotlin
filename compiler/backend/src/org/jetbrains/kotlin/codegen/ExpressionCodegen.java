@@ -48,6 +48,7 @@ import org.jetbrains.kotlin.codegen.signature.BothSignatureWriter;
 import org.jetbrains.kotlin.codegen.signature.JvmSignatureWriter;
 import org.jetbrains.kotlin.codegen.state.GenerationState;
 import org.jetbrains.kotlin.codegen.state.KotlinTypeMapper;
+import org.jetbrains.kotlin.codegen.state.TypeMapperUtilsKt;
 import org.jetbrains.kotlin.codegen.when.SwitchCodegen;
 import org.jetbrains.kotlin.codegen.when.SwitchCodegenUtil;
 import org.jetbrains.kotlin.coroutines.CoroutineUtilKt;
@@ -2586,14 +2587,15 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
                     };
                 }
 
-                Type valueBox = null;
+                ValueClassInfo valueClassInfo = null;
                 ClassifierDescriptor declarationDescriptor = variableDescriptorType.getConstructor().getDeclarationDescriptor();
                 if (declarationDescriptor instanceof ClassDescriptor) {
-                    if (((ClassDescriptor) declarationDescriptor).isValue()) {
-                        valueBox = typeMapper.mapClass(declarationDescriptor);
+                    ClassDescriptor classDescriptor = (ClassDescriptor) declarationDescriptor;
+                    if ((classDescriptor).isValue()) {
+                        valueClassInfo = computeValueClassInfo(classDescriptor);
                     }
                 }
-                return adjustVariableValue(StackValue.local(index, varType, putMetadata, valueBox), variableDescriptor);
+                return adjustVariableValue(StackValue.local(index, varType, putMetadata, valueClassInfo), variableDescriptor);
             }
         }
         else {
@@ -4144,10 +4146,11 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
         }
 
         ClassifierDescriptor declarationDescriptor = variableType.getConstructor().getDeclarationDescriptor();
-        Type valueBox = null;
+        ValueClassInfo valueBox = null;
         if (declarationDescriptor instanceof ClassDescriptor) {
-            if (((ClassDescriptor) declarationDescriptor).isValue()) {
-                valueBox = typeMapper.mapClass(declarationDescriptor);
+            ClassDescriptor classDescriptor = (ClassDescriptor) declarationDescriptor;
+            if (classDescriptor.isValue()) {
+                valueBox = computeValueClassInfo(classDescriptor);
             }
         }
         StackValue storeTo = sharedVarType == null ? StackValue.local(index, varType, valueBox) : StackValue.shared(index, varType);
@@ -4167,6 +4170,13 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
             initializePropertyMetadata((KtProperty) variableDeclaration, variableDescriptor, metadataValue);
             invokePropertyDelegatedOnLocalVar(variableDescriptor, storeTo, metadataValue);
         }
+    }
+
+    private ValueClassInfo computeValueClassInfo(@NotNull  ClassDescriptor valueClass) {
+        Type boxedRepresentation = TypeMapperUtilsKt.mapToBoxedRepresentation(typeMapper, valueClass);
+        Type container = typeMapper.mapClass(valueClass);
+
+        return new ValueClassInfo(container, boxedRepresentation);
     }
 
     private void invokePropertyDelegatedOnLocalVar(

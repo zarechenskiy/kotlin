@@ -7,12 +7,12 @@ interface Greeter {
 }
 
 value class NameImpl(val s: String) : Greeter {
-    fun box(): Any {
+    operator fun box(): BoxedGreeter {
         return BoxedGreeter(s)
     }
 
-    fun unbox(boxed: Any): Name {
-        return Name((boxed as BoxedGreeter).s)
+    operator fun unbox(boxed: BoxedGreeter): NameImpl {
+        return NameImpl(boxed.s)
     }
 
     override fun greeting(): String {
@@ -36,6 +36,6 @@ fun box() {
 fun takeGreeter(g: Greeter) {}
 
 // @FooKt.class:
-// 1 INVOKESTATIC NameImpl\$AnyfiedImpls.box \(Ljava/lang/String;\)Ljava/lang/Object;
-// 1 INVOKESTATIC FooKt.greeter \(LGreeter;\)V
+// 1 INVOKESTATIC NameImpl\$AnyfiedImpls.box \(Ljava/lang/String;\)LBoxedGreeter;
+// 1 INVOKESTATIC FooKt.takeGreeter \(LGreeter;\)V
 // 0 INVOKESPECIAL

@@ -51,6 +51,7 @@ import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodParameterSignature
 import org.jetbrains.kotlin.resolve.scopes.receivers.ReceiverValue;
 import org.jetbrains.kotlin.synthetic.SamAdapterExtensionFunctionDescriptor;
 import org.jetbrains.kotlin.types.KotlinType;
+import org.jetbrains.kotlin.util.OperatorNameConventions;
 import org.jetbrains.org.objectweb.asm.Label;
 import org.jetbrains.org.objectweb.asm.Type;
 import org.jetbrains.org.objectweb.asm.commons.InstructionAdapter;
@@ -173,13 +174,13 @@ public abstract class StackValue {
     }
 
     @NotNull
-    public static Local local(int index, @NotNull Type type, @Nullable Type valueBox) {
-        return local(index, type, null, valueBox);
+    public static Local local(int index, @NotNull Type type, @Nullable ValueClassInfo valueClassInfo) {
+        return local(index, type, null, valueClassInfo);
     }
 
     @NotNull
-    public static Local local(int index, @NotNull Type type, @Nullable Function0<Unit> putMetadata, @Nullable Type valueBox) {
-        return new Local(index, type, putMetadata, valueBox);
+    public static Local local(int index, @NotNull Type type, @Nullable Function0<Unit> putMetadata, @Nullable ValueClassInfo valueClassInfo) {
+        return new Local(index, type, putMetadata, valueClassInfo);
     }
 
     @NotNull
@@ -694,13 +695,13 @@ public abstract class StackValue {
         public final int index;
 
         private Function0<Unit> putMetadata;
-        private final Type valueBox;
+        private final @Nullable ValueClassInfo valueClassInfo;
 
-        private Local(int index, Type type, Function0<Unit> putMetadata, Type valueBox) {
+        private Local(int index, Type type, Function0<Unit> putMetadata, @Nullable ValueClassInfo valueClassInfo) {
             super(type, false);
             this.index = index;
             this.putMetadata = putMetadata;
-            this.valueBox = valueBox;
+            this.valueClassInfo = valueClassInfo;
 
             if (index < 0) {
                 throw new IllegalStateException("local variable index must be non-negative");
@@ -713,9 +714,14 @@ public abstract class StackValue {
                 putMetadata.invoke();
             }
             v.load(index, this.type);
-            if (StackValue.coerceValue(valueBox, type, this.type)) {
-                Type anyfiedImpls = KotlinTypeMapper.mapAnyfiedImpls(valueBox);
-                v.invokestatic(anyfiedImpls.getInternalName(), "box", "(" + this.type.getDescriptor() + ")Ljava/lang/Object;", false);
+            if (StackValue.coerceValue(valueClassInfo, type, this.type)) {
+                Type anyfiedImpls = KotlinTypeMapper.mapAnyfiedImpls(valueClassInfo.getContainer());
+                String valueBoxDescriptor = valueClassInfo.getValueBox().getDescriptor();
+                v.invokestatic(
+                        anyfiedImpls.getInternalName(),
+                        OperatorNameConventions.VALUE_BOX.asString(),
+                        "(" + this.type.getDescriptor() + ")" + valueBoxDescriptor,
+                        false);
             } else {
                 coerceTo(type, v);
             }
@@ -724,13 +730,21 @@ public abstract class StackValue {
 
         @Override
         public void storeSelector(@NotNull Type topOfStackType, @NotNull InstructionAdapter v) {
-            if (StackValue.coerceValue(valueBox, topOfStackType, this.type)) {
+            if (StackValue.coerceValue(valueClassInfo, topOfStackType, this.type)) {
                 //if (this.type.getSort() == Type.OBJECT) {
                 //    coerceFrom(topOfStackType, v);
                 //}
 
-                Type anyfiedImpls = KotlinTypeMapper.mapAnyfiedImpls(valueBox);
-                v.invokestatic(anyfiedImpls.getInternalName(), "unbox", "(Ljava/lang/Object;)" + this.type.getDescriptor(), false);
+                coerce(topOfStackType, valueClassInfo.getValueBox(), v);
+
+                Type anyfiedImpls = KotlinTypeMapper.mapAnyfiedImpls(valueClassInfo.getContainer());
+                String valueBoxDescriptor = valueClassInfo.getValueBox().getDescriptor();
+                v.invokestatic(
+                        anyfiedImpls.getInternalName(),
+                        OperatorNameConventions.VALUE_UNBOX.asString(),
+                        "(" + valueBoxDescriptor + ")" + this.type.getDescriptor(),
+                        false);
+
             } else {
                 coerceFrom(topOfStackType, v);
             }
@@ -746,8 +760,8 @@ public abstract class StackValue {
         }
     }
 
-    private static boolean coerceValue(@Nullable Type valueBox, @NotNull Type type, @NotNull Type valueType) {
-        return valueBox != null && type.getSort() == Type.OBJECT && !type.equals(valueType);
+    private static boolean coerceValue(@Nullable ValueClassInfo valueClassInfo, @NotNull Type type, @NotNull Type valueType) {
+        return valueClassInfo != null && type.getSort() == Type.OBJECT && !type.equals(valueType);
     }
 
     public static class Delegate extends StackValue {
