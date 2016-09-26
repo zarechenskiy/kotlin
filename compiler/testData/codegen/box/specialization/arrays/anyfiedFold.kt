@@ -2,7 +2,7 @@
 
 fun box(): String {
     val vArr = intArrayOf(1, 2, 3, 4) as Array<vInt>
-    val seed = 0 as vInt
+    val seed = vInt(0)
 
     val foldResult = vArr.anyfiedFold(seed) { x, y -> y }
 

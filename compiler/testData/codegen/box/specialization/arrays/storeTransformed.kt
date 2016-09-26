@@ -2,8 +2,8 @@
 
 fun box(): String {
     val vArr = intArrayOf(1) as Array<vInt>
-    val el1 = 1 as vInt
-    val el2 = 2 as vInt
+    val el1 = vInt(1)
+    val el2 = vInt(2)
 
     storeInto(vArr, el1) {
         el2

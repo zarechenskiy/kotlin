@@ -1,7 +1,7 @@
 // WITH_RUNTIME
 
 fun box(): String {
-    val v = 1 as vInt
+    val v = vInt(1)
     val arr = AnyfiedArray(10) { v }
 
     assert(arr[5] == v)

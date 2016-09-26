@@ -2,7 +2,7 @@
 
 fun box(): String {
     val arr = intArrayOf(1, 2) as Array<vInt>
-    val default = 10 as vInt
+    val default = vInt(10)
 
     val f = arr.firstOrElse(default) { false }
 

@@ -2,7 +2,7 @@
 
 fun box(): String {
     val arr = intArrayOf(1) as Array<vInt>
-    val el = 3 as vInt
+    val el = vInt(3)
 
     testInit(arr, el)
 
