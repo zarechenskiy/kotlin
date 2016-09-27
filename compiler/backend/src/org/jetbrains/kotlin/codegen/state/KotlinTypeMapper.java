@@ -596,7 +596,17 @@ public class KotlinTypeMapper {
 
                 signatureVisitor.writeTypeArgument(projectionKind);
 
-                mapType(argument.getType(), signatureVisitor,
+                KotlinType argumentType = argument.getType();
+                if (TypeUtils.isValueType(argument.getType())) {
+                    ClassDescriptor valueClass = TypeUtils.getClassDescriptor(argument.getType());
+                    assert valueClass != null : "Value type should have class descriptor";
+
+                    KotlinType boxRepresentation = TypeMapperUtilsKt.findCustomBoxRepresentation(valueClass);
+                    if (boxRepresentation != null) {
+                        argumentType = boxRepresentation;
+                    }
+                }
+                mapType(argumentType, signatureVisitor,
                         argumentMode.toGenericArgumentMode(
                                 TypeMappingUtil.getEffectiveVariance(parameter.getVariance(), argument.getProjectionKind())));
 

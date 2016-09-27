@@ -480,9 +480,9 @@ public class TypeUtils {
     }
 
     public static boolean isValueType(@NotNull KotlinType type) {
-        ClassifierDescriptor descriptor = type.getConstructor().getDeclarationDescriptor();
-        if (descriptor instanceof ClassDescriptor) {
-            return ((ClassDescriptor) descriptor).isValue();
+        ClassDescriptor classDescriptor = getClassDescriptor(type);
+        if (classDescriptor != null) {
+            return classDescriptor.isValue();
         }
 
         return false;

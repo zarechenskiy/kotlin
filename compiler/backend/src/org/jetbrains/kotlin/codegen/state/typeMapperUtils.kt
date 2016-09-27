@@ -90,9 +90,14 @@ fun KotlinType.removeExternalProjections(): KotlinType {
 }
 
 fun KotlinTypeMapper.mapToBoxedRepresentation(valueClass: ClassDescriptor): Type {
+    val customBox = findCustomBoxRepresentation(valueClass) ?: return mapClass(valueClass)
+    return mapType(customBox)
+}
+
+fun findCustomBoxRepresentation(valueClass: ClassDescriptor): KotlinType? {
     val boxMethod = valueClass.defaultType.memberScope.getContributedFunctions(VALUE_BOX, NoLookupLocation.FROM_BACKEND).firstOrNull {
         it.isOperator
-    } ?: return mapClass(valueClass)
+    } ?: return null
 
-    return mapType(boxMethod.returnType!!)
+    return boxMethod.returnType
 }
