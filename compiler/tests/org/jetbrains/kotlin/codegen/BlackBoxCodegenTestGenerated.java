@@ -15802,6 +15802,12 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
                 doTest(fileName);
             }
 
+            @TestMetadata("overrideValueWithCustomBox.kt")
+            public void testOverrideValueWithCustomBox() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/javaInterop/overrideValueWithCustomBox.kt");
+                doTest(fileName);
+            }
+
             @TestMetadata("overridenValue.kt")
             public void testOverridenValue() throws Exception {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/javaInterop/overridenValue.kt");
