@@ -50,6 +50,7 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.DescriptorFactory
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.resolve.OverridingUtil
+import org.jetbrains.kotlin.resolve.descriptorUtil.setSingleOverridden
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.serialization.deserialization.ErrorReporter
 import org.jetbrains.kotlin.storage.NotNullLazyValue
@@ -657,12 +658,37 @@ class LazyJavaClassMemberScope(
         val contributedFunctions = super.getContributedFunctions(name, location)
         val specifiedFunctions = arrayListOf<SimpleFunctionDescriptor>()
         for ((functionName, functions) in contributedFunctions.groupBy { it.name }) {
-            val fakeOverrides = functions.filter { it.kind == CallableMemberDescriptor.Kind.FAKE_OVERRIDE }
-            if (fakeOverrides.isNotEmpty()) {
-                specifiedFunctions.addAll(fakeOverrides)
-            } else {
+            if (functions.size == 1) {
                 specifiedFunctions.addAll(functions)
+                continue
             }
+            val fakeOverride = functions.find { it.kind == CallableMemberDescriptor.Kind.FAKE_OVERRIDE }
+            if (fakeOverride == null) {
+                specifiedFunctions.addAll(functions)
+            } else {
+                val nonFakeOverrides = functions.filter { it.kind != CallableMemberDescriptor.Kind.FAKE_OVERRIDE }
+                for (fn in nonFakeOverrides) {
+                    fn.overriddenDescriptors = fakeOverride.overriddenDescriptors
+                }
+                val sp = nonFakeOverrides
+                        .mapNotNull {
+                            it.newCopyBuilder().apply {
+                                setValueParameters(fakeOverride.valueParameters)
+                                setSource(it.source)
+                            }.build()
+                        }
+                specifiedFunctions.addAll(sp)
+            }
+//            if (fakeOverrides.isNotEmpty()) {
+//                for (fakeOverride in fakeOverrides) {
+//                    fakeOverride.newCopyBuilder().apply {
+//                        setKind(CallableMemberDescriptor.Kind.DECLARATION)
+//                    }
+//                }
+//                specifiedFunctions.addAll(fakeOverrides)
+//            } else {
+//                specifiedFunctions.addAll(functions)
+//            }
         }
         return specifiedFunctions
     }
