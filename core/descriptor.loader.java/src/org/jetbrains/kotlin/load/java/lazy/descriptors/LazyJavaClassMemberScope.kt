@@ -654,7 +654,17 @@ class LazyJavaClassMemberScope(
 
     override fun getContributedFunctions(name: Name, location: LookupLocation): Collection<SimpleFunctionDescriptor> {
         recordLookup(name, location)
-        return super.getContributedFunctions(name, location)
+        val contributedFunctions = super.getContributedFunctions(name, location)
+        val specifiedFunctions = arrayListOf<SimpleFunctionDescriptor>()
+        for ((functionName, functions) in contributedFunctions.groupBy { it.name }) {
+            val fakeOverrides = functions.filter { it.kind == CallableMemberDescriptor.Kind.FAKE_OVERRIDE }
+            if (fakeOverrides.isNotEmpty()) {
+                specifiedFunctions.addAll(fakeOverrides)
+            } else {
+                specifiedFunctions.addAll(functions)
+            }
+        }
+        return specifiedFunctions
     }
 
     override fun getContributedVariables(name: Name, location: LookupLocation): Collection<PropertyDescriptor> {
