@@ -11860,6 +11860,12 @@ public class DiagnosticsTestGenerated extends AbstractDiagnosticsTest {
                     String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/j+k/valueTypes/overrideMethod.kt");
                     doTest(fileName);
                 }
+
+                @TestMetadata("overrideMethodCustomBox.kt")
+                public void testOverrideMethodCustomBox() throws Exception {
+                    String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/j+k/valueTypes/overrideMethodCustomBox.kt");
+                    doTest(fileName);
+                }
             }
         }
 
