@@ -1,0 +1,28 @@
+package
+
+public fun box(/*0*/ a: A, /*1*/ lsOfName: kotlin.collections.List<Name>, /*2*/ lsOfString: kotlin.collections.List<kotlin.String>): kotlin.Unit
+
+public open class A : SomeK {
+    public constructor A()
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    @java.lang.Override() public open override /*1*/ fun sample(/*0*/ ls: kotlin.collections.List<Name>): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
+
+public final value class Name {
+    public constructor Name(/*0*/ s: kotlin.String)
+    public final val s: kotlin.String
+    public final operator fun box(): kotlin.String
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+    public final operator fun unbox(/*0*/ boxed: kotlin.String): Name
+}
+
+public interface SomeK {
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public abstract fun sample(/*0*/ ls: kotlin.collections.List<Name>): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}

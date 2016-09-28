@@ -11919,6 +11919,27 @@ public class DiagnosticsTestGenerated extends AbstractDiagnosticsTest {
                     doTest(fileName);
                 }
             }
+
+            @TestMetadata("compiler/testData/diagnostics/tests/j+k/valueTypes")
+            @TestDataPath("$PROJECT_ROOT")
+            @RunWith(JUnit3RunnerWithInners.class)
+            public static class ValueTypes extends AbstractDiagnosticsTest {
+                public void testAllFilesPresentInValueTypes() throws Exception {
+                    KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/diagnostics/tests/j+k/valueTypes"), Pattern.compile("^(.+)\\.kt$"), true);
+                }
+
+                @TestMetadata("KJKMethodOverride.kt")
+                public void testKJKMethodOverride() throws Exception {
+                    String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/j+k/valueTypes/KJKMethodOverride.kt");
+                    doTest(fileName);
+                }
+
+                @TestMetadata("overrideMethod.kt")
+                public void testOverrideMethod() throws Exception {
+                    String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/j+k/valueTypes/overrideMethod.kt");
+                    doTest(fileName);
+                }
+            }
         }
 
         @TestMetadata("compiler/testData/diagnostics/tests/java8Overrides")
