@@ -15325,6 +15325,21 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
             }
         }
 
+        @TestMetadata("compiler/testData/codegen/box/specialization/javaInterop")
+        @TestDataPath("$PROJECT_ROOT")
+        @RunWith(JUnit3RunnerWithInners.class)
+        public static class JavaInterop extends AbstractBlackBoxCodegenTest {
+            public void testAllFilesPresentInJavaInterop() throws Exception {
+                KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/codegen/box/specialization/javaInterop"), Pattern.compile("^(.+)\\.kt$"), true);
+            }
+
+            @TestMetadata("overridenValue.kt")
+            public void testOverridenValue() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/javaInterop/overridenValue.kt");
+                doTest(fileName);
+            }
+        }
+
         @TestMetadata("compiler/testData/codegen/box/specialization/values")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
