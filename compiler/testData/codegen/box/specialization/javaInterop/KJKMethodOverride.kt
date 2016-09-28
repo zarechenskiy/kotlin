@@ -25,6 +25,12 @@ public class A implements SomeK {
 
 // FILE: 1.kt
 
+class KOverride : A() {
+    override fun sample(ls: List<Name>): Int {
+        return 200
+    }
+}
+
 fun box(): String {
     val name = Name("Kotlin")
 
@@ -33,6 +39,9 @@ fun box(): String {
 
     val result = a.sample(lsOfName)
     assert(result == 100)
+
+    val k = KOverride()
+    assert(k.sample(lsOfName) == 200)
 
     return "OK"
 }
