@@ -11,12 +11,21 @@ interface SomeK {
     fun sample(ls: List<Name>): Int
 }
 
+// FILE: SampleWithString.java
+
+import java.util.List;
+import org.jetbrains.annotations.NotNull;
+
+interface SampleWithString {
+    int sample(@NotNull List<String> ls);
+}
+
 // FILE: A.java
 
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
-public class A implements SomeK {
+public class A implements SomeK, SampleWithString {
     @Override
     public int sample(@NotNull List<String> ls) {
         return 100;
@@ -31,8 +40,12 @@ fun box(): String {
     val a = A()
     val lsOfName = listOf(name)
 
-    val result = a.sample(lsOfName)
-    assert(result == 100)
+    val result1 = a.sample(lsOfName)
+    assert(result1 == 100)
+
+    val lsOfString = listOf("Kotlin")
+    val result2 = (a as SampleWithString).sample(lsOfString)
+    assert(result2 == 100)
 
     return "OK"
 }
