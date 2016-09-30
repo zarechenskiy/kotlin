@@ -15351,6 +15351,18 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
                 doTest(fileName);
             }
 
+            @TestMetadata("overrideWithArrayTypeRefCustom.kt")
+            public void testOverrideWithArrayTypeRefCustom() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/javaInterop/overrideWithArrayTypeRefCustom.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("overrideWithArrayTypeRefValue.kt")
+            public void testOverrideWithArrayTypeRefValue() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/javaInterop/overrideWithArrayTypeRefValue.kt");
+                doTest(fileName);
+            }
+
             @TestMetadata("overrideWithInvariantType.kt")
             public void testOverrideWithInvariantType() throws Exception {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/javaInterop/overrideWithInvariantType.kt");
