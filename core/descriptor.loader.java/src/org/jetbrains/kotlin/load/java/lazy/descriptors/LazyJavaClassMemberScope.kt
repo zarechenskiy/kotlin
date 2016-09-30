@@ -674,6 +674,10 @@ class LazyJavaClassMemberScope(
                         .mapNotNull {
                             it.newCopyBuilder().apply {
                                 setValueParameters(fakeOverride.valueParameters)
+
+                                val returnType = fakeOverride.returnType
+                                if (returnType != null) setReturnType(returnType)
+
                                 setSource(it.source)
                             }.build()
                         }
