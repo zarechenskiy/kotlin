@@ -1204,6 +1204,14 @@ public class KotlinTypeMapper {
      * this class from Java since javac issues errors when loading the class (incompatible return types)
      */
     private static boolean forceBoxedReturnType(@NotNull FunctionDescriptor descriptor) {
+        DeclarationDescriptor containingDeclaration = descriptor.getContainingDeclaration();
+        if (containingDeclaration instanceof ClassDescriptor) {
+            boolean isValue = ((ClassDescriptor) containingDeclaration).isValue();
+            if (isValue && descriptor.isOperator() && descriptor.getName().equals(OperatorNameConventions.VALUE_BOX)) {
+                return true;
+            }
+        }
+
         //noinspection ConstantConditions
         if (!KotlinBuiltIns.isPrimitiveType(descriptor.getReturnType())) return false;
 

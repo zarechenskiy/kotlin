@@ -123,13 +123,13 @@ sealed class ReturnsCheck(val name: String, val type: KotlinBuiltIns.() -> Kotli
     object ReturnsUnit : ReturnsCheck("Unit", { unitType })
 }
 
-object ReturnsReferenceNonNullableType : Check {
+object ReturnsNonNullableType : Check {
     override val description: String
-        get() = "must return reference non-nullable type"
+        get() = "must return non-nullable type"
 
     override fun check(functionDescriptor: FunctionDescriptor): Boolean {
         val returnType = functionDescriptor.returnType ?: return false
-        return !KotlinBuiltIns.isPrimitiveType(returnType) && !returnType.isMarkedNullable
+        return !returnType.isMarkedNullable
     }
 }
 
@@ -230,7 +230,7 @@ object OperatorChecks : AbstractModifierChecks() {
                 }
             },
             Checks(PROPERTY_DELEGATED, Member, ValueParameterCountCheck.Equals(1)), //TODO: more checks required!
-            Checks(VALUE_BOX, Member, NoValueParameters, ReturnsReferenceNonNullableType, NoDefaultAndVarargsCheck, NoTypeParametersCheck) {
+            Checks(VALUE_BOX, Member, NoValueParameters, ReturnsNonNullableType, NoDefaultAndVarargsCheck, NoTypeParametersCheck) {
                 checkIsInValueClass()
             },
             Checks(VALUE_UNBOX, Member, ValueParameterCountCheck.SingleValueParameter, NoDefaultAndVarargsCheck, NoTypeParametersCheck) {
