@@ -1691,7 +1691,9 @@ public abstract class StackValue {
                 // all the needed information, for example there's no way to find out whether or not a smart cast was applied to the receiver.
                 DeclarationDescriptor container = descriptor.getContainingDeclaration();
                 if (container instanceof ClassDescriptor) {
-                    return typeMapper.mapClass((ClassDescriptor) container);
+                    if (!((ClassDescriptor) container).isValue()) {
+                        return typeMapper.mapClass((ClassDescriptor) container);
+                    }
                 }
 
                 return typeMapper.mapType(dispatchReceiver);
