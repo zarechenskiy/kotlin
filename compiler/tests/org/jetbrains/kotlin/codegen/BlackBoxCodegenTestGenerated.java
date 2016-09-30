@@ -15351,6 +15351,12 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
                 doTest(fileName);
             }
 
+            @TestMetadata("overrideWithArrayTypePrimitive.kt")
+            public void testOverrideWithArrayTypePrimitive() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/javaInterop/overrideWithArrayTypePrimitive.kt");
+                doTest(fileName);
+            }
+
             @TestMetadata("overrideWithArrayTypeRefCustom.kt")
             public void testOverrideWithArrayTypeRefCustom() throws Exception {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/javaInterop/overrideWithArrayTypeRefCustom.kt");
