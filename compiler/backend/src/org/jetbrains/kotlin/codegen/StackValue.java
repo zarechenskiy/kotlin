@@ -1555,7 +1555,7 @@ public abstract class StackValue {
         @Override
         public void putSelector(@NotNull Type type, @NotNull InstructionAdapter v) {
             StackValue stackValue = codegen.generateThisOrOuter(descriptor, isSuper);
-            stackValue.put(coerceType ? type : stackValue.type, v);
+            stackValue.put(coerceType || descriptor.isValue() ? type : stackValue.type, v);
         }
     }
 
