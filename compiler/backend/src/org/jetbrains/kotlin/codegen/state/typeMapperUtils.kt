@@ -25,6 +25,7 @@ import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.typeUtil.asTypeProjection
+import org.jetbrains.kotlin.types.typeUtil.findCustomBoxRepresentation
 import org.jetbrains.kotlin.util.OperatorNameConventions.VALUE_BOX
 import org.jetbrains.org.objectweb.asm.Type
 
@@ -92,12 +93,4 @@ fun KotlinType.removeExternalProjections(): KotlinType {
 fun KotlinTypeMapper.mapToBoxedRepresentation(valueClass: ClassDescriptor): Type {
     val customBox = findCustomBoxRepresentation(valueClass) ?: return mapClass(valueClass)
     return mapType(customBox)
-}
-
-fun findCustomBoxRepresentation(valueClass: ClassDescriptor): KotlinType? {
-    val boxMethod = valueClass.defaultType.memberScope.getContributedFunctions(VALUE_BOX, NoLookupLocation.FROM_BACKEND).firstOrNull {
-        it.isOperator
-    } ?: return null
-
-    return boxMethod.returnType
 }

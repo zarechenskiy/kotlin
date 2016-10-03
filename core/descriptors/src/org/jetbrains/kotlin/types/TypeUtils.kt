@@ -19,6 +19,7 @@ package org.jetbrains.kotlin.types.typeUtil
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
+import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.resolve.calls.inference.isCaptured
@@ -26,6 +27,7 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameUnsafe
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.checker.KotlinTypeChecker
+import org.jetbrains.kotlin.util.OperatorNameConventions
 import java.util.*
 
 enum class TypeNullability {
@@ -202,6 +204,14 @@ fun KotlinType.requiresTypeAliasExpansion(): Boolean =
                 it is TypeAliasDescriptor || it is TypeParameterDescriptor
             } ?: false
         }
+
+fun findCustomBoxRepresentation(valueClass: ClassDescriptor): KotlinType? {
+    val boxMethod = valueClass.defaultType.memberScope.getContributedFunctions(OperatorNameConventions.VALUE_BOX, NoLookupLocation.FROM_BACKEND).firstOrNull {
+        it.isOperator
+    } ?: return null
+
+    return boxMethod.returnType
+}
 
 fun KotlinType.containsTypeProjectionsInTopLevelArguments(): Boolean {
     if (isError) return false
