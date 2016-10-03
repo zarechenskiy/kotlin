@@ -76,6 +76,7 @@ import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodSignature;
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedCallableMemberDescriptor;
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedClassDescriptor;
 import org.jetbrains.kotlin.types.*;
+import org.jetbrains.kotlin.types.typeUtil.TypeUtilsKt;
 import org.jetbrains.kotlin.util.OperatorNameConventions;
 import org.jetbrains.org.objectweb.asm.Type;
 import org.jetbrains.org.objectweb.asm.commons.Method;
@@ -587,7 +588,7 @@ public class KotlinTypeMapper {
                     ClassDescriptor valueClass = TypeUtils.getClassDescriptor(argument.getType());
                     assert valueClass != null : "Value type should have class descriptor";
 
-                    KotlinType boxRepresentation = TypeMapperUtilsKt.findCustomBoxRepresentation(valueClass);
+                    KotlinType boxRepresentation = TypeUtilsKt.findCustomBoxRepresentation(valueClass);
                     if (boxRepresentation != null) {
                         argumentType = boxRepresentation;
                     }

@@ -57,6 +57,9 @@ import org.jetbrains.kotlin.storage.NotNullLazyValue
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.TypeUtils
 import org.jetbrains.kotlin.types.checker.KotlinTypeChecker
+import org.jetbrains.kotlin.types.typeUtil.findCustomBoxRepresentation
+import org.jetbrains.kotlin.types.typeUtil.isSubtypeOf
+import org.jetbrains.kotlin.util.OperatorNameConventions
 import org.jetbrains.kotlin.utils.*
 import org.jetbrains.kotlin.utils.addToStdlib.check
 import org.jetbrains.kotlin.utils.addToStdlib.firstNotNullResult
@@ -675,24 +678,21 @@ class LazyJavaClassMemberScope(
                             it.newCopyBuilder().apply {
                                 setValueParameters(fakeOverride.valueParameters)
 
-                                val returnType = fakeOverride.returnType
-                                if (returnType != null) setReturnType(returnType)
+                                val fakeReturnType = fakeOverride.returnType
+                                if (fakeReturnType != null) {
+                                    setReturnType(fakeReturnType)
+//                                    val returnTypeFromJava = it.returnType
+//
+//                                    if (!fakeReturnType.isCovariantOverride(returnTypeFromJava!!)) {
+//                                        setReturnType(returnTypeFromJava)
+//                                    }
+                                }
 
                                 setSource(it.source)
                             }.build()
                         }
                 specifiedFunctions.addAll(sp)
             }
-//            if (fakeOverrides.isNotEmpty()) {
-//                for (fakeOverride in fakeOverrides) {
-//                    fakeOverride.newCopyBuilder().apply {
-//                        setKind(CallableMemberDescriptor.Kind.DECLARATION)
-//                    }
-//                }
-//                specifiedFunctions.addAll(fakeOverrides)
-//            } else {
-//                specifiedFunctions.addAll(functions)
-//            }
         }
         return specifiedFunctions
     }
@@ -718,4 +718,16 @@ class LazyJavaClassMemberScope(
     }
 
     override fun toString() = "Lazy Java member scope for " + jClass.fqName
+}
+
+private fun KotlinType.isCovariantOverride(typeFromJava: KotlinType): Boolean {
+    val declarationDescriptor = this.constructor.declarationDescriptor
+    if (declarationDescriptor !is ClassDescriptor) return false
+
+    if (!declarationDescriptor.isValue) {
+        return typeFromJava.isSubtypeOf(this)
+    }
+
+    val boxRepresentation = findCustomBoxRepresentation(declarationDescriptor) ?: return false
+    return typeFromJava.isSubtypeOf(boxRepresentation)
 }
