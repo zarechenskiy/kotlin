@@ -130,10 +130,18 @@ fun <T : Any> mapType(
         }
 
         descriptor is ClassDescriptor -> {
-            if (descriptor.isValue && !mode.needValueClassWrapping) {
+            if (descriptor.isValue && !mode.needValueClassWrapping && !mode.needValueClassBoxing) {
                 val representationType = descriptor.representationTypeOfValueClass().type
                 return mapType(representationType, factory, mode, typeMappingConfiguration,
                                descriptorTypeWriter, writeGenericType, mappings, true)
+            }
+
+            if (descriptor.isValue && mode.needValueClassBoxing) {
+                val boxRepresentation = findCustomBoxRepresentation(descriptor)
+                if (boxRepresentation != null) {
+                    return mapType(boxRepresentation, factory, mode, typeMappingConfiguration,
+                                   descriptorTypeWriter, writeGenericType, mappings, true)
+                }
             }
 
             val jvmType =
