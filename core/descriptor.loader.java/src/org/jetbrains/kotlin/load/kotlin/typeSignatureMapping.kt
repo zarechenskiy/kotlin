@@ -27,6 +27,7 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.representationTypeOfValueClas
 import org.jetbrains.kotlin.resolve.jvm.JvmClassName
 import org.jetbrains.kotlin.resolve.jvm.JvmPrimitiveType
 import org.jetbrains.kotlin.types.*
+import org.jetbrains.kotlin.types.typeUtil.findCustomBoxRepresentation
 import org.jetbrains.kotlin.types.typeUtil.isTypeParameter
 import org.jetbrains.kotlin.types.typeUtil.replaceArgumentsWithStarProjections
 import org.jetbrains.kotlin.utils.DO_NOTHING_3
@@ -63,7 +64,7 @@ fun <T : Any> mapType(
 ): T {
     mapBuiltInType(kotlinType, factory)?.let { builtInType ->
         val jvmType = if (KotlinBuiltIns.isPrimitiveValueType(kotlinType) || asValue)
-            builtInType
+            factory.boxTypeIfNeeded(builtInType, mode.needValueClassBoxing)
         else
             factory.boxTypeIfNeeded(builtInType, mode.needPrimitiveBoxing)
 
