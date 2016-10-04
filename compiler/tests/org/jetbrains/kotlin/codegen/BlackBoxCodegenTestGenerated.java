@@ -15867,6 +15867,12 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/javaInterop/valueLongOverridesObject.kt");
                 doTest(fileName);
             }
+
+            @TestMetadata("valueRefOverridesObject.kt")
+            public void testValueRefOverridesObject() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/javaInterop/valueRefOverridesObject.kt");
+                doTest(fileName);
+            }
         }
 
         @TestMetadata("compiler/testData/codegen/box/specialization/values")
