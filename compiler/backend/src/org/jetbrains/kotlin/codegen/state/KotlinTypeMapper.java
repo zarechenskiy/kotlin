@@ -342,7 +342,7 @@ public class KotlinTypeMapper {
         else if (descriptor instanceof FunctionDescriptor && forceBoxedReturnType((FunctionDescriptor) descriptor)) {
             // GENERIC_TYPE is a hack to automatically box the return type
             //noinspection ConstantConditions
-            return mapType(descriptor.getReturnType(), sw, TypeMappingMode.GENERIC_ARGUMENT);
+            return mapType(descriptor.getReturnType(), sw, TypeMappingMode.ANYFIED_GENERIC_ARGUMENT);
         }
 
         return mapReturnType(descriptor, sw, returnType);
@@ -376,6 +376,12 @@ public class KotlinTypeMapper {
     @NotNull
     public Type mapTypeParameter(@NotNull KotlinType jetType, @Nullable JvmSignatureWriter signatureVisitor) {
         return mapType(jetType, signatureVisitor, TypeMappingMode.GENERIC_ARGUMENT);
+    }
+
+    @NotNull
+    public Type mapTypeParameter(@NotNull KotlinType jetType, @Nullable JvmSignatureWriter signatureVisitor, boolean isAnyfied) {
+        TypeMappingMode mode = isAnyfied ? TypeMappingMode.ANYFIED_GENERIC_ARGUMENT : TypeMappingMode.GENERIC_ARGUMENT;
+        return mapType(jetType, signatureVisitor, mode);
     }
 
     @NotNull
@@ -1213,12 +1219,14 @@ public class KotlinTypeMapper {
             }
         }
 
+        KotlinType returnType = descriptor.getReturnType();
         //noinspection ConstantConditions
-        if (!KotlinBuiltIns.isPrimitiveType(descriptor.getReturnType())) return false;
+        if (!KotlinBuiltIns.isPrimitiveType(returnType) && !TypeUtils.isValueType(returnType)) return false;
 
         for (FunctionDescriptor overridden : getAllOverriddenDescriptors(descriptor)) {
+            KotlinType overridenReturnType = overridden.getReturnType();
             //noinspection ConstantConditions
-            if (!KotlinBuiltIns.isPrimitiveType(overridden.getReturnType())) return true;
+            if (!KotlinBuiltIns.isPrimitiveType(overridenReturnType) && !TypeUtils.isValueType(overridenReturnType)) return true;
         }
 
         return false;

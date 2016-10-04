@@ -26,6 +26,7 @@ class TypeMappingMode private constructor(
         val skipDeclarationSiteWildcards: Boolean = false,
         val skipDeclarationSiteWildcardsIfPossible: Boolean = false,
         val needValueClassWrapping: Boolean = false,
+        val needValueClassBoxing: Boolean = false,
         private val genericArgumentMode: TypeMappingMode? = null,
         private val genericContravariantArgumentMode: TypeMappingMode? = genericArgumentMode,
         private val genericInvariantArgumentMode: TypeMappingMode? = genericArgumentMode
@@ -37,24 +38,28 @@ class TypeMappingMode private constructor(
         @JvmField
         val GENERIC_ARGUMENT = TypeMappingMode()
 
+        @JvmField
+        val ANYFIED_GENERIC_ARGUMENT = TypeMappingMode(needValueClassBoxing = true)
+
         /**
          * kotlin.Int is mapped to I
          */
         @JvmField
-        val DEFAULT = TypeMappingMode(genericArgumentMode = GENERIC_ARGUMENT, needPrimitiveBoxing = false)
+        val DEFAULT = TypeMappingMode(genericArgumentMode = GENERIC_ARGUMENT, needPrimitiveBoxing = false, needValueClassBoxing = false)
 
         /**
          * kotlin.Int is mapped to I
          * value class VClass is mapped to LVClass
          */
         @JvmField
-        val CLASS_TYPE = TypeMappingMode(genericArgumentMode = GENERIC_ARGUMENT, needPrimitiveBoxing = false, needValueClassWrapping = true)
+        val CLASS_TYPE = TypeMappingMode(genericArgumentMode = GENERIC_ARGUMENT, needPrimitiveBoxing = false, needValueClassWrapping = true,
+                                         needValueClassBoxing = false)
         /**
          * kotlin.Int is mapped to Ljava/lang/Integer;
          * No projections allowed in immediate arguments
          */
         @JvmField
-        val SUPER_TYPE = TypeMappingMode(skipDeclarationSiteWildcards = true, genericArgumentMode = GENERIC_ARGUMENT)
+        val SUPER_TYPE = TypeMappingMode(skipDeclarationSiteWildcards = true, genericArgumentMode = ANYFIED_GENERIC_ARGUMENT)
 
         /**
          * kotlin.reflect.KClass mapped to java.lang.Class
