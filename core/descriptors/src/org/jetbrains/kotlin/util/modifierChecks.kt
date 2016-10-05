@@ -232,6 +232,7 @@ object OperatorChecks : AbstractModifierChecks() {
             Checks(PROPERTY_DELEGATED, Member, ValueParameterCountCheck.Equals(1)), //TODO: more checks required!
             Checks(VALUE_BOX, Member, NoValueParameters, ReturnsNonNullableType, NoDefaultAndVarargsCheck, NoTypeParametersCheck) {
                 checkIsInValueClass()
+                ?: checkSuperTypesOfBoxAndWrapper()
             },
             Checks(VALUE_UNBOX, Member, ValueParameterCountCheck.SingleValueParameter, NoDefaultAndVarargsCheck, NoTypeParametersCheck) {
                 checkIsInValueClass()
@@ -260,6 +261,22 @@ object OperatorChecks : AbstractModifierChecks() {
         return ensure(isValue) {
             "Method should be a member of value class"
         }
+    }
+
+    private fun FunctionDescriptor.checkSuperTypesOfBoxAndWrapper(): String? {
+        val valueClass = containingDeclaration as ClassDescriptor
+        val customBox = returnType!!
+
+        val valueClassSuperTypes = valueClass.typeConstructor.supertypes
+        val boxSuperTypes = customBox.constructor.supertypes
+
+        for (valueClassSuperType in valueClassSuperTypes) {
+            if (!boxSuperTypes.any { it.isSubtypeOf(valueClassSuperType) }) {
+                return "Return type should implement at least same interfaces as the value type"
+            }
+        }
+
+        return null
     }
 
     private fun FunctionDescriptor.checkHandleSecondParameter(): String? {
