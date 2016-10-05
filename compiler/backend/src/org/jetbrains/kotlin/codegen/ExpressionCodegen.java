@@ -95,6 +95,7 @@ import org.jetbrains.kotlin.types.TypeUtils;
 import org.jetbrains.kotlin.types.checker.KotlinTypeChecker;
 import org.jetbrains.kotlin.types.expressions.DoubleColonLHS;
 import org.jetbrains.kotlin.types.typesApproximation.CapturedTypeApproximationKt;
+import org.jetbrains.kotlin.util.OperatorNameConventions;
 import org.jetbrains.org.objectweb.asm.Label;
 import org.jetbrains.org.objectweb.asm.MethodVisitor;
 import org.jetbrains.org.objectweb.asm.Opcodes;
@@ -2571,6 +2572,9 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
 
             Type sharedVarType = typeMapper.getSharedVarType(descriptor);
             Type varType = getVariableTypeNoSharing(variableDescriptor);
+            if (isValueParameterInsideBox(descriptor)) {
+                varType = AsmUtil.boxType(varType);
+            }
             if (sharedVarType != null) {
                 return StackValue.shared(index, varType);
             }
@@ -2601,6 +2605,20 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
         else {
             return StackValue.local(index, OBJECT_TYPE);
         }
+    }
+
+    private static boolean isValueParameterInsideBox(DeclarationDescriptor descriptor) {
+        if (!(descriptor instanceof ValueParameterDescriptor)) {
+            return false;
+        }
+
+        DeclarationDescriptor containingDeclaration = descriptor.getContainingDeclaration();
+        if (!(containingDeclaration instanceof FunctionDescriptor)) {
+            return false;
+        }
+
+        FunctionDescriptor functionDescriptor = (FunctionDescriptor) containingDeclaration;
+        return functionDescriptor.getName().equals(OperatorNameConventions.VALUE_UNBOX) && functionDescriptor.isOperator();
     }
 
     @Override
