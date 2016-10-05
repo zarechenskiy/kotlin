@@ -1381,7 +1381,16 @@ public class KotlinTypeMapper {
             @Nullable CallableDescriptor callableDescriptor,
             @Nullable TypeParameterMappings typeParameterMappings
     ) {
+        boolean isOperatorUnbox = callableDescriptor instanceof FunctionDescriptor &&
+                                  OperatorNameConventions.VALUE_UNBOX.equals(callableDescriptor.getName()) &&
+                                  ((FunctionDescriptor) callableDescriptor).isOperator();
+
         if (sw.skipGenericSignature()) {
+            if (isOperatorUnbox) {
+                mapType(type, sw, TypeMappingMode.ANYFIED_GENERIC_ARGUMENT);
+                return;
+            }
+
             mapType(type, sw, TypeMappingMode.DEFAULT);
             return;
         }
@@ -1396,6 +1405,9 @@ public class KotlinTypeMapper {
         }
         else if (TypeMappingUtil.isMethodWithDeclarationSiteWildcards(callableDescriptor) && !type.getArguments().isEmpty()) {
             typeMappingMode = TypeMappingMode.GENERIC_ARGUMENT; // Render all wildcards
+        }
+        else if (isOperatorUnbox) {
+                typeMappingMode = TypeMappingMode.ANYFIED_GENERIC_ARGUMENT;
         }
         else {
             typeMappingMode = TypeMappingMode.getOptimalModeForValueParameter(type);

@@ -4,7 +4,7 @@
 
 value class VLong(val v: Long) {
     operator fun box(): Long = v
-    operator fun unbox(boxed: java.lang.Long): VLong = VLong(boxed.toLong())
+    operator fun unbox(boxed: Long): VLong = VLong(boxed)
 }
 
 interface A<T> {
