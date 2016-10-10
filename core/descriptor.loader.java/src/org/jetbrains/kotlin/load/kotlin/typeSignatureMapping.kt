@@ -130,16 +130,19 @@ fun <T : Any> mapType(
         }
 
         descriptor is ClassDescriptor -> {
-            if (descriptor.isValue && !mode.needValueClassWrapping && !mode.needValueClassBoxing) {
-                val representationType = descriptor.representationTypeOfValueClass().type
-                return mapType(representationType, factory, mode, typeMappingConfiguration,
-                               descriptorTypeWriter, writeGenericType, mappings, true)
-            }
+            if (descriptor.isValue) {
+                val underlyingType = when {
+                    TypeUtils.isNullableType(kotlinType) || mode.needValueClassBoxing ->
+                        findCustomBoxRepresentation(descriptor)?.let { customBox ->
+                            TypeUtils.makeNullableAsSpecified(customBox, TypeUtils.isNullableType(kotlinType))
+                        }
 
-            if (descriptor.isValue && mode.needValueClassBoxing) {
-                val boxRepresentation = findCustomBoxRepresentation(descriptor)
-                if (boxRepresentation != null) {
-                    return mapType(boxRepresentation, factory, mode, typeMappingConfiguration,
+                    !mode.needValueClassWrapping && !mode.needValueClassBoxing -> descriptor.representationTypeOfValueClass().type
+                    else -> null
+                }
+
+                if (underlyingType != null) {
+                    return mapType(underlyingType, factory, mode, typeMappingConfiguration,
                                    descriptorTypeWriter, writeGenericType, mappings, true)
                 }
             }
