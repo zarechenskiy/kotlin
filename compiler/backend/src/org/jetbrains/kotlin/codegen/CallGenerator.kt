@@ -64,6 +64,10 @@ abstract class CallGenerator {
                     codegen.putAnyfiedOperationMarkerIfTypeIsReifiedParameter(valueParameterDescriptor.type)
                 }
             } else {
+                if (TypeUtils.isValueType(valueParameterDescriptor.type) && value is StackValue.Constant) {
+                    val valueClassInfo = codegen.computeValueClassInfo(TypeUtils.getClassDescriptor(valueParameterDescriptor.type)!!)
+                    value.setValueClassInfo(valueClassInfo)
+                }
                 value.put(parameterType, codegen.v)
             }
         }

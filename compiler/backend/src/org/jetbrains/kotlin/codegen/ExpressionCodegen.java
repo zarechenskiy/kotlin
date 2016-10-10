@@ -4229,7 +4229,7 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
         }
     }
 
-    private ValueClassInfo computeValueClassInfo(@NotNull  ClassDescriptor valueClass) {
+    public ValueClassInfo computeValueClassInfo(@NotNull  ClassDescriptor valueClass) {
         Type boxedRepresentation = AsmUtil.boxType(TypeMapperUtilsKt.mapToBoxedRepresentation(typeMapper, valueClass));
         Type container = typeMapper.mapClass(valueClass);
 

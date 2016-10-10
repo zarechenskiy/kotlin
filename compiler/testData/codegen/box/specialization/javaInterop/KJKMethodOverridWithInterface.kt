@@ -41,10 +41,8 @@ class KOverride : A() {
 }
 
 fun box(): String {
-    val name = Name("Kotlin")
-
     val a = A()
-    val lsOfName = listOf(name)
+    val lsOfName = listOf(Name("Kotlin"))
 
     val result1 = a.sample(lsOfName)
     assert(result1 == 100)

@@ -26,10 +26,8 @@ public class A implements SomeK {
 // FILE: 1.kt
 
 fun box(): String {
-    val name = Name("Kotlin")
-
     val a = A()
-    val lsOfName = listOf(name)
+    val lsOfName = listOf(Name("Kotlin"))
 
     val result = a.sample(lsOfName)
     assert(result == 100)
