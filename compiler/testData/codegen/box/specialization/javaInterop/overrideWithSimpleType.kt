@@ -26,9 +26,7 @@ public class A implements SomeK {
 // FILE: 1.kt
 
 fun box(): String {
-    val name = Name("Kotlin")
-
-    val result = A().sample(name)
+    val result = A().sample(Name("Kotlin"))
     assert(result.s == "Kotlin")
 
     return "OK"

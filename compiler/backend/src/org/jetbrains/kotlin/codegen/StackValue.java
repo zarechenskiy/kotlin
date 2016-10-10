@@ -715,13 +715,7 @@ public abstract class StackValue {
             }
             v.load(index, this.type);
             if (StackValue.coerceValue(valueClassInfo, type, this.type)) {
-                Type anyfiedImpls = KotlinTypeMapper.mapAnyfiedImpls(valueClassInfo.getContainer());
-                String valueBoxDescriptor = valueClassInfo.getValueBox().getDescriptor();
-                v.invokestatic(
-                        anyfiedImpls.getInternalName(),
-                        OperatorNameConventions.VALUE_BOX.asString(),
-                        "(" + this.type.getDescriptor() + ")" + valueBoxDescriptor,
-                        false);
+                boxValueType(this.type, valueClassInfo, v);
             } else {
                 coerceTo(type, v);
             }
@@ -736,7 +730,6 @@ public abstract class StackValue {
                 //}
 
                 coerce(topOfStackType, valueClassInfo.getValueBox(), v);
-
                 Type anyfiedImpls = KotlinTypeMapper.mapAnyfiedImpls(valueClassInfo.getContainer());
                 String valueBoxDescriptor = valueClassInfo.getValueBox().getDescriptor();
                 v.invokestatic(
@@ -758,6 +751,16 @@ public abstract class StackValue {
         public void setMetadata(@Nullable Function0<Unit> putMetadata) {
             this.putMetadata = putMetadata;
         }
+    }
+
+    public static void boxValueType(@NotNull Type fromType, @NotNull ValueClassInfo valueClassInfo, @NotNull InstructionAdapter v) {
+        Type anyfiedImpls = KotlinTypeMapper.mapAnyfiedImpls(valueClassInfo.getContainer());
+        String valueBoxDescriptor = valueClassInfo.getValueBox().getDescriptor();
+        v.invokestatic(
+                anyfiedImpls.getInternalName(),
+                OperatorNameConventions.VALUE_BOX.asString(),
+                "(" + fromType.getDescriptor() + ")" + valueBoxDescriptor,
+                false);
     }
 
     private static boolean coerceValue(@Nullable ValueClassInfo valueClassInfo, @NotNull Type type, @NotNull Type valueType) {
@@ -886,9 +889,11 @@ public abstract class StackValue {
         }
     }
 
-    private static class Constant extends StackValue {
+    public static class Constant extends StackValue {
         @Nullable
         private final Object value;
+        @Nullable
+        private ValueClassInfo valueClassInfo;
 
         public Constant(@Nullable Object value, Type type) {
             super(type, false);
@@ -917,7 +922,16 @@ public abstract class StackValue {
                 v.aconst(value);
             }
 
-            coerceTo(type, v);
+            if (valueClassInfo != null && StackValue.coerceValue(valueClassInfo, type, this.type)) {
+                boxValueType(this.type, valueClassInfo, v);
+            } else {
+                coerceTo(type, v);
+            }
+
+        }
+
+        public void setValueClassInfo(@NotNull ValueClassInfo valueClassInfo) {
+            this.valueClassInfo = valueClassInfo;
         }
     }
 

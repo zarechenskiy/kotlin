@@ -30,10 +30,8 @@ public class A extends SomeValue {
 // FILE: 1.kt
 
 fun box(): String {
-    val name = Name("Kotlin")
-
     val a = A()
-    val lsOfName = arrayListOf(name)
+    val lsOfName = arrayListOf(Name("Kotlin"))
 
     val result = a.sample(lsOfName)
     assert(result == 100)
