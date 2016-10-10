@@ -1,12 +1,12 @@
 // WITH_RUNTIME
 
 value class VLong(val l: Long) {
-    operator fun box(): Any {
-        return java.lang.Long.valueOf(l)
+    operator fun box(): Long {
+        return l
     }
 
-    operator fun unbox(boxed: Any): VLong {
-        return VLong(boxed as Long)
+    operator fun unbox(boxed: Long): VLong {
+        return VLong(boxed)
     }
 
     fun inc(): VLong = VLong(l + 1)
