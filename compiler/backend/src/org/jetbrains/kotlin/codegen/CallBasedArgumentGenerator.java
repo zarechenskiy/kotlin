@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,11 @@ package org.jetbrains.kotlin.codegen;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor;
+import org.jetbrains.kotlin.load.kotlin.TypeMappingMode;
 import org.jetbrains.kotlin.psi.KtExpression;
 import org.jetbrains.kotlin.psi.ValueArgument;
 import org.jetbrains.kotlin.resolve.calls.model.*;
+import org.jetbrains.kotlin.types.KotlinType;
 import org.jetbrains.org.objectweb.asm.Type;
 
 import java.util.List;
@@ -83,8 +85,19 @@ public class CallBasedArgumentGenerator extends ArgumentGenerator {
     @Override
     protected void generateVararg(int i, @NotNull VarargValueArgument argument) {
         ValueParameterDescriptor parameter = valueParameters.get(i);
+        boolean useErasedValues;
+        if (ExpressionCodegen.isArrayOfValueType(parameter.getType())) {
+            KotlinType originalType = parameter.getOriginal().getType();
+            if (ExpressionCodegen.isArrayOfAnyfiedType(originalType)) {
+                useErasedValues = true;
+            } else {
+                useErasedValues = false;
+            }
+        } else {
+            useErasedValues = true;
+        }
         Type type = valueParameterTypes.get(i);
-        codegen.genVarargs(argument, parameter.getType());
+        codegen.genVarargs(argument, parameter.getType(), useErasedValues);
         callGenerator.afterParameterPut(type, null, i);
     }
 
