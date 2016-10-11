@@ -395,6 +395,11 @@ public class KotlinTypeMapper {
     }
 
     @NotNull
+    public Type mapArrayOfValuesType(@NotNull KotlinType ktType) {
+        return mapType(ktType, null, TypeMappingMode.ARRAY_VALUE);
+    }
+
+    @NotNull
     public Type mapType(@NotNull KotlinType jetType, @NotNull TypeParameterMappings mappings) {
         return mapType(jetType, null, TypeMappingMode.DEFAULT, mappings);
     }

@@ -47,6 +47,9 @@ class TypeMappingMode private constructor(
         @JvmField
         val DEFAULT = TypeMappingMode(genericArgumentMode = GENERIC_ARGUMENT, needPrimitiveBoxing = false, needValueClassBoxing = false)
 
+        @JvmField
+        val ARRAY_VALUE = TypeMappingMode(genericArgumentMode = ANYFIED_GENERIC_ARGUMENT, needPrimitiveBoxing = false, needValueClassBoxing = false)
+
         /**
          * kotlin.Int is mapped to I
          * value class VClass is mapped to LVClass

@@ -3,8 +3,8 @@
 // check that we do not specialize anything in this case
 
 fun box(): String {
-    val arr1 = intArrayOf(1) as Array<vInt>
-    val arr2 = arrayOf(intArrayOf(1) as Array<vInt>)
+    val arr1 = anyfiedArrayOf(VInt(1))
+    val arr2 = arrayOf(anyfiedArrayOf(VInt(1)))
 
     arr1.test1(arr2)
     arr2.test2(arr1)
@@ -20,4 +20,11 @@ inline fun <@Anyfied T> Array<Array<T>>.test2(destination: Array<T>) {
     this[0] = destination
 }
 
-value class vInt(val v: Int)
+value class VInt(val v: Int) {
+    operator fun box(): Int = v
+    operator fun unbox(boxed: Int) = VInt(boxed)
+}
+
+inline fun <reified @Anyfied T> anyfiedArrayOf(vararg elements: T): Array<T> {
+    return elements as Array<T>
+}

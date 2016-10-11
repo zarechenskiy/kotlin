@@ -3346,8 +3346,10 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
     }
 
 
-    public void genVarargs(@NotNull VarargValueArgument valueArgument, @NotNull KotlinType outType) {
-        Type type = asmType(outType);
+    public void genVarargs(@NotNull VarargValueArgument valueArgument, @NotNull KotlinType outType, boolean useErasedValues) {
+        Type type = useErasedValues ? asmType(outType) : typeMapper.mapArrayOfValuesType(outType);
+        //Type type = asmType(outType);
+        //Type type = typeMapper.mapArrayOfValuesType(outType);
         assert type.getSort() == Type.ARRAY;
         Type elementType = correctElementType(type);
         List<ValueArgument> arguments = valueArgument.getArguments();
@@ -3421,7 +3423,12 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
         }
         else {
             v.iconst(arguments.size());
-            newArrayInstruction(outType);
+            if (isArrayOfValueType(outType) && !useErasedValues) {
+                Type componentType = correctElementType(type);
+                v.newarray(componentType);
+            } else {
+                newArrayInstruction(outType);
+            }
             for (int i = 0; i != size; ++i) {
                 v.dup();
                 StackValue rightSide = gen(arguments.get(i).getArgumentExpression());

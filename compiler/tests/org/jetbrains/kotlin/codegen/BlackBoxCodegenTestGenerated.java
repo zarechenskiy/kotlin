@@ -15501,6 +15501,12 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
                 doTest(fileName);
             }
 
+            @TestMetadata("genericVararg.kt")
+            public void testGenericVararg() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/valuesBoxing/genericVararg.kt");
+                doTest(fileName);
+            }
+
             @TestMetadata("localVarBox.kt")
             public void testLocalVarBox() throws Exception {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/valuesBoxing/localVarBox.kt");
