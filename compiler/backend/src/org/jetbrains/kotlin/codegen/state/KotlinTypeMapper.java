@@ -1249,7 +1249,10 @@ public class KotlinTypeMapper {
         for (FunctionDescriptor overridden : getAllOverriddenDescriptors(descriptor)) {
             KotlinType overridenReturnType = overridden.getReturnType();
             //noinspection ConstantConditions
-            if (!KotlinBuiltIns.isPrimitiveType(overridenReturnType) && !TypeUtils.isValueType(overridenReturnType)) return true;
+            if (!KotlinBuiltIns.isPrimitiveType(overridenReturnType) &&
+                (!TypeUtils.isValueType(overridenReturnType) || TypeUtils.isNullableType(overridenReturnType))) {
+                return true;
+            }
         }
 
         return false;

@@ -21584,6 +21584,30 @@ public class DiagnosticsTestGenerated extends AbstractDiagnosticsTest {
             }
         }
 
+        @TestMetadata("compiler/testData/diagnostics/tests/valueTypes")
+        @TestDataPath("$PROJECT_ROOT")
+        @RunWith(JUnit3RunnerWithInners.class)
+        public static class ValueTypes extends AbstractDiagnosticsTest {
+            public void testAllFilesPresentInValueTypes() throws Exception {
+                KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/diagnostics/tests/valueTypes"), Pattern.compile("^(.+)\\.kt$"), true);
+            }
+
+            @TestMetadata("compiler/testData/diagnostics/tests/valueTypes/override")
+            @TestDataPath("$PROJECT_ROOT")
+            @RunWith(JUnit3RunnerWithInners.class)
+            public static class Override extends AbstractDiagnosticsTest {
+                public void testAllFilesPresentInOverride() throws Exception {
+                    KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/diagnostics/tests/valueTypes/override"), Pattern.compile("^(.+)\\.kt$"), true);
+                }
+
+                @TestMetadata("overrideNullableValueType.kt")
+                public void testOverrideNullableValueType() throws Exception {
+                    String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/valueTypes/override/overrideNullableValueType.kt");
+                    doTest(fileName);
+                }
+            }
+        }
+
         @TestMetadata("compiler/testData/diagnostics/tests/varargs")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
