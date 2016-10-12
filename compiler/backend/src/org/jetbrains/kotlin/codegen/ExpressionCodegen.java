@@ -2277,6 +2277,15 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
 
                 Type returnType = isNonLocalReturn ? nonLocalReturn.returnType : ExpressionCodegen.this.returnType;
                 StackValue valueToReturn = returnedExpression != null ? gen(returnedExpression) : null;
+                KotlinType descriptorReturnType = descriptor.getReturnType();
+                if (descriptorReturnType != null && TypeUtils.isValueType(descriptorReturnType)) {
+                    if (valueToReturn instanceof StackValue.Constant) {
+                        @SuppressWarnings("ConstantConditions")
+                        ValueClassInfo info = computeValueClassInfo(TypeUtils.getClassDescriptor(descriptorReturnType));
+                        ((StackValue.Constant) valueToReturn).setValueClassInfo(info);
+                    }
+                }
+
                 StackValue handleResultValue = genControllerHandleResultCallIfNeeded(expression, returnedExpression);
 
                 if (handleResultValue != null) {
