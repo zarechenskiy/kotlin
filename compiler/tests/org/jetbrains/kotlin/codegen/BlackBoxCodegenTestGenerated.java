@@ -15431,6 +15431,12 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/override/overrideNullableValue.kt");
                 doTest(fileName);
             }
+
+            @TestMetadata("overrideNullableValueCustomBox.kt")
+            public void testOverrideNullableValueCustomBox() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/override/overrideNullableValueCustomBox.kt");
+                doTest(fileName);
+            }
         }
 
         @TestMetadata("compiler/testData/codegen/box/specialization/values")
