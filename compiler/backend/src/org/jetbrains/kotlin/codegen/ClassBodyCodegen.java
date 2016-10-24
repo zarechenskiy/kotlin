@@ -53,7 +53,7 @@ public abstract class ClassBodyCodegen extends MemberCodegen<KtClassOrObject> {
     @Override
     protected void generateBody() {
         List<KtObjectDeclaration> companions = new ArrayList<KtObjectDeclaration>();
-        if (kind != OwnerKind.DEFAULT_IMPLS) {
+        if (kind != OwnerKind.DEFAULT_IMPLS && kind != OwnerKind.ANYFIED_IMPLS) {
             //generate nested classes first and only then generate class body. It necessary to access to nested CodegenContexts
             for (KtDeclaration declaration : myClass.getDeclarations()) {
                 if (shouldProcessFirst(declaration)) {
