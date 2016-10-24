@@ -139,6 +139,8 @@ open class KnownClassDescriptor(
     override fun isData(): Boolean = false
     override fun isInner(): Boolean = false
 
+    override fun isValue(): Boolean = false
+
     override fun <R : Any?, D : Any?> accept(visitor: DeclarationDescriptorVisitor<R, D>, data: D): R {
         return visitor.visitClassDescriptor(this, data)
     }
