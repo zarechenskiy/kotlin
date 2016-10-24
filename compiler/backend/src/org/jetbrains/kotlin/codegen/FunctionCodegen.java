@@ -406,7 +406,8 @@ public class FunctionCodegen {
     ) {
         ReceiverParameterDescriptor dispatchReceiver = functionDescriptor.getDispatchReceiverParameter();
         if (functionDescriptor instanceof ConstructorDescriptor) {
-            return typeMapper.mapType(functionDescriptor);
+            //noinspection ConstantConditions
+            return typeMapper.mapClass(functionDescriptor.getReturnType());
         }
         else if (dispatchReceiver != null) {
             return typeMapper.mapType(dispatchReceiver.getType());
