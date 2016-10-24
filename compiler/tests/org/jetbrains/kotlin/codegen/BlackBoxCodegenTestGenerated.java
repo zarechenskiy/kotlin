@@ -15489,6 +15489,12 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
                 doTest(fileName);
             }
 
+            @TestMetadata("valueAsField.kt")
+            public void testValueAsField() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/values/valueAsField.kt");
+                doTest(fileName);
+            }
+
             @TestMetadata("valueCallableReferences.kt")
             public void testValueCallableReferences() throws Exception {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/values/valueCallableReferences.kt");
