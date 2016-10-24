@@ -167,10 +167,6 @@ public class FunctionCodegen {
             return;
         }
 
-        if (functionDescriptor instanceof PropertyAccessorDescriptor && contextKind == OwnerKind.ANYFIED_IMPLS) {
-            return;
-        }
-
         JvmMethodGenericSignature jvmSignature = typeMapper.mapSignatureWithGeneric(functionDescriptor, contextKind);
         Method asmMethod = jvmSignature.getAsmMethod();
 
@@ -231,7 +227,7 @@ public class FunctionCodegen {
         if (isClass(containingDeclaration) &&
             ((ClassDescriptor) containingDeclaration).isValue() &&
             contextKind != OwnerKind.ANYFIED_IMPLS &&
-                functionDescriptor instanceof SimpleFunctionDescriptor) {
+            (functionDescriptor instanceof SimpleFunctionDescriptor || functionDescriptor instanceof PropertyAccessorDescriptor)) {
 
             mv.visitCode();
 
