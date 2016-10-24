@@ -23,6 +23,7 @@ import org.jetbrains.kotlin.diagnostics.DiagnosticSink
 import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtDeclaration
+import org.jetbrains.kotlin.resolve.checkers.SimpleDeclarationChecker
 
 object ValueClassDeclarationChecker : SimpleDeclarationChecker {
     override fun check(
