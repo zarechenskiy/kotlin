@@ -116,7 +116,7 @@ public class PropertyCodegen {
             @Nullable KtPropertyAccessor getter,
             @Nullable KtPropertyAccessor setter
     ) {
-        assert kind == OwnerKind.PACKAGE || kind == OwnerKind.IMPLEMENTATION || kind == OwnerKind.DEFAULT_IMPLS
+        assert kind == OwnerKind.PACKAGE || kind == OwnerKind.IMPLEMENTATION || kind == OwnerKind.DEFAULT_IMPLS || kind == OwnerKind.ANYFIED_IMPLS
                 : "Generating property with a wrong kind (" + kind + "): " + descriptor;
 
         genBackingFieldAndAnnotations(declaration, descriptor, false);
