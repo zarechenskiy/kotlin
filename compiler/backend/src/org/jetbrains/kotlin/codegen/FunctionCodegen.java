@@ -67,6 +67,7 @@ import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodParameterSignature
 import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodSignature;
 import org.jetbrains.kotlin.types.KotlinType;
 import org.jetbrains.kotlin.types.TypeUtils;
+import org.jetbrains.kotlin.util.OperatorNameConventions;
 import org.jetbrains.org.objectweb.asm.*;
 import org.jetbrains.org.objectweb.asm.commons.InstructionAdapter;
 import org.jetbrains.org.objectweb.asm.commons.Method;
@@ -170,6 +171,12 @@ public class FunctionCodegen {
             return;
         }
 
+        if (functionDescriptor instanceof PropertyAccessorDescriptor &&
+            contextKind == OwnerKind.ANYFIED_IMPLS &&
+            ((PropertyAccessorDescriptor) functionDescriptor).isDefault()) {
+            return;
+        }
+
         JvmMethodGenericSignature jvmSignature = typeMapper.mapSignatureWithGeneric(functionDescriptor, contextKind);
         Method asmMethod = jvmSignature.getAsmMethod();
 
@@ -232,7 +239,8 @@ public class FunctionCodegen {
         if (isClass(containingDeclaration) &&
             ((ClassDescriptor) containingDeclaration).isValue() &&
             contextKind != OwnerKind.ANYFIED_IMPLS &&
-            (functionDescriptor instanceof SimpleFunctionDescriptor || functionDescriptor instanceof PropertyAccessorDescriptor)) {
+            (functionDescriptor instanceof SimpleFunctionDescriptor ||
+                (functionDescriptor instanceof PropertyAccessorDescriptor && !((PropertyAccessorDescriptor) functionDescriptor).isDefault()))) {
 
             mv.visitCode();
 
@@ -661,7 +669,7 @@ public class FunctionCodegen {
         iv.visitLabel(label);
         iv.visitLineNumber(1, label);
 
-        boolean unboxMethod = asmMethod.getName().equals("unbox");
+        boolean unboxMethod = asmMethod.getName().equals(OperatorNameConventions.VALUE_UNBOX.asString());
         if (!unboxMethod) {
             iv.load(0, AsmTypes.OBJECT_TYPE);
             iv.visitFieldInsn(Opcodes.GETFIELD, fieldOwnerType.getInternalName(), fieldName, fieldType.getDescriptor());
