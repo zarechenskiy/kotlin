@@ -2447,8 +2447,9 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
             }
 
             DeclarationDescriptor containingDeclaration = propertyDescriptor.getContainingDeclaration();
-            if (containingDeclaration instanceof ClassDescriptor) {
-                if (((ClassDescriptor) containingDeclaration).isValue()) {
+            if (containingDeclaration instanceof ClassDescriptor && ((ClassDescriptor) containingDeclaration).isValue()) {
+                PropertyGetterDescriptor getter = propertyDescriptor.getGetter();
+                if (getter != null && getter.isDefault()) {
                     return receiver;
                 }
             }
@@ -2730,7 +2731,12 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
 
                 PropertyGetterDescriptor getter = propertyDescriptor.getGetter();
                 if (getter != null && !isConstOrHasJvmFieldAnnotation(propertyDescriptor)) {
-                    callableGetter = typeMapper.mapToCallableMethod(getter, isSuper);
+                    if (containingDeclaration instanceof ClassDescriptor && ((ClassDescriptor) containingDeclaration).isValue()) {
+                        callableGetter = typeMapper.mapToAnyfiedCallableMethod(getter, (ClassDescriptor) containingDeclaration);
+                    }
+                    else {
+                        callableGetter = typeMapper.mapToCallableMethod(getter, isSuper);
+                    }
                 }
             }
 
