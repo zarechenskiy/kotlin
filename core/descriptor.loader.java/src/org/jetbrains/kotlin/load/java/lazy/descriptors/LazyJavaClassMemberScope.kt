@@ -666,10 +666,11 @@ class LazyJavaClassMemberScope(
                 continue
             }
             val fakeOverride = functions.find { it.kind == CallableMemberDescriptor.Kind.FAKE_OVERRIDE }
-            if (fakeOverride == null) {
+            val nonFakeOverrides = functions.filter { it.kind != CallableMemberDescriptor.Kind.FAKE_OVERRIDE }
+
+            if (fakeOverride == null || !isNeedAnyfication(fakeOverride, nonFakeOverrides)) {
                 specifiedFunctions.addAll(functions)
             } else {
-                val nonFakeOverrides = functions.filter { it.kind != CallableMemberDescriptor.Kind.FAKE_OVERRIDE }
                 for (fn in nonFakeOverrides) {
                     fn.overriddenDescriptors = fakeOverride.overriddenDescriptors
                 }
@@ -681,11 +682,6 @@ class LazyJavaClassMemberScope(
                                 val fakeReturnType = fakeOverride.returnType
                                 if (fakeReturnType != null) {
                                     setReturnType(fakeReturnType)
-//                                    val returnTypeFromJava = it.returnType
-//
-//                                    if (!fakeReturnType.isCovariantOverride(returnTypeFromJava!!)) {
-//                                        setReturnType(returnTypeFromJava)
-//                                    }
                                 }
 
                                 setSource(it.source)
@@ -718,6 +714,24 @@ class LazyJavaClassMemberScope(
     }
 
     override fun toString() = "Lazy Java member scope for " + jClass.fqName
+}
+
+private fun isNeedAnyfication(fakeOverride: FunctionDescriptor, nonFakeOverrides: List<FunctionDescriptor>): Boolean {
+    if (nonFakeOverrides.any { it.valueParameters.size != fakeOverride.valueParameters.size }) return false
+
+    return containsValueType(fakeOverride)
+}
+
+private fun containsValueType(descriptor: FunctionDescriptor): Boolean {
+    return descriptor.valueParameters.any { containsValueType(it.type) }
+}
+
+private fun containsValueType(type: KotlinType): Boolean {
+    if (TypeUtils.isValueType(type)) {
+        return true
+    }
+
+    return type.arguments.any { containsValueType(it.type) }
 }
 
 private fun KotlinType.isCovariantOverride(typeFromJava: KotlinType): Boolean {
