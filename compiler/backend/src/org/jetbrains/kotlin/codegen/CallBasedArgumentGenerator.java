@@ -17,12 +17,14 @@
 package org.jetbrains.kotlin.codegen;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.kotlin.descriptors.ClassDescriptor;
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor;
 import org.jetbrains.kotlin.load.kotlin.TypeMappingMode;
 import org.jetbrains.kotlin.psi.KtExpression;
 import org.jetbrains.kotlin.psi.ValueArgument;
 import org.jetbrains.kotlin.resolve.calls.model.*;
 import org.jetbrains.kotlin.types.KotlinType;
+import org.jetbrains.kotlin.types.TypeUtils;
 import org.jetbrains.org.objectweb.asm.Type;
 
 import java.util.List;
@@ -86,18 +88,25 @@ public class CallBasedArgumentGenerator extends ArgumentGenerator {
     protected void generateVararg(int i, @NotNull VarargValueArgument argument) {
         ValueParameterDescriptor parameter = valueParameters.get(i);
         boolean useErasedValues;
+        ValueClassInfo valueClassInfo = null;
         if (ExpressionCodegen.isArrayOfValueType(parameter.getType())) {
             KotlinType originalType = parameter.getOriginal().getType();
             if (ExpressionCodegen.isArrayOfAnyfiedType(originalType)) {
                 useErasedValues = true;
             } else {
+                ClassDescriptor descriptor = TypeUtils.getClassDescriptor(parameter.getType().getArguments().get(0).getType());
+                if (descriptor == null) {
+                    valueClassInfo = null;
+                } else {
+                    valueClassInfo = codegen.computeValueClassInfo(descriptor);
+                }
                 useErasedValues = false;
             }
         } else {
             useErasedValues = true;
         }
         Type type = valueParameterTypes.get(i);
-        codegen.genVarargs(argument, parameter.getType(), useErasedValues);
+        codegen.genVarargs(argument, parameter.getType(), useErasedValues, valueClassInfo);
         callGenerator.afterParameterPut(type, null, i);
     }
 

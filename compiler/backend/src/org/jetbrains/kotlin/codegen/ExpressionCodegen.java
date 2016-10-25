@@ -3361,7 +3361,11 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
     }
 
 
-    public void genVarargs(@NotNull VarargValueArgument valueArgument, @NotNull KotlinType outType, boolean useErasedValues) {
+    public void genVarargs(
+            @NotNull VarargValueArgument valueArgument,
+            @NotNull KotlinType outType,
+            boolean useErasedValues,
+            @Nullable ValueClassInfo valueClassInfo) {
         Type type = useErasedValues ? asmType(outType) : typeMapper.mapArrayOfValuesType(outType);
         //Type type = asmType(outType);
         //Type type = typeMapper.mapArrayOfValuesType(outType);
@@ -3447,7 +3451,29 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
             for (int i = 0; i != size; ++i) {
                 v.dup();
                 StackValue rightSide = gen(arguments.get(i).getArgumentExpression());
-                StackValue.arrayElement(elementType, StackValue.onStack(type), StackValue.constant(i, Type.INT_TYPE)).store(rightSide, v);
+                ValueClassInfo infoForBoxing;
+                if (rightSide instanceof StackValue.Constant) {
+                    infoForBoxing = valueClassInfo;
+                } else {
+                    infoForBoxing = null;
+                }
+
+                if (rightSide instanceof StackValue.Local) {
+                    ((StackValue.Local) rightSide).setUseErasedTypes(useErasedValues);
+                }
+
+                Type specializedType;
+                if (valueClassInfo != null) {
+                    specializedType = valueClassInfo.getErasedType();
+                } else {
+                    specializedType = elementType;
+                }
+
+                StackValue arrayElement = StackValue.arrayElement(specializedType, StackValue.onStack(type), StackValue.constant(i, Type.INT_TYPE), infoForBoxing);
+                if (arrayElement instanceof StackValue.ArrayElement) {
+                    ((StackValue.ArrayElement) arrayElement).setUseErasedType(useErasedValues);
+                }
+                arrayElement.store(rightSide, v);
             }
         }
     }
@@ -4215,8 +4241,9 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
     public ValueClassInfo computeValueClassInfo(@NotNull  ClassDescriptor valueClass) {
         Type boxedRepresentation = AsmUtil.boxType(TypeMapperUtilsKt.mapToBoxedRepresentation(typeMapper, valueClass));
         Type container = typeMapper.mapClass(valueClass);
+        Type erasedType = typeMapper.mapType(valueClass);
 
-        return new ValueClassInfo(container, boxedRepresentation);
+        return new ValueClassInfo(container, boxedRepresentation, erasedType);
     }
 
     private void invokePropertyDelegatedOnLocalVar(
@@ -4381,7 +4408,7 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
             StackValue arrayValue = genLazy(array, arrayType);
             StackValue index = genLazy(indices.get(0), Type.INT_TYPE);
 
-            return StackValue.arrayElement(elementType, arrayValue, index, putMetadata);
+            return StackValue.arrayElement(elementType, arrayValue, index, putMetadata, null);
         }
         else {
             ResolvedCall<FunctionDescriptor> resolvedSetCall = bindingContext.get(INDEXED_LVALUE_SET, expression);

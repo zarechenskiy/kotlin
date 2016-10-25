@@ -15530,6 +15530,12 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/values/valueProperty.kt");
                 doTest(fileName);
             }
+
+            @TestMetadata("varargs.kt")
+            public void testVarargs() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/values/varargs.kt");
+                doTest(fileName);
+            }
         }
 
         @TestMetadata("compiler/testData/codegen/box/specialization/valuesBoxing")

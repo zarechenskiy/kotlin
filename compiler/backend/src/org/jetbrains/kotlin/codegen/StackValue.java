@@ -243,12 +243,26 @@ public abstract class StackValue {
 
     @NotNull
     public static StackValue arrayElement(@NotNull Type type, StackValue array, StackValue index) {
-        return arrayElement(type, array, index, null);
+        return arrayElement(type, array, index, null, null);
     }
 
     @NotNull
-    public static StackValue arrayElement(@NotNull Type type, StackValue array, StackValue index, @Nullable Function0<Unit> putMetadata) {
-        return new ArrayElement(type, array, index, putMetadata);
+    public static StackValue arrayElement(
+            @NotNull Type type,
+            StackValue array,
+            StackValue index,
+            @Nullable ValueClassInfo valueClassInfo) {
+        return arrayElement(type, array, index, null, valueClassInfo);
+    }
+
+    @NotNull
+    public static StackValue arrayElement(
+            @NotNull Type type,
+            StackValue array,
+            StackValue index,
+            @Nullable Function0<Unit> putMetadata,
+            @Nullable ValueClassInfo valueClassInfo) {
+        return new ArrayElement(type, array, index, putMetadata, valueClassInfo);
     }
 
     @NotNull
@@ -696,6 +710,7 @@ public abstract class StackValue {
 
         private Function0<Unit> putMetadata;
         private final @Nullable ValueClassInfo valueClassInfo;
+        private volatile boolean useErasedTypes = true;
 
         private Local(int index, Type type, Function0<Unit> putMetadata, @Nullable ValueClassInfo valueClassInfo) {
             super(type, false);
@@ -714,7 +729,7 @@ public abstract class StackValue {
                 putMetadata.invoke();
             }
             v.load(index, this.type);
-            if (StackValue.coerceValue(valueClassInfo, type, this.type)) {
+            if (StackValue.coerceValue(valueClassInfo, type, this.type, useErasedTypes)) {
                 boxValueType(this.type, valueClassInfo, v);
             } else {
                 coerceTo(type, v);
@@ -751,6 +766,10 @@ public abstract class StackValue {
         public void setMetadata(@Nullable Function0<Unit> putMetadata) {
             this.putMetadata = putMetadata;
         }
+
+        public void setUseErasedTypes(boolean useErasedTypes) {
+            this.useErasedTypes = useErasedTypes;
+        }
     }
 
     public static void boxValueType(@NotNull Type fromType, @NotNull ValueClassInfo valueClassInfo, @NotNull InstructionAdapter v) {
@@ -759,13 +778,20 @@ public abstract class StackValue {
         v.invokestatic(
                 anyfiedImpls.getInternalName(),
                 OperatorNameConventions.VALUE_BOX.asString(),
-                "(" + fromType.getDescriptor() + ")" + valueBoxDescriptor,
+                "(" + valueClassInfo.getErasedType().getDescriptor() + ")" + valueBoxDescriptor,
                 false);
     }
 
-    private static boolean coerceValue(@Nullable ValueClassInfo valueClassInfo, @NotNull Type type, @NotNull Type valueType) {
+    private static boolean coerceValue(@Nullable ValueClassInfo valueClassInfo, @NotNull Type type, @NotNull Type valueType, boolean useErasedType) {
+        boolean withBoxType = !useErasedType && (valueClassInfo != null && !valueClassInfo.getValueBox().equals(type));
         return valueClassInfo != null && type.getSort() == Type.OBJECT && !type.equals(valueClassInfo.getContainer()) &&
-                !type.equals(valueType);
+               (!type.equals(valueType) || withBoxType);
+    }
+
+    private static boolean coerceValue(@Nullable ValueClassInfo valueClassInfo, @NotNull Type type, @NotNull Type valueType) {
+        return coerceValue(valueClassInfo, type, valueType, true);
+               //(!type.equals(valueType) ||
+               // (!valueClassInfo.getContainer().equals(valueClassInfo.getValueBox())));
     }
 
     public static class Delegate extends StackValue {
@@ -895,6 +921,8 @@ public abstract class StackValue {
         @Nullable
         private ValueClassInfo valueClassInfo;
 
+        private boolean userErasedType = true;
+
         public Constant(@Nullable Object value, Type type) {
             super(type, false);
             assert !Type.BOOLEAN_TYPE.equals(type) : "Boolean constants should be created via 'StackValue.constant'";
@@ -922,7 +950,7 @@ public abstract class StackValue {
                 v.aconst(value);
             }
 
-            if (valueClassInfo != null && StackValue.coerceValue(valueClassInfo, type, this.type)) {
+            if (valueClassInfo != null && StackValue.coerceValue(valueClassInfo, type, this.type, userErasedType)) {
                 boxValueType(this.type, valueClassInfo, v);
             } else {
                 coerceTo(type, v);
@@ -933,21 +961,33 @@ public abstract class StackValue {
         public void setValueClassInfo(@NotNull ValueClassInfo valueClassInfo) {
             this.valueClassInfo = valueClassInfo;
         }
+
+        public void setUserErasedType(boolean userErasedType) {
+            this.userErasedType = userErasedType;
+        }
     }
 
-    private static class ArrayElement extends StackValueWithSimpleReceiver {
+    public static class ArrayElement extends StackValueWithSimpleReceiver {
         private final Type type;
         private final Function0<Unit> putMetadata;
+        private final ValueClassInfo valueClassInfo;
+        private volatile boolean useErasedType = true;
 
-        public ArrayElement(Type type, StackValue array, StackValue index, Function0<Unit> putMetadata) {
+        public ArrayElement(Type type, StackValue array, StackValue index, Function0<Unit> putMetadata, ValueClassInfo valueClassInfo) {
             super(type, false, false, new Receiver(Type.LONG_TYPE, array, index), true);
             this.type = type;
             this.putMetadata = putMetadata;
+            this.valueClassInfo = valueClassInfo;
         }
 
         @Override
         public void storeSelector(@NotNull Type topOfStackType, @NotNull InstructionAdapter v) {
-            coerceFrom(topOfStackType, v);
+            if (StackValue.coerceValue(valueClassInfo, type, this.type, useErasedType)) {
+                boxValueType(this.type, valueClassInfo, v);
+            } else {
+                coerceFrom(topOfStackType, v);
+            }
+
 
             if (putMetadata != null) {
                 putMetadata.invoke();
@@ -968,7 +1008,16 @@ public abstract class StackValue {
                 putMetadata.invoke();
             }
             v.aload(this.type);    // assumes array and index are on the stack
-            coerceTo(type, v);
+
+            if (StackValue.coerceValue(valueClassInfo, type, this.type)) {
+                boxValueType(this.type, valueClassInfo, v);
+            } else {
+                coerceTo(type, v);
+            }
+        }
+
+        public void setUseErasedType(boolean useErasedType) {
+            this.useErasedType = useErasedType;
         }
     }
 
