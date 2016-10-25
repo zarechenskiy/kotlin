@@ -812,6 +812,10 @@ public class InlineCodegen extends CallGenerator {
     }
 
     private Pair<Type, KotlinType> mapParameter(int parameterIndex) {
+        if (parameterIndex < 0) {
+            return null;
+        }
+
         ValueParameterDescriptor parameterDescriptor = functionDescriptor.getValueParameters().get(parameterIndex);
         return mapParameter(parameterDescriptor);
     }
