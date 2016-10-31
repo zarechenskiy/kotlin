@@ -2813,6 +2813,10 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
                         ValueClassInfo info = computeValueClassInfo(valueClassDescriptor.getDefaultType());
                         ((StackValue.Constant) argument).setValueClassInfo(info);
                     }
+                    else if (argument instanceof StackValue.Local) {
+                        ValueClassInfo info = computeValueClassInfo(valueClassDescriptor.getDefaultType());
+                        ((StackValue.Local) argument).setValueClassInfo(info);
+                    }
                     return argument;
                 }
             }

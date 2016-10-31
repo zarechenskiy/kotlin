@@ -744,8 +744,8 @@ public abstract class StackValue {
         public final int index;
 
         private Function0<Unit> putMetadata;
-        private final @Nullable ValueClassInfo valueClassInfo;
-        private final boolean forceValueBoxing;
+        private @Nullable volatile ValueClassInfo valueClassInfo = null;
+        private volatile boolean forceValueBoxing = false;
 
         private Local(int index, Type type, Function0<Unit> putMetadata, @Nullable ValueClassInfo valueClassInfo, boolean forceValueBoxing) {
             super(type, false);
@@ -789,8 +789,20 @@ public abstract class StackValue {
             v.store(index, this.type);
         }
 
+        public boolean isValue() {
+            return valueClassInfo != null;
+        }
+
         public void setMetadata(@Nullable Function0<Unit> putMetadata) {
             this.putMetadata = putMetadata;
+        }
+
+        public void setValueClassInfo(@Nullable ValueClassInfo valueClassInfo) {
+            this.valueClassInfo = valueClassInfo;
+        }
+
+        public void setForceValueBoxing(boolean forceValueBoxing) {
+            this.forceValueBoxing = forceValueBoxing;
         }
     }
 
