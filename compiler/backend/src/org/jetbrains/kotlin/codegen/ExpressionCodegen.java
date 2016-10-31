@@ -2805,9 +2805,15 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
         if (descriptor instanceof ConstructorDescriptor) {
             DeclarationDescriptor containingDeclaration = descriptor.getContainingDeclaration();
             if (containingDeclaration instanceof ClassDescriptor) {
-                if (((ClassDescriptor) containingDeclaration).isValue()) {
+                ClassDescriptor valueClassDescriptor = (ClassDescriptor) containingDeclaration;
+                if (valueClassDescriptor.isValue()) {
                     KtValueArgument valueArgument = expression.getValueArguments().get(0);
-                    return gen(valueArgument.getArgumentExpression());
+                    StackValue argument = gen(valueArgument.getArgumentExpression());
+                    if (argument instanceof StackValue.Constant) {
+                        ValueClassInfo info = computeValueClassInfo(valueClassDescriptor.getDefaultType());
+                        ((StackValue.Constant) argument).setValueClassInfo(info);
+                    }
+                    return argument;
                 }
             }
             return generateNewCall(expression, resolvedCall);
@@ -4337,7 +4343,14 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
 
     @NotNull
     private StackValue generateNewCall(@NotNull KtCallExpression expression, @NotNull ResolvedCall<?> resolvedCall) {
-        Type type = expressionType(expression);
+        KotlinType expressionType = expressionJetType(expression);
+        Type type = expressionType != null ? typeMapper.mapClass(expressionType) : Type.VOID_TYPE;
+        if (expressionType != null) {
+            type = typeMapper.mapClass(expressionType);
+        } else {
+            type = Type.VOID_TYPE;
+        }
+
         if (type.getSort() == Type.ARRAY) {
             //noinspection ConstantConditions
             return generateNewArray(expression, bindingContext.getType(expression), resolvedCall);
