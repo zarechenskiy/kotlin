@@ -17,6 +17,8 @@
 package org.jetbrains.kotlin.codegen
 
 import org.jetbrains.kotlin.codegen.inline.AnyfiedTypeInliner
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
@@ -64,9 +66,8 @@ abstract class CallGenerator {
                     codegen.putAnyfiedOperationMarkerIfTypeIsReifiedParameter(valueParameterDescriptor.type)
                 }
             } else {
-                if (TypeUtils.isValueType(valueParameterDescriptor.type) && value is StackValue.Constant) {
-                    val valueClassInfo = codegen.computeValueClassInfo(valueParameterDescriptor.type)
-                    value.setValueClassInfo(valueClassInfo)
+                if (value is StackValue.Constant && value.isValue && !TypeUtils.isNonNullValueType(valueParameterDescriptor.type)) {
+                    value.setForceValueBoxing(true)
                 }
                 value.put(parameterType, codegen.v)
             }

@@ -955,6 +955,8 @@ public abstract class StackValue {
         @Nullable
         private ValueClassInfo valueClassInfo;
 
+        private boolean forceValueBoxing = false;
+
         public Constant(@Nullable Object value, Type type) {
             super(type, false);
             assert !Type.BOOLEAN_TYPE.equals(type) : "Boolean constants should be created via 'StackValue.constant'";
@@ -982,16 +984,23 @@ public abstract class StackValue {
                 v.aconst(value);
             }
 
-            if (valueClassInfo != null && StackValue.coerceValue(valueClassInfo, type, this.type)) {
+            if (valueClassInfo != null && StackValue.coerceValue(valueClassInfo, type, this.type, forceValueBoxing)) {
                 boxValueType(this.type, valueClassInfo, v);
             } else {
                 coerceTo(type, v);
             }
-
         }
 
         public void setValueClassInfo(@NotNull ValueClassInfo valueClassInfo) {
             this.valueClassInfo = valueClassInfo;
+        }
+
+        public void setForceValueBoxing(boolean forceValueBoxing) {
+            this.forceValueBoxing = forceValueBoxing;
+        }
+
+        public boolean isValue() {
+            return valueClassInfo != null;
         }
     }
 
