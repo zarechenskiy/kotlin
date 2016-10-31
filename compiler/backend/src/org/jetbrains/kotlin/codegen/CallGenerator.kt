@@ -66,9 +66,13 @@ abstract class CallGenerator {
                     codegen.putAnyfiedOperationMarkerIfTypeIsReifiedParameter(valueParameterDescriptor.type)
                 }
             } else {
-                if (value is StackValue.Constant && value.isValue && !TypeUtils.isNonNullValueType(valueParameterDescriptor.type)) {
-                    value.setForceValueBoxing(true)
+                if (!TypeUtils.isNonNullValueType(valueParameterDescriptor.type)) {
+                    when (value) {
+                        is StackValue.Constant -> if (value.isValue) value.setForceValueBoxing(true)
+                        is StackValue.Local -> if (value.isValue) value.setForceValueBoxing(true)
+                    }
                 }
+
                 value.put(parameterType, codegen.v)
             }
         }
