@@ -488,6 +488,10 @@ public class TypeUtils {
         return false;
     }
 
+    public static boolean isNonNullValueType(@NotNull KotlinType type) {
+        return isValueType(type) && !isNullableType(type);
+    }
+
     @Nullable
     public static TypeParameterDescriptor getTypeParameterDescriptorOrNull(@NotNull KotlinType type) {
         if (type.getConstructor().getDeclarationDescriptor() instanceof TypeParameterDescriptor) {

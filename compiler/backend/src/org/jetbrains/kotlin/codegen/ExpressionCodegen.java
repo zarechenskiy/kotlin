@@ -2281,7 +2281,7 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
                 if (descriptorReturnType != null && TypeUtils.isValueType(descriptorReturnType)) {
                     if (valueToReturn instanceof StackValue.Constant) {
                         @SuppressWarnings("ConstantConditions")
-                        ValueClassInfo info = computeValueClassInfo(TypeUtils.getClassDescriptor(descriptorReturnType));
+                        ValueClassInfo info = computeValueClassInfo(descriptorReturnType);
                         ((StackValue.Constant) valueToReturn).setValueClassInfo(info);
                     }
                 }
@@ -2456,13 +2456,13 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
                 receiver = StackValue.receiverWithoutReceiverArgument(receiver);
             }
 
-            DeclarationDescriptor containingDeclaration = propertyDescriptor.getContainingDeclaration();
-            if (containingDeclaration instanceof ClassDescriptor && ((ClassDescriptor) containingDeclaration).isValue()) {
-                PropertyGetterDescriptor getter = propertyDescriptor.getGetter();
-                if (getter != null && getter.isDefault()) {
-                    return receiver;
-                }
-            }
+            //DeclarationDescriptor containingDeclaration = propertyDescriptor.getContainingDeclaration();
+            //if (containingDeclaration instanceof ClassDescriptor && ((ClassDescriptor) containingDeclaration).isValue()) {
+            //    PropertyGetterDescriptor getter = propertyDescriptor.getGetter();
+            //    if (getter != null && getter.isDefault()) {
+            //        return receiver;
+            //    }
+            //}
 
             return intermediateValueForProperty(propertyDescriptor, directToField, directToField, superCallTarget, false, receiver, resolvedCall);
         }
@@ -2611,13 +2611,11 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
                     };
                 }
 
-                ValueClassInfo valueClassInfo = null;
-                ClassifierDescriptor declarationDescriptor = variableDescriptorType.getConstructor().getDeclarationDescriptor();
-                if (declarationDescriptor instanceof ClassDescriptor) {
-                    ClassDescriptor classDescriptor = (ClassDescriptor) declarationDescriptor;
-                    if ((classDescriptor).isValue()) {
-                        valueClassInfo = computeValueClassInfo(classDescriptor);
-                    }
+                ValueClassInfo valueClassInfo;
+                if (TypeUtils.isValueType(variableDescriptorType)) {
+                    valueClassInfo = computeValueClassInfo(variableDescriptorType);
+                } else {
+                    valueClassInfo = null;
                 }
                 return adjustVariableValue(StackValue.local(index, varType, putMetadata, valueClassInfo), variableDescriptor);
             }
@@ -3214,6 +3212,15 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
         return false;
     }
 
+    public static boolean isArrayOfNonNullValueType(@NotNull KotlinType type) {
+        if (KotlinBuiltIns.isArray(type)) {
+            KotlinType componentType = type.getArguments().get(0).getType();
+            return TypeUtils.isNonNullValueType(componentType);
+        }
+
+        return false;
+    }
+
     public static boolean isExtractedTypeAnyfied(@NotNull KotlinType type) {
         return TypeUtils.isAnyfiedTypeParameter(extractSpecializationType(type));
     }
@@ -3402,9 +3409,8 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
     public void genVarargs(
             @NotNull VarargValueArgument valueArgument,
             @NotNull KotlinType outType,
-            boolean useErasedValues,
             @Nullable ValueClassInfo valueClassInfo) {
-        Type type = useErasedValues ? asmType(outType) : typeMapper.mapArrayOfValuesType(outType);
+        Type type = typeMapper.mapArrayOfValuesType(outType);
         //Type type = asmType(outType);
         //Type type = typeMapper.mapArrayOfValuesType(outType);
         assert type.getSort() == Type.ARRAY;
@@ -3480,7 +3486,7 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
         }
         else {
             v.iconst(arguments.size());
-            if (isArrayOfValueType(outType) && !useErasedValues) {
+            if (valueClassInfo != null && !valueClassInfo.isNullable()) {
                 Type componentType = correctElementType(type);
                 v.newarray(componentType);
             } else {
@@ -3496,21 +3502,26 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
                     infoForBoxing = null;
                 }
 
-                if (rightSide instanceof StackValue.Local) {
-                    ((StackValue.Local) rightSide).setUseErasedTypes(useErasedValues);
-                }
+                //if (rightSide instanceof StackValue.Local) {
+                //    ((StackValue.Local) rightSide).setForceValueBoxing(useErasedValues);
+                //}
 
                 Type specializedType;
                 if (valueClassInfo != null) {
-                    specializedType = valueClassInfo.getErasedType();
+                    specializedType = valueClassInfo.getValueBox();
                 } else {
                     specializedType = elementType;
                 }
 
-                StackValue arrayElement = StackValue.arrayElement(specializedType, StackValue.onStack(type), StackValue.constant(i, Type.INT_TYPE), infoForBoxing);
-                if (arrayElement instanceof StackValue.ArrayElement) {
-                    ((StackValue.ArrayElement) arrayElement).setUseErasedType(useErasedValues);
-                }
+                StackValue arrayElement = StackValue.arrayElement(
+                        specializedType,
+                        StackValue.onStack(type),
+                        StackValue.constant(i, Type.INT_TYPE),
+                        valueClassInfo,
+                        true);
+                //if (arrayElement instanceof StackValue.ArrayElement) {
+                //    ((StackValue.ArrayElement) arrayElement).setForceValueBoxing(useErasedValues);
+                //}
                 arrayElement.store(rightSide, v);
             }
         }
@@ -4251,13 +4262,13 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
         }
 
         ClassifierDescriptor declarationDescriptor = variableType.getConstructor().getDeclarationDescriptor();
-        ValueClassInfo valueBox = null;
-        if (declarationDescriptor instanceof ClassDescriptor) {
-            ClassDescriptor classDescriptor = (ClassDescriptor) declarationDescriptor;
-            if (classDescriptor.isValue()) {
-                valueBox = computeValueClassInfo(classDescriptor);
-            }
+        ValueClassInfo valueBox;
+        if (TypeUtils.isValueType(variableType)) {
+            valueBox = computeValueClassInfo(variableType);
+        } else {
+            valueBox = null;
         }
+
         StackValue storeTo = sharedVarType == null ? StackValue.local(index, varType, valueBox) : StackValue.shared(index, varType);
 
         storeTo.putReceiver(v, false);
@@ -4277,12 +4288,20 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
         }
     }
 
-    public ValueClassInfo computeValueClassInfo(@NotNull  ClassDescriptor valueClass) {
+    public ValueClassInfo computeValueClassInfo(@NotNull KotlinType valueType) {
+        if (!TypeUtils.isValueType(valueType)) {
+            throw new IllegalArgumentException("Could not compute value class info for non-value type: " + valueType);
+        }
+
+        ClassDescriptor valueClass = TypeUtils.getClassDescriptor(valueType);
+
+        //noinspection ConstantConditions
         Type boxedRepresentation = AsmUtil.boxType(TypeMapperUtilsKt.mapToBoxedRepresentation(typeMapper, valueClass));
         Type container = typeMapper.mapClass(valueClass);
         Type erasedType = typeMapper.mapType(valueClass);
+        boolean isNullable = TypeUtils.isNullableType(valueType);
 
-        return new ValueClassInfo(container, boxedRepresentation, erasedType);
+        return new ValueClassInfo(container, boxedRepresentation, erasedType, isNullable);
     }
 
     @NotNull
@@ -4470,7 +4489,7 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
             StackValue arrayValue = genLazy(array, arrayType);
             StackValue index = genLazy(indices.get(0), Type.INT_TYPE);
 
-            return StackValue.arrayElement(elementType, arrayValue, index, putMetadata, null);
+            return StackValue.arrayElement(elementType, arrayValue, index, putMetadata);
         }
         else {
             ResolvedCall<FunctionDescriptor> resolvedSetCall = bindingContext.get(INDEXED_LVALUE_SET, expression);

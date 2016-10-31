@@ -17,6 +17,7 @@
 package org.jetbrains.kotlin.codegen;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.kotlin.builtins.KotlinBuiltIns;
 import org.jetbrains.kotlin.descriptors.ClassDescriptor;
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor;
 import org.jetbrains.kotlin.load.kotlin.TypeMappingMode;
@@ -86,27 +87,19 @@ public class CallBasedArgumentGenerator extends ArgumentGenerator {
 
     @Override
     protected void generateVararg(int i, @NotNull VarargValueArgument argument) {
-        ValueParameterDescriptor parameter = valueParameters.get(i);
-        boolean useErasedValues;
-        ValueClassInfo valueClassInfo = null;
-        if (ExpressionCodegen.isArrayOfValueType(parameter.getType())) {
-            KotlinType originalType = parameter.getOriginal().getType();
-            if (ExpressionCodegen.isArrayOfAnyfiedType(originalType)) {
-                useErasedValues = true;
-            } else {
-                ClassDescriptor descriptor = TypeUtils.getClassDescriptor(parameter.getType().getArguments().get(0).getType());
-                if (descriptor == null) {
-                    valueClassInfo = null;
-                } else {
-                    valueClassInfo = codegen.computeValueClassInfo(descriptor);
-                }
-                useErasedValues = false;
-            }
+        ValueParameterDescriptor descriptor = valueParameters.get(i);
+        KotlinType argumentType = descriptor.getType();
+
+        ValueClassInfo valueClassInfo;
+        if (ExpressionCodegen.isArrayOfValueType(argumentType)) {
+            KotlinType componentType = argumentType.getArguments().get(0).getType();
+            valueClassInfo = codegen.computeValueClassInfo(componentType);
         } else {
-            useErasedValues = true;
+            valueClassInfo = null;
         }
+
         Type type = valueParameterTypes.get(i);
-        codegen.genVarargs(argument, parameter.getType(), useErasedValues, valueClassInfo);
+        codegen.genVarargs(argument, argumentType, valueClassInfo);
         callGenerator.afterParameterPut(type, null, i);
     }
 

@@ -18,5 +18,5 @@ package org.jetbrains.kotlin.codegen
 
 import org.jetbrains.org.objectweb.asm.Type
 
-class ValueClassInfo(val container: Type, val valueBox: Type, val erasedType: Type) {
+class ValueClassInfo(val container: Type, val valueBox: Type, val erasedType: Type, val isNullable: Boolean) {
 }

@@ -65,7 +65,7 @@ abstract class CallGenerator {
                 }
             } else {
                 if (TypeUtils.isValueType(valueParameterDescriptor.type) && value is StackValue.Constant) {
-                    val valueClassInfo = codegen.computeValueClassInfo(TypeUtils.getClassDescriptor(valueParameterDescriptor.type)!!)
+                    val valueClassInfo = codegen.computeValueClassInfo(valueParameterDescriptor.type)
                     value.setValueClassInfo(valueClassInfo)
                 }
                 value.put(parameterType, codegen.v)

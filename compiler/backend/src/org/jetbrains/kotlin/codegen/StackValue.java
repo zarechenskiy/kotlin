@@ -51,6 +51,7 @@ import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodParameterSignature
 import org.jetbrains.kotlin.resolve.scopes.receivers.ReceiverValue;
 import org.jetbrains.kotlin.synthetic.SamAdapterExtensionFunctionDescriptor;
 import org.jetbrains.kotlin.types.KotlinType;
+import org.jetbrains.kotlin.types.TypeUtils;
 import org.jetbrains.kotlin.util.OperatorNameConventions;
 import org.jetbrains.org.objectweb.asm.Label;
 import org.jetbrains.org.objectweb.asm.Type;
@@ -170,17 +171,31 @@ public abstract class StackValue {
 
     @NotNull
     public static Local local(int index, @NotNull Type type) {
-        return local(index, type, null, null);
+        return local(index, type, null, null, false);
     }
 
     @NotNull
     public static Local local(int index, @NotNull Type type, @Nullable ValueClassInfo valueClassInfo) {
-        return local(index, type, null, valueClassInfo);
+        return local(index, type, null, valueClassInfo, false);
     }
 
     @NotNull
-    public static Local local(int index, @NotNull Type type, @Nullable Function0<Unit> putMetadata, @Nullable ValueClassInfo valueClassInfo) {
-        return new Local(index, type, putMetadata, valueClassInfo);
+    public static Local local(
+            int index,
+            @NotNull Type type,
+            @Nullable Function0<Unit> putMetadata,
+            @Nullable ValueClassInfo valueClassInfo) {
+        return local(index, type, putMetadata, valueClassInfo, false);
+    }
+
+    @NotNull
+    public static Local local(
+            int index,
+            @NotNull Type type,
+            @Nullable Function0<Unit> putMetadata,
+            @Nullable ValueClassInfo valueClassInfo,
+            boolean forceValueBoxing) {
+        return new Local(index, type, putMetadata, valueClassInfo, forceValueBoxing);
     }
 
     @NotNull
@@ -243,7 +258,7 @@ public abstract class StackValue {
 
     @NotNull
     public static StackValue arrayElement(@NotNull Type type, StackValue array, StackValue index) {
-        return arrayElement(type, array, index, null, null);
+        return arrayElement(type, array, index, null, null, false);
     }
 
     @NotNull
@@ -252,7 +267,26 @@ public abstract class StackValue {
             StackValue array,
             StackValue index,
             @Nullable ValueClassInfo valueClassInfo) {
-        return arrayElement(type, array, index, null, valueClassInfo);
+        return arrayElement(type, array, index, null, valueClassInfo, false);
+    }
+
+    @NotNull
+    public static StackValue arrayElement(
+            @NotNull Type type,
+            StackValue array,
+            StackValue index,
+            @Nullable ValueClassInfo valueClassInfo,
+            boolean forceValueBoxing) {
+        return arrayElement(type, array, index, null, valueClassInfo, forceValueBoxing);
+    }
+
+    @NotNull
+    public static StackValue arrayElement(
+            @NotNull Type type,
+            StackValue array,
+            StackValue index,
+            @Nullable Function0<Unit> putMetadata) {
+        return arrayElement(type, array, index, putMetadata, null, false);
     }
 
     @NotNull
@@ -261,8 +295,9 @@ public abstract class StackValue {
             StackValue array,
             StackValue index,
             @Nullable Function0<Unit> putMetadata,
-            @Nullable ValueClassInfo valueClassInfo) {
-        return new ArrayElement(type, array, index, putMetadata, valueClassInfo);
+            @Nullable ValueClassInfo valueClassInfo,
+            boolean forceValueBoxing) {
+        return new ArrayElement(type, array, index, putMetadata, valueClassInfo, forceValueBoxing);
     }
 
     @NotNull
@@ -710,13 +745,14 @@ public abstract class StackValue {
 
         private Function0<Unit> putMetadata;
         private final @Nullable ValueClassInfo valueClassInfo;
-        private volatile boolean useErasedTypes = true;
+        private final boolean forceValueBoxing;
 
-        private Local(int index, Type type, Function0<Unit> putMetadata, @Nullable ValueClassInfo valueClassInfo) {
+        private Local(int index, Type type, Function0<Unit> putMetadata, @Nullable ValueClassInfo valueClassInfo, boolean forceValueBoxing) {
             super(type, false);
             this.index = index;
             this.putMetadata = putMetadata;
             this.valueClassInfo = valueClassInfo;
+            this.forceValueBoxing = forceValueBoxing;
 
             if (index < 0) {
                 throw new IllegalStateException("local variable index must be non-negative");
@@ -729,7 +765,7 @@ public abstract class StackValue {
                 putMetadata.invoke();
             }
             v.load(index, this.type);
-            if (StackValue.coerceValue(valueClassInfo, type, this.type, useErasedTypes)) {
+            if (StackValue.coerceValue(valueClassInfo, type, this.type, forceValueBoxing)) {
                 boxValueType(this.type, valueClassInfo, v);
             } else {
                 coerceTo(type, v);
@@ -740,18 +776,8 @@ public abstract class StackValue {
         @Override
         public void storeSelector(@NotNull Type topOfStackType, @NotNull InstructionAdapter v) {
             if (StackValue.coerceValue(valueClassInfo, topOfStackType, this.type)) {
-                //if (this.type.getSort() == Type.OBJECT) {
-                //    coerceFrom(topOfStackType, v);
-                //}
-
                 coerce(topOfStackType, valueClassInfo.getValueBox(), v);
-                Type anyfiedImpls = KotlinTypeMapper.mapAnyfiedImpls(valueClassInfo.getContainer());
-                String valueBoxDescriptor = valueClassInfo.getValueBox().getDescriptor();
-                v.invokestatic(
-                        anyfiedImpls.getInternalName(),
-                        OperatorNameConventions.VALUE_UNBOX.asString(),
-                        "(" + valueBoxDescriptor + ")" + this.type.getDescriptor(),
-                        false);
+                StackValue.unboxValueType(valueClassInfo, v);
 
             } else {
                 coerceFrom(topOfStackType, v);
@@ -766,10 +792,16 @@ public abstract class StackValue {
         public void setMetadata(@Nullable Function0<Unit> putMetadata) {
             this.putMetadata = putMetadata;
         }
+    }
 
-        public void setUseErasedTypes(boolean useErasedTypes) {
-            this.useErasedTypes = useErasedTypes;
-        }
+    public static void unboxValueType(@NotNull ValueClassInfo valueClassInfo, @NotNull InstructionAdapter v) {
+        Type anyfiedImpls = KotlinTypeMapper.mapAnyfiedImpls(valueClassInfo.getContainer());
+        String valueBoxDescriptor = valueClassInfo.getValueBox().getDescriptor();
+        v.invokestatic(
+                anyfiedImpls.getInternalName(),
+                OperatorNameConventions.VALUE_UNBOX.asString(),
+                "(" + valueBoxDescriptor + ")" + valueClassInfo.getErasedType().getDescriptor(),
+                false);
     }
 
     public static void boxValueType(@NotNull Type fromType, @NotNull ValueClassInfo valueClassInfo, @NotNull InstructionAdapter v) {
@@ -782,14 +814,16 @@ public abstract class StackValue {
                 false);
     }
 
-    private static boolean coerceValue(@Nullable ValueClassInfo valueClassInfo, @NotNull Type type, @NotNull Type valueType, boolean useErasedType) {
-        boolean withBoxType = !useErasedType && (valueClassInfo != null && !valueClassInfo.getValueBox().equals(type));
-        return valueClassInfo != null && type.getSort() == Type.OBJECT && !type.equals(valueClassInfo.getContainer()) &&
-               (!type.equals(valueType) || withBoxType);
+    private static boolean coerceValue(@Nullable ValueClassInfo valueClassInfo, @NotNull Type type, @NotNull Type valueType, boolean forceValueBoxing) {
+        if (valueClassInfo == null) return false;
+
+        if (forceValueBoxing && !valueClassInfo.isNullable()) return true;
+
+        return type.getSort() == Type.OBJECT && !type.equals(valueClassInfo.getContainer()) && !type.equals(valueType);
     }
 
     private static boolean coerceValue(@Nullable ValueClassInfo valueClassInfo, @NotNull Type type, @NotNull Type valueType) {
-        return coerceValue(valueClassInfo, type, valueType, true);
+        return coerceValue(valueClassInfo, type, valueType, false);
                //(!type.equals(valueType) ||
                // (!valueClassInfo.getContainer().equals(valueClassInfo.getValueBox())));
     }
@@ -921,8 +955,6 @@ public abstract class StackValue {
         @Nullable
         private ValueClassInfo valueClassInfo;
 
-        private boolean userErasedType = true;
-
         public Constant(@Nullable Object value, Type type) {
             super(type, false);
             assert !Type.BOOLEAN_TYPE.equals(type) : "Boolean constants should be created via 'StackValue.constant'";
@@ -950,7 +982,7 @@ public abstract class StackValue {
                 v.aconst(value);
             }
 
-            if (valueClassInfo != null && StackValue.coerceValue(valueClassInfo, type, this.type, userErasedType)) {
+            if (valueClassInfo != null && StackValue.coerceValue(valueClassInfo, type, this.type)) {
                 boxValueType(this.type, valueClassInfo, v);
             } else {
                 coerceTo(type, v);
@@ -961,29 +993,32 @@ public abstract class StackValue {
         public void setValueClassInfo(@NotNull ValueClassInfo valueClassInfo) {
             this.valueClassInfo = valueClassInfo;
         }
-
-        public void setUserErasedType(boolean userErasedType) {
-            this.userErasedType = userErasedType;
-        }
     }
 
     public static class ArrayElement extends StackValueWithSimpleReceiver {
         private final Type type;
         private final Function0<Unit> putMetadata;
         private final ValueClassInfo valueClassInfo;
-        private volatile boolean useErasedType = true;
+        private final boolean forceValueBoxing;
 
-        public ArrayElement(Type type, StackValue array, StackValue index, Function0<Unit> putMetadata, ValueClassInfo valueClassInfo) {
+        public ArrayElement(
+                Type type,
+                StackValue array,
+                StackValue index,
+                Function0<Unit> putMetadata,
+                ValueClassInfo valueClassInfo,
+                boolean forceValueBoxing) {
             super(type, false, false, new Receiver(Type.LONG_TYPE, array, index), true);
             this.type = type;
             this.putMetadata = putMetadata;
             this.valueClassInfo = valueClassInfo;
+            this.forceValueBoxing = forceValueBoxing;
         }
 
         @Override
         public void storeSelector(@NotNull Type topOfStackType, @NotNull InstructionAdapter v) {
-            if (StackValue.coerceValue(valueClassInfo, type, this.type, useErasedType)) {
-                boxValueType(this.type, valueClassInfo, v);
+            if (StackValue.coerceValue(valueClassInfo, topOfStackType, this.type, forceValueBoxing)) {
+                boxValueType(topOfStackType, valueClassInfo, v);
             } else {
                 coerceFrom(topOfStackType, v);
             }
@@ -1014,10 +1049,6 @@ public abstract class StackValue {
             } else {
                 coerceTo(type, v);
             }
-        }
-
-        public void setUseErasedType(boolean useErasedType) {
-            this.useErasedType = useErasedType;
         }
     }
 
@@ -1207,6 +1238,18 @@ public abstract class StackValue {
             }
             CallGenerator callGenerator = getCallGenerator();
             callGenerator.genCall(getter, resolvedGetCall, genDefaultMaskIfPresent(callGenerator), codegen);
+
+            KotlinType returnType = resolvedGetCall.getCandidateDescriptor().getReturnType();
+            if (returnType != null && TypeUtils.isValueType(returnType)) {
+                ValueClassInfo valueClassInfo = codegen.computeValueClassInfo(returnType);
+                if (StackValue.coerceValue(valueClassInfo, type, this.type)) {
+                    coerceTo(valueClassInfo.getValueBox(), v);
+                    StackValue.unboxValueType(valueClassInfo, v);
+
+                    return;
+                }
+            }
+
             coerceTo(type, v);
         }
 
@@ -1383,14 +1426,23 @@ public abstract class StackValue {
                 assert backingFieldOwner != null : "Property should have either a getter or a backingFieldOwner: " + descriptor;
                 if (inlineJavaConstantIfNeeded(type, v)) return;
 
-                v.visitFieldInsn(isStaticPut ? GETSTATIC : GETFIELD,
-                                 backingFieldOwner.getInternalName(), fieldName, this.type.getDescriptor());
-                genNotNullAssertionForLateInitIfNeeded(v);
+                if (codegen.getContext().getContextKind() != OwnerKind.ANYFIED_IMPLS || !isContainingDeclarationStatic(descriptor)) {
+                    v.visitFieldInsn(isStaticPut ? GETSTATIC : GETFIELD,
+                                     backingFieldOwner.getInternalName(), fieldName, this.type.getDescriptor());
+                    genNotNullAssertionForLateInitIfNeeded(v);
+                }
+
                 coerceTo(type, v);
             }
             else {
                 PropertyGetterDescriptor getterDescriptor = descriptor.getGetter();
                 assert getterDescriptor != null : "Getter descriptor should be not null for " + descriptor;
+
+                if (isContainingDeclarationStatic(descriptor)) {
+                    if (getterDescriptor.isDefault()) {
+                        return;
+                    }
+                }
                 if (resolvedCall != null && getterDescriptor.isInline()) {
                     CallGenerator callGenerator = codegen.getOrCreateCallGenerator(resolvedCall, getterDescriptor);
                     callGenerator.putHiddenParams();
@@ -1407,6 +1459,11 @@ public abstract class StackValue {
                     v.athrow();
                 }
             }
+        }
+
+        private static boolean isContainingDeclarationStatic(PropertyDescriptor descriptor) {
+            DeclarationDescriptor containingDeclaration = descriptor.getContainingDeclaration();
+            return containingDeclaration instanceof ClassDescriptor && ((ClassDescriptor) containingDeclaration).isValue();
         }
 
         private boolean inlineJavaConstantIfNeeded(@NotNull Type type, @NotNull InstructionAdapter v) {
