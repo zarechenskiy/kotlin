@@ -27,7 +27,7 @@ class ExtendsC extends C {
 
     @Override
     @NotNull
-    public Long foo() { return 52; }
+    public Long foo() { return 52L; }
 }
 
 // FILE: 1.kt

@@ -662,32 +662,23 @@ class LazyJavaClassMemberScope(
         val specifiedFunctions = arrayListOf<SimpleFunctionDescriptor>()
         for ((functionName, functions) in contributedFunctions.groupBy { it.name }) {
             if (functions.size == 1) {
-                specifiedFunctions.addAll(functions)
-                continue
+                val descriptorWithValue = overridenDescriptorWithValueType(functions[0])
+                if (descriptorWithValue == null) {
+                    specifiedFunctions.addAll(functions)
+                    continue
+                } else {
+                    specifiedFunctions.addAll(anyfyFunctions(listOf(functions[0]), descriptorWithValue))
+                    continue
+                }
             }
+
             val fakeOverride = functions.find { it.kind == CallableMemberDescriptor.Kind.FAKE_OVERRIDE }
             val nonFakeOverrides = functions.filter { it.kind != CallableMemberDescriptor.Kind.FAKE_OVERRIDE }
 
             if (fakeOverride == null || !isNeedAnyfication(fakeOverride, nonFakeOverrides)) {
                 specifiedFunctions.addAll(functions)
             } else {
-                for (fn in nonFakeOverrides) {
-                    fn.overriddenDescriptors = fakeOverride.overriddenDescriptors
-                }
-                val sp = nonFakeOverrides
-                        .mapNotNull {
-                            it.newCopyBuilder().apply {
-                                setValueParameters(fakeOverride.valueParameters)
-
-                                val fakeReturnType = fakeOverride.returnType
-                                if (fakeReturnType != null) {
-                                    setReturnType(fakeReturnType)
-                                }
-
-                                setSource(it.source)
-                            }.build()
-                        }
-                specifiedFunctions.addAll(sp)
+                specifiedFunctions.addAll(anyfyFunctions(nonFakeOverrides, fakeOverride))
             }
         }
         return specifiedFunctions
@@ -716,6 +707,32 @@ class LazyJavaClassMemberScope(
     override fun toString() = "Lazy Java member scope for " + jClass.fqName
 }
 
+private fun anyfyFunctions(functionsToAnyfy: List<SimpleFunctionDescriptor>, functionWithValue: FunctionDescriptor): List<SimpleFunctionDescriptor> {
+    for (fn in functionsToAnyfy) {
+        fn.overriddenDescriptors = functionWithValue.overriddenDescriptors
+    }
+    return functionsToAnyfy
+            .mapNotNull {
+                it.newCopyBuilder().apply {
+                    setValueParameters(functionWithValue.valueParameters)
+
+                    val fakeReturnType = functionWithValue.returnType
+                    if (fakeReturnType != null) {
+                        setReturnType(fakeReturnType)
+                    }
+
+                    setSource(it.source)
+                }.build()
+            }
+}
+
+private fun overridenDescriptorWithValueType(function: FunctionDescriptor): FunctionDescriptor? {
+    val overriddenDescriptors = function.overriddenDescriptors
+    if (overriddenDescriptors.isEmpty()) return null
+
+    return overriddenDescriptors.find(::containsValueType)
+}
+
 private fun isNeedAnyfication(fakeOverride: FunctionDescriptor, nonFakeOverrides: List<FunctionDescriptor>): Boolean {
     if (nonFakeOverrides.any { it.valueParameters.size != fakeOverride.valueParameters.size }) return false
 
@@ -723,7 +740,7 @@ private fun isNeedAnyfication(fakeOverride: FunctionDescriptor, nonFakeOverrides
 }
 
 private fun containsValueType(descriptor: FunctionDescriptor): Boolean {
-    return descriptor.valueParameters.any { containsValueType(it.type) }
+    return descriptor.valueParameters.any { containsValueType(it.type) } || (descriptor.returnType?.let(::containsValueType) ?: false)
 }
 
 private fun containsValueType(type: KotlinType): Boolean {
