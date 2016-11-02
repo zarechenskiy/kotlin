@@ -27,6 +27,7 @@ import org.jetbrains.kotlin.resolve.BindingContext;
 import org.jetbrains.kotlin.resolve.DescriptorUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -88,6 +89,12 @@ public abstract class ClassBodyCodegen extends MemberCodegen<KtClassOrObject> {
             for (DeclarationDescriptor memberDescriptor : DescriptorUtils.getAllDescriptors(descriptor.getDefaultType().getMemberScope())) {
                 if (memberDescriptor instanceof CallableMemberDescriptor) {
                     CallableMemberDescriptor member = (CallableMemberDescriptor) memberDescriptor;
+                    if (kind == OwnerKind.ANYFIED_IMPLS &&
+                        member.getKind() == CallableMemberDescriptor.Kind.DELEGATION &&
+                        member instanceof FunctionDescriptor) {
+                        CallableMemberDescriptor overridenDescriptor = member.getOverriddenDescriptors().iterator().next();
+                        functionCodegen.genDelegate((FunctionDescriptor) member, (FunctionDescriptor) overridenDescriptor, null);
+                    }
                     if (!member.getKind().isReal() && ImplKt.findInterfaceImplementation(member) == null) {
                         if (member instanceof FunctionDescriptor) {
                             functionCodegen.generateBridges((FunctionDescriptor) member);
