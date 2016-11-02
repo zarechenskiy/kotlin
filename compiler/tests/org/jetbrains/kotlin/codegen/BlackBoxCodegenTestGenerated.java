@@ -15796,6 +15796,12 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
                 doTest(fileName);
             }
 
+            @TestMetadata("genericValueWithGenericErasedValue.kt")
+            public void testGenericValueWithGenericErasedValue() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/javaInterop/genericValueWithGenericErasedValue.kt");
+                doTest(fileName);
+            }
+
             @TestMetadata("genericValueWithSimpleErasedType.kt")
             public void testGenericValueWithSimpleErasedType() throws Exception {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/specialization/javaInterop/genericValueWithSimpleErasedType.kt");
