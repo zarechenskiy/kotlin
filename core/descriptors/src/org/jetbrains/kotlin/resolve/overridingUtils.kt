@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@
 package org.jetbrains.kotlin.resolve
 
 import org.jetbrains.kotlin.descriptors.CallableDescriptor
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
+import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.types.TypeUtils
 import org.jetbrains.kotlin.utils.DFS
 import org.jetbrains.kotlin.utils.SmartSet
 import java.util.*
@@ -80,4 +83,16 @@ fun <H : Any> Collection<H>.selectMostSpecificInEachOverridableGroup(
         result.add(mostSpecific)
     }
     return result
+}
+
+fun containsValueType(descriptor: CallableDescriptor): Boolean {
+    return descriptor.valueParameters.any { containsValueType(it.type) } || (descriptor.returnType?.let(::containsValueType) ?: false)
+}
+
+private fun containsValueType(type: KotlinType): Boolean {
+    if (TypeUtils.isValueType(type)) {
+        return true
+    }
+
+    return type.arguments.any { !it.isStarProjection && containsValueType(it.type) }
 }
