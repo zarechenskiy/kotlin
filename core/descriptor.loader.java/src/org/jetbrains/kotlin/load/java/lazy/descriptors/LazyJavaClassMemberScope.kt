@@ -748,7 +748,7 @@ private fun containsValueType(type: KotlinType): Boolean {
         return true
     }
 
-    return type.arguments.any { containsValueType(it.type) }
+    return type.arguments.any { !it.isStarProjection && containsValueType(it.type) }
 }
 
 private fun KotlinType.isCovariantOverride(typeFromJava: KotlinType): Boolean {
