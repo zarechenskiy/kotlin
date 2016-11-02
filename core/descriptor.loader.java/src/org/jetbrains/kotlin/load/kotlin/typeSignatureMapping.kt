@@ -18,6 +18,7 @@ package org.jetbrains.kotlin.load.kotlin
 
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.load.java.typeEnhancement.hasEnhancedNullability
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.name.SpecialNames
@@ -137,7 +138,12 @@ fun <T : Any> mapType(
                             TypeUtils.makeNullableAsSpecified(customBox, TypeUtils.isNullableType(kotlinType))
                         }
 
-                    !mode.needValueClassWrapping && !mode.needValueClassBoxing -> descriptor.representationTypeOfValueClass().type
+                    !mode.needValueClassWrapping && !mode.needValueClassBoxing -> {
+                        val propertyDescriptor = descriptor.representationTypeOfValueClass()
+                        val substitutedProperty = kotlinType.memberScope.getContributedVariables(propertyDescriptor.name, NoLookupLocation.FROM_BACKEND)
+
+                        substitutedProperty.first().type
+                    }
                     else -> null
                 }
 
