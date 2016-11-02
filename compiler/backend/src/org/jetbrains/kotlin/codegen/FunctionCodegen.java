@@ -1257,7 +1257,9 @@ public class FunctionCodegen {
 
                         InstructionAdapter iv = new InstructionAdapter(mv);
                         iv.load(0, OBJECT_TYPE);
-                        field.put(field.type, iv);
+                        if (field != null) {
+                            field.put(field.type, iv);
+                        }
                         for (int i = 0, reg = 1; i < argTypes.length; i++) {
                             StackValue.local(reg, argTypes[i]).put(originalArgTypes[i], iv);
                             //noinspection AssignmentToForLoopParameter
