@@ -136,8 +136,6 @@ class LazyJavaClassDescriptor(
 
     override fun getFunctionTypeForSamInterface(): SimpleType? = functionTypeForSamInterface()
 
-    override fun isCompanionObject() = false
-
     override fun toString() = "Lazy Java class ${this.fqNameUnsafe}"
 
     private inner class LazyJavaClassTypeConstructor : AbstractClassTypeConstructor(c.storageManager) {
@@ -219,8 +217,6 @@ class LazyJavaClassDescriptor(
 
         override val supertypeLoopChecker: SupertypeLoopChecker
             get() = c.components.supertypeLoopChecker
-
-        override val annotations: Annotations get() = Annotations.EMPTY
 
         override fun isFinal(): Boolean = isFinalClass
 

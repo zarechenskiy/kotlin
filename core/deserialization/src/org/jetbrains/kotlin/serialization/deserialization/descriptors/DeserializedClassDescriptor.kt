@@ -167,7 +167,7 @@ class DeserializedClassDescriptor(
             if (unresolved.isNotEmpty()) {
                 c.components.errorReporter.reportIncompleteHierarchy(
                         this@DeserializedClassDescriptor,
-                        unresolved.map { it.classId.asSingleFqName().asString() }
+                        unresolved.map { it.classId?.asSingleFqName()?.asString() ?: it.name.asString() }
                 )
             }
 
@@ -181,8 +181,6 @@ class DeserializedClassDescriptor(
         override fun isDenotable() = true
 
         override fun getDeclarationDescriptor() = this@DeserializedClassDescriptor
-
-        override val annotations: Annotations get() = Annotations.EMPTY // TODO
 
         override fun toString() = name.toString()
 

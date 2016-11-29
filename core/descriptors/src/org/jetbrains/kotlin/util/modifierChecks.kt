@@ -237,7 +237,7 @@ object OperatorChecks : AbstractModifierChecks() {
             Checks(VALUE_UNBOX, Member, ValueParameterCountCheck.SingleValueParameter, NoDefaultAndVarargsCheck, NoTypeParametersCheck) {
                 checkIsInValueClass()
                 ?: checkUnboxReturnTypeEqualsValue()
-            }
+            },
             Checks(COROUTINE_INTERCEPT_RESUME, Member, ValueParameterCountCheck.Equals(1), ReturnsUnit, NoDefaultAndVarargsCheck,
                    NoTypeParametersCheck
             ) {
